@@ -1,0 +1,198 @@
+<div class="bg-white rounded-lg shadow-xl w-full overflow-visible" (click)="$event.stopPropagation()">
+  <!-- HEADER -->
+  <div class="flex justify-between items-center px-6 py-4 border-b">
+    <h2 class="text-lg font-semibold">
+      {{ mode }} Análisis Físico — {{ targetLabel }}
+    </h2>
+  </div>
+
+  <!-- FORMULARIO -->
+  <form class="grid grid-cols-5 gap-4 p-6">
+    <!-- Fila 1 -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Peso Muestra (g)</label>
+      <input type="number" [(ngModel)]="form.peso_muestra" name="peso_muestra" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Peso Pergamino (g)</label>
+      <input type="number" [(ngModel)]="form.peso_pergamino" name="peso_pergamino"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">WA (%)</label>
+      <input type="number" [(ngModel)]="form.wa" name="wa" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+
+    <!-- Fila 2 -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Temp. WA (°C)</label>
+      <input type="number" [(ngModel)]="form.temperatura_wa" name="temperatura_wa"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Humedad (%)</label>
+      <input type="number" [(ngModel)]="form.humedad" name="humedad" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Temp. Humedad (°C)</label>
+      <input type="number" [(ngModel)]="form.temperatura_humedad" name="temperatura_humedad"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+
+    <!-- Fila 3 -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Densidad (g/L)</label>
+      <input type="number" [(ngModel)]="form.densidad" name="densidad" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Color Grano Verde</label>
+      <input type="text" [(ngModel)]="form.color_grano_verde" name="color_grano_verde"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Olor</label>
+      <input type="text" [(ngModel)]="form.olor" name="olor" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+
+    <!-- Fila 4 -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Malla >18</label>
+      <input type="number" [(ngModel)]="form.superior_malla_18" name="superior_malla_18"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Malla >16</label>
+      <input type="number" [(ngModel)]="form.superior_malla_16" name="superior_malla_16"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Malla >14</label>
+      <input type="number" [(ngModel)]="form.superior_malla_14" name="superior_malla_14"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+
+    <!-- Fila 5 -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Malla &lt;16</label>
+      <input type="number" [(ngModel)]="form.menor_malla_16" name="menor_malla_16"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-1">Peso Defectos (g)</label>
+      <input type="number" [(ngModel)]="form.peso_defectos" name="peso_defectos" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Quaquers</label>
+      <input type="number" [(ngModel)]="form.quaquers" name="quaquers" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+
+    <!-- Fila 6 -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Peso Muestra Tostada (g)</label>
+      <input type="number" [(ngModel)]="form.peso_muestra_tostada" name="peso_muestra_tostada"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Desarrollo (%)</label>
+      <input type="number" [(ngModel)]="form.desarrollo" name="desarrollo" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">% Caramelización</label>
+      <input type="number" [(ngModel)]="form.pocentaje_caramelizcacion" name="pocentaje_caramelizcacion"
+        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+
+    <!-- Fila 7 -->
+    <div>
+      <label class="block text-sm font-medium mb-1">C. Desarrollo</label>
+      <input type="number" [(ngModel)]="form.c_desarrollo" name="c_desarrollo" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Grado</label>
+      <input type="text" [(ngModel)]="form.grado" name="grado" class="w-full border rounded px-3 py-2"
+        (ngModelChange)="persist()" />
+    </div>
+
+    <!-- Fila 8: defectos -->
+    <!-- Defectos Primarios -->
+    <div class="col-span-2 relative" #primContainer>
+      <label class="block text-sm font-medium mb-1">Defectos Primarios</label>
+      <div (click)="togglePrimDropdown()"
+        class="flex items-center justify-between border rounded px-3 py-2 cursor-pointer focus-within:ring-2 focus-within:ring-[#B8672E]">
+        <span class="flex-1 truncate">
+          {{ form.defectos_primarios?.length
+          ? form.defectos_primarios?.join(', ')
+          : 'Selecciona defectos primarios' }}
+        </span>
+        <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
+      </div>
+      <div *ngIf="showPrimDropdown"
+        class="absolute z-10 mt-1 w-full bg-white border rounded shadow max-h-52 overflow-auto">
+        <input type="text" name="filterPrim" [(ngModel)]="filterPrim" (click)="$event.stopPropagation()"
+          placeholder="Filtrar…" class="w-full px-3 py-2 border-b focus:outline-none" />
+        <ul>
+          <li *ngFor="let o of filteredPrimOptions" (click)="$event.stopPropagation(); onTogglePrim(o)"
+            class="px-3 py-2 hover:bg-gray-100 flex items-center cursor-pointer">
+            <input type="checkbox" [checked]="form.defectos_primarios?.includes(o)" class="mr-2"
+              (click)="$event.stopPropagation()" />
+            <span class="flex-1">{{ o }}</span>
+          </li>
+          <li *ngIf="!filteredPrimOptions.length" class="px-3 py-2 text-gray-500">
+            No hay coincidencias
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Defectos Secundarios -->
+    <div class="col-span-2 relative" #secContainer>
+      <label class="block text-sm font-medium mb-1">Defectos Secundarios</label>
+      <div (click)="toggleSecDropdown()"
+        class="flex items-center justify-between border rounded px-3 py-2 cursor-pointer focus-within:ring-2 focus-within:ring-[#B8672E]">
+        <span class="flex-1 truncate">
+          {{ form.defectos_secundarios?.length
+          ? form.defectos_secundarios?.join(', ')
+          : 'Selecciona defectos secundarios' }}
+        </span>
+        <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
+      </div>
+      <div *ngIf="showSecDropdown"
+        class="absolute z-10 mt-1 w-full bg-white border rounded shadow max-h-52 overflow-auto">
+        <input type="text" name="filterSec" [(ngModel)]="filterSec" (click)="$event.stopPropagation()"
+          placeholder="Filtrar…" class="w-full px-3 py-2 border-b focus:outline-none" />
+        <ul>
+          <li *ngFor="let o of filteredSecOptions" (click)="$event.stopPropagation(); onToggleSec(o)"
+            class="px-3 py-2 hover:bg-gray-100 flex items-center cursor-pointer">
+            <input type="checkbox" [checked]="form.defectos_secundarios?.includes(o)" class="mr-2"
+              (click)="$event.stopPropagation()" />
+            <span class="flex-1">{{ o }}</span>
+          </li>
+          <li *ngIf="!filteredSecOptions.length" class="px-3 py-2 text-gray-500">
+            No hay coincidencias
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div class="col-span-5">
+      <label class="block text-sm font-medium mb-1">Comentario</label>
+      <textarea [(ngModel)]="form.comentario" name="comentario" class="w-full border rounded px-3 py-2" rows="3"
+        (ngModelChange)="persist()"></textarea>
+    </div>
+
+  </form>
+
+
+
+</div>

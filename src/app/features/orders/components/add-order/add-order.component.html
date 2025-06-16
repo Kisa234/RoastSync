@@ -1,0 +1,82 @@
+<!-- src/app/features/orders/components/add-order/add-order.component.html -->
+<div class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-xl overflow-auto">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-[#E5E5E5]">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Nuevo Pedido</h2>
+        <p class="text-gray-600 text-sm">Crea una orden de Venta Verde o Tostado Verde</p>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+        <lucide-icon [img]="X" class="w-5 h-5"/>
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form (ngSubmit)="onSave()" class="grid grid-cols-2 gap-x-6 gap-y-4 px-6 py-5">
+      <!-- Tipo Pedido -->
+      <div>
+        <label for="tipo" class="block text-gray-700 text-sm mb-1">Tipo Pedido *</label>
+        <select id="tipo" name="tipo_pedido" [(ngModel)]="model.tipo_pedido" required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+          <option value="" disabled selected>Selecciona tipo</option>
+          <option *ngFor="let t of tipos" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+
+      <!-- Cliente -->
+      <div>
+        <label for="cliente" class="block text-gray-700 text-sm mb-1">Cliente *</label>
+        <select id="cliente" name="id_user" [(ngModel)]="model.id_user" required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+          <option value="" disabled selected>Selecciona cliente</option>
+          <option *ngFor="let u of clientes" [value]="u.id_user">{{ u.nombre }}</option>
+        </select>
+      </div>
+
+      <!-- Lote -->
+      <div>
+        <label for="lote" class="block text-gray-700 text-sm mb-1">Lote *</label>
+        <select id="lote" name="id_lote" [(ngModel)]="model.id_lote" (change)="onLoteChange()" required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+          <option value="" disabled selected>Selecciona lote</option>
+          <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
+        </select>
+      </div>
+
+      <!-- Cantidad Pedido -->
+      <div>
+        <label for="cantidad" class="block text-gray-700 text-sm mb-1">Cantidad (Gr) *</label>
+        <input id="cantidad" name="cantidad" type="number" min="1" [(ngModel)]="model.cantidad" required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+      </div>
+
+      <!-- Disponible -->
+      <div>
+        <label class="block text-gray-700 text-sm mb-1">Disponible (Gr)</label>
+        <input type="text" [value]="availableQty | number:'1.0-0'" disabled
+          class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700" />
+      </div>
+
+      <!-- Comentario -->
+      <div class="col-span-2">
+        <label for="comentario" class="block text-gray-700 text-sm mb-1">Comentario</label>
+        <textarea id="comentario" name="comentario" [(ngModel)]="model.comentario" rows="4"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"></textarea>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="flex justify-end items-center space-x-4 px-6 py-4 border-t border-[#E5E5E5]">
+      <button (click)="onCancel()"
+        class="px-4 py-2 border border-[#A67C52] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition">
+        Cancelar
+      </button>
+      <button (click)="onSave()"
+        class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition flex items-center">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2"/>Guardar
+      </button>
+    </div>
+  </div>
+</div>

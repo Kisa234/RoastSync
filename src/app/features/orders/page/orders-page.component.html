@@ -1,0 +1,113 @@
+<!-- src/app/features/orders/page/orders-page.component.html -->
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Pedidos</h1>
+      <p class="text-gray-600">Gestiona pedidos de Venta Verde y Tostado Verde</p>
+    </div>
+    <button
+      class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+      (click)="openAdd()"
+    >
+      <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+      Agregar Pedido
+    </button>
+  </div>
+
+  <!-- Contenedor principal -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 space-y-6">
+
+    <!-- Título de sección -->
+    <div>
+      <h2 class="text-xl font-semibold text-[#1F1F1F]">Lista de Pedidos</h2>
+    </div>
+
+    <!-- Buscador -->
+    <div class="max-w-md">
+      <div class="relative">
+        <input
+          type="text"
+          [(ngModel)]="filterText"
+          (ngModelChange)="onSearchChange()"
+          placeholder="Buscar..."
+          class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
+                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition"
+        />
+        <lucide-icon
+          [img]="Search"
+          class="absolute left-1 top-1/2 transform -translate-y-1/2 text-gray-400"
+        />
+      </div>
+    </div>
+
+    <!-- Tabla de Pedidos -->
+    <div class="overflow-x-auto m-1 rounded-lg shadow-sm ">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo Pedido</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad (Gr)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let p of pedidos$ | async" class="hover:bg-[#F9F9F9]">
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.tipo_pedido }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.cantidad.toLocaleString('en-US') }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_lote }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.estado_pedido }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.fecha_registro | date:'dd/MM/yyyy' }}</td>
+            <td class="px-6 py-4 text-right text-sm space-x-2">
+              <button (click)="view(p)"   class="text-gray-500 hover:text-[#B8672E]">
+                <lucide-icon [img]="Eye" class="w-5 h-5" />
+              </button>
+              <button (click)="edit(p)"   class="text-gray-500 hover:text-[#B8672E]">
+                <lucide-icon [img]="Edit2" class="w-5 h-5" />
+              </button>
+              <button (click)="delete(p)" class="text-gray-500 hover:text-red-600">
+                <lucide-icon [img]="Trash2" class="w-5 h-5" />
+              </button>
+              <button (click)="complete(p)" class="text-gray-500 hover:text-green-600">
+                <lucide-icon [img]="Check" class="w-5 h-5" />
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="(pedidos$ | async)?.length === 0">
+            <td colspan="8" class="px-6 py-6 text-center text-gray-500">
+              No hay pedidos registrados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Modal de creación -->
+  <add-order
+    *ngIf="showAddOrder"
+    (close)="showAddOrder = false"
+    (create)="onOrderCreated($event)"
+  ></add-order>
+
+  <edit-order
+    *ngIf="showEditOrder"
+    [orderId]="selectedOrderId"
+    (close)="showEditOrder = false"
+    (edit)="onOrderEdit($event)"
+    >
+  </edit-order>
+
+  <view-order
+    *ngIf="showViewOrder"
+    [orderId]="selectedOrderId"
+    (close)="showViewOrder = false"
+    >
+  </view-order>
+
+</div>

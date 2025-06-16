@@ -1,0 +1,116 @@
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md overflow-visible">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-[#E5E5E5]">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Agregar Usuarios</h2>
+        <p class="text-gray-600 text-sm">Registra un nuevo usuarios en el sistema</p>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+        <lucide-icon [img]="X" class="w-5 h-5" />
+      </button>
+    </div>
+
+    <!-- Formulario -->
+    <form class="grid grid-cols-2 gap-x-6 gap-y-4 px-6 py-5">
+      <!-- Nombre -->
+      <div class="col-span-2">
+        <label for="nombre" class="block text-gray-700 text-sm mb-1">Nombre *</label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          [(ngModel)]="model.nombre"
+          required
+          placeholder="Ej: Carlos Mendoza"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+                 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition"
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="col-span-2">
+        <label for="email" class="block text-gray-700 text-sm mb-1">Email *</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          [(ngModel)]="model.email"
+          required
+          placeholder="cliente@ejemplo.com"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+                 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition"
+        />
+      </div>
+
+      <!-- Contrasena -->
+      <div class="col-span-2">
+        <label for="password" class="block text-gray-700 text-sm mb-1">Contraseña *</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          [(ngModel)]="model.password"
+          required
+          placeholder="Contraseña"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+                 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition"
+        />
+      </div>
+
+      <!-- Teléfono -->
+      <div class="col-span-2 sm:col-span-1">
+        <label for="telefono" class="block text-gray-700 text-sm mb-1">Teléfono</label>
+        <input
+          id="telefono"
+          name="numero_telefono"
+          type="tel"
+          [(ngModel)]="model.numero_telefono"
+          placeholder="+57 300 123 4567"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+                 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition"
+        />
+      </div>
+
+      <!-- Rol -->
+      <div class="col-span-2 sm:col-span-1">
+        <label for="rol" class="block text-gray-700 text-sm mb-1">Rol *</label>
+        <div class="relative">
+          <select
+            id="rol"
+            name="rol"
+            [(ngModel)]="model.rol"
+            class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition"
+          >
+            <option *ngFor="let r of roles" [value]="r.value">
+              {{ r.label }}
+            </option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5] space-x-2">
+      <button
+        (click)="onCancel()"
+        class="px-4 py-2 rounded-lg border border-[#A67C52] text-[#1F1F1F] hover:bg-[#F3F2F1] transition"
+      >
+        Cancelar
+      </button>
+      <button
+        (click)="onSave()"
+        class="px-4 py-2 rounded-lg bg-[#B8672E] text-white hover:bg-[#A67C52] transition flex items-center"
+      >
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />
+        Guardar Cliente
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,109 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto flex flex-col">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div class="">
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Tuestes</h1>
+      <p class="text-gray-600">Gestiona las órdenes de tueste y revisa el historial</p>
+    </div>
+    <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+      (click)="openAddRoaster()">
+      <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+      Nuevo Tostado
+    </button>
+  </div>
+
+  <!-- 1) Pendientes -->
+  <section class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <h2 class="text-lg font-semibold text-[#1F1F1F] mb-2">Órdenes de Tostado Pendientes</h2>
+    <div *ngIf="pendingOrders.length; else none">
+      <ul class="space-y-4">
+        <li *ngFor="let o of pendingOrders"
+          class="border border-[#E5E5E5] rounded-lg p-4 flex justify-between items-center">
+          <div>
+            <div class="font-medium">{{ o.id_lote }}</div>
+            <div class="text-sm text-gray-600">
+              {{ o.cantidad | number }} Gr - {{o.pesos?.length}} Batch — Cliente: {{(o.userName)}}
+            </div>
+            <div class="text-sm text-gray-600">
+              Fecha: {{ o.fecha_tueste | date:'dd/MM/yyyy' }} —
+              Tipo de Tueste: <span class="inline-block  px-2 py-0.5 text-xs rounded-full" [ngClass]="{
+                  'bg-blue-100 text-blue-800': o.comentario==='Tueste Claro',
+                  'bg-yellow-100 text-yellow-800': o.comentario==='Tueste Medio',
+                  'bg-gray-800 text-white': o.comentario==='Tueste Oscuro'
+                }">{{ o.comentario }}</span>
+            </div>
+
+
+          </div>
+          <div class="flex gap-2">
+            <button
+              class=" flex items-center px-4 py-2  shadow bg-[#B8672E] text-white rounded hover:bg-[#A67C52] transition"
+              >
+              <lucide-icon [img]="Edit" class="w-5 h-5 mr-2" />
+              Editar Orden
+            </button>
+            <button
+              class=" flex items-center px-4 py-2  shadow bg-[#B8672E] text-white rounded hover:bg-[#A67C52] transition"
+              (click)="openRoasts(o)">
+              <lucide-icon [img]="Eye" class="w-5 h-5 mr-2" />
+              Ver Tuestes
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <ng-template #none>
+      <p class="text-gray-500">No hay órdenes de tueste pendientes.</p>
+    </ng-template>
+  </section>
+
+  <!-- 2) Historial -->
+  <section class="flex-1 bg-white rounded-lg shadow-sm p-6 overflow-auto">
+    <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Historial de Tuestes</h2>
+    <div class="mb-4 flex space-x-4">
+      <input type="date" [(ngModel)]="historyDate" (change)="loadHistory()"
+        class="border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+      <select [(ngModel)]="historyLevel" (change)="loadHistory()"
+        class="border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+        <option value="">Todos los niveles</option>
+        <option *ngFor="let lvl of roastLevels" [value]="lvl">{{ lvl }}</option>
+      </select>
+    </div>
+    <div *ngIf="historyRoasts.length; else noHist">
+      <ul class="space-y-4">
+        <li *ngFor="let h of historyRoasts" class="border border-[#E5E5E5] rounded-lg p-4">
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <span class="font-medium">{{ h.id_lote }}</span>
+              <span class="text-sm text-gray-600"> — {{ h.fecha_tueste | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="inline-block px-2 py-0.5 text-xs rounded-full" [ngClass]="{
+                  'bg-blue-100 text-blue-800': h.comentario==='Tueste Claro',
+                  'bg-yellow-100 text-yellow-800': h.comentario==='Tueste Medio',
+                  'bg-gray-800 text-white': h.comentario==='Tueste Oscuro'
+                }">{{ h.comentario }}</span>
+              <span class="inline-block px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded-full">
+                Completado
+              </span>
+            </div>
+          </div>
+          <div class="text-sm text-gray-700">
+            Cantidad: {{ h.cantidad | number }} Gr
+
+          </div>
+
+        </li>
+      </ul>
+    </div>
+    <ng-template #noHist>
+      <p class="text-gray-500">No hay tuestes en el historial.</p>
+    </ng-template>
+  </section>
+</div>
+
+<!-- Modal de Progreso de Tueste -->
+<add-roaster *ngIf="showAddRoaster" (close)="showAddRoaster = false" (create)="onRoasterCreated($event)"></add-roaster>
+
+<order-roasts *ngIf="showRoastsModal" [orderId]="selectedOrder?.id_pedido!"
+  [deliveryDate]="selectedOrder?.fecha_registro!" (close)="showRoastsModal=false"></order-roasts>

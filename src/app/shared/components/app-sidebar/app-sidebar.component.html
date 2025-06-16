@@ -1,0 +1,21 @@
+<nav class="bg-[#30251D] text-white h-screen flex flex-col justify-between">
+  <!-- Logo -->
+  <div class="px-6 py-4 flex items-center space-x-2">
+    <lucide-icon [img]="Coffee"></lucide-icon>
+    <span class="text-xl font-semibold">RoastSync</span>
+  </div>
+
+  <!-- Menú -->
+  <ul class="flex-1 px-2 space-y-1">
+    <li *ngFor="let link of links">
+      <a
+        [routerLink]="link.path"
+        routerLinkActive="bg-[#B8672E]/20"
+        class="flex items-center px-4 py-3 rounded hover:bg-[#B8672E]/20"
+      >
+        <lucide-icon [img]="link.icon"></lucide-icon>
+        <span class="ml-3">{{ link.label }}</span>
+      </a>
+    </li>
+  </ul>
+</nav>

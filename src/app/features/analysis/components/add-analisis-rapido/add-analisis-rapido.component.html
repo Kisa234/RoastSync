@@ -1,0 +1,75 @@
+<div class="bg-white rounded-lg shadow-lg w-full overflow-auto" (click)="$event.stopPropagation()">
+  <!-- Header -->
+  <div class="flex justify-between items-center px-6 py-4 border-b">
+    <div>
+      <h2 class="text-xl font-semibold">
+        {{ mode }} Análisis Rápido
+        <span *ngIf="targetLabel">– {{ targetLabel }}</span>
+      </h2>
+      <p class="text-sm text-gray-600">Registra los atributos rápidos de tueste</p>
+    </div>
+
+  </div>
+
+  <!-- Formulario -->
+  <form class="grid grid-cols-3 gap-4 p-6">
+    <!-- Horneado -->
+    <div class="flex items-center space-x-2">
+      <input type="checkbox" [(ngModel)]="form.horneado" name="horneado" 
+        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
+        (ngModelChange)="persist()"/>
+      <label class="text-sm">Horneado</label>
+    </div>
+
+    <!-- Humo -->
+    <div class="flex items-center space-x-2">
+      <input type="checkbox" [(ngModel)]="form.humo" name="humo"
+        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
+        (ngModelChange)="persist()"/>
+      <label class="text-sm">Humo</label>
+    </div>
+
+    <!-- Uniforme -->
+    <div class="flex items-center space-x-2">
+      <input type="checkbox" [(ngModel)]="form.uniforme" name="uniforme"
+        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
+        (ngModelChange)="persist()"/>
+      <label class="text-sm">Uniforme</label>
+    </div>
+
+    <!-- Verde -->
+    <div class="flex items-center space-x-2">
+      <input type="checkbox" [(ngModel)]="form.verde" name="verde"
+        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
+        (ngModelChange)="persist()"/>
+      <label class="text-sm">Verde</label>
+    </div>
+
+    <!-- Arrebatado -->
+    <div class="flex items-center space-x-2">
+      <input type="checkbox" [(ngModel)]="form.arrebatado" name="arrebatado"
+        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
+        (ngModelChange)="persist()"/>
+      <label class="text-sm">Arrebatado</label>
+    </div>
+
+    <!-- Oscuro -->
+    <div class="flex items-center space-x-2">
+      <input type="checkbox" [(ngModel)]="form.oscuro" name="oscuro"
+        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
+        (ngModelChange)="persist()"/>
+      <label class="text-sm">Oscuro</label>
+    </div>
+
+    <!-- Comentario -->
+    <div class="col-span-3">
+      <label class="block text-sm font-medium mb-1">Comentario</label>
+      <textarea rows="3" [(ngModel)]="form.comentario" name="comentario"
+        class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]"
+        (ngModelChange)="persist()"></textarea>
+    </div>
+  </form>
+
+  <!-- Footer -->
+
+</div>

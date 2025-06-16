@@ -1,0 +1,134 @@
+<div class="fixed inset-0  bg-opacity-50 backdrop-blur-md  flex items-center justify-center z-40 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg overflow-visible">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-[#E5E5E5]">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Crear Nueva Muestra</h2>
+        <p class="text-gray-600 text-sm">Registra una nueva muestra</p>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+        <lucide-icon [img]="X" class="w-5 h-5" />
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form class="grid grid-cols-2 gap-x-6 gap-y-4 px-6 py-5">
+      <!-- Productor -->
+      <div class="col-span-2 sm:col-span-1">
+        <label class="block text-gray-700 text-sm mb-1" for="productor">
+          Productor *
+        </label>
+        <input id="productor" type="text" [(ngModel)]="model.productor" name="productor" required
+          placeholder="Ej: Simon Brown" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+      </div>
+
+      <!-- Finca -->
+      <div class="col-span-2 sm:col-span-1">
+        <label class="block text-gray-700 text-sm mb-1" for="finca">
+          Finca *
+        </label>
+        <input id="finca" type="text" [(ngModel)]="model.finca" name="finca" required placeholder="Ej: Las Chimoyas"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+      </div>
+
+      <!-- Región -->
+      <div class="col-span-2 sm:col-span-1">
+        <label class="block text-gray-700 text-sm mb-1" for="region">
+          Región
+        </label>
+        <input id="region" type="text" [(ngModel)]="model.region" name="region" placeholder="Ej: Jaen" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+      </div>
+
+      <!-- Departamento -->
+      <div class="col-span-2 sm:col-span-1">
+        <label class="block text-gray-700 text-sm mb-1" for="departamento">
+          Departamento
+        </label>
+        <input id="departamento" type="text" [(ngModel)]="model.departamento" name="departamento"
+          placeholder="Ej: Cajamarca" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+      </div>
+
+      <!-- Peso (kg) -->
+      <div class="col-span-2 sm:col-span-1">
+        <label class="block text-gray-700 text-sm mb-1" for="peso">
+          Peso (gr) *
+        </label>
+        <input id="peso" type="number" min="0" [(ngModel)]="model.peso" name="peso" required class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+      </div>
+
+
+      <!-- Variedades -->
+      <div class="col-span-2 relative" #varietyContainer>
+        <label class="block text-gray-700 text-sm mb-1">Variedades</label>
+
+        <!-- “textbox” que abre/cierra -->
+        <div (click)="toggleVarDropdown()" class="flex items-center justify-between border border-[#E5E5E5] rounded-lg px-3 py-2 cursor-pointer
+           focus-within:ring-2 focus-within:ring-[#B8672E]">
+          <span class="flex-1 text-gray-700 truncate">
+            {{ (model.variedades?.length
+            ? (model.variedades || []).join(', ')
+            : 'Ej: Caturra, Castillo') }}
+          </span>
+          <lucide-icon name="ChevronDown" class="w-4 h-4 text-gray-400" />
+        </div>
+
+        <!-- desplegable -->
+        <div *ngIf="showVarDropdown" class="absolute z-10 mt-1 w-full bg-white border border-[#E5E5E5]
+           rounded-lg shadow max-h-52 overflow-auto">
+          <!-- **Fíjate que hemos añadido name="filterVar"** -->
+          <input type="text" name="filterVar" [(ngModel)]="filterVar" placeholder="Filtrar..."
+            class="w-full px-3 py-2 border-b border-[#E5E5E5] focus:outline-none" />
+
+          <ul>
+            <li *ngFor="let v of filteredVariedades" (click)="onVarToggle(v)"
+              class="px-3 py-2 hover:bg-gray-100 flex items-center cursor-pointer">
+              <!-- Elimina pointer-events-none para que el li reciba el click -->
+              <input type="checkbox" [checked]="model.variedades?.includes(v)" class="mr-2" />
+              <span class="flex-1">{{ v }}</span>
+            </li>
+            <li *ngIf="!filteredVariedades.length" class="px-3 py-2 text-gray-500">
+              No hay coincidencias
+            </li>
+          </ul>
+        </div>
+      </div>
+
+
+
+      <!-- Proceso -->
+      <div class="col-span-2">
+        <label class="block text-gray-700 text-sm mb-1">Proceso</label>
+        <div class="relative">
+          <select [(ngModel)]="model.proceso" name="proceso" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="" disabled selected>Selecciona el proceso</option>
+            <option *ngFor="let p of procesos" [value]="p">{{ p }}</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <lucide-icon name="ChevronDown" class="w-4 h-4 text-gray-400" />
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="flex justify-end items-center space-x-4 px-6 py-4 border-t border-[#E5E5E5]">
+      <button (click)="onCancel()"
+        class="px-4 py-2 rounded-lg border border-[#A67C52] text-[#1F1F1F] hover:bg-[#F3F2F1] transition">
+        Cancelar
+      </button>
+      <button (click)="onSave()"
+        class="px-4 py-2 rounded-lg bg-[#B8672E] text-white hover:bg-[#A67C52] transition flex items-center">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />
+        Crear Muestra
+      </button>
+    </div>
+
+  </div>
+</div>

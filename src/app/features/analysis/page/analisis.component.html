@@ -1,0 +1,134 @@
+<div class="p-6 bg-[#F9F9F9] h-full overflow-auto">
+  <div class="grid grid-cols-4 gap-6 h-full">
+    <!-- Zona principal (col-span-2) -->
+    <div class="col-span-3">
+      <!-- Header y acción -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-[#1F1F1F]">Análisis de Café</h1>
+          <p class="text-gray-600 text-sm">Gestiona análisis simultáneos</p>
+        </div>
+        <button (click)="addAnalysis()"
+          class="bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition">
+          {{ actionButtonLabel }}
+        </button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-medium mb-1">Tipo de Target</label>
+          <select [(ngModel)]="selectedTargetType" (ngModelChange)="onTargetTypeChange($event)"
+            class="w-full border rounded px-3 py-2">
+            <option *ngFor="let t of targetTypes" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">{{ selectLabel }}</label>
+          <select [(ngModel)]="selectedLot" class="w-full border rounded px-3 py-2">
+            <option value="">{{ selectLabel }}</option>
+            <ng-container *ngIf="selectedTargetType==='Lote'">
+              <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
+            </ng-container>
+            <ng-container *ngIf="selectedTargetType==='Muestra'">
+              <option *ngFor="let m of muestras" [value]="m.id_muestra">{{ m.id_muestra }}</option>
+            </ng-container>
+            <ng-container *ngIf="selectedTargetType==='Café Tostado'">
+              <option *ngFor="let t of tostados" [value]="t.id_lote_tostado">{{ t.id_lote_tostado }}</option>
+            </ng-container>
+          </select>
+        </div>
+      </div>
+
+      <!-- Pestañas -->
+      <div class="flex border-b border-[#E5E5E5] mb-6">
+        <button *ngIf="selectedTargetType!=='Café Tostado'" (click)="selectedTab='fisico'" [ngClass]="selectedTab==='fisico'
+                  ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
+          class="px-4 py-2 transition">Análisis Físico</button>
+        <button *ngIf="selectedTargetType!=='Café Tostado'" (click)="selectedTab='sensorial'" [ngClass]="selectedTab==='sensorial'
+                  ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
+          class="px-4 py-2 transition">Análisis Sensorial</button>
+        <button *ngIf="selectedTargetType==='Café Tostado'" (click)="selectedTab='rapido'" [ngClass]="selectedTab==='rapido'
+                  ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
+          class="px-4 py-2 transition">Análisis Rápido</button>
+      </div>
+
+      
+
+      <div *ngIf="showModal && selectedTab==='fisico'" class="mb-6 w-full">
+        <add-analisis-fisico
+          class="w-full"
+          [targetLabel]="`${selectedTargetType} ${selectedLot}`"
+          [mode]="selectedMode"
+          (saved)="onModalSaved()"
+          (close)="closeModal()"
+        ></add-analisis-fisico>
+      </div>
+      
+      <div *ngIf="showModal && selectedTab==='sensorial'" class="mb-6 w-full">
+        <add-analisis-sensorial
+          class="w-full"
+          [targetLabel]="`${selectedTargetType} ${selectedLot}`"
+          [mode]="selectedMode"
+          (saved)="onModalSaved()"
+          (close)="closeModal()"
+        ></add-analisis-sensorial>
+      </div>
+
+      <div *ngIf="showModal && selectedTab==='rapido'" class="mb-6 w-full">
+        <add-analisis-rapido
+          class="w-full"
+          [targetLabel]="`${selectedTargetType} ${selectedLot}`"
+          [mode]="selectedMode"
+          (saved)="onModalSaved()"
+          (close)="closeModal()"
+        ></add-analisis-rapido>
+      </div>
+
+      <!-- Vistas previas -->
+      <div *ngIf="selectedTab==='fisico'" class="mb-6">
+        <!-- TODO: listado de análisis físicos ya creados -->
+      </div>
+      <div *ngIf="selectedTab==='sensorial'" class="mb-6">
+        <!-- TODO: listado de análisis sensoriales ya creados -->
+      </div>
+      <div *ngIf="selectedTab==='rapido'">
+        <!-- TODO: listado de análisis rápidos ya creados -->
+      </div>
+    </div>
+
+
+
+    <!-- Zona Target (col-span-1) -->
+    <aside class="flex flex-col justify-between col-span-1 bg-white rounded-lg shadow p-4 overflow-auto">
+      <div class="">
+        <h2 class="text-lg font-semibold mb-4">Historial</h2>
+        <ul class="space-y-2">
+            <li *ngFor="let h of history; let i = index" class="cursor-pointer flex p-2 border rounded hover:bg-gray-100"
+            (click)="onSelectHistory(h)">
+            <div class="flex w-full items-center justify-between">
+              <div class="">
+                <div class="text-sm font-medium">
+                  {{ h.targetType }} {{ h.targetId }}
+                </div>
+                <div class="text-xs text-gray-600">
+                  {{ h.analysisType }} — {{ h.mode }}
+                </div>
+              </div>
+              <button (click)="deleteHistory(i,$event)" class="text-red-500 hover:text-red-700">
+                <lucide-icon [img]="X" class="w-4 h-4" />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      
+      <button (click)="saveAllPhysicalAndSensorial()"
+        class="bg-[#B8672E] text-white px-4 py-2 rounded">
+        Guardar Físico & Sensorial
+      </button>
+    </aside>
+
+  </div>
+</div>
+

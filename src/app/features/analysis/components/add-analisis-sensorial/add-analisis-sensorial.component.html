@@ -1,0 +1,113 @@
+  <div class="bg-white rounded-lg shadow-lg w-full overflow-auto"  (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b">
+      <div>
+        <h2 class="text-xl font-semibold">
+          {{ mode }} Análisis Sensorial
+          <span *ngIf="targetLabel">– {{ targetLabel }}</span>
+        </h2>
+        <p class="text-sm text-gray-600">Completa los datos del análisis sensorial</p>
+      </div>
+      
+    </div>
+
+    <!-- Formulario -->
+    <form class="grid grid-cols-4 gap-4 p-6">
+      <!-- Fila 1 -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Fragancia / Aroma</label>
+        <input type="number" [(ngModel)]="form.fragancia_aroma" name="fragancia_aroma"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" 
+               (ngModelChange)="persist()"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Sabor</label>
+        <input type="number" [(ngModel)]="form.sabor" name="sabor"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" 
+               (ngModelChange)="persist()"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Sabor Residual</label>
+        <input type="number" [(ngModel)]="form.sabor_residual" name="sabor_residual"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]"
+               (ngModelChange)="persist()" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Acidez</label>
+        <input type="number" [(ngModel)]="form.acidez" name="acidez"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]"
+               (ngModelChange)="persist()" />
+      </div>
+
+      <!-- Fila 2 -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Cuerpo</label>
+        <input type="number" [(ngModel)]="form.cuerpo" name="cuerpo"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]"
+               (ngModelChange)="persist()" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Uniformidad</label>
+        <input type="number" [(ngModel)]="form.uniformidad" name="uniformidad"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]"
+               (ngModelChange)="persist()" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Balance</label>
+        <input type="number" [(ngModel)]="form.balance" name="balance"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" 
+               (ngModelChange)="persist()"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Taza Limpia</label>
+        <input type="number" [(ngModel)]="form.taza_limpia" name="taza_limpia"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" 
+               (ngModelChange)="persist()"/>
+      </div>
+
+      <!-- Fila 3 -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Dulzor</label>
+        <input type="number" [(ngModel)]="form.dulzor" name="dulzor"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" 
+               (ngModelChange)="persist()"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Puntaje Catador</label>
+        <input type="number" [(ngModel)]="form.puntaje_catador" name="puntaje_catador"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" 
+               (ngModelChange)="persist()"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1"># Taza defecto leve</label>
+        <input type="number" [(ngModel)]="form.taza_defecto_ligero" name="taza_defecto_ligero"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" 
+               (ngModelChange)="persist()"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1"># Taza defecto fuerte</label>
+        <input type="number" [(ngModel)]="form.tazas_defecto_rechazo" name="tazas_defecto_rechazo"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" 
+               (ngModelChange)="persist()"/>
+      </div>
+
+      <!-- Fila 4 -->
+      <div class="col-span-3">
+        <label class="block text-sm font-medium mb-1">Puntaje Taza</label>
+        <input type="number" [(ngModel)]="form.puntaje_taza" name="puntaje_taza"
+               class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]"
+               (ngModelChange)="persist()" />
+      </div>
+
+      <!-- Comentario -->
+      <div class="col-span-4">
+        <label class="block text-sm font-medium mb-1">Comentario</label>
+        <textarea rows="3" [(ngModel)]="form.comentario" name="comentario"
+                  class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]"
+                  (ngModelChange)="persist()"></textarea>
+      </div>
+    </form>
+
+    
+  
+  </div>
