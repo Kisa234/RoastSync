@@ -1,0 +1,70 @@
+<div class="min-h-screen bg-[#FFF9EF] flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg shadow-md w-full max-w-md p-8 border border-[#E5E5E5]">
+
+    <!-- Logo -->
+    <div class="flex justify-center mb-6">
+      <div class="bg-[#FFEBD6] p-4 rounded-full">
+        <lucide-angular [name]='Coffee' class="w-12 h-12 text-[#A67C52]" aria-hidden="true"></lucide-angular>
+      </div>
+    </div>
+
+    <!-- Título -->
+    <h1 class="text-center text-2xl font-semibold text-[#1F1F1F] mb-1">Iniciar Sesión</h1>
+    <p class="text-center text-[#7A7A7A] mb-6">Ingresa tu correo electrónico y contraseña para continuar</p>
+
+    <!-- Formulario -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" aria-label="Formulario de inicio de sesión">
+
+      <!-- Email -->
+      <label for="email" class="block text-sm font-medium text-[#1F1F1F] mb-1">Correo electrónico</label>
+      <div class="relative mb-4">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#A67C52]">
+          <lucide-angular [name]='Mail' class="w-4 h-4" aria-hidden="true"></lucide-angular>
+        </span>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="ejemplo@email.com"
+          class="pl-10 pr-4 py-2 w-full rounded-md bg-[#F9F9F9] border border-[#E5E5E5] focus:outline-none focus:ring-2 focus:ring-[#B8672E] placeholder-gray-400"
+          aria-required="true"
+          aria-describedby="emailError"
+        />
+      </div>
+      <div *ngIf="email.invalid && email.touched" id="emailError" class="text-red-600 text-sm mb-4">
+        Ingresa un correo válido.
+      </div>
+
+      <!-- Contraseña -->
+      <label for="password" class="block text-sm font-medium text-[#1F1F1F] mb-1">Contraseña</label>
+      <div class="relative mb-6">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#A67C52]">
+          <lucide-angular [name]='Lock' class="w-4 h-4" aria-hidden="true"></lucide-angular>
+        </span>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="********"
+          class="pl-10 pr-4 py-2 w-full rounded-md bg-[#F9F9F9] border border-[#E5E5E5] focus:outline-none focus:ring-2 focus:ring-[#B8672E] placeholder-gray-400"
+          aria-required="true"
+        />
+      </div>
+      <div *ngIf="password.invalid && password.touched" class="text-red-600 text-sm mb-4">
+        La contraseña debe tener al menos 6 caracteres.
+      </div>
+
+      <!-- Botón -->
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || loading"
+        class="w-full py-2 rounded-md text-white font-medium bg-gradient-to-r from-[#C8A88D] to-[#A67C52] hover:opacity-90 transition disabled:opacity-50"
+      >
+        {{ loading ? 'Iniciando...' : 'Iniciar Sesión' }}
+      </button>
+      <div *ngIf="errorMsg" class="text-center text-red-600 text-sm mt-4">
+        {{ errorMsg }}
+      </div>
+    </form>
+  </div>
+</div>

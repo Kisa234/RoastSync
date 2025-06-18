@@ -9,10 +9,6 @@ import { AlertComponent } from './shared/components/alert/alert.component';
   selector: 'app-root',
   imports: [
     RouterOutlet,
-    SidebarComponent,
-    RouterModule,
-    AlertComponent,
-    ConfirmDialogComponent
   ],
   templateUrl: './app.component.html',
   styles: [
