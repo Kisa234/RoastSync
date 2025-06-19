@@ -5,7 +5,7 @@
     "ng": "ng",
     "dev": "ng serve -o",
     "start": "ng serve",
-    "build": "npm install && ng build --configuration=production --base-href=/",
+    "build": "npm install && ng build --configuration=production --base-href=/ && sed -i \"s|REPLACE_ME|$API_URL|\" dist/roast-sync/browser/assets/env.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
