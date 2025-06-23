@@ -12,6 +12,8 @@ import { PedidoService } from '../../orders/service/orders.service';
 import { UserService } from '../../users/service/users-service.service';
 import { catchError, map, Observable, of } from 'rxjs';
 import { OrderRoastsComponent } from '../components/order-roasts/order-roasts.component';
+import { EditRoastComponent } from '../components/edit-roast/edit-roast.component';
+import { EditOrderComponent } from '../components/edit-order/edit-order.component';
 
 interface ExtendedPedido extends Pedido {
   userName?: string;
@@ -27,7 +29,8 @@ interface ExtendedPedido extends Pedido {
     NgFor,
     LucideAngularModule,
     AddRoasterComponent,
-    OrderRoastsComponent
+    OrderRoastsComponent,
+    EditOrderComponent
   ],
   templateUrl: './roast-page.component.html',
 })
@@ -46,6 +49,7 @@ export class RoastsPage {
   historyDate   = '';
   historyLevel  = '';
   showRoastsModal = false;
+  showEditRoastModal = false;
   selectedOrder?: Pedido;
 
   constructor(
@@ -101,6 +105,11 @@ export class RoastsPage {
   openRoasts(o: Pedido) {
     this.selectedOrder = o;
     this.showRoastsModal = true;
+  }
+
+  onEditRoast(o: Pedido) {
+    this.selectedOrder = o;
+    this.showEditRoastModal = true;
   }
 
   onRoasterCreated(data: any) {
