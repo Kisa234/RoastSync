@@ -1,39 +1,60 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
-import { catchError, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+
+interface LoginResp {
+  accessToken: string;
+  refreshToken: string;
+  user: { id_user: string; email: string; rol: string };
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/user`;
-  private accessToken: string | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient) {}
 
-  login(email: string, password: string) {
-    return this.http.post<any>(`${this.apiUrl}/login`, { email, password }, { withCredentials: true } );
+  login(email: string, password: string): Observable<LoginResp> {
+    return this.http
+      .post<LoginResp>(`${this.apiUrl}/login`, { email, password })
+      .pipe(
+        tap(resp => {
+          localStorage.setItem('access_token', resp.accessToken);
+          localStorage.setItem('refresh_token', resp.refreshToken);
+        })
+      );
   }
 
   refreshAccessToken() {
-    return this.http.get<{ accessToken: string }>(`${this.apiUrl}/refresh`, { withCredentials: true });
+    const refreshToken = localStorage.getItem('refresh_token');
+    return this.http
+      .post<{ accessToken: string }>(`${this.apiUrl}/refresh`, { refreshToken })
+      .pipe(
+        tap(r => {
+          localStorage.setItem('access_token', r.accessToken);
+        })
+      );
   }
-
-  checkSession() {
-  return this.http.get<{ id: string, email: string, rol: string }>(`${this.apiUrl}/me`, {
-    withCredentials: true
-  }).pipe(
-    // Esto se asegura de que cualquier 401 lance error
-    catchError(err => {
-      return throwError(() => err);
-    })
-  );
-}
 
   logout() {
     localStorage.removeItem('access_token');
-    this.accessToken = null;
-    this.router.navigate(['/auth/login']);
+    localStorage.removeItem('refresh_token');
   }
 
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refresh_token');
+  }
+
+  // PARA TUS GUARDS: comprueba sesión llamando /me
+  checkSession() {
+    return this.http.get<{ id: string; email: string; rol: string }>(
+      `${this.apiUrl}/me`
+    );
+  }
 }

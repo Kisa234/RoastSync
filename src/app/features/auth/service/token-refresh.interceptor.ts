@@ -1,39 +1,38 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+// src/app/features/auth/service/token-refresh.interceptor.ts
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 
-export const TokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
+export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  const currentPath = location.pathname;
-
   return next(req).pipe(
     catchError(err => {
-      const hasRefreshToken = document.cookie.includes('refreshToken=');
-
-      if (
-        err.status === 401 &&
-        !req.url.includes('/user/login') &&
-        !req.url.includes('/user/refresh') &&
-        hasRefreshToken &&
-        currentPath !== '/login'
-      ) {
+      const isAuthCall = req.url.includes('/login') || req.url.includes('/refresh');
+      const refreshToken = auth.getRefreshToken();
+      if (err.status === 401 && !isAuthCall && refreshToken) {
         return auth.refreshAccessToken().pipe(
-          switchMap(() => next(req)),
-          catchError(error => {
+          switchMap(() => {
+            const newToken = auth.getToken()!;
+            const cloned = req.clone({
+              setHeaders: { Authorization: `Bearer ${newToken}` }
+            });
+            return next(cloned);
+          }),
+          catchError(() => {
+            auth.logout();
             router.navigate(['/login']);
-            return throwError(() => error);
+            return throwError(() => err);
           })
         );
       }
-
-      if (err.status === 401 && currentPath !== '/login') {
+      if (err.status === 401 && !isAuthCall) {
+        auth.logout();
         router.navigate(['/login']);
       }
-
       return throwError(() => err);
     })
   );

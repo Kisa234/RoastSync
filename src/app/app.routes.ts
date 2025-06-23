@@ -25,7 +25,7 @@ export const appRoutes: Routes = [
   {
     path: 'login',
     component: AuthLayoutComponent,
-    canActivate: [ smartRedirectGuard ],
+    canActivateChild: [ smartRedirectGuard ],
     children: [
       { path: '', component: AuthComponent }
     ]

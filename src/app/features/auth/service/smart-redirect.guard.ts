@@ -1,15 +1,16 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from './auth.service';
-import { firstValueFrom } from 'rxjs';
 
-export const smartRedirectGuard: CanActivateFn = async () => {
+export const smartRedirectGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);
   const router = inject(Router);
-  try {
-    await firstValueFrom(auth.checkSession());
+
+  const token = auth.getToken();
+  if (token) {
+    // si hay token, directo al dashboard
     return router.parseUrl('/dashboard');
-  } catch {
-    return true;
   }
+  // si no, muestro el login
+  return true;
 };
