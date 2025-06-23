@@ -160,7 +160,7 @@ export class ReportLoteComponent implements OnInit {
     }else{
       this.muestraSvc.getById(this.MuestraId!).pipe(
       tap(m => this.muestra = m),
-      switchMap(m => this.analisisSvc.getAnalisisById(m.analisis_id!)),
+      switchMap(m => this.analisisSvc.getAnalisisById(m.id_analisis!)),
       tap(a => this.analisis = a),
       switchMap(a => this.afSvc.getAnalisisById(a.analisisFisico_id!)),
       tap(f => this.af = f),

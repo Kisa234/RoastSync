@@ -10,5 +10,5 @@ export interface Muestra {
   fecha_registro: Date;
   eliminado: boolean;
   id_user?: string;
-  analisis_id?: string;
+  id_analisis?: string;
 }

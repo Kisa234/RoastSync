@@ -8,5 +8,7 @@ import { RouterOutlet } from '@angular/router';
   styles: ``
 })
 export class AuthLayoutComponent {
-
+  constructor() {
+    console.log('🔐 AuthLayoutComponent cargado');
+  }  
 }

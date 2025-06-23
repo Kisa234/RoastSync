@@ -8,6 +8,8 @@ export const TokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
+  const currentPath = location.pathname;
+
   return next(req).pipe(
     catchError(err => {
       const hasRefreshToken = document.cookie.includes('refreshToken=');
@@ -16,7 +18,8 @@ export const TokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
         err.status === 401 &&
         !req.url.includes('/user/login') &&
         !req.url.includes('/user/refresh') &&
-        hasRefreshToken
+        hasRefreshToken &&
+        currentPath !== '/login'
       ) {
         return auth.refreshAccessToken().pipe(
           switchMap(() => next(req)),
@@ -27,8 +30,7 @@ export const TokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
         );
       }
 
-      // No refresh → redirige
-      if (err.status === 401) {
+      if (err.status === 401 && currentPath !== '/login') {
         router.navigate(['/login']);
       }
 
@@ -36,4 +38,3 @@ export const TokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 };
-

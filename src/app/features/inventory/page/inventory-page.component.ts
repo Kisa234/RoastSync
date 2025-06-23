@@ -127,7 +127,8 @@ export class InventoryPage {
 
   onReportMuestra(m: Muestra) {
     this.muestraService.getById(m.id_muestra).subscribe(muestra => {
-      if (!muestra || !muestra.analisis_id) {
+      console.log(muestra);
+      if (!muestra || !muestra.id_analisis) {
         this.uiService.alert('error', 'Error', 'La muestra no tiene análisis asociado');
         return;
       } else {

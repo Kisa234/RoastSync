@@ -1,4 +1,4 @@
-<div class="flex h-screen">
+<div class="flex h-screen" *ngIf="authReady">
       <app-sidebar class="w-64"></app-sidebar>
       <div class="flex-1 overflow-auto bg-[#F9F9F9]">
         <router-outlet></router-outlet>

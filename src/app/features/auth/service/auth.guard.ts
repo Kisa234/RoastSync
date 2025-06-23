@@ -4,18 +4,12 @@ import { AuthService } from './auth.service';
 import { firstValueFrom } from 'rxjs';
 
 export const authGuard: CanActivateFn = async () => {
-  console.log('🔐 authGuard ejecutado');
-
-  const auth = inject(AuthService);
+  const auth   = inject(AuthService);
   const router = inject(Router);
-
   try {
-    const res = await firstValueFrom(auth.checkSession());
-    console.log('✅ sesión válida:', res);
+    await firstValueFrom(auth.checkSession());
     return true;
-  } catch (err) {
-    console.warn('⛔ sesión inválida:', err);
-    router.navigate(['/login']);
-    return false;
+  } catch {
+    return router.parseUrl('/login');
   }
 };

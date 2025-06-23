@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
+import { catchError, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -19,10 +20,15 @@ export class AuthService {
   }
 
   checkSession() {
-    return this.http.get<{ id: string, email: string, rol: string }>(`${this.apiUrl}/me`, {
-      withCredentials: true
-    });
-  }
+  return this.http.get<{ id: string, email: string, rol: string }>(`${this.apiUrl}/me`, {
+    withCredentials: true
+  }).pipe(
+    // Esto se asegura de que cualquier 401 lance error
+    catchError(err => {
+      return throwError(() => err);
+    })
+  );
+}
 
   logout() {
     localStorage.removeItem('access_token');

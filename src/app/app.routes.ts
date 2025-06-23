@@ -20,43 +20,38 @@ import { authGuard } from './features/auth/service/auth.guard';
 import { smartRedirectGuard } from './features/auth/service/smart-redirect.guard';
 import { NotFoundRedirectComponent } from './shared/components/not-found-redirect/not-found-redirect.component';
 
-
 export const appRoutes: Routes = [
-  // 🟢 Redirección inicial clara
+  // 1) Login
   {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
-  },
-
-  // 🟠 Layout vacío para login
-  {
-    path: '',
+    path: 'login',
     component: AuthLayoutComponent,
+    canActivate: [ smartRedirectGuard ],
     children: [
-      { path: 'login', component: AuthComponent, canActivate: [smartRedirectGuard] },
+      { path: '', component: AuthComponent }
     ]
   },
 
-  // 🟢 Layout completo protegido
+  // 2) Rutas protegidas (todo lo demás)
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [ authGuard ],
     children: [
-      { path: 'dashboard', component: OverviewComponent },
-      { path: 'inventory', component: InventoryPage },
-      { path: 'orders', component: OrdersPage },
-      { path: 'roasts', component: RoastsPage },
-      { path: 'analisis', component: AnalisisPage },
-      { path: 'clients', component: UsersPageComponent }
-    ]
-  },
+      // Raíz → dashboard
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
-  // ⚠️ Ruta comodín
-  {
-    path: '**',
-    canActivate: [smartRedirectGuard],
-    component: NotFoundRedirectComponent
+      // Tus vistas
+      { path: 'dashboard',  component: OverviewComponent  },
+      { path: 'inventory',  component: InventoryPage      },
+      { path: 'orders',     component: OrdersPage         },
+      { path: 'roasts',     component: RoastsPage         },
+      { path: 'analisis',   component: AnalisisPage       },
+      { path: 'clients',    component: UsersPageComponent },
+
+      // Cualquier otra:  
+      // – si no estás auth: authGuard → UrlTree('/login')  
+      // – si sí estás auth: redirige a dashboard
+      { path: '**', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
   }
 ];
