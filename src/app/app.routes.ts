@@ -34,7 +34,7 @@ export const appRoutes: Routes = [
     path: '',
     component: AuthLayoutComponent,
     children: [
-      { path: 'login', component: AuthComponent }
+      { path: 'login', component: AuthComponent, canActivate: [smartRedirectGuard] },
     ]
   },
 

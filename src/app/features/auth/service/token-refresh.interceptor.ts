@@ -10,22 +10,30 @@ export const TokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError(err => {
-      // Si el token expiró y hay refreshToken, intenta renovarlo
-      if (err.status === 401 && !req.url.includes('/user/login') && !req.url.includes('/user/refresh')) {
+      const hasRefreshToken = document.cookie.includes('refreshToken=');
+
+      if (
+        err.status === 401 &&
+        !req.url.includes('/user/login') &&
+        !req.url.includes('/user/refresh') &&
+        hasRefreshToken
+      ) {
         return auth.refreshAccessToken().pipe(
-          switchMap(() => {
-            // Reintenta la request original después del refresh
-            return next(req);
-          }),
+          switchMap(() => next(req)),
           catchError(error => {
-            // Si también falla, redirige a login
-            router.navigate(['/auth/login']);
+            router.navigate(['/login']);
             return throwError(() => error);
           })
         );
+      }
+
+      // No refresh → redirige
+      if (err.status === 401) {
+        router.navigate(['/login']);
       }
 
       return throwError(() => err);
     })
   );
 };
+
