@@ -30,7 +30,7 @@ interface ExtendedPedido extends Pedido {
     LucideAngularModule,
     AddRoasterComponent,
     OrderRoastsComponent,
-    EditOrderComponent
+    // EditOrderComponent
   ],
   templateUrl: './roast-page.component.html',
 })
