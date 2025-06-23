@@ -18,13 +18,10 @@ export class AuthService {
     return this.http.get<{ accessToken: string }>(`${this.apiUrl}/refresh`, { withCredentials: true });
   }
 
-  setToken(token: string) {
-    this.accessToken = token;
-    localStorage.setItem('access_token', token);
-  }
-
-  getToken(): string | null {
-    return this.accessToken || localStorage.getItem('access_token');
+  checkSession() {
+    return this.http.get<{ id: string, email: string, rol: string }>(`${this.apiUrl}/me`, {
+      withCredentials: true
+    });
   }
 
   logout() {
@@ -33,13 +30,4 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
-  isAuthenticated(): boolean {
-    const token = this.getToken();
-
-    if (!token) return false;
-
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const exp = payload.exp * 1000; // `exp` está en segundos
-    return Date.now() < exp;
-  }
 }

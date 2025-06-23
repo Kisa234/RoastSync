@@ -13,11 +13,17 @@ import { LoteService } from '../../inventory/service/lote.service';
 import { Lote } from '../../../shared/models/lote';
 import { Muestra } from '../../../shared/models/muestra';
 import { LoteTostado } from '../../../shared/models/lote-tostado';
-import { LucideAngularModule, X, } from 'lucide-angular';
+import { LucideAngularModule, X } from 'lucide-angular';
 import { AnalisisService } from '../service/analisis.service';
 import { lastValueFrom } from 'rxjs';
 import { AnalisisFisicoService } from '../service/analisis-fisico.service';
 import { AnalisisSensorialService } from '../service/analisis-sensorial.service';
+import { AnalisisRapidoService } from '../service/analisis-rapido.service';
+import { AnalisisSensorial } from '../../../shared/models/analisis-sensorial';
+import { AnalisisRapido } from '../../../shared/models/analisis-rapido';
+import { Analisis } from '../../../shared/models/analisis';
+import { UserService } from '../../users/service/users-service.service';
+import { User } from '../../../shared/models/user';
 
 @Component({
   selector: 'analisis-page',
@@ -33,42 +39,36 @@ import { AnalisisSensorialService } from '../service/analisis-sensorial.service'
   templateUrl: './analisis.component.html',
 })
 export class AnalisisPage implements OnInit {
-  // icons
   readonly X = X;
 
   lotes: Lote[] = [];
   muestras: Muestra[] = [];
   tostados: LoteTostado[] = [];
+  clientes: User[] = [];
 
-  // Tipos de target y selección
+
   targetTypes = ['Lote', 'Muestra', 'Café Tostado'];
   selectedTargetType = this.targetTypes[0];
   selectedLot = '';
+  selectedClient = '';
 
-  // Modo Crear / Editar
-  selectedMode = 'Crear';
-
-  // Pestañas de análisis
+  selectedMode: 'Crear' | 'Editar' = 'Crear';
   tabs = ['fisico', 'sensorial', 'rapido'];
   selectedTab = 'fisico';
 
-  // Control de modal
+
   showModal = false;
 
-  // Histórico de operaciones
-  history: Array<{
-    targetId: string;
-    targetType: string;
-    analysisType: string;
-    mode: string;
-  }> = [];
+  history: Array<{ targetType: string; targetId: string; analysisType: string; mode: string }> = [];
+  private readonly historyKey = 'ANALISIS_PAGE_HISTORY';
 
-  // Etiquetas para pestañas
   tabLabels: Record<string, string> = {
     fisico: 'Fisico',
     sensorial: 'Sensorial',
-    rapido: 'Rápido'
+    rapido: 'Rapido',
   };
+
+  currentAnalysis: AnalisisFisico | AnalisisSensorial | AnalisisRapido | null = null;
 
   constructor(
     private loteSvc: LoteService,
@@ -77,17 +77,28 @@ export class AnalisisPage implements OnInit {
     private analisisSvc: AnalisisService,
     private analisisFisicoSvc: AnalisisFisicoService,
     private analisisSensorialSvc: AnalisisSensorialService,
-    private ui: UiService,
+    private analisisRapidoSvc: AnalisisRapidoService,
+    private userSvc: UserService,
+    private uiSvc: UiService
   ) { }
 
-  private readonly historyKey = 'ANALISIS_PAGE_HISTORY';
-
-
   ngOnInit() {
-    this.loteSvc.getAll().subscribe(list => this.lotes = list);
-    this.muestraSvc.getAll().subscribe(list => this.muestras = list);
-    this.tostadoSvc.getAll().subscribe(list => this.tostados = list);
+    this.muestraSvc.getAll().subscribe((list) => (this.muestras = list));
+    this.tostadoSvc.getAll().subscribe((list) => (this.tostados = list));
+    this.userSvc.getUsers().subscribe(users => { this.clientes = users });
     this.loadHistory();
+  }
+
+  onClientChange(id: string) {
+    this.selectedClient = id;
+    this.loteSvc.getAll().subscribe((list) => {
+      this.lotes = list.filter(lote => lote.id_user === id);
+      if (this.lotes.length > 0) {
+        this.selectedLot = this.lotes[0].id_lote; // Selecciona el primer lote por defecto
+      } else {
+        this.selectedLot = '';
+      }
+    });
   }
 
   private loadHistory() {
@@ -119,251 +130,362 @@ export class AnalisisPage implements OnInit {
     this.selectedMode = 'Crear';
   }
 
-  openModal() { this.showModal = true; }
-  closeModal() { this.showModal = false; }
-  onModalSaved() {
-    // añade al history según selectedTab y luego:
-    switch (this.selectedTab) {
-      case 'fisico': this.handleFisico(); break;
-      case 'sensorial': this.handleSensorial(); break;
-      case 'rapido': this.handleRapido(); break;
-    }
-    this.closeModal();
+  openModal() {
+    this.showModal = true;
   }
 
-  findTabByLabel(label: string): string {
-    const entry = Object.entries(this.tabLabels).find(([, v]) => v === label);
-    return entry ? entry[0] : 'fisico';
-  }
-
-
-
-  onSelectHistory(h: any) {
-    this.selectedTargetType = h.targetType;
-    this.selectedLot = h.targetId;
-    this.selectedTab = this.findTabByLabel(h.analysisType);
-    this.selectedMode = h.mode;
-    // this.openModal();
-
-    // primero cerramos…
+  closeModal() {
     this.showModal = false;
-    // y en el siguiente tick lo volvemos a abrir
-    setTimeout(() => this.showModal = true, 0);
-  }
-
-  handleFisico() {
-    this.history.push({
-      targetId: this.selectedLot,
-      targetType: this.selectedTargetType,
-      analysisType: this.tabLabels['fisico'],
-      mode: this.selectedMode
-    });
-    // this.closeModal();
-  }
-
-  handleSensorial() {
-    this.history.push({
-      targetId: this.selectedLot,
-      targetType: this.selectedTargetType,
-      analysisType: this.tabLabels['sensorial'],
-      mode: this.selectedMode
-    });
-    // this.closeModal();
-  }
-
-  handleRapido() {
-    this.history.push({
-      targetId: this.selectedLot,
-      targetType: this.selectedTargetType,
-      analysisType: this.tabLabels['rapido'],
-      mode: this.selectedMode
-    });
-    // this.closeModal();
   }
 
   async addAnalysis() {
 
     if (!this.selectedLot) {
-      this.ui.alert('warning',
-        'Falta selección',
-        `Por favor selecciona un ${this.selectedTargetType} antes de agregar el análisis.`);
+      this.uiSvc.alert('warning', 'Falta selección', `Por favor selecciona un ${this.selectedTargetType}`);
       return;
     }
 
-    const tipo = this.selectedTargetType;
-    const id = this.selectedLot;
-    const modo = this.selectedMode;
-    const analisisType = this.tabLabels[this.selectedTab];
-
-    // 1) Comprobar duplicado en history
-    if (this.history.some(h => h.targetType === tipo && h.targetId === id && h.analysisType === analisisType && h.mode === modo)) {
-      this.ui.alert('info', 'Repetido', 'Este análisis ya está en tu historial.');
-      return;
-    }
-
-    try {
-      // 2) Obtengo el análisis existente (devuelve { analisisFisico_id?, analisisSensorial_id?, … })
-      const a = await this.analisisSvc.getAnalisisByLoteId(id).toPromise();
-      const tieneFisico = a!.analisisFisico_id ? true : false;
-      const tieneSensorial = a!.analisisSensorial_id ? true : false;
-
-      // 3a) Si hay físico pero NO sensorial → error y no agrego
-      if (tieneFisico && !tieneSensorial && this.selectedTab === 'fisico') {
-        this.ui.alert('error', 'Incompleto',
-          `El lote ${id} tiene análisis físico pero no sensorial. Completa primero el sensorial.`);
-        return;
+    // Check if is already in history
+    const existing = this.history.find(
+      (h) => h.targetType === this.selectedTargetType && h.targetId === this.selectedLot && h.analysisType === this.tabLabels[this.selectedTab]
+    );
+    if (existing) {
+      this.uiSvc.alert('warning', 'Análisis existente', `El ${this.selectedTargetType} ${this.selectedLot} ya tiene un análisis ${this.tabLabels[this.selectedTab]} agregado.`);
+    } else {
+      switch (this.selectedTargetType) {
+        case 'Lote':
+          await this.handleLoteAnalysis();
+          break;
+        case 'Muestra':
+          await this.handleMuestraAnalysis();
+          break;
+        case 'Café Tostado':
+          await this.handleTostadoAnalysis();
+          break;
       }
-      // 3b) Si hay sensorial pero NO físico → sólo crear nuevo (caso sensorio o físico)
-      if (!tieneFisico && tieneSensorial && this.selectedTab === 'sensorial') {
-        this.ui.alert('error', 'Incompleto',
-          `El lote ${id} tiene análisis sensorial pero no físico. Completa primero el físico.`);
-        return;
-      }
-      // 3c) Si no hay ninguno → crear nuevo
-      if (!tieneFisico && !tieneSensorial) {
-        this.pushHistory();
-        return;
-      }
-      // 3d) Si tiene ambos → preguntar editar o nuevo
-      if (tieneFisico && tieneSensorial) {
-
-        const opts = {
-          title: 'Análisis existente',
-          message: `El lote ${id} ya tiene ambos análisis. ¿Editar último o crear uno nuevo?`,
-          confirmText: 'Editar',
-          cancelText: 'Crear nuevo'
-        };
-        const editar = await this.ui.confirm(opts);
-        if (editar) {
-          this.selectedMode = 'Editar';
-          this.pushHistory();
-          return
-        } else {
-          this.selectedMode = 'Crear';
-          this.pushHistory();
-          return 
-        }
-      }
-      // 4) Si llega hasta aquí, es porque no hay conflictos
-      // y se puede agregar al historial
-      this.selectedMode = 'Crear';
-      this.pushHistory();
-    } catch (e) {
-      // si da error en GET, tratamos como “no hay análisis”
-      this.pushHistory();
     }
   }
 
-  /** Empuja la entrada al historial y abre el modal */
-  private pushHistory() {
-    this.history.push({
+  resetData() {
+    this.selectedTab = this.targetTypes[0] === 'Café Tostado' ? 'rapido' : 'fisico';
+    this.selectedMode = 'Crear';
+    this.currentAnalysis = null;
+    this.showModal = false;
+  }
+
+  private async handleLoteAnalysis() {
+    // 1) Obtener análisis completo del lote usando Promise en lugar de subscribe
+    let analisis: Analisis | null = null;
+    try {
+      analisis = await lastValueFrom(this.analisisSvc.getAnalisisByLoteId(this.selectedLot));
+    } catch (error) {
+      this.uiSvc.alert('error', 'Error de servidor', 'No se pudo obtener el análisis del lote.');
+    }
+    console.log('Análisis obtenido:', analisis);
+
+    // 2) Obtener estado (tieneFisico/tieneSensorial) via checkAnalysis
+    if (analisis) {
+      const { tieneFisico, tieneSensorial } = await this.checkAnalysis(analisis);
+      // 3) Delegar la lógica de flujo a processAnalysis
+      await this.processAnalysis('Lote', tieneFisico, tieneSensorial, analisis);
+    } else {
+      // Si no hay análisis, pasar ambos como false
+      await this.processAnalysis('Lote', false, false, null);
+    }
+  }
+
+  private async handleMuestraAnalysis() {
+    // 1) Obtener análisis completo del lote usando Promise en lugar de subscribe
+    let analisis: Analisis | null = null;
+    try {
+      analisis = await lastValueFrom(this.analisisSvc.getAnalisisByMuestraId(this.selectedLot));
+    } catch (error) {
+      this.uiSvc.alert('error', 'Error de servidor', 'No se pudo obtener el análisis de la muestra.');
+    }
+    console.log('Análisis obtenido:', analisis);
+
+    // 2) Obtener estado (tieneFisico/tieneSensorial) via checkAnalysis
+    if (analisis) {
+      const { tieneFisico, tieneSensorial } = await this.checkAnalysis(analisis);
+      // 3) Delegar la lógica de flujo a processAnalysis
+      await this.processAnalysis('Muestra', tieneFisico, tieneSensorial, analisis);
+    } else {
+      // Si no hay análisis, pasar ambos como false
+      await this.processAnalysis('Muestra', false, false, null);
+    }
+  }
+
+  private async handleTostadoAnalysis() {
+    // 1) Recuperar el café tostado por ID
+    let tostado: LoteTostado | null = null;
+    try {
+      tostado = await lastValueFrom(this.tostadoSvc.getById(this.selectedLot));
+    } catch {
+      this.uiSvc.alert('error', 'Error de servidor', 'No se pudo cargar el café tostado.');
+      return;
+    }
+    if (!tostado) {
+      this.uiSvc.alert('error', 'No encontrado', `No existe café tostado con ID ${this.selectedLot}`);
+      return;
+    }
+
+    // 2) Comprobar si ya hay análisis rápido
+    const rapidoId = tostado.id_analisis_rapido;
+    if (!rapidoId) {
+      // Sin análisis previo: crear uno nuevo
+      this.currentAnalysis = null;
+      this.createEntry('Café Tostado', 'Crear');
+      return;
+    }
+
+    // 3) Si ya existe, preguntar editar o crear nuevo
+    const editar = await this.askEditOrCreate('Café Tostado', 'rápido');
+    if (editar) {
+      // Cargar análisis existente
+      this.currentAnalysis = await lastValueFrom(this.analisisRapidoSvc.getAnalisisById(rapidoId));
+    } else {
+      // Crear nuevo
+      this.currentAnalysis = null;
+    }
+
+    // 3) Empujar al historial Y levantar modal
+    this.createEntry('Café Tostado', editar ? 'Editar' : 'Crear');
+  }
+
+
+  private async checkAnalysis(a: Analisis): Promise<{ tieneFisico: boolean; tieneSensorial: boolean; }> {
+    return {
+      tieneFisico: a.analisisFisico_id ? true : false,
+      tieneSensorial: a.analisisSensorial_id ? true : false,
+    };
+  }
+
+  private async processAnalysis(target: string, fisico: boolean, sensorial: boolean, analisis: Analisis | null) {
+    let completo = false;
+    let incompleto = false;
+    if (fisico && sensorial) {
+      // Si ambos análisis existen, preguntar si editar o crear nuevo
+      completo = true;
+    } else if (fisico || sensorial) {
+      // Si solo uno de los análisis existe, preguntar si completar el otro
+      incompleto = true;
+    }
+
+    if (completo) {
+      // 1) Pregunta si editar o crear
+      const editar = await this.askEditOrCreate(target, 'completo');
+
+      // 2) Si edita, carga currentAnalysis usando el objeto analisis
+      if (editar && analisis) {
+        const id = this.selectedTab === 'fisico'
+          ? analisis.analisisFisico_id!
+          : analisis.analisisSensorial_id!;
+        this.currentAnalysis = this.selectedTab === 'fisico'
+          ? await lastValueFrom(this.analisisFisicoSvc.getAnalisisById(id))
+          : await lastValueFrom(this.analisisSensorialSvc.getAnalisisById(id));
+      } else {
+        // Crear nuevo
+        this.currentAnalysis = null;
+      }
+
+      // 3) Empuja al historial
+      this.createEntry(target, editar ? 'Editar' : 'Crear');
+      return;
+    }
+
+
+    if (incompleto) {
+      const faltante = fisico ? 'sensorial' : 'físico';
+      if (this.selectedTab === faltante) {
+        this.currentAnalysis = null;
+        this.createEntry(target, 'Crear');
+      } else {
+        this.uiSvc.alert(
+          'error',
+          'Análisis incompleto',
+          `El reporte ya tiene ${fisico ? 'físico' : 'sensorial'} y falta completar el análisis.`
+        );
+      }
+      return;
+    }
+
+    // Sin análisis previo: crear
+    this.currentAnalysis = null;
+    this.createEntry(target, 'Crear');
+
+  }
+
+  private async askEditOrCreate(
+    target: string,
+    analysisLabel: string    // 'completo' o 'rápido'
+  ): Promise<boolean> {
+    const opts: ConfirmOptions = {
+      title: 'Análisis existente',
+      message: `${target} ya tiene un análisis ${analysisLabel}. ¿Editar último o crear uno nuevo?`,
+      confirmText: 'Editar',
+      cancelText: 'Crear nuevo',
+    };
+    try {
+      return await this.uiSvc.confirm(opts);
+    } catch {
+      return false;
+    }
+  }
+
+  private createEntry(target: string, mode: 'Crear' | 'Editar') {
+    this.selectedMode = mode;
+    const entry = {
+      targetType: target,
       targetId: this.selectedLot,
-      targetType: this.selectedTargetType,
       analysisType: this.tabLabels[this.selectedTab],
-      mode: this.selectedMode
-    });
+      mode,
+    };
+    this.history.push(entry);
     this.saveHistory();
     this.showModal = true;
   }
 
+  onSelectHistory(h: any) {
+    this.selectedTargetType = h.targetType;
+    this.selectedLot = h.targetId;
+    this.selectedTab = Object.entries(this.tabLabels).find(([, v]) => v === h.analysisType)?.[0] || 'fisico';
+    this.selectedMode = h.mode as any;
+    this.showModal = false;
+    setTimeout(() => (this.showModal = true), 0);
+  }
 
   deleteHistory(idx: number, event: MouseEvent) {
-    // 1) evita disparar onSelectHistory
     event.stopPropagation();
-
     const h = this.history[idx];
     const opts: ConfirmOptions = {
       title: 'Eliminar análisis',
       message: `¿Eliminar ${h.targetType} ${h.targetId} (${h.analysisType})?`,
       confirmText: 'Eliminar',
-      cancelText: 'Cancelar'
+      cancelText: 'Cancelar',
     };
-
-    this.ui.confirm(opts).then(ok => {
+    this.uiSvc.confirm(opts).then((ok) => {
       if (!ok) return;
-
-      // 2) elimina la clave asociada en localStorage
       const key = `${h.targetType.toUpperCase()}-${h.targetId}-${h.analysisType.toUpperCase()}-${h.mode.toUpperCase()}`;
       localStorage.removeItem(key);
-
-      // 3) elimina del arreglo history
       this.history.splice(idx, 1);
       this.saveHistory();
-      // 4) si el historial quedó vacío, cierra el modal
-      if (this.history.length === 0) {
-        this.closeModal();
-      } else {
-        // opcional: selecciona el primero restante
-        const next = this.history[0];
-        this.onSelectHistory(next);
-      }
+      if (this.history.length === 0) this.closeModal();
+      else this.onSelectHistory(this.history[0]);
     });
   }
 
-  /** Guarda todos los análisis físicos y sensoriales del historial */
-  async saveAllPhysicalAndSensorial() {
-    // Recorremos de atrás hacia adelante para poder splicear sin desalinear
-    for (let i = this.history.length - 1; i >= 0; i--) {
-      const h = this.history[i];
+  onTabChange(tab: 'fisico' | 'sensorial' | 'rapido') {
+    this.closeModal();
+    this.currentAnalysis = null;
+    this.selectedTab = tab;
+    this.selectedMode = 'Crear';
+  }
 
-      // solo procesar físico y sensorial
-      if (h.analysisType !== this.tabLabels['fisico'] &&
-        h.analysisType !== this.tabLabels['sensorial']) {
+  async saveAll(): Promise<void> {
+    if (!this.history.length) {
+      this.uiSvc.alert('info', 'Nada que guardar', 'No hay análisis en el historial.');
+      return;
+    }
+
+    const failed: string[] = [];
+
+    for (const entry of this.history) {
+      const key = `${entry.targetType.toUpperCase()}-${entry.targetId}-${entry.analysisType.toUpperCase()}-${entry.mode.toUpperCase()}`;
+      console.log(key);
+      const raw = localStorage.getItem(key);
+      if (!raw) {
+        failed.push(`${entry.analysisType} (${entry.targetId}) — sin datos en localStorage`);
         continue;
       }
 
-      const id = h.targetId;
-      const modo = h.mode; // 'Crear' o 'Editar'
-      const tipo = h.analysisType.toUpperCase();
-      const key = `${h.targetType.toUpperCase()}-${id}-${tipo}-${modo.toUpperCase()}`;
+      const payload = JSON.parse(raw);
+      const typeParam =
+        entry.targetType === 'Lote' ? 'lote' :
+          entry.targetType === 'Muestra' ? 'muestra' :
+            null;
 
       try {
-        const stored = localStorage.getItem(key);
-        if (!stored) throw new Error(`No hay datos ${h.analysisType.toLowerCase()} para guardar`);
-
-        const payload = JSON.parse(stored);
-
-        if (h.analysisType === this.tabLabels['fisico']) {
-          if (modo === 'Crear') {
-            await lastValueFrom(this.analisisFisicoSvc.createAnalisis(payload, id));
+        if (entry.analysisType === this.tabLabels['fisico']) {
+          // Físico
+          if (entry.mode === 'Editar') {
+            await lastValueFrom(
+              this.analisisFisicoSvc.updateAnalisis(entry.targetId, payload, typeParam!)
+            );
+            localStorage.removeItem(key);
           } else {
-            await lastValueFrom(this.analisisFisicoSvc.updateAnalisis(id, payload));
+            await lastValueFrom(
+              this.analisisFisicoSvc.createAnalisis(payload, entry.targetId, typeParam!)
+            );
+            localStorage.removeItem(key);
           }
-        } else { // sensorial
-          if (modo === 'Crear') {
-            await lastValueFrom(this.analisisSensorialSvc.createAnalisisSensorial(payload, id));
+
+        } else if (entry.analysisType === this.tabLabels['sensorial']) {
+          // Sensorial
+          if (entry.mode === 'Editar') {
+            await lastValueFrom(
+              this.analisisSensorialSvc.updateAnalisisSensorial(
+                payload.id_analisis_sensorial!,
+                payload,
+                typeParam!
+              )
+            );
+            localStorage.removeItem(key);
           } else {
-            await lastValueFrom(this.analisisSensorialSvc.updateAnalisisSensorial(id, payload));
+            await lastValueFrom(
+              this.analisisSensorialSvc.createAnalisisSensorial(
+                payload,
+                entry.targetId,
+                typeParam!
+              )
+            );
+            localStorage.removeItem(key);
+          }
+
+        } else {
+          // Rápido (Café Tostado)
+          if (entry.mode === 'Editar') {
+            await lastValueFrom(
+              this.analisisRapidoSvc.updateAnalisis(
+                payload.id_analisis_rapido!,
+                payload
+              )
+            );
+            localStorage.removeItem(key);
+          } else {
+            await lastValueFrom(
+              this.analisisRapidoSvc.createAnalisis(
+                payload,
+                entry.targetId
+              )
+            );
+            localStorage.removeItem(key);
           }
         }
 
-        // 1) eliminar del localStorage
-        localStorage.removeItem(key);
-
-        // 2) eliminar del history
-        this.history.splice(i, 1);
-
-      } catch (err: any) {
-        this.ui.alert(
-          'error',
-          `Error guardando ${h.analysisType} de ${h.targetType} ${id}`,
-          err.message || 'Fallo inesperado'
-        );
-        // continuar con el siguiente
+        
+        
+      } catch (err) {
+        console.error(`Error guardando ${entry.analysisType} ${entry.targetId}:`, err);
+        failed.push(`${entry.analysisType} (${entry.targetId})`);
       }
     }
 
-    // notificación final
-    this.ui.alert('success', 'Proceso completado', 'Se intentaron guardar todos los análisis físicos y sensoriales.');
-
-    // 3) reabrir el modal para el primer elemento en history, si existe
-    if (this.history.length) {
-      // seleccionamos el primero y abrimos modal
-      this.onSelectHistory(this.history[0]);
-      this.openModal();
+    // mostrar resultado final
+    if (failed.length) {
+      this.uiSvc.alert(
+        'warning',
+        'Guardado parcial',
+        `No se pudo guardar: ${failed.join(', ')}. El resto se guardó correctamente.`
+      );
+    } else {
+      this.uiSvc.alert('success', 'Guardado', 'Todos los análisis se guardaron correctamente.');
     }
+
+    // limpiar historial y estado global
+    this.history = [];
+    this.saveHistory();
+    this.resetData();
   }
 
+
 }
-
-

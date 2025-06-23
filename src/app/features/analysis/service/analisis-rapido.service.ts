@@ -15,8 +15,8 @@ export class AnalisisRapidoService {
 
   constructor(private http: HttpClient) {}
 
-  createAnalisis(data: AnalisisRapido): Observable<AnalisisRapido> {
-    return this.http.post<AnalisisRapido>(`${this.baseUrl}`, data);
+  createAnalisis(data: AnalisisRapido,id_lote_tostado:string): Observable<AnalisisRapido> {
+    return this.http.post<AnalisisRapido>(`${this.baseUrl}/lote/${id_lote_tostado}`, data);
   }
 
   getAnalisisById(id: string): Observable<AnalisisRapido> {

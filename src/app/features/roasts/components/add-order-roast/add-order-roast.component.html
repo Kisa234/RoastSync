@@ -1,5 +1,5 @@
 <!-- overlay -->
-<div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4">
+<div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-10 p-4">
   <!-- modal card -->
   <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl overflow-auto" (click)="$event.stopPropagation()">
 
@@ -123,7 +123,7 @@
                 <input type="number" [(ngModel)]="b.pesoTostado" (ngModelChange)="onBatchTostadoChange(b)" min="0"
                   class="w-full border rounded px-2 py-1" />
               </td>
-             
+
               <td class="px-4 py-2">
                 <button (click)="quitarBatch(b)" class="text-red-600 hover:text-red-800">
                   Eliminar

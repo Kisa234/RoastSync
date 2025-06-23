@@ -15,16 +15,16 @@ export class AnalisisFisicoService {
 
   constructor(private http: HttpClient) {}
 
-  createAnalisis(data: AnalisisFisico, id_lote:string): Observable<AnalisisFisico> {
-    return this.http.post<AnalisisFisico>(`${this.baseUrl}/${id_lote}`, data);
+  createAnalisis(data: AnalisisFisico, id_lote:string,type:string): Observable<AnalisisFisico> {
+    return this.http.post<AnalisisFisico>(`${this.baseUrl}/${id_lote}/${type}`, data);
   }
 
   getAnalisisById(id: string): Observable<AnalisisFisico> {
     return this.http.get<AnalisisFisico>(`${this.baseUrl}/${id}`);
   }
 
-  updateAnalisis(id_lote: string, data: AnalisisFisico): Observable<AnalisisFisico> {
-    return this.http.put<AnalisisFisico>(`${this.baseUrl}/${id_lote}`, data);
+  updateAnalisis(id_lote: string, data: AnalisisFisico, type:string): Observable<AnalisisFisico> {
+    return this.http.put<AnalisisFisico>(`${this.baseUrl}/${id_lote}/${type}`, data);
   }
 
   getAllAnalisis(): Observable<AnalisisFisico[]> {

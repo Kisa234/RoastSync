@@ -20,7 +20,9 @@ export class MuestraService {
   }
 
   create(data: Partial<Muestra>): Observable<Muestra> {
-    return this.http.post<Muestra>(this.baseUrl, data);
+    return this.http.post<Muestra>(this.baseUrl, data, {
+      withCredentials: true // 🔐 importante para enviar la cookie
+    });
   }
 
   update(id: string, data: Partial<Muestra>): Observable<Muestra> {

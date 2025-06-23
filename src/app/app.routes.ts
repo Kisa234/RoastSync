@@ -17,6 +17,8 @@ import { AuthComponent } from './features/auth/page/auth.component';
 
 // Auth Guard
 import { authGuard } from './features/auth/service/auth.guard';
+import { smartRedirectGuard } from './features/auth/service/smart-redirect.guard';
+import { NotFoundRedirectComponent } from './shared/components/not-found-redirect/not-found-redirect.component';
 
 
 export const appRoutes: Routes = [
@@ -52,5 +54,9 @@ export const appRoutes: Routes = [
   },
 
   // ⚠️ Ruta comodín
-  { path: '**', redirectTo: 'login' }
+  {
+    path: '**',
+    canActivate: [smartRedirectGuard],
+    component: NotFoundRedirectComponent
+  }
 ];

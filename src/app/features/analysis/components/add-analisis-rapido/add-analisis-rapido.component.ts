@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule }  from '@angular/forms';
 import { X }           from 'lucide-angular';
+import { AnalisisRapido } from '../../../../shared/models/analisis-rapido';
 
 @Component({
   selector: 'add-analisis-rapido',
@@ -18,10 +19,11 @@ import { X }           from 'lucide-angular';
   templateUrl: './add-analisis-rapido.component.html'
 })
 export class AddAnalisisRapido implements OnInit, OnChanges {
-  @Input() targetLabel: string = '';
+  @Input() targetType: string = '';
+  @Input() targetId: string = '';
   @Input() mode: string = 'Crear';
-  @Output() saved = new EventEmitter<void>();
-  @Output() close = new EventEmitter<void>();
+  @Input() initialData: Partial<AnalisisRapido> = {};
+  
 
   readonly X = X;
 
@@ -44,18 +46,33 @@ export class AddAnalisisRapido implements OnInit, OnChanges {
   };
 
   ngOnInit() {
+    this.seedStorageIfNeeded();
     this.loadFromStorage();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['targetLabel'] || changes['mode']) {
+    if (
+      (changes['targetType'] && !changes['targetType'].isFirstChange()) ||
+      (changes['targetId']   && !changes['targetId'].isFirstChange())   ||
+      (changes['mode']       && !changes['mode'].isFirstChange())
+    ) {
+      this.seedStorageIfNeeded();
       this.loadFromStorage();
     }
   }
 
-  private storageKey(): string {
-    const [type, id] = this.targetLabel.split(' ');
-    return `${type?.toUpperCase() || 'ITEM'}-${id || 'UNKNOWN'}-RAPIDO-${this.mode.toUpperCase()}`;
+   private seedStorageIfNeeded() {
+    const key       = this.storageKey();
+    const hasStored = !!localStorage.getItem(key);
+    const hasData   = this.initialData && Object.keys(this.initialData).length > 0;
+    if (!hasStored && hasData) {
+      localStorage.setItem(key, JSON.stringify(this.initialData));
+    }
+  }
+
+
+  private storageKey(): string {   
+    return `${this.targetType.toUpperCase()}-${this.targetId}-RAPIDO-${this.mode.toUpperCase()}`;
   }
 
   private loadFromStorage() {
@@ -78,7 +95,5 @@ export class AddAnalisisRapido implements OnInit, OnChanges {
    
   }
 
-  onClose() {
-    this.close.emit();
-  }
+  
 }

@@ -1,18 +1,17 @@
-import { CanActivateFn, Router } from "@angular/router";
-import { AuthService } from "./auth.service";
-import { inject } from "@angular/core";
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { AuthService } from './auth.service';
+import { firstValueFrom } from 'rxjs';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  const isAuth = auth.isAuthenticated();
-  console.log('[authGuard] Autenticado:', isAuth);
-
-  if (!isAuth) {
-    router.navigate(['/login']);
+  try {
+    await firstValueFrom(auth.checkSession()); // ← consulta backend
+    return true;
+  } catch (err) {
+    router.navigate(['/auth/login']);
     return false;
   }
-
-  return true;
 };

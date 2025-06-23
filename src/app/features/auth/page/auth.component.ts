@@ -37,10 +37,6 @@ export class AuthComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
-
-    if (this.authSvc.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
-    }
   }
 
   get email() {
@@ -52,13 +48,12 @@ export class AuthComponent implements OnInit {
 
   async onSubmit() {
     if (!this.loginForm || this.loginForm.invalid) return;
-    
+
     this.loading = true;
     const { email, password } = this.loginForm.value;
-    
+
     try {
-      const { accessToken } = await this.authSvc.login(email, password).toPromise();
-      this.authSvc.setToken(accessToken);
+      await this.authSvc.login(email, password).toPromise();
       this.router.navigate(['/dashboard']);
     } catch (err: any) {
       this.errorMsg = err?.error?.error || 'Error al iniciar sesión';

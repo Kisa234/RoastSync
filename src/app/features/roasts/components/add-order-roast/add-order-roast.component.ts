@@ -1,13 +1,15 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule }  from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
-import { X, Check }     from 'lucide-angular';
+import { X, Check } from 'lucide-angular';
 
 import { PedidoService } from '../../../orders/service/orders.service';
 import { LoteService } from '../../../inventory/service/lote.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { Pedido } from '../../../../shared/models/pedido';
+import { UiService } from '../../../../shared/services/ui.service';
+import { AnalisisService } from '../../../analysis/service/analisis.service';
 
 
 interface Batch {
@@ -19,19 +21,19 @@ interface Batch {
 @Component({
   selector: 'add-roaster',
   standalone: true,
-  imports: [ CommonModule, FormsModule, LucideAngularModule ],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './add-order-roast.component.html',
 })
 export class AddRoasterComponent implements OnInit {
-  @Output() close  = new EventEmitter<void>();
+  @Output() close = new EventEmitter<void>();
   @Output() create = new EventEmitter<any>();
 
-  readonly X     = X;
+  readonly X = X;
   readonly Check = Check;
 
   // Listas para selects
   clientes: any[] = [];
-  lotes:    any[] = [];
+  lotes: any[] = [];
   lotesAll: any[] = [];
 
   // Modelo principal
@@ -41,7 +43,7 @@ export class AddRoasterComponent implements OnInit {
     comentario: '',
     id_user: '',
     id_lote: '',
-    pesos:    [],
+    pesos: [],
     tostadora: '',
     fecha_tueste: new Date(),
   };
@@ -52,7 +54,7 @@ export class AddRoasterComponent implements OnInit {
   ];
 
   // Disponibles
-  pesoVerdeDisp   = 0;
+  pesoVerdeDisp = 0;
   pesoTostadoDisp = 0;
 
   // Para batches
@@ -61,7 +63,7 @@ export class AddRoasterComponent implements OnInit {
   batchTostado = 0;
 
   nextId = 1;
- 
+
 
   tiposTueste = [
     'Tueste Claro',
@@ -73,38 +75,61 @@ export class AddRoasterComponent implements OnInit {
 
   constructor(
     private pedidoSvc: PedidoService,
-    private loteSvc:   LoteService,
-    private userSvc:   UserService
-  ) {}
+    private loteSvc: LoteService,
+    private userSvc: UserService,
+    private uiSvc: UiService,
+    private analisisSvc: AnalisisService
+  ) { }
 
   ngOnInit() {
     this.userSvc.getUsers().subscribe(u => this.clientes = u);
     this.loteSvc.getAll().subscribe(l => {
       this.lotesAll = l;
-      this.lotes = []; 
+      this.lotes = [];
     });
   }
 
   onClienteChange() {
     if (this.orden.id_user) {
       this.lotes = this.lotesAll.filter(l => l.id_user === this.orden.id_user);
-      this.orden.id_lote = ''; }
-      this.pesoVerdeDisp = 0;
-      this.pesoTostadoDisp = 0;
+      this.orden.id_lote = '';
+    }
+    this.pesoVerdeDisp = 0;
+    this.pesoTostadoDisp = 0;
   }
 
 
-  
+
   cerrar() {
     this.close.emit();
   }
 
 
   onLoteChange() {
-    const sel = this.lotes.find(l => l.id_lote===this.orden.id_lote);
-    this.pesoVerdeDisp   = sel?.peso || 0;
+    const sel = this.lotes.find(l => l.id_lote === this.orden.id_lote);
+
+    this.pesoVerdeDisp = sel?.peso || 0;
     this.pesoTostadoDisp = sel?.peso_tostado || 0;
+
+    if (!sel) return;
+
+    this.loteSvc.getById(sel.id_lote).subscribe(lote => {
+      // Supongamos que viene lote.analisis
+      if (!lote.id_analisis) {
+        this.uiSvc.alert(
+          'error',
+          'Lote sin análisis',
+          `El lote ${lote.id_lote} no tiene análisis registrado. Por favor, crea uno antes de continuar.`,
+          5000
+        );
+        this.orden.id_lote = '';
+        this.pesoVerdeDisp = 0;
+        this.pesoTostadoDisp = 0;
+      }
+    });
   }
+
+
 
   agregarBatch() {
     const nextId = this.batches.length + 1;
@@ -115,7 +140,7 @@ export class AddRoasterComponent implements OnInit {
     });
   }
 
-  
+
 
   // cada vez que cambie el verde, recalculas tostado
   onBatchVerdeChange(b: Batch) {
@@ -139,9 +164,9 @@ export class AddRoasterComponent implements OnInit {
 
 
   quitarBatch(b: Batch) {
-    this.pesoVerdeDisp   += b.pesoVerde;
+    this.pesoVerdeDisp += b.pesoVerde;
     this.pesoTostadoDisp += b.pesoTostado;
-    this.batches = this.batches.filter(x=>x.id!==b.id);
+    this.batches = this.batches.filter(x => x.id !== b.id);
   }
 
   get totalVerde(): number {
@@ -155,10 +180,10 @@ export class AddRoasterComponent implements OnInit {
     console.log('Guardar orden de tueste', this.orden);
     // validar que exista al menos un batch
     if (!this.batches.length) return;
-    this.orden.pesos = this.batches.map(b=>b.pesoVerde);
+    this.orden.pesos = this.batches.map(b => b.pesoVerde);
     // construir payload
     const payload = { ...this.orden };
-    this.pedidoSvc.createPedido(payload).subscribe(res=>{
+    this.pedidoSvc.createPedido(payload).subscribe(res => {
       this.create.emit(res);
       this.close.emit();
     });

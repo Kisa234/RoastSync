@@ -1,3 +1,4 @@
+import { tap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -14,8 +15,8 @@ export class AnalisisSensorialService {
   constructor(private http: HttpClient) {}
 
   // Crear un nuevo análisis sensorial
-  createAnalisisSensorial(data: AnalisisSensorial,id_lote:string): Observable<AnalisisSensorial> {
-    return this.http.post<AnalisisSensorial>(`${this.baseUrl}/${id_lote}`, data);
+  createAnalisisSensorial(data: AnalisisSensorial,id_lote:string,type:string): Observable<AnalisisSensorial> {
+    return this.http.post<AnalisisSensorial>(`${this.baseUrl}/${id_lote}/${type}`, data);
   }
 
   // Obtener un análisis sensorial por ID
@@ -24,8 +25,8 @@ export class AnalisisSensorialService {
   }
 
   // Actualizar un análisis sensorial
-  updateAnalisisSensorial(id: string, data: AnalisisSensorial): Observable<AnalisisSensorial> {
-    return this.http.put<AnalisisSensorial>(`${this.baseUrl}/${id}`, data);
+  updateAnalisisSensorial(id: string, data: AnalisisSensorial, type:string): Observable<AnalisisSensorial> {
+    return this.http.put<AnalisisSensorial>(`${this.baseUrl}/${id}/${type}`, data);
   }
 
   // Obtener todos los análisis sensoriales

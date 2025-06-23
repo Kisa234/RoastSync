@@ -16,6 +16,8 @@ import { LoteTostadoService } from '../service/lote-tostado.service';
 import { AddLoteComponent } from '../components/add-lote/add-lote.component';
 import { AddMuestraComponent } from '../components/add-muestra/add-muestra.component';
 import { ReportLoteComponent } from '../components/report-lote/report-lote.component';
+import { UserService } from '../../users/service/users-service.service';
+import { User } from '../../../shared/models/user';
 
 type InventoryTab = 'muestras' | 'verde' | 'tostado';
 
@@ -62,16 +64,19 @@ export class InventoryPage {
   filterText = '';
   selectedLoteId = '';
   selectedMuestraId = '';
+  usuarios: any;
 
   constructor(
     private muestraService: MuestraService,
     private loteService:   LoteService,
-    private tostService:   LoteTostadoService, 
+    private tostService:   LoteTostadoService,
+    private userService: UserService,
     private uiService: UiService,
   ) {}
 
   ngOnInit() {
     this.loadMuestras();
+    this.loadUsuarios();
   }
 
   openAdd() {
@@ -97,6 +102,26 @@ export class InventoryPage {
         this.selectedLoteId = l.id_lote;
         this.showReportLote = true;
       }
+    });
+  }
+
+  getLotesCliente(lotes: Lote[]) {
+    return lotes.filter(l => {
+      const user = this.usuarios.find((u: User) => u.id_user === l.id_user);
+      return user?.rol === 'cliente';
+    });
+  }
+
+  getLotesAdmin(lotes: Lote[]) {
+    return lotes.filter(l => {
+      const user = this.usuarios.find((u: User) => u.id_user === l.id_user);
+      return user?.rol === 'admin';
+    });
+  }
+
+  loadUsuarios() {
+    this.userService.getUsers().subscribe(users => {
+      this.usuarios = users;
     });
   }
 

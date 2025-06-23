@@ -37,7 +37,11 @@ export class AnalisisService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-   getAnalisisByLoteId(id_lote: string): Observable<Analisis> {
+  getAnalisisByLoteId(id_lote: string): Observable<Analisis> {
     return this.http.get<Analisis>(`${this.baseUrl}/lote/${id_lote}`);
+  }
+
+  getAnalisisByMuestraId(id_muestra: string): Observable<Analisis> {
+    return this.http.get<Analisis>(`${this.baseUrl}/muestra/${id_muestra}`);
   }
 }

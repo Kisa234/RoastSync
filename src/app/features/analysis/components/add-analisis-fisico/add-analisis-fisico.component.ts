@@ -11,10 +11,10 @@ import { AnalisisFisico } from '../../../../shared/models/analisis-fisico';
   templateUrl: './add-analisis-fisico.component.html'
 })
 export class AddAnalisisFisico implements OnInit, OnChanges {
-  @Input() targetLabel: string = '';
+  @Input() targetType: string = '';
+  @Input() targetId: string = '';
   @Input() mode: string = 'Crear';
-  @Output() saved = new EventEmitter<void>();
-  @Output() close = new EventEmitter<void>();
+  @Input() initialData: Partial<AnalisisFisico> = {};
 
   readonly X = X;
   readonly ChevronDown = ChevronDown;
@@ -95,18 +95,32 @@ export class AddAnalisisFisico implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    this.seedStorageIfNeeded();
     this.loadFromStorage();
   }
 
+  private seedStorageIfNeeded() {
+    const key       = this.storageKey();
+    const hasStored = !!localStorage.getItem(key);
+    const hasData   = this.initialData && Object.keys(this.initialData).length > 0;
+    if (!hasStored && hasData) {
+      localStorage.setItem(key, JSON.stringify(this.initialData));
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['targetLabel'] || changes['mode']) {
+    if (
+      (changes['targetType'] && !changes['targetType'].isFirstChange()) ||
+      (changes['targetId']   && !changes['targetId'].isFirstChange())   ||
+      (changes['mode']       && !changes['mode'].isFirstChange())
+    ) {
+      this.seedStorageIfNeeded();
       this.loadFromStorage();
     }
   }
 
   private storageKey(): string {
-    const [type, id] = this.targetLabel.split(' ');
-    return `${type?.toUpperCase() || 'ITEM'}-${id || 'UNKNOWN'}-FISICO-${this.mode.toUpperCase()}`;
+    return `${this.targetType.toUpperCase()}-${this.targetId}-FISICO-${this.mode.toUpperCase()}`;
   }
 
   private loadFromStorage() {
@@ -127,7 +141,5 @@ export class AddAnalisisFisico implements OnInit, OnChanges {
     
   }
 
-  onClose() {
-    this.close.emit();
-  }
+ 
 }
