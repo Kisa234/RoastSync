@@ -1,0 +1,22 @@
+export interface AnalisisDefectos {
+    id_analisis_defecto: string,
+    grano_negro: number,
+    grano_agrio: number,
+    grano_con_hongos: number,
+    cereza_seca: number,
+    materia_estrana: number,
+    broca_severa: number,
+    negro_parcial: number,
+    agrio_parcial: number,
+    pergamino: number,
+    flotadores: number,
+    inmaduro: number,
+    averanado: number,
+    conchas: number,
+    cascara_pulpa_seca: number,
+    partido_mordido_cortado: number,
+    broca_leva: number,
+    grado: string,
+    fecha_registro: Date,
+    eliminado: boolean
+}

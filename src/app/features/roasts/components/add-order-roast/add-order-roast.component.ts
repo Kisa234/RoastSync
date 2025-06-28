@@ -10,6 +10,8 @@ import { UserService } from '../../../users/service/users-service.service';
 import { Pedido } from '../../../../shared/models/pedido';
 import { UiService } from '../../../../shared/services/ui.service';
 import { AnalisisService } from '../../../analysis/service/analisis.service';
+import { AvgTueste } from '../../../../shared/models/avg-tueste';
+import { RoastsService } from '../../service/roasts.service';
 
 
 interface Batch {
@@ -48,6 +50,8 @@ export class AddRoasterComponent implements OnInit {
     fecha_tueste: new Date(),
   };
 
+  
+
   Tostadoras: string[] = [
     'Kaleido',
     'Candela',
@@ -77,6 +81,7 @@ export class AddRoasterComponent implements OnInit {
     private pedidoSvc: PedidoService,
     private loteSvc: LoteService,
     private userSvc: UserService,
+    private roastSvc: RoastsService,
     private uiSvc: UiService,
     private analisisSvc: AnalisisService
   ) { }
@@ -87,6 +92,8 @@ export class AddRoasterComponent implements OnInit {
       this.lotesAll = l;
       this.lotes = [];
     });
+
+    
   }
 
   onClienteChange() {
@@ -107,26 +114,8 @@ export class AddRoasterComponent implements OnInit {
 
   onLoteChange() {
     const sel = this.lotes.find(l => l.id_lote === this.orden.id_lote);
-
     this.pesoVerdeDisp = sel?.peso || 0;
     this.pesoTostadoDisp = sel?.peso_tostado || 0;
-
-    if (!sel) return;
-
-    this.loteSvc.getById(sel.id_lote).subscribe(lote => {
-      // Supongamos que viene lote.analisis
-      if (!lote.id_analisis) {
-        this.uiSvc.alert(
-          'error',
-          'Lote sin análisis',
-          `El lote ${lote.id_lote} no tiene análisis registrado. Por favor, crea uno antes de continuar.`,
-          5000
-        );
-        this.orden.id_lote = '';
-        this.pesoVerdeDisp = 0;
-        this.pesoTostadoDisp = 0;
-      }
-    });
   }
 
 
@@ -144,21 +133,21 @@ export class AddRoasterComponent implements OnInit {
 
   // cada vez que cambie el verde, recalculas tostado
   onBatchVerdeChange(b: Batch) {
-    b.pesoTostado = parseFloat((b.pesoVerde * 1.15).toFixed(2));
+    b.pesoTostado = parseFloat((b.pesoVerde / 1.15).toFixed(2));
   }
 
   // cada vez que cambie el tostado, recalculas verde
   onBatchTostadoChange(b: Batch) {
-    b.pesoVerde = parseFloat((b.pesoTostado / 1.15).toFixed(2));
+    b.pesoVerde = parseFloat((b.pesoTostado * 1.15).toFixed(2));
   }
 
   BatchVerde() {
-    this.batchTostado = parseFloat((this.orden.cantidad! * 1.15).toFixed(2));
+    this.batchTostado = parseFloat((this.orden.cantidad! / 1.15).toFixed(2));
   }
 
-  // cada vez que cambie el tostado, recalculas verde
+ 
   BatchTostado() {
-    this.orden.cantidad = parseFloat((this.batchTostado / 1.15).toFixed(2));
+    this.orden.cantidad = parseFloat((this.batchTostado * 1.15).toFixed(2));
   }
 
 

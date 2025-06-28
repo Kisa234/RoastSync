@@ -103,9 +103,11 @@
 </div>
 
 <!-- Modal de Progreso de Tueste -->
-<add-roaster *ngIf="showAddRoaster" (close)="showAddRoaster = false" (create)="onRoasterCreated($event)"></add-roaster>
+<add-roaster *ngIf="showAddRoaster" (close)="showAddRoaster = false" (create)="onRoasterCreated($event)">
+</add-roaster>
 
 <order-roasts *ngIf="showRoastsModal" [orderId]="selectedOrder?.id_pedido!"
-  [deliveryDate]="selectedOrder?.fecha_registro!" (close)="showRoastsModal=false"></order-roasts>
+  [deliveryDate]="selectedOrder?.fecha_registro!" (close)="showRoastsModal=false">
+</order-roasts>
 
 <!-- <edit-order *ngIf="showEditRoastModal" [OrderId]="selectedOrder?.id_pedido!" (close)="showEditRoastModal=false"></edit-order>  -->

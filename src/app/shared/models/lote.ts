@@ -1,9 +1,9 @@
 export interface Lote {
   id_lote: string;
-  productor: string;
-  finca: string;
-  region: string;
-  departamento: string;
+  productor?: string;
+  finca?: string;
+  region?: string;
+  departamento?: string;
   peso: number;
   variedades: string[];
   proceso: string;

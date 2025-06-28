@@ -43,18 +43,22 @@ export class AddAnalisisFisico implements OnInit, OnChanges {
     comentario: '',
     defectos_primarios: [],
     defectos_secundarios: []
-  };
+  };  
 
-  primOptions = [
-    'Grano negro completo', 'Grano negro parcial',
-    'Grano agrio completo','Grano agrio parcial',
-    'Cereza seca','Pergamino',
-    'Piedra','Palo'
+  colorGranoOptions = [
+    'Azul-verde',
+    'Azulado-Verde',
+    'Verde',
+    'Verdoso',
+    'Amarillo-verde',
+    'Amarillo Pálido',
+    'Amarillento',
+    'Marrón'
   ];
-  secOptions = [
-    'Inmaduro','Mordido por insecto','Caracol',
-    'Decolorado','Cáscara','Quebrado',
-    'Malformado','Oxidado','Daño por agua'
+
+  olorOptions = [
+    'Olor Extraño',
+    'Limpio'
   ];
 
   showPrimDropdown = false;
@@ -64,16 +68,6 @@ export class AddAnalisisFisico implements OnInit, OnChanges {
 
   @ViewChild('primContainer') primContainer!: ElementRef;
   @ViewChild('secContainer')  secContainer!: ElementRef;
-
-  // getters para listas filtradas
-  get filteredPrimOptions() {
-    const f = this.filterPrim.toLowerCase();
-    return this.primOptions.filter(o => o.toLowerCase().includes(f));
-  }
-  get filteredSecOptions() {
-    const f = this.filterSec.toLowerCase();
-    return this.secOptions.filter(o => o.toLowerCase().includes(f));
-  }
 
   togglePrimDropdown() { this.showPrimDropdown = !this.showPrimDropdown; }
   toggleSecDropdown()  { this.showSecDropdown  = !this.showSecDropdown; }

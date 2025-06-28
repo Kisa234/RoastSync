@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { LoteTostado } from '../../../shared/models/lote-tostado';
 import { environment } from '../../../../environments/environment';
+import { FichaTueste } from '../../../shared/models/ficha-tueste';
 
 @Injectable({ providedIn: 'root' })
 export class LoteTostadoService {
@@ -28,5 +29,9 @@ export class LoteTostadoService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getFichaTueste(id: string): Observable<FichaTueste> {
+    return this.http.get<FichaTueste>(`${this.baseUrl}/ficha/${id}`);
   }
 }

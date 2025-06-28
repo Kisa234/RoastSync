@@ -6,14 +6,20 @@
       <h1 class="text-2xl font-bold text-[#1F1F1F]">Inventario</h1>
       <p class="text-gray-600">Gestiona muestras, lotes de café verde y café tostado</p>
     </div>
-    <button 
-      *ngIf="activeTab!=='tostado'"
-      class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
-      (click)="openAdd()"
-      >
-      <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
-      Agregar Producto
-    </button>
+    <div class="flex gap-2.5">
+      <button *ngIf="activeTab!=='tostado'"
+        class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openAdd()">
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+        Agregar Producto
+      </button>
+      <button *ngIf="activeTab!=='muestras' && activeTab!=='tostado'"
+        class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openBlendLote()">
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+        Fusionar Lotes
+      </button>
+    </div>
   </div>
 
   <!-- Contenedor de pestañas -->
@@ -21,15 +27,10 @@
     <!-- Tabs -->
     <ul class="flex bg-[#F3F2F1] rounded-t-lg overflow-hidden">
       <li *ngFor="let tab of tabs" class="flex-1">
-        <button
-          (click)="onTabSelect(tab.key)"
-          class="w-full text-center px-4 py-2 transition-colors duration-200"
-          [class.bg-white]="activeTab===tab.key"
-          [class.text-[#1F1F1F]]="activeTab===tab.key"
-          [class.font-semibold]="activeTab===tab.key"
-          [class.text-gray-500]="activeTab!==tab.key"
-          [class.hover:text-[#1F1F1F]]="activeTab!==tab.key"
-        >
+        <button (click)="onTabSelect(tab.key)" class="w-full text-center px-4 py-2 transition-colors duration-200"
+          [class.bg-white]="activeTab===tab.key" [class.text-[#1F1F1F]]="activeTab===tab.key"
+          [class.font-semibold]="activeTab===tab.key" [class.text-gray-500]="activeTab!==tab.key"
+          [class.hover:text-[#1F1F1F]]="activeTab!==tab.key">
           {{ tab.label }}
         </button>
       </li>
@@ -41,18 +42,11 @@
 
       <!-- Search -->
       <div class="mb-4 relative max-w-md">
-        <input
-          type="text"
-          [(ngModel)]="filterText"
-          (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por productor, finca o región..."
-          class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
-                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition"
-        />
-        <lucide-icon
-          [img]="Search"
-          class="absolute left-1 top-1/2 transform -translate-y-1/2 text-gray-400"
-        ></lucide-icon>
+        <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por productor, finca o región..." class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
+                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition" />
+        <lucide-icon [img]="Search"
+          class="absolute left-1 top-1/2 transform -translate-y-1/2 text-gray-400"></lucide-icon>
       </div>
 
       <!-- Tabla -->
@@ -79,28 +73,23 @@
               <td class="px-6 py-4 text-sm text-gray-700">{{ m.region }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ m.peso.toLocaleString('en-US') }}</td>
               <td class="px-6 py-4">
-                <span
-                  *ngFor="let v of m.variedades"
-                  class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full mr-1"
-                >
+                <span *ngFor="let v of m.variedades"
+                  class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full mr-1">
                   {{ v }}
                 </span>
               </td>
               <td class="px-6 py-4">
-                <span
-                  class="inline-block text-xs px-2 py-0.5 rounded-full"
-                  [ngClass]="{
+                <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
                     'bg-blue-100 text-blue-800': m.proceso==='Lavado',
                     'bg-green-100 text-green-800': m.proceso==='Natural',
                     'bg-yellow-100 text-yellow-800': m.proceso==='Honey'
-                  }"
-                >
+                  }">
                   {{ m.proceso }}
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ m.fecha_registro | date:'dd/MM/yyyy' }}</td>
               <td class="px-6 py-4 text-right text-sm space-x-2">
-                <button (click)="onReportMuestra(m)"   class="text-gray-500 hover:text-gray-700">
+                <button (click)="onReportMuestra(m)" class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="Eye" class="w-5 h-5" />
                 </button>
                 <!-- <button (click)="onEdit(m)"   class="text-gray-500 hover:text-gray-700">
@@ -122,20 +111,13 @@
 
       <!-- Search -->
       <div class="mb-4 relative max-w-md">
-        <input
-          type="text"
-          [(ngModel)]="filterText"
-          (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por productor, finca o región..."
-          class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
-                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition"
-        />
-        <lucide-icon
-          [img]="Search"
-          class="absolute left-1 top-1/2 transform -translate-y-1/2 text-gray-400"
-        ></lucide-icon>
+        <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por productor, finca o región..." class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
+                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition" />
+        <lucide-icon [img]="Search"
+          class="absolute left-1 top-1/2 transform -translate-y-1/2 text-gray-400"></lucide-icon>
       </div>
-    
+
       <div class="m-1 rounded-lg shadow-sm overflow-x-auto">
         <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
           <thead class="bg-[#F9F9F9]">
@@ -151,7 +133,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-[#E5E5E5]" *ngIf="(lotes$ | async) as lotes">
-          
+
             <!-- ADMIN -->
             <tr class="bg-[#F3F3F3]">
               <td colspan="8" class="text-left text-xs uppercase text-gray-500 py-2 px-6">Lotes de Fortunato</td>
@@ -168,14 +150,11 @@
                   </span>
                 </td>
                 <td class="px-6 py-4">
-                  <span
-                    class="inline-block text-xs px-2 py-0.5 rounded-full"
-                    [ngClass]="{
+                  <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
                       'bg-green-100 text-green-800': l.proceso==='Natural',
                       'bg-blue-100 text-blue-800': l.proceso==='Lavado',
                       'bg-yellow-100 text-yellow-800': l.proceso==='Honey'
-                    }"
-                  >
+                    }">
                     {{ l.proceso }}
                   </span>
                 </td>
@@ -204,14 +183,11 @@
                   </span>
                 </td>
                 <td class="px-6 py-4">
-                  <span
-                    class="inline-block text-xs px-2 py-0.5 rounded-full"
-                    [ngClass]="{
+                  <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
                       'bg-green-100 text-green-800': l.proceso==='Natural',
                       'bg-blue-100 text-blue-800': l.proceso==='Lavado',
                       'bg-yellow-100 text-yellow-800': l.proceso==='Honey'
-                    }"
-                  >
+                    }">
                     {{ l.proceso }}
                   </span>
                 </td>
@@ -223,7 +199,7 @@
                 </td>
               </tr>
             </ng-container>
-          
+
           </tbody>
         </table>
       </div>
@@ -231,23 +207,16 @@
 
 
 
-    
+
     <!-- 3) CAFÉ TOSTADO -->
     <section *ngIf="activeTab==='tostado'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Café Tostado</h2>
       <div class="mb-4 relative max-w-md">
-        <input
-          type="text"
-          [(ngModel)]="filterText"
-          (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por lote o fecha..."
-          class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
-                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition"
-        />
-        <lucide-icon
-          [img]="Search"
-          class="absolute left-1  top-1/2 transform -translate-y-1/2 text-gray-400"
-        ></lucide-icon>
+        <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por lote o fecha..." class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
+                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition" />
+        <lucide-icon [img]="Search"
+          class="absolute left-1  top-1/2 transform -translate-y-1/2 text-gray-400"></lucide-icon>
       </div>
       <div class=" m-1 rounded-lg shadow-sm overflow-x-auto">
         <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
@@ -269,7 +238,7 @@
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.fecha_tostado | date:'dd/MM/yyyy' }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.peso.toLocaleString('en-US') }}</td>
               <td class="px-6 py-4 text-right text-sm space-x-2">
-                <button (click)="onView(t)"   class="text-gray-500 hover:text-gray-700">
+                <button (click)="onFichaTueste(t)" class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="Eye" class="w-5 h-5" />
                 </button>
                 <!-- <button (click)="onEdit(t)"   class="text-gray-500 hover:text-gray-700">
@@ -278,9 +247,9 @@
                 <button (click)="onDelete(t)" class="text-gray-500 hover:text-red-600">
                   <lucide-icon [img]="Trash2" class="w-5 h-5" />
                 </button> -->
-                
-              </tr>
-            </tbody>
+
+            </tr>
+          </tbody>
         </table>
       </div>
     </section>
@@ -288,21 +257,14 @@
 </div>
 
 <!-- Modales -->
-<add-muestra
-  *ngIf="showAddMuestra"
-  (close)="showAddMuestra=false"
-  (create)="onMuestraCreated($event)"
-></add-muestra>
+<add-muestra *ngIf="showAddMuestra" (close)="showAddMuestra=false" (create)="onMuestraCreated()"></add-muestra>
 
-<add-lote
-  *ngIf="showAddLote"
-  (close)="showAddLote=false"
-  (create)="onLoteCreated($event)"
-></add-lote>
+<add-lote *ngIf="showAddLote" (close)="showAddLote=false" (create)="onLoteCreated()"></add-lote>
 
-<report-lote
-  [loteId]="selectedLoteId"
-  [MuestraId]="selectedMuestraId"
-  *ngIf="showReportLote"
-  (close)="showReportLote=false"
-></report-lote>
+<blend-lote *ngIf="showBlendLote" (cancel)="showBlendLote=false" (create)="onCreateBlend()"></blend-lote>
+
+<report-lote [loteId]="selectedLoteId" [MuestraId]="selectedMuestraId" *ngIf="showReportLote"
+  (close)="showReportLote=false"></report-lote>
+
+<ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false">
+</ficha-tueste>

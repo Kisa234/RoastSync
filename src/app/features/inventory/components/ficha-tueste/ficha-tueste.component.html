@@ -1,0 +1,92 @@
+<!-- roast-label-modal.component.html -->
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center z-50" (click)="OnClose()">
+    <div class="bg-white rounded-xl shadow-lg w-[400px] p-6 relative" (click)="OnClose()">
+        <!-- Cerrar -->
+        <button class="absolute top-3 right-3 text-gray-500 hover:text-black text-2xl"
+            (click)="OnClose()">&times;</button>
+
+        <!-- Logo y subtítulo -->
+        <div class="text-center mb-4">
+            <img src="../../../../../assets/img/fortunato-logo.png" alt="Fortunato" class="mx-auto h-10" />
+        </div>
+
+        <!-- Nombre grande -->
+        <div class="text-center text-lg font-semibold mb-4">
+            {{ data.id_lote }}
+        </div>
+
+        <!-- Grid de pares etiqueta / valor -->
+        <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+            <!-- Humedad -->
+            <div>
+                <div class="text-gray-600">Humedad</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.humedad }}%
+                </div>
+            </div>
+            <!-- Densidad -->
+            <div>
+                <div class="text-gray-600">Densidad</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.densidad }}
+                </div>
+            </div>
+            <!-- % Caramelización -->
+            <div>
+                <div class="text-gray-600">% Caramelización</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.caramelizacion }}%
+                </div>
+            </div>
+            <!-- Desarrollo -->
+            <div>
+                <div class="text-gray-600">Desarrollo</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.desarrollo }}
+                </div>
+            </div>
+            <!-- C. Des. -->
+            <div>
+                <div class="text-gray-600">C. Des.</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.temp_desarrollo }}
+                </div>
+            </div>
+            <!-- Rot. Com. -->
+            <div>
+                <div class="text-gray-600">Rot. Com.</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.agtrom}}
+                </div>
+            </div>
+            <!-- Tiempo -->
+            <div>
+                <div class="text-gray-600">Tiempo</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.tiempo }}
+                </div>
+            </div>
+            <!-- Tueste -->
+            <div>
+                <div class="text-gray-600">Tueste</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.tueste }}
+                </div>
+            </div>
+            <!-- Peso Total -->
+            <div>
+                <div class="text-gray-600">Peso Total</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.peso_total }}
+                </div>
+            </div>
+            <!-- Lote -->
+            <div>
+                <div class="text-gray-600">Lote</div>
+                <div class="border-b border-gray-400 pb-1 font-medium">
+                    {{ data.id_lote_tostado }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

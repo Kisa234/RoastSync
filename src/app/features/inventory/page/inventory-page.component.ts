@@ -18,12 +18,14 @@ import { AddMuestraComponent } from '../components/add-muestra/add-muestra.compo
 import { ReportLoteComponent } from '../components/report-lote/report-lote.component';
 import { UserService } from '../../users/service/users-service.service';
 import { User } from '../../../shared/models/user';
+import { FichaTuesteComponent } from "../components/ficha-tueste/ficha-tueste.component";
+import { BlendLoteComponent } from '../components/blend-lote/blend-lote.component';
 
 type InventoryTab = 'muestras' | 'verde' | 'tostado';
 
 @Component({
   selector: 'inventory-page',
-  imports: [ 
+  imports: [
     CommonModule,
     FormsModule,
     NgIf,
@@ -32,8 +34,10 @@ type InventoryTab = 'muestras' | 'verde' | 'tostado';
     LucideAngularModule,
     AddLoteComponent,
     AddMuestraComponent,
-    ReportLoteComponent
-  ],
+    ReportLoteComponent,
+    FichaTuesteComponent,
+    BlendLoteComponent
+],
   templateUrl: './inventory-page.component.html',
   styles: ``
 })
@@ -61,9 +65,14 @@ export class InventoryPage {
   showAddMuestra = false;
   showAddLote    = false;
   showReportLote = false;
+  showFichaTueste = false;
+  showBlendLote = false;
+
   filterText = '';
   selectedLoteId = '';
   selectedMuestraId = '';
+  selectedTuesteId = '';
+
   usuarios: any;
 
   constructor(
@@ -83,13 +92,20 @@ export class InventoryPage {
     if (this.activeTab === 'muestras')   this.showAddMuestra = true;
     else if (this.activeTab === 'verde') this.showAddLote    = true;
   }
+  openBlendLote() {
+    this.showBlendLote = true;
+  }
 
-  onMuestraCreated(m: Muestra) {
+  onMuestraCreated() {
     this.showAddMuestra = false;
     this.loadMuestras();
   }
-  onLoteCreated(l: Lote) {
+  onLoteCreated() {
     this.showAddLote = false;
+    this.loadLotes();
+  }
+  onCreateBlend() {
+    this.showBlendLote = false;
     this.loadLotes();
   }
 
@@ -138,6 +154,11 @@ export class InventoryPage {
     })
   }
   
+  onFichaTueste(t: LoteTostado) {
+    this.selectedTuesteId = t.id_lote_tostado;
+    this.showFichaTueste = true;
+  }
+
 
   onTabSelect(key: string) {
     this.activeTab = key as InventoryTab;

@@ -42,11 +42,13 @@
           <label class="block text-sm font-medium mb-1">Temperatura Entrada (°C)</label>
           <input type="number" [(ngModel)]="roast.temperatura_entrada" name="temperaturaEntrada"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.temperatura_entrada}}</sub>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Llama Inicial (%)</label>
           <input type="number" [(ngModel)]="roast.llama_inicial" name="llamaInicial"
-            class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.llama_inicial}}</sub>
         </div>
 
         <!-- Fila 3 -->
@@ -54,16 +56,22 @@
           <label class="block text-sm font-medium mb-1">Aire Inicial (%)</label>
           <input type="number" [(ngModel)]="roast.aire_inicial" name="aireInicial"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.aire_inicial}}</sub>
+
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Punto No Retorno (min)</label>
           <input type="number" [(ngModel)]="roast.punto_no_retorno" name="puntoNoRetorno"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.punto_no_retorno}}</sub>
+
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Tiempo Después Crack (min)</label>
           <input type="number" [(ngModel)]="roast.tiempo_despues_crack" name="tiempoDespuesCrack"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.tiempo_despues_crack}}</sub>
+
         </div>
 
         <!-- Fila 4 -->
@@ -71,16 +79,22 @@
           <label class="block text-sm font-medium mb-1">Temperatura Crack (°C)</label>
           <input type="number" [(ngModel)]="roast.temperatura_crack" name="temperaturaCrack"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.temperatura_crack}}</sub>
+
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Temperatura Salida (°C)</label>
           <input type="number" [(ngModel)]="roast.temperatura_salida" name="temperaturaSalida"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.temperatura_salida}}</sub>
+
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Tiempo Total (min)</label>
           <input type="number" [(ngModel)]="roast.tiempo_total" name="tiempoTotal"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.tiempo_total}}</sub>
+
         </div>
 
         <!-- Fila 5 -->
@@ -88,16 +102,22 @@
           <label class="block text-sm font-medium mb-1">% Caramelización</label>
           <input type="number" [(ngModel)]="roast.porcentaje_caramelizacion" name="porcentajeCaramelizacion"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.porcentaje_caramelizacion}}</sub>
+
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Desarrollo (%)</label>
           <input type="number" [(ngModel)]="roast.desarrollo" name="desarrollo"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.desarrollo}}</sub>
+
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Grados Desarrollo</label>
           <input type="number" [(ngModel)]="roast.grados_desarrollo" name="gradosDesarrollo"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+          <sub class="block text-xs font-medium mt-1">prom: {{ref.grados_desarrollo}}</sub>
+
         </div>
       </form>
 

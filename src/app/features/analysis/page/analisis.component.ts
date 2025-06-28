@@ -24,6 +24,9 @@ import { AnalisisRapido } from '../../../shared/models/analisis-rapido';
 import { Analisis } from '../../../shared/models/analisis';
 import { UserService } from '../../users/service/users-service.service';
 import { User } from '../../../shared/models/user';
+import { AddAnalisisDefectos } from '../components/add-analisis-defectos/add-analisis-defectos.component';
+import { AnalisisDefectos } from '../../../shared/models/analisis-defectos';
+import { AnalisisDefectosService } from '../service/analisis-defectos.service';
 
 @Component({
   selector: 'analisis-page',
@@ -34,6 +37,7 @@ import { User } from '../../../shared/models/user';
     AddAnalisisFisico,
     AddAnalisisSensorial,
     AddAnalisisRapido,
+    AddAnalisisDefectos,
     LucideAngularModule
   ],
   templateUrl: './analisis.component.html',
@@ -53,7 +57,7 @@ export class AnalisisPage implements OnInit {
   selectedClient = '';
 
   selectedMode: 'Crear' | 'Editar' = 'Crear';
-  tabs = ['fisico', 'sensorial', 'rapido'];
+  tabs = ['fisico', 'sensorial', 'rapido', 'defectos'];
   selectedTab = 'fisico';
 
 
@@ -65,10 +69,12 @@ export class AnalisisPage implements OnInit {
   tabLabels: Record<string, string> = {
     fisico: 'Fisico',
     sensorial: 'Sensorial',
-    rapido: 'Rapido',
+    defectos: 'Defectos',
+    rapido: 'Rapido'
   };
 
-  currentAnalysis: AnalisisFisico | AnalisisSensorial | AnalisisRapido | null = null;
+
+  currentAnalysis: AnalisisDefectos | AnalisisFisico | AnalisisSensorial | AnalisisRapido | null = null;
 
   constructor(
     private loteSvc: LoteService,
@@ -78,6 +84,7 @@ export class AnalisisPage implements OnInit {
     private analisisFisicoSvc: AnalisisFisicoService,
     private analisisSensorialSvc: AnalisisSensorialService,
     private analisisRapidoSvc: AnalisisRapidoService,
+    private analisisDefectosSvc: AnalisisDefectosService,
     private userSvc: UserService,
     private uiSvc: UiService
   ) { }
@@ -185,12 +192,12 @@ export class AnalisisPage implements OnInit {
 
     // 2) Obtener estado (tieneFisico/tieneSensorial) via checkAnalysis
     if (analisis) {
-      const { tieneFisico, tieneSensorial } = await this.checkAnalysis(analisis);
+      const { tieneFisico, tieneSensorial, tieneDefectos } = await this.checkAnalysis(analisis);
       // 3) Delegar la lógica de flujo a processAnalysis
-      await this.processAnalysis('Lote', tieneFisico, tieneSensorial, analisis);
+      await this.processAnalysis('Lote', tieneFisico, tieneSensorial, tieneDefectos, analisis);
     } else {
       // Si no hay análisis, pasar ambos como false
-      await this.processAnalysis('Lote', false, false, null);
+      await this.processAnalysis('Lote', false, false, false, null);
     }
   }
 
@@ -206,12 +213,12 @@ export class AnalisisPage implements OnInit {
 
     // 2) Obtener estado (tieneFisico/tieneSensorial) via checkAnalysis
     if (analisis) {
-      const { tieneFisico, tieneSensorial } = await this.checkAnalysis(analisis);
+      const { tieneFisico, tieneSensorial, tieneDefectos } = await this.checkAnalysis(analisis);
       // 3) Delegar la lógica de flujo a processAnalysis
-      await this.processAnalysis('Muestra', tieneFisico, tieneSensorial, analisis);
+      await this.processAnalysis('Muestra', tieneFisico, tieneSensorial, tieneDefectos, analisis);
     } else {
       // Si no hay análisis, pasar ambos como false
-      await this.processAnalysis('Muestra', false, false, null);
+      await this.processAnalysis('Muestra', false, false, false, null);
     }
   }
 
@@ -253,21 +260,22 @@ export class AnalisisPage implements OnInit {
   }
 
 
-  private async checkAnalysis(a: Analisis): Promise<{ tieneFisico: boolean; tieneSensorial: boolean; }> {
+  private async checkAnalysis(a: Analisis): Promise<{ tieneFisico: boolean; tieneSensorial: boolean; tieneDefectos: boolean }> {
     return {
       tieneFisico: a.analisisFisico_id ? true : false,
       tieneSensorial: a.analisisSensorial_id ? true : false,
+      tieneDefectos: a.analisisDefectos_id ? true : false
     };
   }
 
-  private async processAnalysis(target: string, fisico: boolean, sensorial: boolean, analisis: Analisis | null) {
+  private async processAnalysis(target: string, fisico: boolean, sensorial: boolean, defectos: boolean, analisis: Analisis | null) {
     let completo = false;
     let incompleto = false;
-    if (fisico && sensorial) {
-      // Si ambos análisis existen, preguntar si editar o crear nuevo
+    if (fisico && sensorial && defectos) {
+      // Si los tres análisis existen, preguntar si editar o crear nuevo
       completo = true;
-    } else if (fisico || sensorial) {
-      // Si solo uno de los análisis existe, preguntar si completar el otro
+    } else if (fisico || sensorial || defectos) {
+      // Si solo uno de los análisis existe, preguntar si completar el otro o editar el existente
       incompleto = true;
     }
 
@@ -292,20 +300,37 @@ export class AnalisisPage implements OnInit {
       this.createEntry(target, editar ? 'Editar' : 'Crear');
       return;
     }
-
-
     if (incompleto) {
-      const faltante = fisico ? 'sensorial' : 'físico';
-      if (this.selectedTab === faltante) {
-        this.currentAnalysis = null;
-        this.createEntry(target, 'Crear');
-      } else {
-        this.uiSvc.alert(
-          'error',
-          'Análisis incompleto',
-          `El reporte ya tiene ${fisico ? 'físico' : 'sensorial'} y falta completar el análisis.`
-        );
+      // pregunta si editar o crear nuevo
+      const opts: ConfirmOptions = {
+        title: 'Análisis incompleto',
+        message: `${target} ya tiene un análisis ${this.tabLabels[this.selectedTab]}. Desea Editarlo?`,
+        confirmText: 'Editar',
+        cancelText: 'Cancelar',
       }
+      const editar = await this.uiSvc.confirm(opts);
+      this.selectedMode = editar ? 'Editar' : 'Crear';
+      if (editar && analisis) {
+        // usuario
+        if (this.selectedTab === 'fisico' && fisico) {
+          this.currentAnalysis = await lastValueFrom(
+            this.analisisFisicoSvc.getAnalisisById(analisis!.analisisFisico_id!)
+          );
+        } else if (this.selectedTab === 'sensorial' && sensorial) {
+          this.currentAnalysis = await lastValueFrom(
+            this.analisisSensorialSvc.getAnalisisById(analisis!.analisisSensorial_id!)
+          );
+        } else if (this.selectedTab === 'defectos' && defectos) {
+          this.currentAnalysis = await lastValueFrom(
+            this.analisisDefectosSvc.getAnalisisById(analisis!.analisisDefectos_id!)
+          );
+        }
+      }
+      else {
+        // usuario canceló la edición 
+        return;
+      }
+      this.createEntry(target, this.selectedMode);
       return;
     }
 
@@ -374,7 +399,7 @@ export class AnalisisPage implements OnInit {
     });
   }
 
-  onTabChange(tab: 'fisico' | 'sensorial' | 'rapido') {
+  onTabChange(tab: 'fisico' | 'sensorial' | 'rapido' | 'defectos') {
     this.closeModal();
     this.currentAnalysis = null;
     this.selectedTab = tab;
@@ -387,103 +412,128 @@ export class AnalisisPage implements OnInit {
       return;
     }
 
-    const failed: string[] = [];
+    const failed: typeof this.history = [];
 
     for (const entry of this.history) {
       const key = `${entry.targetType.toUpperCase()}-${entry.targetId}-${entry.analysisType.toUpperCase()}-${entry.mode.toUpperCase()}`;
       console.log(key);
       const raw = localStorage.getItem(key);
       if (!raw) {
-        failed.push(`${entry.analysisType} (${entry.targetId}) — sin datos en localStorage`);
+        failed.push(entry);
         continue;
       }
-
       const payload = JSON.parse(raw);
       const typeParam =
         entry.targetType === 'Lote' ? 'lote' :
           entry.targetType === 'Muestra' ? 'muestra' :
             null;
-
       try {
         if (entry.analysisType === this.tabLabels['fisico']) {
           // Físico
           if (entry.mode === 'Editar') {
+
             await lastValueFrom(
               this.analisisFisicoSvc.updateAnalisis(entry.targetId, payload, typeParam!)
             );
-            localStorage.removeItem(key);
+
           } else {
+
             await lastValueFrom(
               this.analisisFisicoSvc.createAnalisis(payload, entry.targetId, typeParam!)
             );
-            localStorage.removeItem(key);
+
           }
 
         } else if (entry.analysisType === this.tabLabels['sensorial']) {
           // Sensorial
           if (entry.mode === 'Editar') {
+
             await lastValueFrom(
-              this.analisisSensorialSvc.updateAnalisisSensorial(
+              this.analisisSensorialSvc.updateAnalisis(
                 payload.id_analisis_sensorial!,
                 payload,
                 typeParam!
               )
             );
-            localStorage.removeItem(key);
+
           } else {
+
             await lastValueFrom(
-              this.analisisSensorialSvc.createAnalisisSensorial(
+              this.analisisSensorialSvc.createAnalisis(
                 payload,
                 entry.targetId,
                 typeParam!
               )
             );
-            localStorage.removeItem(key);
+
           }
 
-        } else {
+        } else if (entry.analysisType === this.tabLabels['defectos']) {
+          // Defectos
+          if (entry.mode === 'Editar') {
+
+            await lastValueFrom(
+              this.analisisDefectosSvc.updateAnalisis(
+                payload.id_analisis_defecto!,
+                payload,
+                typeParam!
+              )
+            );
+
+          } else {
+
+            await lastValueFrom(
+              this.analisisDefectosSvc.createAnalisis(
+                payload,
+                entry.targetId,
+                typeParam!
+              )
+            );
+
+          }
+        }
+        else {
           // Rápido (Café Tostado)
           if (entry.mode === 'Editar') {
+
             await lastValueFrom(
               this.analisisRapidoSvc.updateAnalisis(
                 payload.id_analisis_rapido!,
                 payload
               )
             );
-            localStorage.removeItem(key);
+
           } else {
+
             await lastValueFrom(
               this.analisisRapidoSvc.createAnalisis(
                 payload,
                 entry.targetId
               )
             );
-            localStorage.removeItem(key);
+
           }
         }
-
-        
-        
+        localStorage.removeItem(key);
       } catch (err) {
         console.error(`Error guardando ${entry.analysisType} ${entry.targetId}:`, err);
-        failed.push(`${entry.analysisType} (${entry.targetId})`);
+        failed.push(entry);
       }
     }
+    this.history = failed;
+    this.saveHistory();
 
     // mostrar resultado final
     if (failed.length) {
       this.uiSvc.alert(
         'warning',
         'Guardado parcial',
-        `No se pudo guardar: ${failed.join(', ')}. El resto se guardó correctamente.`
+        `No se pudo guardar algunos analisis. El resto se guardó correctamente.`
       );
     } else {
       this.uiSvc.alert('success', 'Guardado', 'Todos los análisis se guardaron correctamente.');
     }
 
-    // limpiar historial y estado global
-    this.history = [];
-    this.saveHistory();
     this.resetData();
   }
 

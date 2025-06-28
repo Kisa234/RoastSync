@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { Tueste } from '../../../shared/models/tueste';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { AvgTueste } from '../../../shared/models/avg-tueste';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,10 @@ export class RoastsService {
 
   completarTostado(id:string, tueste:Tueste): Observable<Tueste> {
     return this.http.put<Tueste>(`${this.baseUrl}/c/${id}`, {tueste});
+  }
+
+  getAverageTueste(id:string): Observable<AvgTueste> {
+    return this.http.get<AvgTueste>(`${this.baseUrl}/ref/${id}`);
   }
 
 }

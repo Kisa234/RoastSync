@@ -1,0 +1,95 @@
+<div class="bg-white rounded-lg shadow-xl w-full overflow-visible" (click)="$event.stopPropagation()">
+  <!-- HEADER -->
+  <div class="flex justify-between items-center px-6 py-4 border-b">
+    <h2 class="text-lg font-semibold">
+      {{ mode }} Análisis Defectos — {{ targetType }} {{ targetId }}
+    </h2>
+  </div>
+
+  <!-- FORM -->
+  <form class="grid grid-cols-5 gap-4 p-6">
+    <!-- Título Defectos Primarios -->
+    <div class="col-span-5">
+      <h3 class="text-md font-semibold mb-2">Defectos Primarios</h3>
+    </div>
+    <!-- Inputs Primarios -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Grano Negro</label>
+      <input type="number" [(ngModel)]="form.grano_negro" name="grano_negro" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Grano Agrio</label>
+      <input type="number" [(ngModel)]="form.grano_agrio" name="grano_agrio" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Con Hongos</label>
+      <input type="number" [(ngModel)]="form.grano_con_hongos" name="grano_con_hongos" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Cereza Seca</label>
+      <input type="number" [(ngModel)]="form.cereza_seca" name="cereza_seca" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Materia Extraña</label>
+      <input type="number" [(ngModel)]="form.materia_estrana" name="materia_estrana" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Broca Severa</label>
+      <input type="number" [(ngModel)]="form.broca_severa" name="broca_severa" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+
+    <!-- Título Defectos Secundarios -->
+    <div class="col-span-5 mt-4">
+      <h3 class="text-md font-semibold mb-2">Defectos Secundarios</h3>
+    </div>
+    <!-- Inputs Secundarios -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Negro Parcial</label>
+      <input type="number" [(ngModel)]="form.negro_parcial" name="negro_parcial" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Agrio Parcial</label>
+      <input type="number" [(ngModel)]="form.agrio_parcial" name="agrio_parcial" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Pergamino</label>
+      <input type="number" [(ngModel)]="form.pergamino" name="pergamino" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Flotadores</label>
+      <input type="number" [(ngModel)]="form.flotadores" name="flotadores" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Inmaduro</label>
+      <input type="number" [(ngModel)]="form.inmaduro" name="inmaduro" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Averanado</label>
+      <input type="number" [(ngModel)]="form.averanado" name="averanado" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Conchas</label>
+      <input type="number" [(ngModel)]="form.conchas" name="conchas" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Cáscara/Pulpa Seca</label>
+      <input type="number" [(ngModel)]="form.cascara_pulpa_seca" name="cascara_pulpa_seca" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Partido/Mordido</label>
+      <input type="number" [(ngModel)]="form.partido_mordido_cortado" name="partido_mordido_cortado" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium mb-1">Broca Leva</label>
+      <input type="number" [(ngModel)]="form.broca_leva" name="broca_leva" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+    
+    <div class="col-span-5 mt-4">
+      <h3 class="text-md font-semibold">Grado</h3>
+      <input type="text" [(ngModel)]="form.grado" name="grado" class="w-fit border rounded px-3 py-2" (ngModelChange)="persist()" />
+    </div>
+
+  </form>
+
+  
+</div>

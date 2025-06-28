@@ -3,5 +3,6 @@ export interface Analisis {
   fecha_registro: Date;
   analisisFisico_id?: string;
   analisisSensorial_id?: string;
+  analisisDefectos_id?: string;
   comentario?: string;
 }

@@ -25,7 +25,7 @@ export class AddMuestraComponent {
   readonly ChevronDown = ChevronDown;
 
   @Output() close = new EventEmitter<void>();
-  @Output() create = new EventEmitter<Muestra>();
+  @Output() create = new EventEmitter<void>();
 
   // Modelo
   model: Partial<Muestra> = {
@@ -93,7 +93,7 @@ export class AddMuestraComponent {
 
   onSave() {
     this.svc.create(this.model).subscribe(m => {
-      this.create.emit(m);
+      this.create.emit();
       this.close.emit();
     });
   }

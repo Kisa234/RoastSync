@@ -1,10 +1,6 @@
-
-
 <!-- src/app/features/roasts/components/order-roasts-modal/order-roasts-modal.component.html -->
-<div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-40 p-4"
-     (click)="onClose()">
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl overflow-auto"
-       (click)="$event.stopPropagation()">
+<div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-40 p-4" (click)="onClose()">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl overflow-auto" (click)="$event.stopPropagation()">
 
     <!-- Header -->
     <div class="flex justify-between items-center px-6 py-4 border-b border-[#E5E5E5]">
@@ -15,7 +11,7 @@
         </p>
       </div>
       <button (click)="onClose()" class="text-gray-400 hover:text-gray-600">
-        <lucide-icon [img]="X" class="w-5 h-5"/>
+        <lucide-icon [img]="X" class="w-5 h-5" />
       </button>
     </div>
 
@@ -29,17 +25,17 @@
                 <div>
                   <div class="font-medium">{{ r.id_lote }}</div>
                   <div class="text-sm text-gray-600">
-                    {{ r.peso_entrada }} Gr 
+                    {{ r.peso_entrada }} Gr
                   </div>
                 </div>
                 <div class="flex space-x-2">
                   <button (click)="openEdit(r.id_tueste)"
-                          class="px-3 py-1 border border-[#A67C52] rounded hover:bg-[#F3F2F1] transition">
-                    <lucide-icon [img]="Edit" class="w-4 h-4 mr-1 inline"/>Editar
+                    class="px-3 py-1 border border-[#A67C52] rounded hover:bg-[#F3F2F1] transition">
+                    <lucide-icon [img]="Edit" class="w-4 h-4 mr-1 inline" />Editar
                   </button>
                   <button *ngIf="r.estado_tueste=='Pendiente'" (click)="openComplete(r.id_tueste)"
-                          class="px-3 py-1 bg-[#B8672E] text-white rounded hover:bg-[#A67C52] transition">
-                    <lucide-icon [img]="Check" class="w-4 h-4 mr-1 inline"/>Finalizar
+                    class="px-3 py-1 bg-[#B8672E] text-white rounded hover:bg-[#A67C52] transition">
+                    <lucide-icon [img]="Check" class="w-4 h-4 mr-1 inline" />Finalizar
                   </button>
                 </div>
               </div>
@@ -59,7 +55,7 @@
     <!-- Footer -->
     <div class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5]">
       <button (click)="onClose()"
-              class="px-4 py-2 border border-[#A67C52] text-[#1F1F1F] rounded hover:bg-[#F3F2F1] transition">
+        class="px-4 py-2 border border-[#A67C52] text-[#1F1F1F] rounded hover:bg-[#F3F2F1] transition">
         Cerrar
       </button>
     </div>
@@ -67,16 +63,8 @@
   </div>
 </div>
 
-<edit-roast
-  *ngIf="showEdit"
-  [roastId]="selectedId"
-  (saved)="onRoasterUpdated($event)"
-  (close)="showEdit=false"
-></edit-roast>
+<edit-roast *ngIf="showEdit" [roastId]="selectedId" (saved)="onRoasterUpdated($event)"
+  (close)="showEdit=false"></edit-roast>
 
-<complete-roast
-  *ngIf="showComplete"
-  [roastId]="selectedId"
-  (saved)="onCompleted($event)"
-  (close)="showComplete = false"
-></complete-roast>
+<complete-roast *ngIf="showComplete" [roastId]="selectedId" (saved)="onCompleted($event)"
+  (close)="showComplete = false"></complete-roast>

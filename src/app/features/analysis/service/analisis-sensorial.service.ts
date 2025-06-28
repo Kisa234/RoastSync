@@ -15,7 +15,7 @@ export class AnalisisSensorialService {
   constructor(private http: HttpClient) {}
 
   // Crear un nuevo análisis sensorial
-  createAnalisisSensorial(data: AnalisisSensorial,id_lote:string,type:string): Observable<AnalisisSensorial> {
+  createAnalisis(data: AnalisisSensorial,id_lote:string,type:string): Observable<AnalisisSensorial> {
     return this.http.post<AnalisisSensorial>(`${this.baseUrl}/${id_lote}/${type}`, data);
   }
 
@@ -25,17 +25,17 @@ export class AnalisisSensorialService {
   }
 
   // Actualizar un análisis sensorial
-  updateAnalisisSensorial(id: string, data: AnalisisSensorial, type:string): Observable<AnalisisSensorial> {
+  updateAnalisis(id: string, data: AnalisisSensorial, type:string): Observable<AnalisisSensorial> {
     return this.http.put<AnalisisSensorial>(`${this.baseUrl}/${id}/${type}`, data);
   }
 
   // Obtener todos los análisis sensoriales
-  getAllAnalisisSensorial(): Observable<AnalisisSensorial[]> {
+  getAllAnalisis(): Observable<AnalisisSensorial[]> {
     return this.http.get<AnalisisSensorial[]>(`${this.baseUrl}`);
   }
 
   // Eliminar un análisis sensorial por ID
-  deleteAnalisisSensorial(id: string): Observable<AnalisisSensorial> {
+  deleteAnalisis(id: string): Observable<AnalisisSensorial> {
     return this.http.delete<AnalisisSensorial>(`${this.baseUrl}/${id}`);
   }
 }

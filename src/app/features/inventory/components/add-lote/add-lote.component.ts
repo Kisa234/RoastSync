@@ -8,6 +8,7 @@ import { MuestraService } from '../../service/muestra.service';
 import { LoteService }    from '../../service/lote.service';
 import { Muestra }        from '../../../../shared/models/muestra';
 import { Lote }           from '../../../../shared/models/lote';
+import { UserService } from '../../../users/service/users-service.service';
 
 @Component({
   selector: 'add-lote',
@@ -23,7 +24,8 @@ export class AddLoteComponent implements OnInit {
   
   constructor(
     private loteSvc:    LoteService,
-    private muestraSvc: MuestraService
+    private muestraSvc: MuestraService,
+    private userSvc:    UserService
   ) {}
 
   // icons
@@ -33,12 +35,13 @@ export class AddLoteComponent implements OnInit {
 
 
   @Output() close  = new EventEmitter<void>();
-  @Output() create = new EventEmitter<Lote>();
+  @Output() create = new EventEmitter<void>();
 
   // pestañas
   tabs: { key: string; label: string }[] = [
     { key: 'manual',       label: 'Manual' },
-    { key: 'desde-muestra', label: 'Desde Muestra' }
+    { key: 'desde-muestra', label: 'Desde Muestra' },
+    { key: 'lote-cliente', label: 'Lote Cliente' }
   ];
   activeTab = 'manual';
 
@@ -52,6 +55,7 @@ export class AddLoteComponent implements OnInit {
     variedades: [],
     proceso: '',
     tipo_lote: 'Lote Verde',
+    id_user: '',
   };
   
   variedades: string[] = [
@@ -68,6 +72,7 @@ export class AddLoteComponent implements OnInit {
   muestras: Muestra[] = [];
   selectedMuestraId = '';
   muestraPeso = 0;
+  clientes: any[] = [];
 
   // dropdown variedades
   showVarDropdown = false;
@@ -102,6 +107,7 @@ export class AddLoteComponent implements OnInit {
 
   ngOnInit() {
     this.muestraSvc.getAll().subscribe(list => this.muestras = list);
+    this.userSvc.getUsers().subscribe(u => this.clientes = u);
   }
 
   selectTab(key: string) {
@@ -117,7 +123,7 @@ export class AddLoteComponent implements OnInit {
 
   saveManual() {
     this.loteSvc.create(this.model).subscribe(l => {
-      this.create.emit(l);
+      this.create.emit();
       this.close.emit();
     });
   }
@@ -132,8 +138,15 @@ export class AddLoteComponent implements OnInit {
 
   saveFromMuestra() {
     this.loteSvc.createByMuestra(this.selectedMuestraId, this.muestraPeso).subscribe(l => {
-      this.create.emit(l);
+      this.create.emit();
       this.close.emit();  
+    });
+  }
+
+  saveLoteCliente() {
+    this.loteSvc.createRapido(this.model).subscribe(l => {
+      this.create.emit();
+      this.close.emit();
     });
   }
 }

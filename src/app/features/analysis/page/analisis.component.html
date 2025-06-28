@@ -55,9 +55,13 @@
         <button *ngIf="selectedTargetType!=='Café Tostado'" (click)="onTabChange('sensorial')" [ngClass]="selectedTab==='sensorial'
                   ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
           class="px-4 py-2 transition">Análisis Sensorial</button>
+        <button *ngIf="selectedTargetType!=='Café Tostado'" (click)="onTabChange('defectos')" [ngClass]="selectedTab==='defectos'
+                  ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
+          class="px-4 py-2 transition">Análisis Defectos</button>
         <button *ngIf="selectedTargetType==='Café Tostado'" (click)="onTabChange('rapido')" [ngClass]="selectedTab==='rapido'
                   ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
           class="px-4 py-2 transition">Análisis Rápido</button>
+        
       </div>
 
       
@@ -90,6 +94,16 @@
           [mode]="selectedMode"
           [initialData]="currentAnalysis!"
         ></add-analisis-rapido>
+      </div>
+
+      <div *ngIf="showModal && selectedTab==='defectos'" class="mb-6 w-full">        
+        <add-analisis-defectos
+          class="w-full"
+          [targetType]="selectedTargetType"
+          [targetId]="selectedLot"
+          [mode]="selectedMode"
+          [initialData]="currentAnalysis!">
+        </add-analisis-defectos>
       </div>
 
       <!-- Vistas previas -->
