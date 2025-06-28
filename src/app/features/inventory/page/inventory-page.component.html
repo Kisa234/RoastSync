@@ -257,11 +257,11 @@
 </div>
 
 <!-- Modales -->
-<add-muestra *ngIf="showAddMuestra" (close)="showAddMuestra=false" (create)="onMuestraCreated()"></add-muestra>
+<add-muestra *ngIf="showAddMuestra" (close)="showAddMuestra = false" (create)="onMuestraCreated()"></add-muestra>
 
-<add-lote *ngIf="showAddLote" (close)="showAddLote=false" (create)="onLoteCreated()"></add-lote>
+<add-lote *ngIf="showAddLote" (close)="showAddLote = false" (create)="onLoteCreated()"></add-lote>
 
-<blend-lote *ngIf="showBlendLote" (cancel)="showBlendLote=false" (create)="onCreateBlend()"></blend-lote>
+<blend-lote *ngIf="showBlendLote" (close)="showBlendLote = false" (create)="onCreateBlend()"></blend-lote>
 
 <report-lote [loteId]="selectedLoteId" [MuestraId]="selectedMuestraId" *ngIf="showReportLote"
   (close)="showReportLote=false"></report-lote>

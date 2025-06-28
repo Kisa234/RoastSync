@@ -96,7 +96,7 @@ export class BlendLoteComponent implements OnInit {
       .reduce((sum, [, peso]) => sum + (peso || 0), 0);
   }
 
-  onCancel() {
+  onClose() {
     this.close.emit();
   }
 
