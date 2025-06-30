@@ -25,8 +25,8 @@ export class AnalisisSensorialService {
   }
 
   // Actualizar un análisis sensorial
-  updateAnalisis(id: string, data: AnalisisSensorial, type:string): Observable<AnalisisSensorial> {
-    return this.http.put<AnalisisSensorial>(`${this.baseUrl}/${id}/${type}`, data);
+  updateAnalisis(id_lote: string, data: AnalisisSensorial, type:string): Observable<AnalisisSensorial> {
+    return this.http.put<AnalisisSensorial>(`${this.baseUrl}/${id_lote}/${type}`, data);
   }
 
   // Obtener todos los análisis sensoriales

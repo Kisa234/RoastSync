@@ -22,7 +22,7 @@ export class AddAnalisisDefectos {
   readonly ChevronDown = ChevronDown;
 
   form: Partial<AnalisisDefectos> = {
-    id_analisis_defecto: '',
+    id_analisis_defectos: '',
     grano_negro: 0,
     grano_agrio: 0,
     grano_con_hongos: 0,

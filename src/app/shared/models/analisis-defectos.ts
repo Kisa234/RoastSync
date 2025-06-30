@@ -1,5 +1,5 @@
 export interface AnalisisDefectos {
-    id_analisis_defecto: string,
+    id_analisis_defectos: string,
     grano_negro: number,
     grano_agrio: number,
     grano_con_hongos: number,

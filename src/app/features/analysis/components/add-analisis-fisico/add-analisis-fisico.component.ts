@@ -37,12 +37,9 @@ export class AddAnalisisFisico implements OnInit, OnChanges {
     quaquers: 0,
     peso_muestra_tostada: 0,
     desarrollo: 0,
-    pocentaje_caramelizcacion: 0,
+    porcentaje_caramelizacion: 0,
     c_desarrollo: 0,
-    grado: '',
     comentario: '',
-    defectos_primarios: [],
-    defectos_secundarios: []
   };  
 
   colorGranoOptions = [
@@ -71,22 +68,6 @@ export class AddAnalisisFisico implements OnInit, OnChanges {
 
   togglePrimDropdown() { this.showPrimDropdown = !this.showPrimDropdown; }
   toggleSecDropdown()  { this.showSecDropdown  = !this.showSecDropdown; }
-
-  onTogglePrim(option: string) {
-    const arr = this.form.defectos_primarios || [];
-    this.form.defectos_primarios = arr.includes(option)
-      ? arr.filter(x => x !== option)
-      : [...arr, option];
-    this.persist();
-  }
-
-  onToggleSec(option: string) {
-    const arr = this.form.defectos_secundarios || [];
-    this.form.defectos_secundarios = arr.includes(option)
-      ? arr.filter(x => x !== option)
-      : [...arr, option];
-    this.persist();
-  }
 
   ngOnInit() {
     this.seedStorageIfNeeded();

@@ -188,7 +188,6 @@ export class AnalisisPage implements OnInit {
     } catch (error) {
       this.uiSvc.alert('error', 'Error de servidor', 'No se pudo obtener el análisis del lote.');
     }
-    console.log('Análisis obtenido:', analisis);
 
     // 2) Obtener estado (tieneFisico/tieneSensorial) via checkAnalysis
     if (analisis) {
@@ -209,7 +208,6 @@ export class AnalisisPage implements OnInit {
     } catch (error) {
       this.uiSvc.alert('error', 'Error de servidor', 'No se pudo obtener el análisis de la muestra.');
     }
-    console.log('Análisis obtenido:', analisis);
 
     // 2) Obtener estado (tieneFisico/tieneSensorial) via checkAnalysis
     if (analisis) {
@@ -274,23 +272,37 @@ export class AnalisisPage implements OnInit {
     if (fisico && sensorial && defectos) {
       // Si los tres análisis existen, preguntar si editar o crear nuevo
       completo = true;
-    } else if (fisico || sensorial || defectos) {
+    }
+    else if (fisico || sensorial || defectos) {
       // Si solo uno de los análisis existe, preguntar si completar el otro o editar el existente
       incompleto = true;
     }
-
     if (completo) {
       // 1) Pregunta si editar o crear
       const editar = await this.askEditOrCreate(target, 'completo');
 
       // 2) Si edita, carga currentAnalysis usando el objeto analisis
       if (editar && analisis) {
-        const id = this.selectedTab === 'fisico'
-          ? analisis.analisisFisico_id!
-          : analisis.analisisSensorial_id!;
-        this.currentAnalysis = this.selectedTab === 'fisico'
-          ? await lastValueFrom(this.analisisFisicoSvc.getAnalisisById(id))
-          : await lastValueFrom(this.analisisSensorialSvc.getAnalisisById(id));
+        let id: string;
+
+        if (this.selectedTab === 'fisico') {
+          id = analisis.analisisFisico_id!;
+          this.currentAnalysis = await lastValueFrom(
+            this.analisisFisicoSvc.getAnalisisById(id)
+          );
+        }
+        else if (this.selectedTab === 'sensorial') {
+          id = analisis.analisisSensorial_id!;
+          this.currentAnalysis = await lastValueFrom(
+            this.analisisSensorialSvc.getAnalisisById(id)
+          );
+        }
+        else if (this.selectedTab === 'defectos') {
+          id = analisis.analisisDefectos_id!;
+          this.currentAnalysis = await lastValueFrom(
+            this.analisisDefectosSvc.getAnalisisById(id)
+          );
+        }
       } else {
         // Crear nuevo
         this.currentAnalysis = null;
@@ -301,16 +313,37 @@ export class AnalisisPage implements OnInit {
       return;
     }
     if (incompleto) {
-      // pregunta si editar o crear nuevo
+      let editar = false;
       const opts: ConfirmOptions = {
         title: 'Análisis incompleto',
         message: `${target} ya tiene un análisis ${this.tabLabels[this.selectedTab]}. Desea Editarlo?`,
         confirmText: 'Editar',
         cancelText: 'Cancelar',
       }
-      const editar = await this.uiSvc.confirm(opts);
+      // pregunta si editar o crear nuevo si el analisis seleccionado ya existe
+      if (this.selectedTab == 'fisico' && fisico) {
+        editar = await this.uiSvc.confirm(opts);
+        this.selectedMode = editar ? 'Editar' : 'Crear';
+        if (!editar) {
+          return;// Si no se edita, no se crea nada
+        }
+      }
+      else if (this.selectedTab == 'sensorial' && sensorial) {
+        editar = await this.uiSvc.confirm(opts);
+        this.selectedMode = editar ? 'Editar' : 'Crear';
+        if (!editar) {
+          return;// Si no se edita, no se crea nada
+        }
+      }
+      else if (this.selectedTab == 'defectos' && defectos) {
+        editar = await this.uiSvc.confirm(opts);
+        this.selectedMode = editar ? 'Editar' : 'Crear';
+        if (!editar) {
+          return;// Si no se edita, no se crea nada
+        }
+      }
       this.selectedMode = editar ? 'Editar' : 'Crear';
-      if (editar && analisis) {
+      if (editar) {
         // usuario
         if (this.selectedTab === 'fisico' && fisico) {
           this.currentAnalysis = await lastValueFrom(
@@ -325,10 +358,6 @@ export class AnalisisPage implements OnInit {
             this.analisisDefectosSvc.getAnalisisById(analisis!.analisisDefectos_id!)
           );
         }
-      }
-      else {
-        // usuario canceló la edición 
-        return;
       }
       this.createEntry(target, this.selectedMode);
       return;
@@ -416,8 +445,8 @@ export class AnalisisPage implements OnInit {
 
     for (const entry of this.history) {
       const key = `${entry.targetType.toUpperCase()}-${entry.targetId}-${entry.analysisType.toUpperCase()}-${entry.mode.toUpperCase()}`;
-      console.log(key);
       const raw = localStorage.getItem(key);
+
       if (!raw) {
         failed.push(entry);
         continue;
@@ -427,6 +456,8 @@ export class AnalisisPage implements OnInit {
         entry.targetType === 'Lote' ? 'lote' :
           entry.targetType === 'Muestra' ? 'muestra' :
             null;
+      console.log(payload);
+
       try {
         if (entry.analysisType === this.tabLabels['fisico']) {
           // Físico
@@ -449,21 +480,13 @@ export class AnalisisPage implements OnInit {
           if (entry.mode === 'Editar') {
 
             await lastValueFrom(
-              this.analisisSensorialSvc.updateAnalisis(
-                payload.id_analisis_sensorial!,
-                payload,
-                typeParam!
-              )
+              this.analisisSensorialSvc.updateAnalisis(entry.targetId, payload, typeParam!)
             );
 
           } else {
 
             await lastValueFrom(
-              this.analisisSensorialSvc.createAnalisis(
-                payload,
-                entry.targetId,
-                typeParam!
-              )
+              this.analisisSensorialSvc.createAnalisis(payload, entry.targetId, typeParam!)
             );
 
           }
@@ -471,25 +494,13 @@ export class AnalisisPage implements OnInit {
         } else if (entry.analysisType === this.tabLabels['defectos']) {
           // Defectos
           if (entry.mode === 'Editar') {
-
             await lastValueFrom(
-              this.analisisDefectosSvc.updateAnalisis(
-                payload.id_analisis_defecto!,
-                payload,
-                typeParam!
-              )
+              this.analisisDefectosSvc.updateAnalisis(entry.targetId, payload, typeParam!)
             );
-
           } else {
-
             await lastValueFrom(
-              this.analisisDefectosSvc.createAnalisis(
-                payload,
-                entry.targetId,
-                typeParam!
-              )
+              this.analisisDefectosSvc.createAnalisis(payload, entry.targetId, typeParam!)
             );
-
           }
         }
         else {
@@ -497,26 +508,18 @@ export class AnalisisPage implements OnInit {
           if (entry.mode === 'Editar') {
 
             await lastValueFrom(
-              this.analisisRapidoSvc.updateAnalisis(
-                payload.id_analisis_rapido!,
-                payload
-              )
+              this.analisisRapidoSvc.updateAnalisis(entry.targetId!, payload)
             );
-
           } else {
-
             await lastValueFrom(
-              this.analisisRapidoSvc.createAnalisis(
-                payload,
-                entry.targetId
-              )
+              this.analisisRapidoSvc.createAnalisis(payload, entry.targetId)
             );
 
           }
         }
         localStorage.removeItem(key);
       } catch (err) {
-        console.error(`Error guardando ${entry.analysisType} ${entry.targetId}:`, err);
+        console.error('UseCase Error:', err);
         failed.push(entry);
       }
     }

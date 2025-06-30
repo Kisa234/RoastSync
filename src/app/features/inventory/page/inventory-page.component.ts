@@ -62,11 +62,12 @@ export class InventoryPage {
   muestras$!: Observable<Muestra[]>;
   lotes$!:   Observable<Lote[]>;
   tostados$!:Observable<LoteTostado[]>;
+
   showAddMuestra = false;
   showAddLote    = false;
   showReportLote = false;
-  showFichaTueste = false;
   showBlendLote = false;
+  showFichaTueste = false;
 
   filterText = '';
   selectedLoteId = '';

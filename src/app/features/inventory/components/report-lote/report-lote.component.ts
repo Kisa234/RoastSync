@@ -101,12 +101,9 @@ export class ReportLoteComponent implements OnInit {
     quaquers: 0,
     peso_muestra_tostada: 0,
     desarrollo: 0,
-    pocentaje_caramelizcacion: 0,
+    porcentaje_caramelizacion: 0,
     c_desarrollo: 0,
-    grado: '',
     comentario: '',
-    defectos_primarios: [],
-    defectos_secundarios: []
   }
 
   /** Para buclear atributos sensoriales en la vista */

@@ -106,7 +106,6 @@
             <tr><td class="py-1.5">Densidad:</td><td class="py-1.5 text-right">{{ this.af.densidad }}</td></tr>
             <tr><td class="py-1.5">Color:</td><td class="py-1.5 text-right">{{ this.af.color_grano_verde }}</td></tr>
             <tr><td class="py-1.5">Olor:</td><td class="py-1.5 text-right">{{ this.af.olor }}</td></tr>
-            <tr><td class="py-1.5">Grado:</td><td class="py-1.5 text-right">{{ this.af.grado }}</td></tr>
           </tbody>
         </table>
       </div>
@@ -131,13 +130,11 @@
           <div>
             <h4 class="text-sm text-gray-600 mb-1">Primarios</h4>
             <ul class="list-disc list-inside text-sm text-[#1F1F1F]">
-              <li *ngFor="let d of this.af.defectos_primarios">{{ d }}</li>
             </ul>
           </div>
           <div>
             <h4 class="text-sm text-gray-600 mb-1">Secundarios</h4>
             <ul class="list-disc list-inside text-sm text-[#1F1F1F]">
-              <li *ngFor="let d of this.af.defectos_secundarios">{{ d }}</li>
             </ul>
           </div>
         </div>

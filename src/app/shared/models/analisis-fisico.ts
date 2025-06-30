@@ -18,11 +18,8 @@ export interface AnalisisFisico {
   quaquers: number;
   peso_muestra_tostada: number;
   desarrollo: number;
-  pocentaje_caramelizcacion: number;
+  porcentaje_caramelizacion: number;
   c_desarrollo: number;
-  grado: string;
   comentario: string;
-  defectos_primarios: string[];
-  defectos_secundarios: string[];
   eliminado?: boolean;
 }
