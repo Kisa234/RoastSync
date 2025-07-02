@@ -4,7 +4,7 @@ import { AsyncPipe, CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus } from 'lucide-angular';
 import { Search, Eye, Edit2, Trash2 } from 'lucide-angular';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { Muestra } from '../../../shared/models/muestra';
 import { Lote } from '../../../shared/models/lote';
@@ -20,6 +20,7 @@ import { UserService } from '../../users/service/users-service.service';
 import { User } from '../../../shared/models/user';
 import { FichaTuesteComponent } from "../components/ficha-tueste/ficha-tueste.component";
 import { BlendLoteComponent } from '../components/blend-lote/blend-lote.component';
+import { BlendTueste } from "../components/blend-tueste/blend-tueste.component";
 
 type InventoryTab = 'muestras' | 'verde' | 'tostado';
 
@@ -36,7 +37,9 @@ type InventoryTab = 'muestras' | 'verde' | 'tostado';
     AddMuestraComponent,
     ReportLoteComponent,
     FichaTuesteComponent,
-    BlendLoteComponent
+    BlendLoteComponent,
+    FormsModule,
+    BlendTueste
 ],
   templateUrl: './inventory-page.component.html',
   styles: ``
@@ -61,13 +64,19 @@ export class InventoryPage {
   // streams de datos
   muestras$!: Observable<Muestra[]>;
   lotes$!:   Observable<Lote[]>;
+
+
   tostados$!:Observable<LoteTostado[]>;
+  filteredTostados: LoteTostado[] = [];   
+  startDate: string = '';
+  endDate: string = '';
 
   showAddMuestra = false;
   showAddLote    = false;
   showReportLote = false;
   showBlendLote = false;
   showFichaTueste = false;
+  showBlendTueste = false;
 
   filterText = '';
   selectedLoteId = '';
@@ -87,6 +96,8 @@ export class InventoryPage {
   ngOnInit() {
     this.loadMuestras();
     this.loadUsuarios();
+    this.tostados$ = this.tostService.getAll();
+    this.tostados$.subscribe(list => this.filteredTostados = list);
   }
 
   openAdd() {
@@ -95,6 +106,9 @@ export class InventoryPage {
   }
   openBlendLote() {
     this.showBlendLote = true;
+  }
+  openBlendTueste() {
+    this.showBlendTueste = true;
   }
 
   onMuestraCreated() {
@@ -108,6 +122,11 @@ export class InventoryPage {
   onCreateBlend() {
     this.showBlendLote = false;
     this.loadLotes();
+  }
+
+  onCreateBlendTueste() {
+    this.showBlendTueste = false;
+    this.loadTostados();
   }
 
   onReportLote(l: Lote) {
@@ -166,6 +185,19 @@ export class InventoryPage {
     if (key === 'muestras')   this.loadMuestras();
     else if (key === 'verde')   this.loadLotes();
     else if (key === 'tostado') this.loadTostados();
+  }
+
+  onDateChange() {
+    this.tostados$.pipe(
+      map(list =>
+        list.filter(t => {
+          const fecha = new Date(t.fecha_tostado);
+          const desde = this.startDate ? new Date(this.startDate) : null;
+          const hasta = this.endDate ? new Date(this.endDate) : null;
+          return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
+        })
+      )
+    ).subscribe(filtered => this.filteredTostados = filtered);
   }
 
   loadMuestras() {

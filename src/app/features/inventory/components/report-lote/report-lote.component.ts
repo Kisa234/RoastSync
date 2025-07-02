@@ -17,11 +17,14 @@ import { AnalisisFisico }   from '../../../../shared/models/analisis-fisico';
 
 import { tap, switchMap } from 'rxjs/operators';
 import { MuestraService } from '../../service/muestra.service';
+import { AnalisisDefectos } from '../../../../shared/models/analisis-defectos';
+import { AnalisisDefectosService } from '../../../analysis/service/analisis-defectos.service';
+import { SpiderGraphComponent } from "../spider-graph/spider-graph.component";
 
 @Component({
   selector: 'report-lote',
   standalone: true,
-  imports: [ CommonModule, FormsModule, LucideAngularModule, NgIf, NgFor ],
+  imports: [CommonModule, FormsModule, LucideAngularModule, NgIf, NgFor, SpiderGraphComponent],
   templateUrl: './report-lote.component.html'
 })
 export class ReportLoteComponent implements OnInit {
@@ -106,6 +109,29 @@ export class ReportLoteComponent implements OnInit {
     comentario: '',
   }
 
+  ad:AnalisisDefectos= {
+    id_analisis_defectos: '',
+    grano_negro: 0,
+    grano_agrio: 0,
+    grano_con_hongos: 0,
+    cereza_seca: 0,
+    materia_estrana: 0,
+    broca_severa: 0,
+    negro_parcial: 0,
+    agrio_parcial: 0,
+    pergamino: 0,
+    flotadores: 0,
+    inmaduro: 0,
+    averanado: 0,
+    conchas: 0,
+    cascara_pulpa_seca: 0,
+    partido_mordido_cortado: 0,
+    broca_leva: 0,
+    grado: '',
+    fecha_registro: new Date(),
+    eliminado: false
+  }
+
   /** Para buclear atributos sensoriales en la vista */
   analisisSensorialFields = [
     { label: 'Fragancia/Aroma',    value: () => this.as.fragancia_aroma },
@@ -126,6 +152,7 @@ export class ReportLoteComponent implements OnInit {
     private analisisSvc: AnalisisService,
     private afSvc: AnalisisFisicoService,
     private asSvc: AnalisisSensorialService,
+    private adSvc: AnalisisDefectosService,
     private ui: UiService
   ) {}
 
@@ -150,7 +177,9 @@ export class ReportLoteComponent implements OnInit {
       switchMap(a => this.afSvc.getAnalisisById(a.analisisFisico_id!)),
       tap(f => this.af = f),
       switchMap(() => this.asSvc.getAnalisisById(this.analisis.analisisSensorial_id!)),
-      tap(s => this.as = s)
+      tap(s => this.as = s),
+      switchMap(() => this.adSvc.getAnalisisById(this.analisis.analisisDefectos_id!)),
+      tap(ad => this.ad = ad)
     ).subscribe({
       error: () => this.ui.alert('error','Error','No se pudo cargar el reporte')
     });
@@ -162,7 +191,9 @@ export class ReportLoteComponent implements OnInit {
       switchMap(a => this.afSvc.getAnalisisById(a.analisisFisico_id!)),
       tap(f => this.af = f),
       switchMap(() => this.asSvc.getAnalisisById(this.analisis.analisisSensorial_id!)),
-      tap(s => this.as = s)
+      tap(s => this.as = s),
+      switchMap(() => this.adSvc.getAnalisisById(this.analisis.analisisDefectos_id!)),
+      tap(ad => this.ad = ad)
     ).subscribe({
       error: () => this.ui.alert('error','Error','No se pudo cargar el reporte')
     });

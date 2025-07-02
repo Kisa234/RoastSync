@@ -1,11 +1,11 @@
 import { UiService } from './../../../shared/services/ui.service';
 // src/app/features/users/page/users-page.component.ts
-import { Component, OnInit }      from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgIf, NgFor, AsyncPipe } from '@angular/common';
-import { FormsModule }            from '@angular/forms';
-import { LucideAngularModule }    from 'lucide-angular';
+import { FormsModule } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 import { Search, Mail, Phone, Edit2, Trash2, UserPlus } from 'lucide-angular';
-import { Observable }             from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { User } from '../../../shared/models/user';
 import { UserService } from '../service/users-service.service';
 import { AddClientComponent } from '../components/add-client/add-client.component';
@@ -22,7 +22,7 @@ import { EditClientComponent } from "../components/edit-client/edit-client.compo
     LucideAngularModule,
     AddClientComponent,
     EditClientComponent
-],
+  ],
   templateUrl: './users-page.component.html',
   styles: []
 })
@@ -32,7 +32,7 @@ export class UsersPageComponent implements OnInit {
   constructor(
     private userSvc: UserService,
     private uiService: UiService
-   ) {}
+  ) { }
   // iconos
   readonly Search = Search;
   readonly Mail = Mail;
@@ -49,8 +49,8 @@ export class UsersPageComponent implements OnInit {
   filterText = '';
   roleOptions = [
     { label: 'Todos los roles', value: '' },
-    { label: 'Cliente',         value: 'cliente' },
-    { label: 'Administrador',   value: 'admin' }
+    { label: 'Cliente', value: 'cliente' },
+    { label: 'Administrador', value: 'admin' }
   ];
   selectedRole = '';
 
@@ -59,11 +59,20 @@ export class UsersPageComponent implements OnInit {
   selectedUserId?: string;
 
   loadUsers() {
-    this.users$ = this.selectedRole
+    const source$ = this.selectedRole
       ? this.userSvc.getUsersByRole(this.selectedRole)
       : this.userSvc.getUsers();
-  }
 
+    this.users$ = source$.pipe(
+      map(users => {
+        const term = this.filterText.trim().toLowerCase();
+        return users.filter(u =>
+          !term ||
+          u.nombre.toLowerCase().includes(term) 
+        );
+      })
+    );
+  }
   openAddClient() {
     this.showAddClient = true;
   }
@@ -86,7 +95,7 @@ export class UsersPageComponent implements OnInit {
     this.showEditClient = true;
     this.selectedUserId = u.id_user;
     this.users$ = this.userSvc.getUsers();
-  
+
   }
   onDelete(u: User) {
     this.uiService.confirm({

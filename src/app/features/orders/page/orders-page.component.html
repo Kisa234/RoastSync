@@ -24,23 +24,6 @@
       <h2 class="text-xl font-semibold text-[#1F1F1F]">Lista de Pedidos</h2>
     </div>
 
-    <!-- Buscador -->
-    <div class="max-w-md">
-      <div class="relative">
-        <input
-          type="text"
-          [(ngModel)]="filterText"
-          (ngModelChange)="onSearchChange()"
-          placeholder="Buscar..."
-          class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
-                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition"
-        />
-        <lucide-icon
-          [img]="Search"
-          class="absolute left-1 top-1/2 transform -translate-y-1/2 text-gray-400"
-        />
-      </div>
-    </div>
 
     <!-- Tabla de Pedidos -->
     <div class="overflow-x-auto m-1 rounded-lg shadow-sm ">

@@ -3,8 +3,9 @@
     <button class="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl" (click)="onClose()">&times;</button>
 
     <div class="flex flex-col items-start">
-        <h2 class="text-xl font-bold text-[#1F1F1F] text-center mb-1">Reporte de Lote - {{ lote.id_lote }}</h2>
-        <p class="text-sm text-center text-gray-500 mb-6">Análisis completo del lote {{ lote.finca }} - {{ lote.productor }}</p>
+      <h2 class="text-xl font-bold text-[#1F1F1F] text-center mb-1">Reporte de Lote - {{ lote.id_lote }}</h2>
+      <p class="text-sm text-center text-gray-500 mb-6">Análisis completo del lote {{ lote.finca }} - {{ lote.productor
+        }}</p>
     </div>
 
     <!-- Información general -->
@@ -26,33 +27,30 @@
         <div class="font-medium text-[#1F1F1F]">{{ analisis.fecha_registro | date:'dd/MM/yyyy' }}</div>
       </div>
       <div class="col-span-2 md:col-span-4 flex flex-wrap gap-2">
-        <span *ngFor="let v of lote.variedades" class="bg-[#E5E5E5] text-[#1F1F1F] text-xs px-2 py-0.5 rounded-full">{{ v }}</span>
+        <span *ngFor="let v of lote.variedades" class="bg-[#E5E5E5] text-[#1F1F1F] text-xs px-2 py-0.5 rounded-full">{{
+          v }}</span>
         <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full">{{ lote.proceso }}</span>
       </div>
     </div>
 
     <!-- Tabs -->
     <div class="bg-[#F3F2F1] p-1 rounded-lg flex w-full mx-auto mb-4">
-      <button
-        (click)="activeTab = 'sensorial'"
+      <button (click)="activeTab = 'sensorial'"
         class="flex flex-1 items-center justify-center gap-1 px-4 py-2 rounded-md text-sm transition-all duration-150"
         [ngClass]="{
           'bg-white text-[#1F1F1F] shadow-sm font-semibold': activeTab === 'sensorial',
           'text-[#7A746E] hover:text-[#1F1F1F]': activeTab !== 'sensorial'
-        }"
-      >
+        }">
         <lucide-icon [img]="Coffee" class="w-4 h-4" />
         Análisis Sensorial
       </button>
 
-      <button
-        (click)="activeTab = 'fisico'"
+      <button (click)="activeTab = 'fisico'"
         class="flex flex-1 items-center justify-center gap-1 px-4 py-2 rounded-md text-sm transition-all duration-150"
         [ngClass]="{
           'bg-white text-[#1F1F1F] shadow-sm font-semibold': activeTab === 'fisico',
           'text-[#7A746E] hover:text-[#1F1F1F]': activeTab !== 'fisico'
-        }"
-      >
+        }">
         <lucide-icon [img]="FlaskConical" class="w-4 h-4" />
         Análisis Físico
       </button>
@@ -65,25 +63,56 @@
         <h3 class="text-lg font-semibold text-[#1F1F1F] mb-2">Puntuaciones Detalladas</h3>
         <table class="w-full text-sm text-[#1F1F1F]">
           <tbody>
-            <tr><td class="py-1.5">Fragancia/Aroma:</td><td class="py-1.5 text-right">{{ this.as.fragancia_aroma }}</td></tr>
-            <tr><td class="py-1.5">Sabor:</td><td class="py-1.5 text-right">{{ this.as.sabor }}</td></tr>
-            <tr><td class="py-1.5">Sabor Residual:</td><td class="py-1.5 text-right">{{ this.as.sabor_residual }}</td></tr>
-            <tr><td class="py-1.5">Acidez:</td><td class="py-1.5 text-right">{{ this.as.acidez }}</td></tr>
-            <tr><td class="py-1.5">Cuerpo:</td><td class="py-1.5 text-right">{{ this.as.cuerpo }}</td></tr>
-            <tr><td class="py-1.5">Uniformidad:</td><td class="py-1.5 text-right">{{ this.as.uniformidad }}</td></tr>
-            <tr><td class="py-1.5">Balance:</td><td class="py-1.5 text-right">{{ this.as.balance }}</td></tr>
-            <tr><td class="py-1.5">Taza Limpia:</td><td class="py-1.5 text-right">{{ this.as.taza_limpia }}</td></tr>
-            <tr><td class="py-1.5">Dulzor:</td><td class="py-1.5 text-right">{{ this.as.dulzor }}</td></tr>
-            <tr><td class="py-1.5">Puntaje Catador:</td><td class="py-1.5 text-right">{{ this.as.puntaje_catador }}</td></tr>
+            <tr>
+              <td class="py-1.5">Fragancia/Aroma:</td>
+              <td class="py-1.5 text-right">{{ this.as.fragancia_aroma }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Sabor:</td>
+              <td class="py-1.5 text-right">{{ this.as.sabor }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Sabor Residual:</td>
+              <td class="py-1.5 text-right">{{ this.as.sabor_residual }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Acidez:</td>
+              <td class="py-1.5 text-right">{{ this.as.acidez }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Cuerpo:</td>
+              <td class="py-1.5 text-right">{{ this.as.cuerpo }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Uniformidad:</td>
+              <td class="py-1.5 text-right">{{ this.as.uniformidad }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Balance:</td>
+              <td class="py-1.5 text-right">{{ this.as.balance }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Taza Limpia:</td>
+              <td class="py-1.5 text-right">{{ this.as.taza_limpia }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Dulzor:</td>
+              <td class="py-1.5 text-right">{{ this.as.dulzor }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Puntaje Catador:</td>
+              <td class="py-1.5 text-right">{{ this.as.puntaje_catador }}</td>
+            </tr>
           </tbody>
         </table>
-        <div class="mt-4 text-center font-bold text-sm text-[#1F1F1F]">Puntaje Total: {{ this.as.puntaje_taza }} / 100</div>
+        <div class="mt-4 text-center font-bold text-sm text-[#1F1F1F]">Puntaje Total: {{ this.as.puntaje_taza }} / 100
+        </div>
       </div>
 
       <!-- Gráfico -->
       <div class="bg-white border border-[#E5E5E5] rounded-lg p-4 shadow-sm">
-        <h4 class="text-[#1F1F1F] font-semibold text-center mb-2">Perfil Sensorial</h4>
-        <!-- <app-spider-graph [data]="data" [radarChartLabels]="radarChartLabels"></app-spider-graph> -->
+        <h4 class="text-[#1F1F1F] font-semibold text-center mb-2">Spider Graph</h4>
+        <spider-graph [aS]="this.as"></spider-graph>
       </div>
 
       <!-- Comentario -->
@@ -100,12 +129,30 @@
         <h3 class="text-lg font-semibold text-[#1F1F1F] mb-2">Características Físicas</h3>
         <table class="w-full text-sm text-[#1F1F1F]">
           <tbody>
-            <tr><td class="py-1.5">Peso Muestra:</td><td class="py-1.5 text-right">{{ this.af.peso_muestra }}g</td></tr>
-            <tr><td class="py-1.5">Humedad:</td><td class="py-1.5 text-right">{{ this.af.humedad }}%</td></tr>
-            <tr><td class="py-1.5">Water Activity:</td><td class="py-1.5 text-right">{{ this.af.wa }}</td></tr>
-            <tr><td class="py-1.5">Densidad:</td><td class="py-1.5 text-right">{{ this.af.densidad }}</td></tr>
-            <tr><td class="py-1.5">Color:</td><td class="py-1.5 text-right">{{ this.af.color_grano_verde }}</td></tr>
-            <tr><td class="py-1.5">Olor:</td><td class="py-1.5 text-right">{{ this.af.olor }}</td></tr>
+            <tr>
+              <td class="py-1.5">Peso Muestra:</td>
+              <td class="py-1.5 text-right">{{ this.af.peso_muestra }}g</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Humedad:</td>
+              <td class="py-1.5 text-right">{{ this.af.humedad }}%</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Water Activity:</td>
+              <td class="py-1.5 text-right">{{ this.af.wa }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Densidad:</td>
+              <td class="py-1.5 text-right">{{ this.af.densidad }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Color:</td>
+              <td class="py-1.5 text-right">{{ this.af.color_grano_verde }}</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Olor:</td>
+              <td class="py-1.5 text-right">{{ this.af.olor }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -115,10 +162,22 @@
         <h3 class="text-lg font-semibold text-[#1F1F1F] mb-2">Distribución de Mallas</h3>
         <table class="w-full text-sm text-[#1F1F1F]">
           <tbody>
-            <tr><td class="py-1.5">Malla 18:</td><td class="py-1.5 text-right">{{ this.af.superior_malla_18 }}%</td></tr>
-            <tr><td class="py-1.5">Malla 16:</td><td class="py-1.5 text-right">{{ this.af.superior_malla_16 }}%</td></tr>
-            <tr><td class="py-1.5">Malla 14:</td><td class="py-1.5 text-right">{{ this.af.superior_malla_14 }}%</td></tr>
-            <tr><td class="py-1.5">Menor Malla 16:</td><td class="py-1.5 text-right">{{ this.af.menor_malla_16 }}%</td></tr>
+            <tr>
+              <td class="py-1.5">Malla 18:</td>
+              <td class="py-1.5 text-right">{{ this.af.superior_malla_18 }}%</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Malla 16:</td>
+              <td class="py-1.5 text-right">{{ this.af.superior_malla_16 }}%</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Malla 14:</td>
+              <td class="py-1.5 text-right">{{ this.af.superior_malla_14 }}%</td>
+            </tr>
+            <tr>
+              <td class="py-1.5">Menor Malla 16:</td>
+              <td class="py-1.5 text-right">{{ this.af.menor_malla_16 }}%</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -126,16 +185,48 @@
       <!-- Defectos -->
       <div class="md:col-span-2 bg-white border border-[#E5E5E5] rounded-lg p-4 shadow-sm">
         <h3 class="text-lg font-semibold text-[#1F1F1F] mb-2">Defectos</h3>
+
+        <!-- Muestro siempre el grado -->
+        <p class="mb-4"><strong>Grado:</strong> {{ ad.grado }}</p>
+
         <div class="grid grid-cols-2 gap-6">
+          <!-- Primarios -->
           <div>
             <h4 class="text-sm text-gray-600 mb-1">Primarios</h4>
-            <ul class="list-disc list-inside text-sm text-[#1F1F1F]">
-            </ul>
+            <div class="flex gap-5">
+              <ul class="list-disc list-inside text-sm text-[#1F1F1F]">
+                <li *ngIf="ad.grano_negro > 0">Grano negro: {{ ad.grano_negro }}</li>
+                <li *ngIf="ad.grano_agrio > 0">Grano agrio: {{ ad.grano_agrio }}</li>
+                <li *ngIf="ad.grano_con_hongos > 0">Grano con hongos: {{ ad.grano_con_hongos }}</li>
+              </ul>
+              <ul class="list-disc list-inside text-sm text-[#1F1F1F]">
+                <li *ngIf="ad.cereza_seca > 0">Cereza seca: {{ ad.cereza_seca }}</li>
+                <li *ngIf="ad.materia_estrana > 0">Materia extraña: {{ ad.materia_estrana }}</li>
+                <li *ngIf="ad.broca_severa > 0">Broca severa: {{ ad.broca_severa }}</li>
+              </ul>
+            </div>
           </div>
+
+          <!-- Secundarios -->
           <div>
             <h4 class="text-sm text-gray-600 mb-1">Secundarios</h4>
-            <ul class="list-disc list-inside text-sm text-[#1F1F1F]">
-            </ul>
+            <div class="flex gap-5">
+              <ul class="list-disc list-inside text-sm text-[#1F1F1F]">
+                <li *ngIf="ad.negro_parcial > 0">Negro parcial: {{ ad.negro_parcial }}</li>
+                <li *ngIf="ad.agrio_parcial > 0">Agrio parcial: {{ ad.agrio_parcial }}</li>
+                <li *ngIf="ad.pergamino > 0">Pergamino: {{ ad.pergamino }}</li>
+                <li *ngIf="ad.flotadores > 0">Flotadores: {{ ad.flotadores }}</li>
+                <li *ngIf="ad.inmaduro > 0">Inmaduro: {{ ad.inmaduro }}</li>
+              </ul>
+              <ul class="list-disc list-inside text-sm text-[#1F1F1F]">
+                <li *ngIf="ad.averanado > 0">Averanado: {{ ad.averanado }}</li>
+                <li *ngIf="ad.conchas > 0">Conchas: {{ ad.conchas }}</li>
+                <li *ngIf="ad.cascara_pulpa_seca > 0">Cáscara/pulpa seca: {{ ad.cascara_pulpa_seca }}</li>
+                <li *ngIf="ad.partido_mordido_cortado > 0">Partido/mordido/cortado: {{ ad.partido_mordido_cortado }}
+                </li>
+                <li *ngIf="ad.broca_leva > 0">Broca leva: {{ ad.broca_leva }}</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,155 @@
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center z-40 p-4">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg overflow-visible">
+        <!-- Header -->
+
+
+        <div class="flex justify-between items-center px-6 pt-4">
+            <div class="">
+                <h2 class="text-xl font-semibold text-[#1F1F1F]">Fusionar Lotes Tostado</h2>
+            </div>
+            <button (click)="onClose()" class="text-gray-400 hover:text-gray-600">
+                <lucide-icon [img]="X" class="w-5 h-5" />
+            </button>
+        </div>
+
+        <div class="px-6 pt-6">
+            <ul class="flex border-b border-[#E5E5E5]">
+                <li *ngFor="let t of tabs" class="mr-6">
+                    <button (click)="selectTab(t.key)" class="pb-2 text-sm font-medium transition"
+                        [class.border-b-2]="activeTab===t.key" [class.border-[#B8672E]]="activeTab===t.key"
+                        [class.text-[#1F1F1F]]="activeTab===t.key" [class.text-gray-500]="activeTab!==t.key">
+                        {{ t.label }}
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div *ngIf="activeTab==='blend'">
+            <!-- Form -->
+            <div class="px-6 py-5 space-y-4">
+                <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+                    <div class="col-span-2 sm:col-span-1">
+                        <label for="idc" class="block text-gray-700 text-sm mb-1">ID del Blend (Opcional)</label>
+                        <input id="idc" type="text" [(ngModel)]="modelBlend.idc" name="idc"
+                            placeholder="Se generará automáticamente"
+                            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <label for="id_user" class="block text-gray-700 text-sm mb-1">Clientes</label>
+                        <select [(ngModel)]="modelBlend.id_user" name="id_user"
+                            class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+                            <option value="" disabled selected>Seleccionar Cliente</option>
+                            <option *ngFor="let user of User" [value]="user.id_user">{{ user.nombre }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-gray-700 text-sm font-medium">Lotes (máx. {{ maxComponents }})</span>
+                        <button type="button" (click)="addComponent()"
+                            class="flex items-center text-[#B8672E] hover:text-[#A67C52] transition">
+                            <lucide-icon [img]="Plus" class="w-4 h-4 mr-1" />
+                            Agregar
+                        </button>
+                    </div>
+
+                    <div *ngFor="let comp of modelBlend.lotes; let i = index"
+                        class="grid grid-cols-2 gap-x-6 gap-y-4 items-end mb-4 border border-[#E5E5E5] rounded-lg p-4">
+                        <div class="col-span-2 sm:col-span-1">
+                            <label class="block text-gray-700 text-sm mb-1">Lote {{ i + 1 }}</label>
+                            <select [(ngModel)]="modelBlend.lotes[i][0]" name="lote{{ i }}"
+                                class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+                                <option value="" disabled selected>Seleccionar lote</option>
+                                <option *ngFor="let lote of availableLotes" [value]="lote.id_lote">{{ lote.id_lote }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-span-2 sm:col-span-1 flex items-end space-x-6">
+                            <div class="">
+                                <label class="block text-gray-700 text-sm mb-1">Peso (kg)</label>
+                                <input type="number" min="0" [(ngModel)]="modelBlend.lotes[i][1]" name="peso{{ i }}"
+                                    class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+                            </div>
+                            <button type="button" (click)="removeComponent(i)"
+                                class=" text-gray-400 hover:text-gray-600 transition">
+                                <lucide-icon [img]="Trash2" class="w-5 h-5 mb-1" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg px-4 py-3 flex justify-between items-center">
+                    <span class="text-gray-700 font-medium">Peso Total:</span>
+                    <span class="bg-white px-3 py-1 rounded-full text-gray-700 font-semibold">
+                        {{ totalWeight.toFixed(1) }} kg
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+        <div *ngIf="activeTab==='fusionar'">
+            <div *ngIf="activeTab==='fusionar'" class="px-6 py-5 space-y-4">
+                <!-- Recorremos los dos lotes de modelFusionar -->
+                <div *ngFor="let comp of modelFusionar.lotes; let i = index"
+                    class="grid grid-cols-2 gap-x-6 gap-y-4 items-end mb-4 border border-[#E5E5E5] rounded-lg p-4">
+
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="block text-gray-700 text-sm mb-1">Lote {{ i + 1 }}</label>
+                        <select [(ngModel)]="modelFusionar.lotes[i][0]" name="lote{{i}}" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                     focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+                            <option value="" disabled selected>Seleccionar lote</option>
+                            <option *ngFor="let lote of availableLotes" [value]="lote.id_lote">
+                                {{ lote.id_lote }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-span-2 sm:col-span-1 flex items-end space-x-6">
+                        <div>
+                            <label class="block text-gray-700 text-sm mb-1">Peso (kg)</label>
+                            <input type="number" min="0" [(ngModel)]="modelFusionar.lotes[i][1]" name="peso{{i}}"
+                                class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2
+                      placeholder-gray-400 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+                        </div>
+                        <!-- Si quieres permitir eliminar un lote (opcional) -->
+                        <button *ngIf="modelFusionar.lotes.length > 1" type="button"
+                            class="text-gray-400 hover:text-gray-600 transition">
+                            <lucide-icon [img]="Trash2" class="w-5 h-5 mb-1" />
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Total de peso -->
+                <div class="bg-gray-50 rounded-lg px-4 py-3 flex justify-between items-center">
+                    <span class="text-gray-700 font-medium">Peso Total:</span>
+                    <span class="bg-white px-3 py-1 rounded-full text-gray-700 font-semibold">
+                        {{ totalWeightFusionar.toFixed(1) }} kg
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end items-center space-x-4 px-6 py-4 border-t border-[#E5E5E5]">
+            <button (click)="onClose()"
+                class="px-4 py-2 rounded-lg border border-[#A67C52] text-[#1F1F1F] hover:bg-[#F3F2F1] transition">
+                Cancelar
+            </button>
+            <button *ngIf="activeTab=='blend'" (click)="createBlend()"
+                [disabled]="!modelBlend.id_user || totalWeight <= 0"
+                class="px-4 py-2 rounded-lg bg-[#B8672E] text-white hover:bg-[#A67C52] transition flex items-center disabled:opacity-50">
+                <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+                Crear Blend
+            </button>
+            <button *ngIf="activeTab=='fusionar'" (click)="FusionarLotes()" [disabled]=" totalWeightFusionar <= 0"
+                class="px-4 py-2 rounded-lg bg-[#B8672E] text-white hover:bg-[#A67C52] transition flex items-center disabled:opacity-50">
+                <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+                Fusionar Lotes
+            </button>
+        </div>
+    </div>
+</div>

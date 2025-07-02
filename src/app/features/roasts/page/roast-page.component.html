@@ -60,18 +60,25 @@
   <!-- 2) Historial -->
   <section class="flex-1 bg-white rounded-lg shadow-sm p-6 overflow-auto">
     <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Historial de Tuestes</h2>
-    <div class="mb-4 flex space-x-4">
-      <input type="date" [(ngModel)]="historyDate" (change)="loadHistory()"
-        class="border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
-      <select [(ngModel)]="historyLevel" (change)="loadHistory()"
+
+    <!-- filtros -->
+    <div class="mb-4 flex space-x-2 max-w-md">
+      <input type="date" [(ngModel)]="startDate" (ngModelChange)="onFilterChange()"
+        class="w-1/2 border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        placeholder="Desde..." />
+      <input type="date" [(ngModel)]="endDate" (ngModelChange)="onFilterChange()"
+        class="w-1/2 border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        placeholder="Hasta..." />
+      <select [(ngModel)]="historyLevel" (ngModelChange)="onFilterChange()"
         class="border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
         <option value="">Todos los niveles</option>
         <option *ngFor="let lvl of roastLevels" [value]="lvl">{{ lvl }}</option>
       </select>
     </div>
-    <div *ngIf="historyRoasts.length; else noHist">
+
+    <div *ngIf="filteredHistoryRoasts.length; else noHist">
       <ul class="space-y-4">
-        <li *ngFor="let h of historyRoasts" class="border border-[#E5E5E5] rounded-lg p-4">
+        <li *ngFor="let h of filteredHistoryRoasts" class="border border-[#E5E5E5] rounded-lg p-4">
           <div class="flex justify-between items-center mb-2">
             <div>
               <span class="font-medium">{{ h.id_lote }}</span>

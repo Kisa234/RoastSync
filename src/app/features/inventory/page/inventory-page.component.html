@@ -19,6 +19,12 @@
         <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
         Fusionar Lotes
       </button>
+      <button *ngIf="activeTab!=='muestras' && activeTab!=='verde'"
+        class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openBlendTueste()">
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+        Fusionar Lotes Tostados
+      </button>
     </div>
   </div>
 
@@ -39,15 +45,6 @@
     <!-- 1) MUESTRAS -->
     <section *ngIf="activeTab==='muestras'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Muestras de Café</h2>
-
-      <!-- Search -->
-      <div class="mb-4 relative max-w-md">
-        <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por productor, finca o región..." class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
-                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition" />
-        <lucide-icon [img]="Search"
-          class="absolute left-1 top-1/2 transform -translate-y-1/2 text-gray-400"></lucide-icon>
-      </div>
 
       <!-- Tabla -->
       <div class=" m-1 rounded-lg shadow-sm  overflow-x-auto">
@@ -108,15 +105,6 @@
     <!-- 2) LOTES CAFÉ VERDE -->
     <section *ngIf="activeTab==='verde'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Lotes Café Verde</h2>
-
-      <!-- Search -->
-      <div class="mb-4 relative max-w-md">
-        <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por productor, finca o región..." class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
-                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition" />
-        <lucide-icon [img]="Search"
-          class="absolute left-1 top-1/2 transform -translate-y-1/2 text-gray-400"></lucide-icon>
-      </div>
 
       <div class="m-1 rounded-lg shadow-sm overflow-x-auto">
         <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
@@ -211,14 +199,17 @@
     <!-- 3) CAFÉ TOSTADO -->
     <section *ngIf="activeTab==='tostado'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Café Tostado</h2>
-      <div class="mb-4 relative max-w-md">
-        <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por lote o fecha..." class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
-                 focus:outline-none focus:ring-1 focus:ring-[#B8672E] placeholder-gray-400 transition" />
-        <lucide-icon [img]="Search"
-          class="absolute left-1  top-1/2 transform -translate-y-1/2 text-gray-400"></lucide-icon>
+
+      <!-- Rango de fechas -->
+      <div class="mb-4 flex space-x-2 max-w-md">
+        <input type="date" [(ngModel)]="startDate" (ngModelChange)="onDateChange()"
+          class="w-1/2 border border-[#E5E5E5] rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-[#B8672E]" />
+        <input type="date" [(ngModel)]="endDate" (ngModelChange)="onDateChange()"
+          class="w-1/2 border border-[#E5E5E5] rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-[#B8672E]" />
       </div>
-      <div class=" m-1 rounded-lg shadow-sm overflow-x-auto">
+
+      <!-- Tabla filtrada -->
+      <div class="m-1 rounded-lg shadow-sm overflow-x-auto">
         <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
           <thead class="bg-[#F9F9F9]">
             <tr>
@@ -231,28 +222,25 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-[#E5E5E5]">
-            <tr *ngFor="let t of tostados$ | async">
+            <tr *ngFor="let t of filteredTostados">
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ t.id_lote_tostado }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.id_lote }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.perfil_tostado }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ t.fecha_tostado | date:'dd/MM/yyyy' }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                {{ t.fecha_tostado | date:'dd/MM/yyyy' }}
+              </td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.peso.toLocaleString('en-US') }}</td>
-              <td class="px-6 py-4 text-right text-sm space-x-2">
+              <td class="px-6 py-4 text-right text-sm">
                 <button (click)="onFichaTueste(t)" class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="Eye" class="w-5 h-5" />
                 </button>
-                <!-- <button (click)="onEdit(t)"   class="text-gray-500 hover:text-gray-700">
-                  <lucide-icon [img]="Edit2" class="w-5 h-5" />
-                </button>
-                <button (click)="onDelete(t)" class="text-gray-500 hover:text-red-600">
-                  <lucide-icon [img]="Trash2" class="w-5 h-5" />
-                </button> -->
-
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
+
   </div>
 </div>
 
@@ -262,9 +250,11 @@
 <add-lote *ngIf="showAddLote" (close)="showAddLote = false" (create)="onLoteCreated()"></add-lote>
 
 <blend-lote *ngIf="showBlendLote" (close)="showBlendLote = false" (create)="onCreateBlend()"></blend-lote>
+<blend-tueste *ngIf="showBlendTueste" (close)="showBlendTueste = false" (create)="onCreateBlendTueste()"></blend-tueste>
 
 <report-lote [loteId]="selectedLoteId" [MuestraId]="selectedMuestraId" *ngIf="showReportLote"
   (close)="showReportLote=false"></report-lote>
 
 <ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false">
 </ficha-tueste>
+

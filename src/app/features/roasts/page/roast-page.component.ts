@@ -35,19 +35,22 @@ interface ExtendedPedido extends Pedido {
   templateUrl: './roast-page.component.html',
 })
 export class RoastsPage {
-  readonly Plus   = Plus;
-  readonly X      = X;
-  readonly Check  = Check;
-  readonly Eye  = Eye;
-  readonly Edit  = Edit;
-  
-  pendingOrders: ExtendedPedido[] = [];
-  historyRoasts: ExtendedPedido[]   = [];
-  roastLevels = ['Claro', 'Medio', 'Oscuro'];
+  readonly Plus = Plus;
+  readonly X = X;
+  readonly Check = Check;
+  readonly Eye = Eye;
+  readonly Edit = Edit;
 
+  pendingOrders: ExtendedPedido[] = [];
+  allHistoryRoasts: ExtendedPedido[] = [];
+  filteredHistoryRoasts: ExtendedPedido[] = [];
+  
+  startDate    = '';
+  endDate      = '';
   showAddRoaster = false;
-  historyDate   = '';
-  historyLevel  = '';
+  historyDate = '';
+  historyLevel = '';
+  roastLevels = ['Claro', 'Medio', 'Oscuro'];
   showRoastsModal = false;
   showEditRoastModal = false;
   selectedOrder?: Pedido;
@@ -55,7 +58,7 @@ export class RoastsPage {
   constructor(
     private pedidoSvc: PedidoService,
     private userSvc: UserService,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadPending();
@@ -74,28 +77,53 @@ export class RoastsPage {
         this.pendingOrders.forEach(p => {
           this.userSvc.getUserById(p.id_user).subscribe(
             user => p.userName = user?.nombre || 'Desconocido',
-            ()   => p.userName = 'Desconocido'
+            () => p.userName = 'Desconocido'
           );
         });
       });
   }
 
   loadHistory() {
-    this.pedidoSvc.getPedidosByEstado('Completado')
-      .pipe(
-        map(list => list.filter(p => p.tipo_pedido === 'Orden Tueste')),
-        catchError(() => of([])) // Manejo de errores
-      )
-      .subscribe(list => {
-        this.historyRoasts = list.map(p => ({ ...p }));
-        // Por cada pedido, pedimos el nombre
-        this.historyRoasts.forEach(p => {
-          this.userSvc.getUserById(p.id_user).subscribe(
-            user => p.userName = user?.nombre || 'Desconocido',
-            ()   => p.userName = 'Desconocido'
-          );
-        });
-      });
+    this.pedidoSvc.getPedidosByEstado('Completado').pipe(
+      map(list => list.filter(p => p.tipo_pedido === 'Orden Tueste')),
+      catchError(() => of([]))
+    ).subscribe(list => {
+      this.allHistoryRoasts = list.map(p => ({ ...p }));
+      // carga userName igual que antes...
+      this.allHistoryRoasts.forEach(p =>
+        this.userSvc.getUserById(p.id_user).subscribe(
+          u => p.userName = u?.nombre ?? 'Desconocido',
+          () => p.userName = 'Desconocido'
+        )
+      );
+      // Aplica filtro la primera vez
+      this.applyFilter();
+    });
+  }
+
+  onFilterChange() {
+    this.applyFilter();
+  }
+
+  private applyFilter() {
+    const desde = this.startDate ? new Date(this.startDate) : null;
+    const hasta = this.endDate   ? new Date(this.endDate)   : null;
+    const nivel = this.historyLevel; // e.g. "Claro"
+
+    this.filteredHistoryRoasts = this.allHistoryRoasts.filter(h => {
+      const fecha = new Date(h.fecha_tueste!);
+      // rango de fechas
+      const inRange =
+        (!desde || fecha >= desde) &&
+        (!hasta || fecha <= hasta);
+
+      // nivel de tueste: el comentario es "Tueste Claro"/"Tueste Medio"/…
+      const nivelMatch =
+        !nivel ||
+        h.comentario === `Tueste ${nivel}`;
+
+      return inRange && nivelMatch;
+    });
   }
 
   openAddRoaster() {
