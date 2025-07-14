@@ -1,6 +1,6 @@
 import { AnalisisFisico } from './../../../shared/models/analisis-fisico';
 // src/app/features/analysis/page/analisis.component.ts
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UiService, ConfirmOptions } from '../../../shared/services/ui.service';
@@ -38,7 +38,8 @@ import { AnalisisDefectosService } from '../service/analisis-defectos.service';
     AddAnalisisSensorial,
     AddAnalisisRapido,
     AddAnalisisDefectos,
-    LucideAngularModule
+    LucideAngularModule,
+    NgIf
   ],
   templateUrl: './analisis.component.html',
 })

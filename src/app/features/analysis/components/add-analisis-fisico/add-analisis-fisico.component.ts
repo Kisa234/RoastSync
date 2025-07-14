@@ -3,11 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { X, ChevronDown, LucideAngularModule} from 'lucide-angular';
 import { AnalisisFisico } from '../../../../shared/models/analisis-fisico';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'add-analisis-fisico',
   standalone: true,
-  imports: [CommonModule, FormsModule,LucideAngularModule],
+  imports: [CommonModule, FormsModule,LucideAngularModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule],
   templateUrl: './add-analisis-fisico.component.html'
 })
 export class AddAnalisisFisico implements OnInit, OnChanges {

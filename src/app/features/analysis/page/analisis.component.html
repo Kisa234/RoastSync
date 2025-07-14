@@ -23,7 +23,7 @@
             <option *ngFor="let t of targetTypes" [value]="t">{{ t }}</option>
           </select>
         </div>
-        <div>
+        <div *ngIf="selectedTargetType!=='Muestra'">
           <label class="block text-sm font-medium mb-1">Cliente</label>
           <select [(ngModel)]="selectedClient" (ngModelChange)="onClientChange($event)" class="w-full border rounded px-3 py-2">
             <option value="" disabled selected>Selecciona cliente</option>

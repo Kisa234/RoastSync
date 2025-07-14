@@ -9,135 +9,224 @@
   <!-- FORMULARIO -->
   <form class="grid grid-cols-5 gap-4 p-6">
     <!-- Fila 1 -->
-    <div>
-      <label class="block text-sm font-medium mb-1">Peso Muestra (g)</label>
-      <input type="number" [(ngModel)]="form.peso_muestra" name="peso_muestra" class="w-full border rounded px-3 py-2"
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Peso Muestra (g)</mat-label>
+      <input matInput type="number" name="peso_muestra" [(ngModel)]="form.peso_muestra" #pesoM="ngModel" required
+        min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="pesoM.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="pesoM.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Peso Pergamino (g)</mat-label>
+      <input matInput type="number" name="peso_pergamino" [(ngModel)]="form.peso_pergamino" #pesoP="ngModel" required
+        min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="pesoP.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="pesoP.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>WA (%)</mat-label>
+      <input matInput type="number" name="wa" [(ngModel)]="form.wa" #wa="ngModel" required min="0" max="100"
         (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Peso Pergamino (g)</label>
-      <input type="number" [(ngModel)]="form.peso_pergamino" name="peso_pergamino"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">WA (%)</label>
-      <input type="number" [(ngModel)]="form.wa" name="wa" class="w-full border rounded px-3 py-2"
-        (ngModelChange)="persist()" />
-    </div>
+      <mat-error *ngIf="wa.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="wa.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+      <mat-error *ngIf="wa.hasError('max')">
+        El valor máximo es 100
+      </mat-error>
+    </mat-form-field>
 
     <!-- Fila 2 -->
-    <div>
-      <label class="block text-sm font-medium mb-1">Temp. WA (°C)</label>
-      <input type="number" [(ngModel)]="form.temperatura_wa" name="temperatura_wa"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Humedad (%)</label>
-      <input type="number" [(ngModel)]="form.humedad" name="humedad" class="w-full border rounded px-3 py-2"
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Temp. WA (°C)</mat-label>
+      <input matInput type="number" name="temperatura_wa" [(ngModel)]="form.temperatura_wa" #tWa="ngModel" required
+        min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="tWa.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="tWa.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Humedad (%)</mat-label>
+      <input matInput type="number" name="humedad" [(ngModel)]="form.humedad" #hum="ngModel" required min="0" max="100"
         (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Temp. Humedad (°C)</label>
-      <input type="number" [(ngModel)]="form.temperatura_humedad" name="temperatura_humedad"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
+      <mat-error *ngIf="hum.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="hum.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+      <mat-error *ngIf="hum.hasError('max')">
+        El valor máximo es 100
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Temp. Humedad (°C)</mat-label>
+      <input matInput type="number" name="temperatura_humedad" [(ngModel)]="form.temperatura_humedad" #tHum="ngModel"
+        required min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="tHum.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="tHum.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
 
     <!-- Fila 3 -->
-    <div>
-      <label class="block text-sm font-medium mb-1">Densidad (g/L)</label>
-      <input type="number" [(ngModel)]="form.densidad" name="densidad" class="w-full border rounded px-3 py-2"
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Densidad (g/L)</mat-label>
+      <input matInput type="number" name="densidad" [(ngModel)]="form.densidad" #dens="ngModel" required min="0"
         (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Color Grano Verde</label>
-      <select [(ngModel)]="form.color_grano_verde" name="color_grano_verde" class="w-full border rounded px-3 py-2"
+      <mat-error *ngIf="dens.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="dens.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Color Grano Verde</mat-label>
+      <select matNativeControl name="color_grano_verde" [(ngModel)]="form.color_grano_verde" #colorG="ngModel" required
         (ngModelChange)="persist()">
-        <option value="" disabled selected>Selecciona un color</option>
+        <option value="" disabled>Selecciona un color</option>
         <option *ngFor="let color of colorGranoOptions" [value]="color">
           {{ color }}
         </option>
       </select>
-    </div>
+      <mat-error *ngIf="colorG.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+    </mat-form-field>
 
-    <div>
-      <label class="block text-sm font-medium mb-1">Olor</label>
-      <select [(ngModel)]="form.olor" name="olor" class="w-full border rounded px-3 py-2" (ngModelChange)="persist()">
-        <option value="" disabled selected>Selecciona un olor</option>
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Olor</mat-label>
+      <select matNativeControl name="olor" [(ngModel)]="form.olor" #olor="ngModel" required (ngModelChange)="persist()">
+        <option value="" disabled>Selecciona un olor</option>
         <option *ngFor="let o of olorOptions" [value]="o">
           {{ o }}
         </option>
       </select>
-    </div>
+      <mat-error *ngIf="olor.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+    </mat-form-field>
 
     <!-- Fila 4 -->
-    <div>
-      <label class="block text-sm font-medium mb-1">Malla >18</label>
-      <input type="number" [(ngModel)]="form.superior_malla_18" name="superior_malla_18"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Malla >16</label>
-      <input type="number" [(ngModel)]="form.superior_malla_16" name="superior_malla_16"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Malla >14</label>
-      <input type="number" [(ngModel)]="form.superior_malla_14" name="superior_malla_14"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Malla &gt;18</mat-label>
+      <input matInput type="number" name="superior_malla_18" [(ngModel)]="form.superior_malla_18" #m18="ngModel"
+        required min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="m18.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="m18.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Malla &gt;16</mat-label>
+      <input matInput type="number" name="superior_malla_16" [(ngModel)]="form.superior_malla_16" #m16="ngModel"
+        required min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="m16.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="m16.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Malla &gt;14</mat-label>
+      <input matInput type="number" name="superior_malla_14" [(ngModel)]="form.superior_malla_14" #m14="ngModel"
+        required min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="m14.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="m14.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
 
     <!-- Fila 5 -->
-    <div>
-      <label class="block text-sm font-medium mb-1">Malla &lt;16</label>
-      <input type="number" [(ngModel)]="form.menor_malla_16" name="menor_malla_16"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Malla &lt;16</mat-label>
+      <input matInput type="number" name="menor_malla_16" [(ngModel)]="form.menor_malla_16" #m16l="ngModel" required
+        min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="m16l.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="m16l.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
 
-    <div>
-      <label class="block text-sm font-medium mb-1">Peso Defectos (g)</label>
-      <input type="number" [(ngModel)]="form.peso_defectos" name="peso_defectos" class="w-full border rounded px-3 py-2"
-        (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Quaquers</label>
-      <input type="number" [(ngModel)]="form.quaquers" name="quaquers" class="w-full border rounded px-3 py-2"
-        (ngModelChange)="persist()" />
-    </div>
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Peso Defectos (g)</mat-label>
+      <input matInput type="number" name="peso_defectos" [(ngModel)]="form.peso_defectos" #pesoD="ngModel" required
+        min="0" (ngModelChange)="persist()" />
+      <mat-error *ngIf="pesoD.hasError('required')">
+        Este campo es obligatorio
+      </mat-error>
+      <mat-error *ngIf="pesoD.hasError('min')">
+        El valor mínimo es 0
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Quaquers</mat-label>
+      <input matInput type="number" name="quaquers" [(ngModel)]="form.quaquers" (ngModelChange)="persist()" />
+    </mat-form-field>
 
     <!-- Fila 6 -->
-    <div>
-      <label class="block text-sm font-medium mb-1">Peso Muestra Tostada (g)</label>
-      <input type="number" [(ngModel)]="form.peso_muestra_tostada" name="peso_muestra_tostada"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">Desarrollo (%)</label>
-      <input type="number" [(ngModel)]="form.desarrollo" name="desarrollo" class="w-full border rounded px-3 py-2"
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Peso Muestra Tostada (g)</mat-label>
+      <input matInput type="number" name="peso_muestra_tostada" [(ngModel)]="form.peso_muestra_tostada"
         (ngModelChange)="persist()" />
-    </div>
-    <div>
-      <label class="block text-sm font-medium mb-1">% Caramelización</label>
-      <input type="number" [(ngModel)]="form.porcentaje_caramelizacion" name="pocentaje_caramelizcacion"
-        class="w-full border rounded px-3 py-2" (ngModelChange)="persist()" />
-    </div>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Desarrollo (%)</mat-label>
+      <input matInput type="number" name="desarrollo" [(ngModel)]="form.desarrollo" (ngModelChange)="persist()" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>% Caramelización</mat-label>
+      <input matInput type="number" name="porcentaje_caramelizacion" [(ngModel)]="form.porcentaje_caramelizacion"
+        (ngModelChange)="persist()" />
+    </mat-form-field>
 
     <!-- Fila 7 -->
-    <div>
-      <label class="block text-sm font-medium mb-1">C. Desarrollo</label>
-      <input type="number" [(ngModel)]="form.c_desarrollo" name="c_desarrollo" class="w-full border rounded px-3 py-2"
-        (ngModelChange)="persist()" />
-    </div>
-    
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>C. Desarrollo</mat-label>
+      <input matInput type="number" name="c_desarrollo" [(ngModel)]="form.c_desarrollo" (ngModelChange)="persist()" />
+    </mat-form-field>
 
-
+    <!-- Comentario -->
     <div class="col-span-5">
-      <label class="block text-sm font-medium mb-1">Comentario</label>
-      <textarea [(ngModel)]="form.comentario" name="comentario" class="w-full border rounded px-3 py-2" rows="3"
-        (ngModelChange)="persist()"></textarea>
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Comentario</mat-label>
+        <textarea matInput name="comentario" rows="3" [(ngModel)]="form.comentario" #comF="ngModel" maxlength="500" required
+          (ngModelChange)="persist()"></textarea>
+        <mat-hint align="end">{{ comF.value?.length || 0 }}/500</mat-hint>
+      </mat-form-field>
     </div>
-
   </form>
-
-
-
 </div>

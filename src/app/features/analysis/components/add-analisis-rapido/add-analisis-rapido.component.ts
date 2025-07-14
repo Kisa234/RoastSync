@@ -11,11 +11,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule }  from '@angular/forms';
 import { X }           from 'lucide-angular';
 import { AnalisisRapido } from '../../../../shared/models/analisis-rapido';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @Component({
   selector: 'add-analisis-rapido',
   standalone: true,
-  imports: [ CommonModule, FormsModule ],
+  imports: [ CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule,MatCheckboxModule ],
   templateUrl: './add-analisis-rapido.component.html'
 })
 export class AddAnalisisRapido implements OnInit, OnChanges {
@@ -27,23 +32,33 @@ export class AddAnalisisRapido implements OnInit, OnChanges {
 
   readonly X = X;
 
-  form: {
-    horneado: boolean;
-    humo: boolean;
-    uniforme: boolean;
-    verde: boolean;
-    arrebatado: boolean;
-    oscuro: boolean;
-    comentario: string;
-  } = {
-    horneado: false,
-    humo: false,
-    uniforme: false,
-    verde: false,
-    arrebatado: false,
-    oscuro: false,
-    comentario: ''
-  };
+  form: Partial<AnalisisRapido> = {
+    fragancia: '',
+    aroma: '',
+    floral: false,
+    afrutado: false,
+    bayas: false,
+    frutos_secos: false,
+    citricos: false,
+    acido_fermentado: false,
+    acido: false,
+    fermentado: false,
+    verde_vegetal: false,
+    otros: false,
+    quimico: false,
+    rancio: false,
+    tierra: false,
+    papel: false,
+    tostado: false,
+    nueces_cacao: false,
+    nueces: false,
+    cocoa: false,
+    especias: false,
+    dulce: false,
+    vainilla: false,
+    azucar_morena: false,
+    comentario: '',
+  }
 
   ngOnInit() {
     this.seedStorageIfNeeded();

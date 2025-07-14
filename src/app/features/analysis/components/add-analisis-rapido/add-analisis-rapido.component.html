@@ -3,72 +3,198 @@
   <div class="flex justify-between items-center px-6 py-4 border-b">
     <div>
       <h2 class="text-xl font-semibold">
-      {{ mode }} Análisis Rapido — {{ targetType }} {{ targetId }}
+        {{ mode }} Análisis Rápido — {{ targetType }} {{ targetId }}
       </h2>
       <p class="text-sm text-gray-600">Registra los atributos rápidos de tueste</p>
     </div>
-
   </div>
 
   <!-- Formulario -->
   <form class="grid grid-cols-3 gap-4 p-6">
-    <!-- Horneado -->
-    <div class="flex items-center space-x-2">
-      <input type="checkbox" [(ngModel)]="form.horneado" name="horneado" 
-        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
-        (ngModelChange)="persist()"/>
-      <label class="text-sm">Horneado</label>
-    </div>
+    <!-- Fragancia -->
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Fragancia</mat-label>
+      <input
+        matInput
+        type="text"
+        name="fragancia"
+        [(ngModel)]="form.fragancia"
+        #frag="ngModel"
+        required
+        (ngModelChange)="persist()"
+      />
+      <mat-error *ngIf="frag.hasError('required')">
+        La fragancia es obligatoria
+      </mat-error>
+    </mat-form-field>
 
-    <!-- Humo -->
-    <div class="flex items-center space-x-2">
-      <input type="checkbox" [(ngModel)]="form.humo" name="humo"
-        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
-        (ngModelChange)="persist()"/>
-      <label class="text-sm">Humo</label>
-    </div>
+    <!-- Aroma -->
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Aroma</mat-label>
+      <input
+        matInput
+        type="text"
+        name="aroma"
+        [(ngModel)]="form.aroma"
+        #arom="ngModel"
+        required
+        (ngModelChange)="persist()"
+      />
+      <mat-error *ngIf="arom.hasError('required')">
+        El aroma es obligatorio
+      </mat-error>
+    </mat-form-field>
 
-    <!-- Uniforme -->
-    <div class="flex items-center space-x-2">
-      <input type="checkbox" [(ngModel)]="form.uniforme" name="uniforme"
-        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
-        (ngModelChange)="persist()"/>
-      <label class="text-sm">Uniforme</label>
-    </div>
+    <!-- Espacio vacío para mantener grid -->
+    <div></div>
 
-    <!-- Verde -->
-    <div class="flex items-center space-x-2">
-      <input type="checkbox" [(ngModel)]="form.verde" name="verde"
-        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
-        (ngModelChange)="persist()"/>
-      <label class="text-sm">Verde</label>
-    </div>
+    <!-- Checklist -->
+    <mat-checkbox
+      name="floral"
+      [(ngModel)]="form.floral"
+      (ngModelChange)="persist()"
+      >Floral</mat-checkbox>
 
-    <!-- Arrebatado -->
-    <div class="flex items-center space-x-2">
-      <input type="checkbox" [(ngModel)]="form.arrebatado" name="arrebatado"
-        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
-        (ngModelChange)="persist()"/>
-      <label class="text-sm">Arrebatado</label>
-    </div>
+    <mat-checkbox
+      name="afrutado"
+      [(ngModel)]="form.afrutado"
+      (ngModelChange)="persist()"
+      >Afrutado</mat-checkbox>
 
-    <!-- Oscuro -->
-    <div class="flex items-center space-x-2">
-      <input type="checkbox" [(ngModel)]="form.oscuro" name="oscuro"
-        class="h-4 w-4 border rounded focus:ring focus:ring-[#B8672E]" 
-        (ngModelChange)="persist()"/>
-      <label class="text-sm">Oscuro</label>
-    </div>
+    <mat-checkbox
+      name="bayas"
+      [(ngModel)]="form.bayas"
+      (ngModelChange)="persist()"
+      >Bayas</mat-checkbox>
+
+    <mat-checkbox
+      name="frutos_secos"
+      [(ngModel)]="form.frutos_secos"
+      (ngModelChange)="persist()"
+      >Frutos Secos</mat-checkbox>
+
+    <mat-checkbox
+      name="citricos"
+      [(ngModel)]="form.citricos"
+      (ngModelChange)="persist()"
+      >Cítricos</mat-checkbox>
+
+    <mat-checkbox
+      name="acido_fermentado"
+      [(ngModel)]="form.acido_fermentado"
+      (ngModelChange)="persist()"
+      >Ácido Fermentado</mat-checkbox>
+
+    <mat-checkbox
+      name="acido"
+      [(ngModel)]="form.acido"
+      (ngModelChange)="persist()"
+      >Ácido</mat-checkbox>
+
+    <mat-checkbox
+      name="fermentado"
+      [(ngModel)]="form.fermentado"
+      (ngModelChange)="persist()"
+      >Fermentado</mat-checkbox>
+
+    <mat-checkbox
+      name="verde_vegetal"
+      [(ngModel)]="form.verde_vegetal"
+      (ngModelChange)="persist()"
+      >Verde / Vegetal</mat-checkbox>
+
+    <mat-checkbox
+      name="otros"
+      [(ngModel)]="form.otros"
+      (ngModelChange)="persist()"
+      >Otros</mat-checkbox>
+
+    <mat-checkbox
+      name="quimico"
+      [(ngModel)]="form.quimico"
+      (ngModelChange)="persist()"
+      >Químico</mat-checkbox>
+
+    <mat-checkbox
+      name="rancio"
+      [(ngModel)]="form.rancio"
+      (ngModelChange)="persist()"
+      >Rancio</mat-checkbox>
+
+    <mat-checkbox
+      name="tierra"
+      [(ngModel)]="form.tierra"
+      (ngModelChange)="persist()"
+      >Tierra</mat-checkbox>
+
+    <mat-checkbox
+      name="papel"
+      [(ngModel)]="form.papel"
+      (ngModelChange)="persist()"
+      >Papel</mat-checkbox>
+
+    <mat-checkbox
+      name="tostado"
+      [(ngModel)]="form.tostado"
+      (ngModelChange)="persist()"
+      >Tostado</mat-checkbox>
+
+    <mat-checkbox
+      name="nueces_cacao"
+      [(ngModel)]="form.nueces_cacao"
+      (ngModelChange)="persist()"
+      >Nueces Cacao</mat-checkbox>
+
+    <mat-checkbox
+      name="nueces"
+      [(ngModel)]="form.nueces"
+      (ngModelChange)="persist()"
+      >Nueces</mat-checkbox>
+
+    <mat-checkbox
+      name="cocoa"
+      [(ngModel)]="form.cocoa"
+      (ngModelChange)="persist()"
+      >Cocoa</mat-checkbox>
+
+    <mat-checkbox
+      name="especias"
+      [(ngModel)]="form.especias"
+      (ngModelChange)="persist()"
+      >Especias</mat-checkbox>
+
+    <mat-checkbox
+      name="dulce"
+      [(ngModel)]="form.dulce"
+      (ngModelChange)="persist()"
+      >Dulce</mat-checkbox>
+
+    <mat-checkbox
+      name="vainilla"
+      [(ngModel)]="form.vainilla"
+      (ngModelChange)="persist()"
+      >Vainilla</mat-checkbox>
+
+    <mat-checkbox
+      name="azucar_morena"
+      [(ngModel)]="form.azucar_morena"
+      (ngModelChange)="persist()"
+      >Azúcar Morena</mat-checkbox>
 
     <!-- Comentario -->
     <div class="col-span-3">
-      <label class="block text-sm font-medium mb-1">Comentario</label>
-      <textarea rows="3" [(ngModel)]="form.comentario" name="comentario"
-        class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]"
-        (ngModelChange)="persist()"></textarea>
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Comentario</mat-label>
+        <textarea
+          matInput
+          rows="3"
+          name="comentario"
+          [(ngModel)]="form.comentario"
+          maxlength="500"
+          (ngModelChange)="persist()"
+        ></textarea>
+        <mat-hint align="end">{{ form.comentario?.length || 0 }}/500</mat-hint>
+      </mat-form-field>
     </div>
   </form>
-
-  <!-- Footer -->
-
 </div>

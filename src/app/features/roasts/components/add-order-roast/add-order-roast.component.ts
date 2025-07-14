@@ -50,7 +50,7 @@ export class AddRoasterComponent implements OnInit {
     fecha_tueste: new Date(),
   };
 
-  
+
 
   Tostadoras: string[] = [
     'Kaleido',
@@ -93,7 +93,7 @@ export class AddRoasterComponent implements OnInit {
       this.lotes = [];
     });
 
-    
+
   }
 
   onClienteChange() {
@@ -131,23 +131,25 @@ export class AddRoasterComponent implements OnInit {
 
 
 
-  // cada vez que cambie el verde, recalculas tostado
+  private calcTostado(verde: number): number {
+    return parseFloat((verde * 0.85).toFixed(2));
+  }
+  private calcVerde(tostado: number): number {
+    return parseFloat((tostado / 0.85).toFixed(2));
+  }
+
+  // Ahora tus cuatro métodos se reducen a:
   onBatchVerdeChange(b: Batch) {
-    b.pesoTostado = parseFloat((b.pesoVerde / 1.15).toFixed(2));
+    b.pesoTostado = this.calcTostado(b.pesoVerde);
   }
-
-  // cada vez que cambie el tostado, recalculas verde
   onBatchTostadoChange(b: Batch) {
-    b.pesoVerde = parseFloat((b.pesoTostado * 1.15).toFixed(2));
+    b.pesoVerde = this.calcVerde(b.pesoTostado);
   }
-
   BatchVerde() {
-    this.batchTostado = parseFloat((this.orden.cantidad! / 1.15).toFixed(2));
+    this.batchTostado = this.calcTostado(this.orden.cantidad!);
   }
-
- 
   BatchTostado() {
-    this.orden.cantidad = parseFloat((this.batchTostado * 1.15).toFixed(2));
+    this.orden.cantidad = this.calcVerde(this.batchTostado);
   }
 
 

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ChartComponent,
@@ -30,81 +30,56 @@ export type RadarChartOptions = {
   standalone: true,
   imports: [CommonModule, ChartComponent],
   templateUrl: './spider-graph.component.html',
-  styles: [`:host { display: block; }`]
+  styles: [':host { display: block; }']
 })
 export class SpiderGraphComponent implements OnChanges {
   @Input() aS: AnalisisSensorial | null = null;
+  @ViewChild('chart') chart!: ChartComponent;
 
   public chartOptions: RadarChartOptions = {
-    series: [
-      {
-        name: 'Puntaje Sensorial',
-        data: [6, 6, 6, 6, 6, 6, 6, 6, 6]
-      }
-    ],
-    chart: {
-      type: 'radar',
-      height: 350,
-      toolbar: { show: false },
-      animations: { enabled: true }
-    },
+    series: [{ name: 'Puntaje Sensorial', data: [] }],
+    chart: { type: 'radar', height: 350, toolbar: { show: false }, animations: { enabled: true } },
     labels: [
       'Fragancia/Aroma',
       'Sabor',
       'Sabor Residual',
       'Acidez',
       'Cuerpo',
-      'Uniformidad',
-      'Balance',
-      'Taza Limpia',
-      'Dulzor'
+      'Balance'
     ],
-    stroke: {
-      show: true,
-      width: 2
-    },
-    fill: {
-      opacity: 0.2
-    },
-    markers: {
-      size: 4
-    },
+    stroke: { show: true, width: 2 },
+    fill: { opacity: 0.2 },
+    markers: { size: 4 },
     yaxis: {
       show: false,
       labels: { show: false },
       axisBorder: { show: false },
       axisTicks: { show: false },
-      min: 6,
+      min: 1,
       max: 10,
       tickAmount: 8,
       decimalsInFloat: 1
     },
-    grid: {
-      show: false
-    },
-    legend: {
-      show: false
-    }
+    grid: { show: false },
+    legend: { show: false }
   };
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['aS'] && this.aS) {
-      this.chartOptions.series = [
-        {
-          name: 'Puntaje Sensorial',
-          data: [
-            this.aS.fragancia_aroma,
-            this.aS.sabor,
-            this.aS.sabor_residual,
-            this.aS.acidez,
-            this.aS.cuerpo,
-            this.aS.uniformidad,
-            this.aS.balance,
-            this.aS.taza_limpia,
-            this.aS.dulzor
-          ]
-        }
+      const nuevosDatos = [
+        this.aS.fragancia_aroma,
+        this.aS.sabor,
+        this.aS.sabor_residual,
+        this.aS.acidez,
+        this.aS.cuerpo,
+        this.aS.balance
       ];
+
+      this.chartOptions = {
+        ...this.chartOptions,
+        series: [{ name: 'Puntaje Sensorial', data: nuevosDatos }]
+      };
+
     }
   }
 }

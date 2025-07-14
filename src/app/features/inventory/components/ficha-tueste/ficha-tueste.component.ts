@@ -12,8 +12,7 @@ import { LoteTostadoService } from '../../service/lote-tostado.service';
 export class FichaTuesteComponent implements OnInit {
   @Input() id :string = '';
   @Output() close = new EventEmitter<void>();
-
-  
+ 
   data: FichaTueste = {
     id_lote: '',
     humedad: 0,
@@ -45,5 +44,4 @@ export class FichaTuesteComponent implements OnInit {
   OnClose() {
     this.close.emit();
   }
-
 }

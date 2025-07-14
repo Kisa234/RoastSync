@@ -3,11 +3,15 @@ import { AnalisisDefectos } from '../../../../shared/models/analisis-defectos';
 import { LucideAngularModule,X,ChevronDown } from 'lucide-angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @Component({
   selector: 'add-analisis-defectos',
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule],
   templateUrl: './add-analisis-defectos.component.html',
   styles: ``
 })
@@ -22,7 +26,6 @@ export class AddAnalisisDefectos {
   readonly ChevronDown = ChevronDown;
 
   form: Partial<AnalisisDefectos> = {
-    id_analisis_defectos: '',
     grano_negro: 0,
     grano_agrio: 0,
     grano_con_hongos: 0,
@@ -40,8 +43,6 @@ export class AddAnalisisDefectos {
     partido_mordido_cortado: 0,
     broca_leva: 0,
     grado: '',
-    fecha_registro: new Date(),
-    eliminado: false
   };
 
   ngOnInit() {
