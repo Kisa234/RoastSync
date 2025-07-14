@@ -87,11 +87,14 @@ export class AddRoasterComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.userSvc.getUsers().subscribe(u => this.clientes = u);
-    this.loteSvc.getAll().subscribe(l => {
-      this.lotesAll = l;
-      this.lotes = [];
+    this.userSvc.getUsers().subscribe(usuarios => {
+    this.loteSvc.getAll().subscribe(lotes => {
+      this.lotesAll = lotes;
+      this.clientes = usuarios.filter(u =>
+        lotes.some(l => l.id_user === u.id_user)
+      );
     });
+  });
 
 
   }
