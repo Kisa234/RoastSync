@@ -10,8 +10,6 @@ import { MuestraService } from '../../service/muestra.service';
 import { Analisis } from '../../../../shared/models/analisis';
 import { AnalisisSensorialService } from '../../../analysis/service/analisis-sensorial.service';
 import { AnalisisFisicoService } from '../../../analysis/service/analisis-fisico.service';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas-pro';
 import { UserService } from '../../../users/service/users-service.service';
 import { User } from '../../../../shared/models/user';
 import { Lote } from '../../../../shared/models/lote';
@@ -222,7 +220,13 @@ export class PdfComponent implements OnInit {
     }
   }
 
-  exportPdf(): void {
+  async exportPdf(): Promise<void> {
+
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+      import('html2canvas-pro'),
+      import('jspdf')
+    ]);
+
     const original = this.pdfContent.nativeElement;
 
     // 1) Clonar el elemento y fijar su ancho

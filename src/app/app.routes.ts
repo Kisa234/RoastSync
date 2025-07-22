@@ -26,7 +26,7 @@ export const appRoutes: Routes = [
   {
     path: 'login',
     component: AuthLayoutComponent,
-    canActivateChild: [ smartRedirectGuard ],
+    canActivateChild: [smartRedirectGuard],
     children: [
       { path: '', component: AuthComponent }
     ]
@@ -36,23 +36,28 @@ export const appRoutes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [ authGuard ],
+    canActivate: [authGuard],
     children: [
       // Raíz → dashboard
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
       // Tus vistas
-      { path: 'dashboard',  component: OverviewComponent  },
-      { path: 'inventory',  component: InventoryPage      },
-      { path: 'orders',     component: OrdersPage         },
-      { path: 'roasts',     component: RoastsPage         },
-      { path: 'analisis',   component: AnalisisPage       },
-      { path: 'clients',    component: UsersPageComponent },
+      { path: 'dashboard', component: OverviewComponent },
+      { path: 'inventory', component: InventoryPage },
+      { path: 'orders', component: OrdersPage },
+      { path: 'roasts', component: RoastsPage },
+      { path: 'analisis', component: AnalisisPage },
+      { path: 'clients', component: UsersPageComponent },
 
 
       // ...otras rutas
-      { path: 'pdf/:type/:id', component: PdfPageComponent },
-
+      {
+        path: 'pdf/:type/:id',
+        loadComponent: () =>
+          import(
+            './features/inventory/components/pdf/pages/pdf-page.component'
+          ).then(m => m.PdfPageComponent)
+      },
       // Cualquier otra:  
       // – si no estás auth: authGuard → UrlTree('/login')  
       // – si sí estás auth: redirige a dashboard
