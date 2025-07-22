@@ -17,7 +17,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Grano Negro</mat-label>
       <input matInput type="number" name="grano_negro" [(ngModel)]="form.grano_negro" #grNeg="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado(); calcGrado()" />
       <mat-error *ngIf="grNeg.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -30,7 +30,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Grano Agrio</mat-label>
       <input matInput type="number" name="grano_agrio" [(ngModel)]="form.grano_agrio" #grAgr="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="grAgr.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -43,7 +43,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Con Hongos</mat-label>
       <input matInput type="number" name="grano_con_hongos" [(ngModel)]="form.grano_con_hongos" #grHong="ngModel"
-        required min="0" (ngModelChange)="persist()" />
+        required min="0" (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="grHong.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -56,7 +56,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Cereza Seca</mat-label>
       <input matInput type="number" name="cereza_seca" [(ngModel)]="form.cereza_seca" #cerSec="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="cerSec.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -69,7 +69,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Materia Extraña</mat-label>
       <input matInput type="number" name="materia_estrana" [(ngModel)]="form.materia_estrana" #matExt="ngModel" required
-        min="0" (ngModelChange)="persist()" />
+        min="0" (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="matExt.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -82,7 +82,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Broca Severa</mat-label>
       <input matInput type="number" name="broca_severa" [(ngModel)]="form.broca_severa" #broSev="ngModel" required
-        min="0" (ngModelChange)="persist()" />
+        min="0" (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="broSev.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -100,7 +100,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Negro Parcial</mat-label>
       <input matInput type="number" name="negro_parcial" [(ngModel)]="form.negro_parcial" #negPar="ngModel" required
-        min="0" (ngModelChange)="persist()" />
+        min="0" (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="negPar.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -113,7 +113,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Agrio Parcial</mat-label>
       <input matInput type="number" name="agrio_parcial" [(ngModel)]="form.agrio_parcial" #agrPar="ngModel" required
-        min="0" (ngModelChange)="persist()" />
+        min="0" (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="agrPar.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -126,7 +126,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Pergamino</mat-label>
       <input matInput type="number" name="pergamino" [(ngModel)]="form.pergamino" #perg="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="perg.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -139,7 +139,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Flotadores</mat-label>
       <input matInput type="number" name="flotadores" [(ngModel)]="form.flotadores" #flot="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="flot.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -152,7 +152,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Inmaduro</mat-label>
       <input matInput type="number" name="inmaduro" [(ngModel)]="form.inmaduro" #inmad="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="inmad.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -165,7 +165,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Averanado</mat-label>
       <input matInput type="number" name="averanado" [(ngModel)]="form.averanado" #aver="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="aver.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -178,7 +178,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Conchas</mat-label>
       <input matInput type="number" name="conchas" [(ngModel)]="form.conchas" #conch="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="conch.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -191,7 +191,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Cáscara/Pulpa Seca</mat-label>
       <input matInput type="number" name="cascara_pulpa_seca" [(ngModel)]="form.cascara_pulpa_seca" #casp="ngModel"
-        required min="0" (ngModelChange)="persist()" />
+        required min="0" (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="casp.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -204,7 +204,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Partido/Mordido</mat-label>
       <input matInput type="number" name="partido_mordido_cortado" [(ngModel)]="form.partido_mordido_cortado"
-        #part="ngModel" required min="0" (ngModelChange)="persist()" />
+        #part="ngModel" required min="0" (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="part.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -217,7 +217,7 @@
     <mat-form-field appearance="fill" class="w-full">
       <mat-label>Broca Leva</mat-label>
       <input matInput type="number" name="broca_leva" [(ngModel)]="form.broca_leva" #broLe="ngModel" required min="0"
-        (ngModelChange)="persist()" />
+        (ngModelChange)="persist(); calcGrado()" />
       <mat-error *ngIf="broLe.hasError('required')">
         Este campo es obligatorio
       </mat-error>
@@ -231,7 +231,7 @@
       <mat-form-field appearance="fill" class="w-fit">
         <mat-label>Grado</mat-label>
         <input matInput type="text" name="grado" [(ngModel)]="form.grado" #gradoF="ngModel" required
-          (ngModelChange)="persist()" />
+          (ngModelChange)="persist(); calcGrado()" />
         <mat-error *ngIf="gradoF.hasError('required')">
           Este campo es obligatorio
         </mat-error>

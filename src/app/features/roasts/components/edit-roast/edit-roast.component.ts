@@ -1,7 +1,8 @@
+import { TimeInputComponent } from './../../../../shared/components/time-input/time-input.component';
 import { Tueste } from './../../../../shared/models/tueste';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule, X } from 'lucide-angular';
 import { RoastsService } from '../../service/roasts.service';
 import { AvgTueste } from '../../../../shared/models/avg-tueste';
@@ -10,13 +11,15 @@ import { AvgTueste } from '../../../../shared/models/avg-tueste';
 @Component({
   selector: 'edit-roast',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LucideAngularModule, TimeInputComponent],
   templateUrl: 'edit-roast.component.html',
 })
 export class EditRoastComponent implements OnInit {
   @Input() roastId!: string;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<Tueste>();
+
+  
   readonly X = X;
   roast: Partial<Tueste> = {
     id_lote: '',
@@ -86,4 +89,6 @@ export class EditRoastComponent implements OnInit {
         this.close.emit();
       });
   }
+
+  
 }

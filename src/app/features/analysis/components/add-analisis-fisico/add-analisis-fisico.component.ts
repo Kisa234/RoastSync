@@ -36,7 +36,7 @@ export class AddAnalisisFisico implements OnInit, OnChanges {
     superior_malla_18: 0,
     superior_malla_16: 0,
     superior_malla_14: 0,
-    menor_malla_16: 0,
+    menor_malla_14: 0,
     peso_defectos: 0,
     quaquers: 0,
     peso_muestra_tostada: 0,

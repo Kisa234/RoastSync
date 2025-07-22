@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { AnalisisDefectos } from '../../../../shared/models/analisis-defectos';
-import { LucideAngularModule,X,ChevronDown } from 'lucide-angular';
+import { LucideAngularModule, X, ChevronDown } from 'lucide-angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -42,7 +42,7 @@ export class AddAnalisisDefectos {
     cascara_pulpa_seca: 0,
     partido_mordido_cortado: 0,
     broca_leva: 0,
-    grado: '',
+    grado: 'Grado Especial',
   };
 
   ngOnInit() {
@@ -81,13 +81,63 @@ export class AddAnalisisDefectos {
     }
   }
 
-  persist() {
-    localStorage.setItem(this.storageKey(), JSON.stringify(this.form));
-  }
+  calcGrado() {
+    let total = 0;
+    // defectos primarios
+    total += Math.floor(this.form.grano_negro! / 1);
+    total += Math.floor(this.form.grano_agrio! / 1);
+    total += Math.floor(this.form.grano_con_hongos! / 1);
+    total += Math.floor(this.form.cereza_seca! / 1);
+    total += Math.floor(this.form.materia_estrana! / 1);
+    total += Math.floor(this.form.broca_severa! / 5);
+    // defectos secundarios
+    total += Math.floor(this.form.negro_parcial! / 3);
+    total += Math.floor(this.form.agrio_parcial! / 3);
+    total += Math.floor(this.form.pergamino! / 5);
+    total += Math.floor(this.form.flotadores! / 5);
+    total += Math.floor(this.form.inmaduro! / 5);
+    total += Math.floor(this.form.averanado! / 5);
+    total += Math.floor(this.form.conchas! / 5);
+    total += Math.floor(this.form.cascara_pulpa_seca! / 5);
+    total += Math.floor(this.form.partido_mordido_cortado! / 5);
+    total += Math.floor(this.form.broca_leva! / 10);
 
-  onSave() {
-    const payload = { ...this.form } as AnalisisDefectos;
-    this.save.emit(payload);
+    // grados especial max 5 y no primarios
+    // grado 1 max 15 total
+    // grado 2 max 23 total
+    // grado 3 max 30 total
+
+    if (total <= 5 &&
+      this.form.grano_negro == 0 &&
+      this.form.grano_agrio == 0 &&
+      this.form.grano_con_hongos == 0 &&
+      this.form.cereza_seca == 0 &&
+      this.form.materia_estrana == 0 &&
+      this.form.broca_severa == 0) {
+      this.form.grado = 'Especial';
+    }
+    else if (total <= 15) {
+        this.form.grado = 'Grado 1';
+      }
+      else if (total <= 23) {
+        this.form.grado = 'Grado 2';
+      }
+      else if (total <= 30) {
+        this.form.grado = 'Grado 3';
+      }
+      else {
+        this.form.grado = 'Comercial';
+      }
+
+    }
+
+    persist() {
+      localStorage.setItem(this.storageKey(), JSON.stringify(this.form));
+    }
+
+    onSave() {
+      const payload = { ...this.form } as AnalisisDefectos;
+      this.save.emit(payload);
+    }
+
   }
-  
-}

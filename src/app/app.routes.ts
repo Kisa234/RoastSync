@@ -19,6 +19,7 @@ import { AuthComponent } from './features/auth/page/auth.component';
 import { authGuard } from './features/auth/service/auth.guard';
 import { smartRedirectGuard } from './features/auth/service/smart-redirect.guard';
 import { NotFoundRedirectComponent } from './shared/components/not-found-redirect/not-found-redirect.component';
+import { PdfPageComponent } from './features/inventory/components/pdf/pages/pdf-page.component';
 
 export const appRoutes: Routes = [
   // 1) Login
@@ -47,6 +48,10 @@ export const appRoutes: Routes = [
       { path: 'roasts',     component: RoastsPage         },
       { path: 'analisis',   component: AnalisisPage       },
       { path: 'clients',    component: UsersPageComponent },
+
+
+      // ...otras rutas
+      { path: 'pdf/:type/:id', component: PdfPageComponent },
 
       // Cualquier otra:  
       // – si no estás auth: authGuard → UrlTree('/login')  

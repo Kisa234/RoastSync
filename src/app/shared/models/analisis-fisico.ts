@@ -13,7 +13,7 @@ export interface AnalisisFisico {
   superior_malla_18: number;
   superior_malla_16: number;
   superior_malla_14: number;
-  menor_malla_16: number;
+  menor_malla_14: number;
   peso_defectos: number;
   quaquers: number;
   peso_muestra_tostada: number;

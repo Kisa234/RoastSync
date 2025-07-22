@@ -1,40 +1,45 @@
 import { Muestra } from './../../../../shared/models/muestra';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { CommonModule, NgFor, NgIf }        from '@angular/common';
-import { FormsModule }         from '@angular/forms';
-import { LucideAngularModule, X , Coffee, FlaskConical} from 'lucide-angular';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LucideAngularModule, X, Coffee, FlaskConical, Download } from 'lucide-angular';
 
-import { LoteService }                from '../../../inventory/service/lote.service';
-import { AnalisisService }            from '../../../analysis/service/analisis.service';
-import { AnalisisSensorialService }   from '../../../analysis/service/analisis-sensorial.service';
-import { AnalisisFisicoService }      from '../../../analysis/service/analisis-fisico.service';
-import { UiService }                  from '../../../../shared/services/ui.service';
+import { LoteService } from '../../../inventory/service/lote.service';
+import { AnalisisService } from '../../../analysis/service/analisis.service';
+import { AnalisisSensorialService } from '../../../analysis/service/analisis-sensorial.service';
+import { AnalisisFisicoService } from '../../../analysis/service/analisis-fisico.service';
+import { UiService } from '../../../../shared/services/ui.service';
 
-import { Lote }             from '../../../../shared/models/lote';
-import { Analisis }         from '../../../../shared/models/analisis';
-import { AnalisisSensorial }from '../../../../shared/models/analisis-sensorial';
-import { AnalisisFisico }   from '../../../../shared/models/analisis-fisico';
+import { Lote } from '../../../../shared/models/lote';
+import { Analisis } from '../../../../shared/models/analisis';
+import { AnalisisSensorial } from '../../../../shared/models/analisis-sensorial';
+import { AnalisisFisico } from '../../../../shared/models/analisis-fisico';
 
 import { tap, switchMap } from 'rxjs/operators';
 import { MuestraService } from '../../service/muestra.service';
 import { AnalisisDefectos } from '../../../../shared/models/analisis-defectos';
 import { AnalisisDefectosService } from '../../../analysis/service/analisis-defectos.service';
 import { SpiderGraphComponent } from "../spider-graph/spider-graph.component";
+import { PdfComponent } from '../pdf/pdf.component';
+import { ViewChild } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'report-lote',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, NgIf, NgFor, SpiderGraphComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, NgIf, NgFor, SpiderGraphComponent, PdfComponent, RouterLink],
   templateUrl: './report-lote.component.html'
 })
 export class ReportLoteComponent implements OnInit {
   @Input() loteId?: string;
   @Input() MuestraId?: string
   @Output() close = new EventEmitter<void>();
+  @ViewChild('pdfChild') pdfChild!: PdfComponent;
 
   readonly X = X;
   readonly Coffee = Coffee;
   readonly FlaskConical = FlaskConical;
+  readonly Download = Download;
   activeTab: 'sensorial' | 'fisico' = 'sensorial';
 
   muestra: Muestra = {
@@ -65,7 +70,7 @@ export class ReportLoteComponent implements OnInit {
   }
 
   analisis!: Analisis;
-  as: AnalisisSensorial={
+  as: AnalisisSensorial = {
     id_analisis_sensorial: '',
     fragancia_aroma: 0,
     sabor: 0,
@@ -83,8 +88,8 @@ export class ReportLoteComponent implements OnInit {
     comentario: '',
     fecha_registro: new Date(),
   }
-  
-  af: AnalisisFisico ={
+
+  af: AnalisisFisico = {
     id_analisis_fisico: '',
     fecha_registro: new Date(),
     peso_muestra: 0,
@@ -99,7 +104,7 @@ export class ReportLoteComponent implements OnInit {
     superior_malla_18: 0,
     superior_malla_16: 0,
     superior_malla_14: 0,
-    menor_malla_16: 0,
+    menor_malla_14: 0,
     peso_defectos: 0,
     quaquers: 0,
     peso_muestra_tostada: 0,
@@ -109,7 +114,7 @@ export class ReportLoteComponent implements OnInit {
     comentario: '',
   }
 
-  ad:AnalisisDefectos= {
+  ad: AnalisisDefectos = {
     id_analisis_defectos: '',
     grano_negro: 0,
     grano_agrio: 0,
@@ -134,17 +139,20 @@ export class ReportLoteComponent implements OnInit {
 
   /** Para buclear atributos sensoriales en la vista */
   analisisSensorialFields = [
-    { label: 'Fragancia/Aroma',    value: () => this.as.fragancia_aroma },
-    { label: 'Sabor',               value: () => this.as.sabor },
-    { label: 'Sabor Residual',      value: () => this.as.sabor_residual },
-    { label: 'Acidez',              value: () => this.as.acidez },
-    { label: 'Cuerpo',              value: () => this.as.cuerpo },
-    { label: 'Uniformidad',         value: () => this.as.uniformidad },
-    { label: 'Balance',             value: () => this.as.balance },
-    { label: 'Taza Limpia',         value: () => this.as.taza_limpia },
-    { label: 'Dulzor',              value: () => this.as.dulzor },
-    { label: 'Puntaje Catador',     value: () => this.as.puntaje_catador }
+    { label: 'Fragancia/Aroma', value: () => this.as.fragancia_aroma },
+    { label: 'Sabor', value: () => this.as.sabor },
+    { label: 'Sabor Residual', value: () => this.as.sabor_residual },
+    { label: 'Acidez', value: () => this.as.acidez },
+    { label: 'Cuerpo', value: () => this.as.cuerpo },
+    { label: 'Uniformidad', value: () => this.as.uniformidad },
+    { label: 'Balance', value: () => this.as.balance },
+    { label: 'Taza Limpia', value: () => this.as.taza_limpia },
+    { label: 'Dulzor', value: () => this.as.dulzor },
+    { label: 'Puntaje Catador', value: () => this.as.puntaje_catador }
   ];
+
+  id: string = '';
+  type: string = '';
 
   constructor(
     private loteSvc: LoteService,
@@ -154,13 +162,13 @@ export class ReportLoteComponent implements OnInit {
     private asSvc: AnalisisSensorialService,
     private adSvc: AnalisisDefectosService,
     private ui: UiService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.fetchData();
   }
 
-  selectTab(tab: 'sensorial'|'fisico') {
+  selectTab(tab: 'sensorial' | 'fisico') {
     this.activeTab = tab;
   }
 
@@ -169,36 +177,42 @@ export class ReportLoteComponent implements OnInit {
   }
 
   private fetchData() {
-    if(this.loteId) {
-    this.loteSvc.getById(this.loteId).pipe(
-      tap(l => this.lote = l),
-      switchMap(l => this.analisisSvc.getAnalisisById(l.id_analisis!)),
-      tap(a => this.analisis = a),
-      switchMap(a => this.afSvc.getAnalisisById(a.analisisFisico_id!)),
-      tap(f => this.af = f),
-      switchMap(() => this.asSvc.getAnalisisById(this.analisis.analisisSensorial_id!)),
-      tap(s => this.as = s),
-      switchMap(() => this.adSvc.getAnalisisById(this.analisis.analisisDefectos_id!)),
-      tap(ad => this.ad = ad)
-    ).subscribe({
-      error: () => this.ui.alert('error','Error','No se pudo cargar el reporte')
-    });
-    }else{
+    if (this.loteId) {
+      this.id = this.loteId;
+      this.type = 'lote';
+    } else {
+      this.id = this.MuestraId!;
+      this.type = 'muestra';
+    }
+    if (this.loteId) {
+      this.loteSvc.getById(this.loteId).pipe(
+        tap(l => this.lote = l),
+        switchMap(l => this.analisisSvc.getAnalisisById(l.id_analisis!)),
+        tap(a => this.analisis = a),
+        switchMap(a => this.afSvc.getAnalisisById(a.analisisFisico_id!)),
+        tap(f => this.af = f),
+        switchMap(() => this.asSvc.getAnalisisById(this.analisis.analisisSensorial_id!)),
+        tap(s => this.as = s),
+        switchMap(() => this.adSvc.getAnalisisById(this.analisis.analisisDefectos_id!)),
+        tap(ad => this.ad = ad)
+      ).subscribe({
+        error: () => this.ui.alert('error', 'Error', 'No se pudo cargar el reporte')
+      });
+    } else {
       this.muestraSvc.getById(this.MuestraId!).pipe(
-      tap(m => this.muestra = m),
-      switchMap(m => this.analisisSvc.getAnalisisById(m.id_analisis!)),
-      tap(a => this.analisis = a),
-      switchMap(a => this.afSvc.getAnalisisById(a.analisisFisico_id!)),
-      tap(f => this.af = f),
-      switchMap(() => this.asSvc.getAnalisisById(this.analisis.analisisSensorial_id!)),
-      tap(s => this.as = s),
-      switchMap(() => this.adSvc.getAnalisisById(this.analisis.analisisDefectos_id!)),
-      tap(ad => this.ad = ad)
-    ).subscribe({
-      error: () => this.ui.alert('error','Error','No se pudo cargar el reporte')
-    });
+        tap(m => this.muestra = m),
+        switchMap(m => this.analisisSvc.getAnalisisById(m.id_analisis!)),
+        tap(a => this.analisis = a),
+        switchMap(a => this.afSvc.getAnalisisById(a.analisisFisico_id!)),
+        tap(f => this.af = f),
+        switchMap(() => this.asSvc.getAnalisisById(this.analisis.analisisSensorial_id!)),
+        tap(s => this.as = s),
+        switchMap(() => this.adSvc.getAnalisisById(this.analisis.analisisDefectos_id!)),
+        tap(ad => this.ad = ad)
+      ).subscribe({
+        error: () => this.ui.alert('error', 'Error', 'No se pudo cargar el reporte')
+      });
     }
   }
-
-
 }
+

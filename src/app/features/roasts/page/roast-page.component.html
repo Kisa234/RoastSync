@@ -36,12 +36,12 @@
 
           </div>
           <div class="flex gap-2">
-            <!-- <button
+            <button
               class=" flex items-center px-4 py-2  shadow bg-[#B8672E] text-white rounded hover:bg-[#A67C52] transition"
               (click)="onEditRoast(o)">
               <lucide-icon [img]="Edit" class="w-5 h-5 mr-2" />
               Editar Orden
-            </button> -->
+            </button>
             <button
               class=" flex items-center px-4 py-2  shadow bg-[#B8672E] text-white rounded hover:bg-[#A67C52] transition"
               (click)="openRoasts(o)">
@@ -117,4 +117,4 @@
   [deliveryDate]="selectedOrder?.fecha_registro!" (close)="showRoastsModal=false">
 </order-roasts>
 
-<!-- <edit-order *ngIf="showEditRoastModal" [OrderId]="selectedOrder?.id_pedido!" (close)="showEditRoastModal=false"></edit-order>  -->
+<edit-order *ngIf="showEditRoastModal" [OrderId]="selectedOrder?.id_pedido!" (close)="showEditRoastModal=false"></edit-order> 

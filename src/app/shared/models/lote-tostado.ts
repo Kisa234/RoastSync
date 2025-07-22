@@ -6,4 +6,5 @@ export interface LoteTostado {
   peso: number;
   fecha_registro: Date;
   id_analisis_rapido?: string;
+  entregado?: Date;
 }

@@ -167,8 +167,8 @@
 
     <!-- Fila 5 -->
     <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Malla &lt;16</mat-label>
-      <input matInput type="number" name="menor_malla_16" [(ngModel)]="form.menor_malla_16" #m16l="ngModel" required
+      <mat-label>Malla &lt;14</mat-label>
+      <input matInput type="number" name="menor_malla_16" [(ngModel)]="form.menor_malla_14" #m16l="ngModel" required
         min="0" (ngModelChange)="persist()" />
       <mat-error *ngIf="m16l.hasError('required')">
         Este campo es obligatorio

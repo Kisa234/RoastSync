@@ -46,18 +46,6 @@
           </p>
         </div>
 
-        <!-- Agrton Comercial -->
-        <div>
-          <label class="block text-sm font-medium mb-1">Agrton Comercial *</label>
-          <input
-            type="number"
-            [(ngModel)]="roast.agtrom_comercial"
-            name="agrtonC"
-            (change)="calcAgtrom()"
-            class="w-full border rounded px-3 py-2 focus:ring focus:ring-green-400"
-          />
-        </div>
-
         <!-- Agrton Gourmet -->
         <div>
           <label class="block text-sm font-medium mb-1">Agrton Gourmet *</label>
@@ -65,10 +53,23 @@
             type="number"
             [(ngModel)]="roast.agtrom_gourmet"
             name="agrtonG"
+            (change)="calcAgtrom()"
+            class="w-full border rounded px-3 py-2 focus:ring focus:ring-green-400"
+            />
+          </div>
+          
+          <!-- Agrton Comercial -->
+          <div>
+            <label class="block text-sm font-medium mb-1">Agrton Comercial *</label>
+            <input
+            type="number"
+            [(ngModel)]="roast.agtrom_comercial"
+            name="agrtonC"
             disabled
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-green-400"
           />
         </div>
+        
       </form>
 
       <!-- Resumen del Tueste -->
