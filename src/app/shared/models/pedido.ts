@@ -11,6 +11,6 @@ export interface Pedido {
   id_nuevoLote_tostado?: string;
   comentario?: string;
   pesos?: number[];
-  fecha_tueste?: Date;
+  fecha_tueste?: Date | string;
   tostadora?: string;
 }

@@ -32,6 +32,11 @@ export class TimeInputComponent implements ControlValueAccessor {
     this.minutes = Math.floor(t / 60);
     this.seconds = t % 60;
   }
+
+  get promDate(): Date {
+    return new Date(this.prom * 1000);
+  }
+
   registerOnChange(fn: any) { this.onChange = fn; }
   registerOnTouched(fn: any) { this.onTouched = fn; }
 

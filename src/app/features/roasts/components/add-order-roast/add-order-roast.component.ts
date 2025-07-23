@@ -88,13 +88,13 @@ export class AddRoasterComponent implements OnInit {
 
   ngOnInit() {
     this.userSvc.getUsers().subscribe(usuarios => {
-    this.loteSvc.getAll().subscribe(lotes => {
-      this.lotesAll = lotes;
-      this.clientes = usuarios.filter(u =>
-        lotes.some(l => l.id_user === u.id_user)
-      );
+      this.loteSvc.getAll().subscribe(lotes => {
+        this.lotesAll = lotes;
+        this.clientes = usuarios.filter(u =>
+          lotes.some(l => l.id_user === u.id_user)
+        );
+      });
     });
-  });
 
 
   }
@@ -141,18 +141,23 @@ export class AddRoasterComponent implements OnInit {
     return parseFloat((tostado / 0.85).toFixed(2));
   }
 
-  // Ahora tus cuatro métodos se reducen a:
+  // cada vez que cambie el verde, recalculas tostado
   onBatchVerdeChange(b: Batch) {
-    b.pesoTostado = this.calcTostado(b.pesoVerde);
+    b.pesoTostado = parseFloat((b.pesoVerde * 0.85).toFixed(2));
   }
+
+  // cada vez que cambie el tostado, recalculas verde
   onBatchTostadoChange(b: Batch) {
-    b.pesoVerde = this.calcVerde(b.pesoTostado);
+    b.pesoVerde = parseFloat((b.pesoTostado * 1.15).toFixed(2));
   }
+
   BatchVerde() {
-    this.batchTostado = this.calcTostado(this.orden.cantidad!);
+    this.batchTostado = parseFloat((this.orden.cantidad! * 0.85).toFixed(2));
   }
+
+  // cada vez que cambie el tostado, recalculas verde
   BatchTostado() {
-    this.orden.cantidad = this.calcVerde(this.batchTostado);
+    this.orden.cantidad = parseFloat((this.batchTostado * 1.15).toFixed(2));
   }
 
 
@@ -170,9 +175,18 @@ export class AddRoasterComponent implements OnInit {
     return this.batches.reduce((sum, b) => sum + b.pesoTostado, 0);
   }
 
+  validarPesos(): boolean {
+    if (this.totalVerde !== this.orden.cantidad) {
+      this.uiSvc.alert('warning', 'error',
+        'El peso verde total de los batches debe ser igual a la cantidad de la orden.', 5000);
+      return false;
+    }
+    return true;
+  }
+
   guardar() {
     console.log('Guardar orden de tueste', this.orden);
-    // validar que exista al menos un batch
+    if (!this.validarPesos()) return;
     if (!this.batches.length) return;
     this.orden.pesos = this.batches.map(b => b.pesoVerde);
     // construir payload

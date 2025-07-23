@@ -67,6 +67,7 @@ export class EditOrderComponent implements OnInit {
 
   nextId = 1;
 
+  totalPesoVerde = 0;
 
   tiposTueste = [
     'Tueste Claro',
@@ -81,12 +82,10 @@ export class EditOrderComponent implements OnInit {
     private loteSvc: LoteService,
     private userSvc: UserService,
     private uiSvc: UiService,
-    private analisisSvc: AnalisisService,
     private roastsService: RoastsService
   ) { }
 
   ngOnInit() {
-
     forkJoin({
       users: this.userSvc.getUsers(),
       lotesMaestros: this.loteSvc.getAll(),
@@ -94,38 +93,28 @@ export class EditOrderComponent implements OnInit {
     }).subscribe(({ users, lotesMaestros, order }) => {
       this.clientes = users;
       this.lotesAll = lotesMaestros;
-      this.orden = { ...order };
+      this.orden = {
+        ...order,
+        fecha_tueste: this.formatDate(order.fecha_tueste!)
+      };
 
-      // 2) Filtra lotes según cliente de la orden
+      // 1) Filtra lotes según cliente de la orden
       this.lotes = this.lotesAll.filter(l => l.id_user === this.orden.id_user);
+      this.batchTostado = parseFloat((this.orden.cantidad! * 0.85).toFixed(2));
 
-      // 3) Valida análisis y calcula stocks disponibles
+
+      // 2) Valida análisis y calcula stocks disponibles
       this.onLoteChange();
 
-
-
-      // 2c) Traer los “tostes” guardados en la orden y mapearlos a batches
+      // 3) Traer los “tostes” guardados en la orden y mapearlos a batches
       this.roastsService.getTuestesByPedido(this.OrderId).subscribe(tuestes => {
         this.batches = tuestes.map((t, i) => ({
           id: i + 1,
           pesoVerde: t.peso_entrada,
-          pesoTostado: parseFloat((t.peso_entrada * 1.15).toFixed(2))
+          pesoTostado: parseFloat((t.peso_entrada * 0.85).toFixed(2))
         }));
-
-        // 2d) Recalcular pesos disponibles restando lo ya asignado
-        const sel = this.lotesAll.find(l => l.id_lote === this.orden.id_lote);
-        if (sel) {
-          const usadosV = this.batches.reduce((s, b) => s + b.pesoVerde, 0);
-          const usadosT = this.batches.reduce((s, b) => s + b.pesoTostado, 0);
-          this.pesoVerdeDisp = sel.peso - usadosV;
-          this.pesoTostadoDisp = sel.peso_tostado - usadosT;
-        }
       });
     });
-
-    this.BatchVerde();
-    this.BatchTostado();
-    this.onLoteChange();
   }
 
   onSelectLote(idLote: string) {
@@ -156,38 +145,16 @@ export class EditOrderComponent implements OnInit {
     this.pesoTostadoDisp = 0;
   }
 
-
-
   cerrar() {
     this.close.emit();
   }
 
-
   onLoteChange() {
     const sel = this.lotes.find(l => l.id_lote === this.orden.id_lote);
-
     this.pesoVerdeDisp = sel?.peso || 0;
     this.pesoTostadoDisp = sel?.peso_tostado || 0;
-
     if (!sel) return;
-
-    this.loteSvc.getById(sel.id_lote).subscribe(lote => {
-      // Supongamos que viene lote.analisis
-      if (!lote.id_analisis) {
-        this.uiSvc.alert(
-          'error',
-          'Lote sin análisis',
-          `El lote ${lote.id_lote} no tiene análisis registrado. Por favor, crea uno antes de continuar.`,
-          5000
-        );
-        this.orden.id_lote = '';
-        this.pesoVerdeDisp = 0;
-        this.pesoTostadoDisp = 0;
-      }
-    });
   }
-
-
 
   agregarBatch() {
     const nextId = this.batches.length + 1;
@@ -198,28 +165,24 @@ export class EditOrderComponent implements OnInit {
     });
   }
 
-
-
   // cada vez que cambie el verde, recalculas tostado
   onBatchVerdeChange(b: Batch) {
-    b.pesoTostado = parseFloat((b.pesoVerde * 1.15).toFixed(2));
+    b.pesoTostado = parseFloat((b.pesoVerde * 0.85).toFixed(2));
   }
 
   // cada vez que cambie el tostado, recalculas verde
   onBatchTostadoChange(b: Batch) {
-    b.pesoVerde = parseFloat((b.pesoTostado / 1.15).toFixed(2));
+    b.pesoVerde = parseFloat((b.pesoTostado * 1.15).toFixed(2));
   }
 
   BatchVerde() {
-    this.batchTostado = parseFloat((this.orden.cantidad! * 1.15).toFixed(2));
+    this.batchTostado = parseFloat((this.orden.cantidad! * 0.85).toFixed(2));
   }
 
   // cada vez que cambie el tostado, recalculas verde
   BatchTostado() {
-    this.orden.cantidad = parseFloat((this.batchTostado / 1.15).toFixed(2));
+    this.orden.cantidad = parseFloat((this.batchTostado * 1.15).toFixed(2));
   }
-
-
 
   quitarBatch(b: Batch) {
     this.pesoVerdeDisp += b.pesoVerde;
@@ -230,21 +193,32 @@ export class EditOrderComponent implements OnInit {
   get totalVerde(): number {
     return this.batches.reduce((sum, b) => sum + b.pesoVerde, 0);
   }
+
   get totalTostado(): number {
-    return this.batches.reduce((sum, b) => sum + b.pesoTostado, 0);
+    this.totalPesoVerde = this.batches.reduce((sum, b) => sum + b.pesoTostado, 0);
+    return this.totalPesoVerde;
+  }
+
+  validarPesos(): boolean {
+    if (this.totalVerde !== this.orden.cantidad) {
+      this.uiSvc.alert('warning', 'error',
+        'El peso verde total de los batches debe ser igual a la cantidad de la orden.', 5000);
+      return false;
+    }
+    return true;
   }
 
   guardar() {
-    console.log('Guardar orden de tueste', this.orden);
-    // validar que exista al menos un batch
+    if (!this.validarPesos()) return;
     if (!this.batches.length) return;
     this.orden.pesos = this.batches.map(b => b.pesoVerde);
-    // construir payload
     const payload = { ...this.orden };
     console.log('Payload a enviar:', payload);
-    this.pedidoSvc.updatePedido(this.OrderId, payload).subscribe(res => {
-      this.create.emit(res);
-      this.close.emit();
-    });
+    this.pedidoSvc.updatePedido(this.OrderId, payload)
+      .subscribe(res => {
+        this.create.emit(res);
+        this.close.emit();
+      });
   }
+
 }

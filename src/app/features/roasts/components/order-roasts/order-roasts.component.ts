@@ -62,6 +62,7 @@ export class OrderRoastsComponent implements OnInit {
     this.selectedId = id;
     this.showEdit   = true;
   }
+  
   onRoasterUpdated(updated: Tueste) {
     this.showEdit = false;
     this.loadRoasts(); 

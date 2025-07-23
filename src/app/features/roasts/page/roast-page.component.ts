@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus } from 'lucide-angular';
-import { X, Check, Eye, Edit } from 'lucide-angular';
+import { X, Check, Eye, Edit, Trash } from 'lucide-angular';
 
 import { AddRoasterComponent } from '../components/add-order-roast/add-order-roast.component';
 import { Pedido } from '../../../shared/models/pedido';
@@ -14,6 +14,7 @@ import { catchError, map, Observable, of } from 'rxjs';
 import { OrderRoastsComponent } from '../components/order-roasts/order-roasts.component';
 import { EditRoastComponent } from '../components/edit-roast/edit-roast.component';
 import { EditOrderComponent } from '../components/edit-order/edit-order.component';
+import { UiService } from '../../../shared/services/ui.service';
 
 interface ExtendedPedido extends Pedido {
   userName?: string;
@@ -40,13 +41,14 @@ export class RoastsPage {
   readonly Check = Check;
   readonly Eye = Eye;
   readonly Edit = Edit;
+  readonly Trash = Trash;
 
   pendingOrders: ExtendedPedido[] = [];
   allHistoryRoasts: ExtendedPedido[] = [];
   filteredHistoryRoasts: ExtendedPedido[] = [];
-  
-  startDate    = '';
-  endDate      = '';
+
+  startDate = '';
+  endDate = '';
   showAddRoaster = false;
   historyDate = '';
   historyLevel = '';
@@ -58,6 +60,7 @@ export class RoastsPage {
   constructor(
     private pedidoSvc: PedidoService,
     private userSvc: UserService,
+    private uiSvc: UiService,
   ) { }
 
   ngOnInit() {
@@ -107,7 +110,7 @@ export class RoastsPage {
 
   private applyFilter() {
     const desde = this.startDate ? new Date(this.startDate) : null;
-    const hasta = this.endDate   ? new Date(this.endDate)   : null;
+    const hasta = this.endDate ? new Date(this.endDate) : null;
     const nivel = this.historyLevel; // e.g. "Claro"
 
     this.filteredHistoryRoasts = this.allHistoryRoasts.filter(h => {
@@ -141,7 +144,25 @@ export class RoastsPage {
   }
 
   onRoasterCreated(data: any) {
-    // refresca datos si hace falta
     this.showAddRoaster = false;
+    this.loadPending();
+    this.loadHistory();
   }
+
+  onDeleteOrder(o: Pedido) {
+    this.uiSvc.confirm({
+      title: 'Eliminar orden',
+      message: `¿Estás seguro de que deseas eliminar la orden de tueste de ${o.id_lote}?`,
+      confirmText: 'Sí',
+      cancelText: 'No'
+    }).then(confirmed => {
+      if (confirmed) {
+        this.pedidoSvc.deletePedido(o.id_pedido).subscribe(() => {
+          this.loadPending();
+          this.loadHistory();
+        });
+      }
+    });
+  }
+
 }

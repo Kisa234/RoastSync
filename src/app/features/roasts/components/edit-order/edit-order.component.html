@@ -20,8 +20,8 @@
       <!-- Cliente -->
       <div>
         <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
-        <select [(ngModel)]="orden.id_user" name="id_user" (change)="onClienteChange()"
-           disabled class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+        <select [(ngModel)]="orden.id_user" name="id_user"  disabled
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
           <option value="" disabled selected>Selecciona cliente</option>
           <option *ngFor="let u of clientes" [value]="u.id_user">{{ u.nombre }}</option>
         </select>
@@ -30,9 +30,9 @@
       <!-- Lote -->
       <div>
         <label class="block text-gray-700 text-sm mb-1">Lote *</label>
-        <select [(ngModel)]="orden.id_lote" name="id_lote" (change)="onLoteChange()"
-          disabled class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
-          <option value="" disabled>Selecciona lote</option>
+        <select [(ngModel)]="orden.id_lote" name="id_lote"  disabled
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+          <option value="" disabled selected>Selecciona lote</option>
           <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
         </select>
       </div>
@@ -54,7 +54,7 @@
       <!-- Fecha de Tueste -->
       <div>
         <label class="block text-gray-700 text-sm mb-1">Fecha de Tueste</label>
-        <input type="date" (change)="onDateChange($event)" name="fecha_tueste"
+        <input type="date" [(ngModel)]="orden.fecha_tueste" name="fecha_tueste"
           class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
       </div>
 
@@ -82,12 +82,12 @@
       <div class="col-span-2 grid grid-cols-2 gap-x-6">
         <div>
           <label class="block text-gray-700 text-sm mb-1">Batch Verde (Gr)</label>
-          <input type="number" (change)="BatchVerde()" [(ngModel)]="orden.cantidad" name="batchVerde"
+          <input type="number" [(ngModel)]="orden.cantidad" (ngModelChange)="BatchVerde()" name="batchVerde"
             class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] transition" />
         </div>
         <div>
           <label class="block text-gray-700 text-sm mb-1">Batch Tostado (Gr)</label>
-          <input type="number" (change)="BatchTostado()" [(ngModel)]="batchTostado" name="batchTostado"
+          <input type="number" [(ngModel)]="batchTostado" (ngModelChange)="BatchTostado()" name="batchTostado"
             class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] transition" />
         </div>
       </div>
@@ -148,7 +148,7 @@
         Cancelar
       </button>
       <button (click)="guardar()" class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition">
-        Guardar Orden
+        Actualizar Orden
       </button>
     </div>
   </div>

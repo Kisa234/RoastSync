@@ -1,5 +1,6 @@
 export interface Tueste {
    id_tueste                 :string,
+   num_batch                 :number,
    id_lote                   :string,
    tostadora                 :string,
    id_pedido                 :string,

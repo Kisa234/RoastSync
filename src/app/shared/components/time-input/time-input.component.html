@@ -1,19 +1,13 @@
 <div class="mb-4">
   <label class="block text-sm font-medium mb-1">{{ label }}</label>
   <div class="flex space-x-2">
-    <input type="number" min="0" max="59"
-      [(ngModel)]="minutes"
-      (ngModelChange)="update()"
-      placeholder="MM"
+    <input type="number" min="0" max="59" [(ngModel)]="minutes" (ngModelChange)="update()" placeholder="MM"
       class="w-1/2 border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
     <span class="self-center">:</span>
-    <input type="number" min="0" max="59"
-      [(ngModel)]="seconds"
-      (ngModelChange)="update()"
-      placeholder="SS"
+    <input type="number" min="0" max="59" [(ngModel)]="seconds" (ngModelChange)="update()" placeholder="SS"
       class="w-1/2 border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
   </div>
   <sub class="block text-xs font-medium mt-1">
-    prom: {{ prom | date:'mm:ss':'UTC' }}
+    prom: {{ promDate | date:'mm:ss':'UTC' }}
   </sub>
 </div>
