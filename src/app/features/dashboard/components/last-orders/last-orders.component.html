@@ -1,0 +1,28 @@
+<div class="mt-8">
+  <div class="mb-4">
+    <h2 class="text-xl font-semibold text-gray-800">Órdenes Recientes</h2>
+    <p class="text-sm text-gray-500">Últimas órdenes de café verde, tostado</p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-4 divide-y divide-gray-100">
+    <div *ngFor="let pedido of pedidos; let i = index" class="py-4 flex justify-between items-center">
+      <div>
+        <!-- Código y estado -->
+        <div class="flex items-center gap-2">
+          <span class="font-semibold text-sm text-gray-800">#{{ pedido.id_pedido.slice(0, 8).toUpperCase() }}</span>
+          <span class="text-xs px-2 py-1 rounded-full font-medium" [ngClass]="getBadgeColor(pedido.estado_pedido)">
+            {{ pedido.estado_pedido }}
+          </span>
+        </div>
+
+        <!-- Cliente -->
+        <div class="mt-1 text-sm font-medium text-gray-800">{{ cliente[i] }}</div>
+
+        <!-- Comentario -->
+        <div class="text-sm text-gray-500">{{ pedido.comentario }}</div>
+      </div>
+
+
+    </div>
+  </div>
+</div>

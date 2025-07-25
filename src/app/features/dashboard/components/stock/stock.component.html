@@ -1,0 +1,19 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <!-- Inventario Total -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <div class="text-sm text-gray-500">Inventario Total</div>
+    <div class="text-2xl font-bold text-black">{{ stockTotal | number:'1.0-0' }} kg</div>
+  </div>
+
+  <!-- Inventario Tienda -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <div class="text-sm text-gray-500">Inventario Tienda</div>
+    <div class="text-2xl font-bold text-black">{{ stockAdmin | number:'1.0-0' }} kg</div>
+  </div>
+
+  <!-- Inventario Clientes -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <div class="text-sm text-gray-500">Inventario Clientes</div>
+    <div class="text-2xl font-bold text-black">{{ stockCliente | number:'1.0-0' }} kg</div>
+  </div>
+</div>

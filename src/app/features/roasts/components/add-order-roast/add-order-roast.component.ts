@@ -71,9 +71,7 @@ export class AddRoasterComponent implements OnInit {
 
   tiposTueste = [
     'Tueste Claro',
-    'Tueste Medio Claro',
     'Tueste Medio',
-    'Tueste Medio Oscuro',
     'Tueste Oscuro'
   ];
 

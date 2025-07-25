@@ -1,0 +1,32 @@
+<div class="mt-8">
+  <div class="mb-4">
+    <h2 class="text-xl font-semibold text-gray-800">🔥 Tuestes Pendientes</h2>
+    <p class="text-sm text-gray-500">Órdenes de tueste programadas y en espera</p>
+  </div>
+
+  <div *ngIf="tuestes.length > 0; else noTuestes" class="space-y-4">
+    <div *ngFor="let t of tuestes" class="bg-white rounded-xl shadow p-4 flex justify-between items-start">
+      <!-- Info tueste -->
+      <div>
+        <div class="text-sm font-medium text-gray-800">{{ t.cliente }}</div>
+        <div class="text-sm text-gray-500">{{ t.lote }}</div>
+        <div class="text-sm text-gray-600 mt-1">
+          {{ t.peso }} kg • {{ t.tueste }}
+        </div>
+      </div>
+
+      <!-- Entrega y botón -->
+      <div class="text-right text-sm">
+        <div class="text-xs text-gray-500 mb-2">Entrega:</div>
+        <div class="font-semibold text-gray-800 mb-2">{{ t.entrega }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cuando no hay tuestes -->
+  <ng-template #noTuestes>
+    <div class="text-center py-10 text-gray-400">
+      No hay tuestes pendientes por el momento ☕
+    </div>
+  </ng-template>
+</div>
