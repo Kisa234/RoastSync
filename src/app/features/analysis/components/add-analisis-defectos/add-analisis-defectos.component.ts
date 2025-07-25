@@ -81,7 +81,7 @@ export class AddAnalisisDefectos {
     }
   }
 
-  calcGrado() {
+    calcGrado() {
     let total = 0;
     // defectos primarios
     total += Math.floor(this.form.grano_negro! / 1);

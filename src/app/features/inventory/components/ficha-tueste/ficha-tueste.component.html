@@ -38,14 +38,14 @@
             <div>
                 <div class="text-gray-600">% Caramelización</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.caramelizacion }}%
+                    {{ data.caramelizacion | number:'1.2-2' }}%
                 </div>
             </div>
             <!-- Desarrollo -->
             <div>
                 <div class="text-gray-600">Desarrollo</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.desarrollo }}
+                    {{ data.desarrollo | number:'1.2-2'  }}
                 </div>
             </div>
             <!-- C. Des. -->
@@ -66,7 +66,7 @@
             <div>
                 <div class="text-gray-600">Tiempo</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.tiempo }}
+                    {{ formatTiempoSegundos(data.tiempo) }}
                 </div>
             </div>
             <!-- Tueste -->

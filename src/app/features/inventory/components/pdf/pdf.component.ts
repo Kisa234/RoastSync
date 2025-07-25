@@ -119,6 +119,28 @@ export class PdfComponent implements OnInit {
     eliminado: false
   }
 
+  calc: Partial<AnalisisDefectos> = {
+    grano_negro: 0,
+    grano_agrio: 0,
+    grano_con_hongos: 0,
+    cereza_seca: 0,
+    materia_estrana: 0,
+    broca_severa: 0,
+    negro_parcial: 0,
+    agrio_parcial: 0,
+    pergamino: 0,
+    flotadores: 0,
+    inmaduro: 0,
+    averanado: 0,
+    conchas: 0,
+    cascara_pulpa_seca: 0,
+    partido_mordido_cortado: 0,
+    broca_leva: 0,
+    grado: '',
+    fecha_registro: new Date(),
+    eliminado: false
+  }
+
   analisis: Analisis = {
     id_analisis: '',
     fecha_registro: new Date(),
@@ -138,6 +160,8 @@ export class PdfComponent implements OnInit {
     eliminado: false,
     fecha_registro: new Date()
   };
+
+  total: number = 0;
 
   constructor(
     private loteService: LoteService,
@@ -176,7 +200,10 @@ export class PdfComponent implements OnInit {
               .subscribe(s => this.analisisSensorial = s);
             this.analisisDefectosService
               .getAnalisisById(analisis.analisisDefectos_id!)
-              .subscribe(d => this.analisisDefectos = d);
+              .subscribe(d => {
+                this.analisisDefectos = d;
+                this.calcGrado();
+              });
           });
         }
 
@@ -206,7 +233,10 @@ export class PdfComponent implements OnInit {
               .subscribe(s => this.analisisSensorial = s);
             this.analisisDefectosService
               .getAnalisisById(analisis.analisisDefectos_id!)
-              .subscribe(d => this.analisisDefectos = d);
+              .subscribe(d => {
+                this.analisisDefectos = d;
+                this.calcGrado();
+              });
           });
         }
 
@@ -218,6 +248,45 @@ export class PdfComponent implements OnInit {
         // ——————————————————————————————————————————
       });
     }
+
+    
+  }
+
+  calcGrado() {
+    // defectos primarios
+    this.total += Math.floor(this.analisisDefectos.grano_negro! / 1);
+    this.calc.grano_agrio = Math.floor(this.analisisDefectos.grano_agrio! / 1);
+    this.total += Math.floor(this.analisisDefectos.grano_agrio! / 1);
+    this.calc.grano_agrio = Math.floor(this.analisisDefectos.grano_agrio! / 1);
+    this.total += Math.floor(this.analisisDefectos.grano_con_hongos! / 1);
+    this.calc.grano_con_hongos = Math.floor(this.analisisDefectos.grano_con_hongos! / 1);
+    this.total += Math.floor(this.analisisDefectos.cereza_seca! / 1);
+    this.calc.cereza_seca = Math.floor(this.analisisDefectos.cereza_seca! / 1);
+    this.total += Math.floor(this.analisisDefectos.materia_estrana! / 1);
+    this.calc.materia_estrana = Math.floor(this.analisisDefectos.materia_estrana! / 1);
+    this.total += Math.floor(this.analisisDefectos.broca_severa! / 5);
+    this.calc.broca_severa = Math.floor(this.analisisDefectos.broca_severa! / 5);
+    // defectos secundarios
+    this.total += Math.floor(this.analisisDefectos.negro_parcial! / 3);
+    this.calc.negro_parcial = Math.floor(this.analisisDefectos.negro_parcial! / 3);
+    this.total += Math.floor(this.analisisDefectos.agrio_parcial! / 3);
+    this.calc.agrio_parcial = Math.floor(this.analisisDefectos.agrio_parcial! / 3);
+    this.total += Math.floor(this.analisisDefectos.pergamino! / 5);
+    this.calc.pergamino = Math.floor(this.analisisDefectos.pergamino! / 5);
+    this.total += Math.floor(this.analisisDefectos.flotadores! / 5);
+    this.calc.flotadores = Math.floor(this.analisisDefectos.flotadores! / 5);
+    this.total += Math.floor(this.analisisDefectos.inmaduro! / 5);
+    this.calc.inmaduro = Math.floor(this.analisisDefectos.inmaduro! / 5);
+    this.total += Math.floor(this.analisisDefectos.averanado! / 5);
+    this.calc.averanado = Math.floor(this.analisisDefectos.averanado! / 5);
+    this.total += Math.floor(this.analisisDefectos.conchas! / 5);
+    this.calc.conchas = Math.floor(this.analisisDefectos.conchas! / 5);
+    this.total += Math.floor(this.analisisDefectos.cascara_pulpa_seca! / 5);
+    this.calc.cascara_pulpa_seca = Math.floor(this.analisisDefectos.cascara_pulpa_seca! / 5);
+    this.total += Math.floor(this.analisisDefectos.partido_mordido_cortado! / 5);
+    this.calc.partido_mordido_cortado = Math.floor(this.analisisDefectos.partido_mordido_cortado! / 5);
+    this.total += Math.floor(this.analisisDefectos.broca_leva! / 10);
+    this.calc.broca_leva = Math.floor(this.analisisDefectos.broca_leva! / 10);
   }
 
   async exportPdf(): Promise<void> {

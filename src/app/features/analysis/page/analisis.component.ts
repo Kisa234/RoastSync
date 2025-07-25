@@ -46,6 +46,7 @@ import { AnalisisDefectosService } from '../service/analisis-defectos.service';
 export class AnalisisPage implements OnInit {
   readonly X = X;
 
+  lotesAll: Lote[] = [];
   lotes: Lote[] = [];
   muestras: Muestra[] = [];
   tostados: LoteTostado[] = [];
@@ -93,7 +94,14 @@ export class AnalisisPage implements OnInit {
   ngOnInit() {
     this.muestraSvc.getAll().subscribe((list) => (this.muestras = list));
     this.tostadoSvc.getAll().subscribe((list) => (this.tostados = list));
-    this.userSvc.getUsers().subscribe(users => { this.clientes = users });
+    this.userSvc.getUsers().subscribe(usuarios => {
+      this.loteSvc.getAll().subscribe(lotes => {
+        this.lotesAll = lotes;
+        this.clientes = usuarios.filter(u =>
+          lotes.some(l => l.id_user === u.id_user)
+        );
+      });
+    });
     this.loadHistory();
   }
 

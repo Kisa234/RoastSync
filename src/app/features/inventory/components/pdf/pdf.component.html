@@ -1,5 +1,6 @@
 <div #pdfContent class="p-6 bg-white font-sans text-gray-800 relative">
-    <lucide-angular class="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl" (click)="exportPdf()" [img]="Download"></lucide-angular>
+    <lucide-angular class="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl" (click)="exportPdf()"
+        [img]="Download"></lucide-angular>
     <div class="flex justify-center mt-4 mb-4">
         <p class="text-2xl justify-center font-bold text-center">
             ANÁLISIS Y SENSORIAL <br>
@@ -15,10 +16,14 @@
                 <table class="w-full border-collapse mb-6">
                     <tbody>
                         <tr class="border border-black">
-                            <td *ngIf="type=='lote'" class="border border-black px-2 py-1 font-medium ">Matriz de Lote</td>
-                            <td *ngIf="type=='lote'" class="border border-black px-2 py-1 bg-gray-200 text-center">{{ lote.id_lote }}</td>
-                            <td *ngIf="type=='muestra'"class="border border-black px-2 py-1 font-medium ">Matriz de Muestra</td>
-                            <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 bg-gray-200 text-center">{{ muestra.id_muestra }}</td>
+                            <td *ngIf="type=='lote'" class="border border-black px-2 py-1 font-medium ">Matriz de Lote
+                            </td>
+                            <td *ngIf="type=='lote'" class="border border-black px-2 py-1 bg-gray-200 text-center">{{
+                                lote.id_lote }}</td>
+                            <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 font-medium ">Matriz de
+                                Muestra</td>
+                            <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 bg-gray-200 text-center">{{
+                                muestra.id_muestra }}</td>
                         </tr>
                         <tr class="border border-black">
                             <td class="border border-black px-2 py-1 font-medium">Nombre de Cliente</td>
@@ -26,16 +31,20 @@
                         </tr>
                         <tr class="border border-black">
                             <td *ngIf="type=='lote'" class="border border-black px-2 py-1 font-medium">Proveedor</td>
-                            <td *ngIf="type=='lote'" class="border border-black px-2 py-1 text-center">{{ lote.productor }}</td>
+                            <td *ngIf="type=='lote'" class="border border-black px-2 py-1 text-center">{{ lote.productor
+                                }}</td>
                             <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 font-medium">Proveedor</td>
-                            <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 text-center">{{ muestra.productor }}</td>
+                            <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 text-center">{{
+                                muestra.productor }}</td>
 
                         </tr>
                         <tr class="border border-black">
                             <td *ngIf="type=='lote'" class="border border-black px-2 py-1 font-medium">Variedad</td>
-                            <td *ngIf="type=='lote'" class="border border-black px-2 py-1 text-center">{{ lote.variedades.join(', ') }}</td>
+                            <td *ngIf="type=='lote'" class="border border-black px-2 py-1 text-center">{{
+                                lote.variedades.join(', ') }}</td>
                             <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 font-medium">Variedad</td>
-                            <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 text-center">{{ muestra.variedades.join(', ') }}</td>
+                            <td *ngIf="type=='muestra'" class="border border-black px-2 py-1 text-center">{{
+                                muestra.variedades.join(', ') }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -89,19 +98,19 @@
                         <!-- Mallas -->
                         <tr class="border-t border-dotted border-gray-400">
                             <td class="py-1">Superior a malla 18</td>
-                            <td class="py-1 text-right">{{ analisisFisico.superior_malla_18 | number:'1.2-2' }} gr</td>
+                            <td class="py-1 text-right">{{ analisisFisico.superior_malla_18 | number:'1.2-2' }}%</td>
                         </tr>
                         <tr class="border-t border-dotted border-gray-400">
                             <td class="py-1">Superior a malla 16</td>
-                            <td class="py-1 text-right">{{ analisisFisico.superior_malla_16 | number:'1.2-2' }} gr</td>
+                            <td class="py-1 text-right">{{ analisisFisico.superior_malla_16 | number:'1.2-2' }}%</td>
                         </tr>
                         <tr class="border-t border-dotted border-gray-400">
                             <td class="py-1">Superior a malla 14</td>
-                            <td class="py-1 text-right">{{ analisisFisico.superior_malla_14 | number:'1.2-2' }} gr</td>
+                            <td class="py-1 text-right">{{ analisisFisico.superior_malla_14 | number:'1.2-2' }}%</td>
                         </tr>
                         <tr class="border-t border-dotted border-gray-400 border-b">
                             <td class="py-1">Menor a malla 14</td>
-                            <td class="py-1 text-right">{{ analisisFisico.menor_malla_14 | number:'1.2-2' }} gr</td>
+                            <td class="py-1 text-right">{{ analisisFisico.menor_malla_14 | number:'1.2-2' }}%</td>
                         </tr>
                     </tbody>
                 </table>
@@ -163,32 +172,32 @@
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Grano Negro</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.grano_negro }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.grano_negro }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.grano_negro }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Grano Agrio</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.grano_agrio }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.grano_agrio }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.grano_agrio }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Grano con Hongos</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.grano_con_hongos }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.grano_con_hongos }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.grano_con_hongos }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Cereza Seca</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.cereza_seca }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.cereza_seca }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.cereza_seca }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Materia extraña</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.materia_estrana }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.materia_estrana }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.materia_estrana }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400 border-b ">
                                 <td class="px-2 py-1">Broca severa</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.broca_severa }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.broca_severa }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.broca_severa }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -205,52 +214,67 @@
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Negro parcial</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.negro_parcial }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.negro_parcial }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.negro_parcial }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Agrio parcial</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.agrio_parcial }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.agrio_parcial }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.agrio_parcial }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Pergamino</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.pergamino }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.pergamino }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.pergamino }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Flotadores</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.flotadores }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.flotadores }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.flotadores }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Inmaduro</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.inmaduro }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.inmaduro }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.inmaduro }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Averanado</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.averanado }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.averanado }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.averanado }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Conchas</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.conchas }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.conchas }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.conchas }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Cáscara pulpa seca</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.cascara_pulpa_seca }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.cascara_pulpa_seca }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.cascara_pulpa_seca }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400">
                                 <td class="px-2 py-1">Partido mordido o cortado</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.partido_mordido_cortado }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.partido_mordido_cortado }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.partido_mordido_cortado }}</td>
                             </tr>
                             <tr class="border-t border-dotted border-gray-400 border-b">
                                 <td class="px-2 py-1">Broca Leva</td>
                                 <td class="px-2 py-1 text-right">{{ analisisDefectos.broca_leva }}</td>
-                                <td class="px-2 py-1 text-right">{{ analisisDefectos.broca_leva }}</td>
+                                <td class="px-2 py-1 text-right">{{ calc.broca_leva }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Defectos Totales -->
+                    <table class="border border-black border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border px-2 py-1 border-black ">Grado</th>
+                                <th class="border px-2 py-1 border-black ">N° de defectos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t border-dotted border-gray-400">
+                                <td class="px-2 py-1 text-left">{{ analisisDefectos.grado }}</td>
+                                <td class="px-2 py-1 text-right">{{ total }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -259,7 +283,6 @@
         </div>
     </div>
     <div class="">
-
         <!-- Análisis Sensorial -->
         <section class="p-4 mt-6">
             <h2 class="font-bold text-lg mb-2">2.- ANÁLISIS <span class="font-light">Sensorial</span></h2>
@@ -267,90 +290,49 @@
                 <table class="min-w-full border border-black border-collapse text-sm">
                     <thead>
                         <tr>
-                            <th class="border border-black px-2 py-1">Aroma</th>
-                            <th class="border border-black px-2 py-1">{{ analisisSensorial.fragancia_aroma |
-                                number:'1.2-2'
-                                }}</th>
-                            <th class="border border-black px-2 py-1">Flavor</th>
-                            <th class="border border-black px-2 py-1">{{ analisisSensorial.sabor | number:'1.2-2' }}
-                            </th>
-                            <th class="border border-black px-2 py-1">Acidity</th>
-                            <th class="border border-black px-2 py-1">{{ analisisSensorial.acidez | number:'1.2-2' }}
-                            </th>
-                            <th class="border border-black px-2 py-1">Body</th>
-                            <th class="border border-black px-2 py-1">{{ analisisSensorial.cuerpo | number:'1.2-2' }}
-                            </th>
-                            <th class="border border-black px-2 py-1">Uniformity</th>
-                            <th class="border border-black px-2 py-1">{{ analisisSensorial.uniformidad | number:'1.0-0'
-                                }}
-                            </th>
-                            <th class="border border-black px-2 py-1">Clean Cup</th>
-                            <th class="border border-black px-2 py-1">{{ analisisSensorial.taza_limpia | number:'1.0-0'
-                                }}
-                            </th>
-                            <th class="border border-black px-2 py-1">Overall</th>
-                            <th class="border border-black px-2 py-1">{{ analisisSensorial.puntaje_catador |
-                                number:'1.2-2'
-                                }}</th>
-                            <th class="border border-black px-2 py-1">Total</th>
-                            <th class="border border-black px-2 py-1">
-                                {{
-                                (analisisSensorial.fragancia_aroma
-                                + analisisSensorial.sabor
-                                + analisisSensorial.acidez
-                                + analisisSensorial.cuerpo
-                                + analisisSensorial.uniformidad
-                                + analisisSensorial.taza_limpia
-                                + analisisSensorial.balance
-                                + analisisSensorial.dulzor)
-                                | number:'1.2-2'
-                                }}
-                            </th>
+                            <th class="border border-black px-2 py-1 font-normal text-left">Aroma</th>
+                            <th class="border border-black px-2 py-1 font-normal ">{{ analisisSensorial.fragancia_aroma | number:'1.2-2'}}</th>
+                            <th class="border border-black px-2 py-1 font-normal text-left">Flavor</th>
+                            <th class="border border-black px-2 py-1 font-normal">{{ analisisSensorial.sabor | number:'1.2-2' }}</th>
+                            <th class="border border-black px-2 py-1 font-normal text-left">Acidity</th>
+                            <th class="border border-black px-2 py-1 font-normal">{{ analisisSensorial.acidez | number:'1.2-2' }}</th>
+                            <th class="border border-black px-2 py-1 font-normal text-left">Body</th>
+                            <th class="border border-black px-2 py-1 font-normal">{{ analisisSensorial.cuerpo | number:'1.2-2' }}</th>
+                            <th class="border border-black px-2 py-1 font-normal text-left">Uniformity</th>
+                            <th class="border border-black px-2 py-1 font-normal">{{ analisisSensorial.uniformidad | number:'1.0-0' }}</th>
+                            <th class="border border-black px-2 py-1 font-normal text-left">Clean Cup</th>
+                            <th class="border border-black px-2 py-1 font-normal">{{ analisisSensorial.taza_limpia | number:'1.0-0' }}</th> 
+                            <th class="border border-black px-2 py-1 font-normal text-left">Overall</th>
+                            <th class="border border-black px-2 py-1 font-normal">{{ analisisSensorial.puntaje_catador | number:'1.2-2'}}</th>
+                            <th class="border border-black px-2 py-1 font-normal text-left">Total</th>
+                            <th class="border border-black px-2 py-1 font-normal">{{analisisSensorial.puntaje_taza}}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="border border-black px-2 py-1">Dry :</td>
-                            <td class="border border-black px-2 py-1 text-right">0</td>
-                            <td class="border border-black px-2 py-1">Break :</td>
-                            <td class="border border-black px-2 py-1 text-right">{{ analisisSensorial.sabor_residual |
-                                number:'1.2-2' }}</td>
+                            <td class="border border-black px-2 py-1">Dry / Break</td>
+                            <td class="border border-black px-2 py-1 text-center">0 / 0</td>
                             <td class="border border-black px-2 py-1">Aftertaste</td>
-                            <td class="border border-black px-2 py-1 text-right">{{ analisisSensorial.sabor_residual |
-                                number:'1.2-2' }}</td>
+                            <td class="border border-black px-2 py-1 text-center">{{ analisisSensorial.sabor_residual | number:'1.2-2' }}</td>
                             <td class="border border-black px-2 py-1">Intensity</td>
-                            <td class="border border-black px-2 py-1 text-right">0</td>
+                            <td class="border border-black px-2 py-1 text-center">0</td>
                             <td class="border border-black px-2 py-1">Level</td>
-                            <td class="border border-black px-2 py-1 text-right">0</td>
+                            <td class="border border-black px-2 py-1 text-center">0</td>
                             <td class="border border-black px-2 py-1">Balance</td>
-                            <td class="border border-black px-2 py-1 text-right">{{ analisisSensorial.balance |
-                                number:'1.2-2' }}</td>
+                            <td class="border border-black px-2 py-1 text-center">{{ analisisSensorial.balance | number:'1.2-2' }}</td>
                             <td class="border border-black px-2 py-1">Sweetness</td>
-                            <td class="border border-black px-2 py-1 text-right">{{ analisisSensorial.dulzor |
-                                number:'1.0-0' }}</td>
+                            <td class="border border-black px-2 py-1 text-center">{{ analisisSensorial.dulzor | number:'1.0-0' }}</td>
+                            <td class="border border-black px-2 py-1">Traint</td>
+                            <td class="border border-black px-2 py-1 text-center">0</td>
                             <td class="border border-black px-2 py-1">Defects</td>
-                            <td class="border border-black px-2 py-1 text-right">{{
-                                analisisSensorial.taza_defecto_ligero +
-                                analisisSensorial.tazas_defecto_rechazo }}</td>
+                            <td class="border border-black px-2 py-1 text-center">{{ analisisSensorial.taza_defecto_ligero +analisisSensorial.tazas_defecto_rechazo }}</td>
                         </tr>
                         <tr>
                             <td class="px-2 py-1 border border-black" colspan="15">
                                 <strong>Notes :</strong> {{ analisisSensorial.comentario }}
                             </td>
                             <td class="border border-black px-2 py-1 text-center">Final</td>
-                            <td class="border border-black px-2 py-1 text-right">
-                                {{
-                                (analisisSensorial.fragancia_aroma
-                                + analisisSensorial.sabor
-                                + analisisSensorial.acidez
-                                + analisisSensorial.cuerpo
-                                + analisisSensorial.uniformidad
-                                + analisisSensorial.taza_limpia
-                                + analisisSensorial.balance
-                                + analisisSensorial.dulzor)
-                                | number:'1.2-2'
-                                }}
-                            </td>
+                            <td class="border border-black px-2 py-1 text-right">{{ analisisSensorial.puntaje_taza | number:'1.2-2' }}</td>
                         </tr>
                     </tbody>
                 </table>

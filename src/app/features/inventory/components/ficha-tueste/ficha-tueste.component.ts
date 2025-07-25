@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { LoteTostado } from './../../../../shared/models/lote-tostado';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, output, ViewChild } from '@angular/core';
 import { FichaTueste } from '../../../../shared/models/ficha-tueste';
@@ -6,7 +7,7 @@ import { LucideAngularModule, Download } from 'lucide-angular';
 
 @Component({
   selector: 'ficha-tueste',
-  imports: [LucideAngularModule],
+  imports: [LucideAngularModule, CommonModule],
   templateUrl: './ficha-tueste.component.html',
   styles: ``
 })
@@ -42,6 +43,12 @@ export class FichaTuesteComponent implements OnInit {
     this.loteTostadoSvc.getFichaTueste(this.id).subscribe(data => {
       this.data = data;
     });
+  }
+
+  formatTiempoSegundos(segundos: number): string {
+    const minutos = Math.floor(segundos / 60);
+    const segundosRestantes = Math.round(segundos % 60);
+    return `${minutos}min ${segundosRestantes}s`;
   }
 
   OnClose() {
