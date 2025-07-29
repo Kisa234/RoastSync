@@ -16,7 +16,7 @@ export const CoffeeFlavors: ICoffeeFlavor[] = [
         "color": "#b6804d",
         "children": [
           { "name": "acre", "color": "#b0a068" },
-          { "name": "ceniciento", "color": "#94a993" },
+          { "name": "ceniza", "color": "#94a993" },
           { "name": "ahumado", "color": "#a97f34" },
           { "name": "marrón tostado", "color": "#835621" }
         ]

@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { LoteTostado } from './../../../../shared/models/lote-tostado';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, output, ViewChild } from '@angular/core';
-import { FichaTueste } from '../../../../shared/models/ficha-tueste';
-import { LoteTostadoService } from '../../service/lote-tostado.service';
 import { LucideAngularModule, Download } from 'lucide-angular';
+import { FichaTueste } from '../../models/ficha-tueste';
+import { LoteTostadoService } from '../../../features/inventory/service/lote-tostado.service';
 
 @Component({
   selector: 'ficha-tueste',

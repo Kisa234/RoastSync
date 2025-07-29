@@ -1,40 +1,36 @@
-import { Muestra } from './../../../../shared/models/muestra';
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, X, Coffee, FlaskConical, Download } from 'lucide-angular';
-
-import { LoteService } from '../../../inventory/service/lote.service';
-import { AnalisisService } from '../../../analysis/service/analisis.service';
-import { AnalisisSensorialService } from '../../../analysis/service/analisis-sensorial.service';
-import { AnalisisFisicoService } from '../../../analysis/service/analisis-fisico.service';
-import { UiService } from '../../../../shared/services/ui.service';
-
-import { Lote } from '../../../../shared/models/lote';
-import { Analisis } from '../../../../shared/models/analisis';
-import { AnalisisSensorial } from '../../../../shared/models/analisis-sensorial';
-import { AnalisisFisico } from '../../../../shared/models/analisis-fisico';
-
-import { tap, switchMap } from 'rxjs/operators';
-import { MuestraService } from '../../service/muestra.service';
-import { AnalisisDefectos } from '../../../../shared/models/analisis-defectos';
-import { AnalisisDefectosService } from '../../../analysis/service/analisis-defectos.service';
-import { SpiderGraphComponent } from "../spider-graph/spider-graph.component";
-import { PdfComponent } from '../pdf/pdf.component';
-import { ViewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { CommonModule, NgFor, NgIf } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { Coffee, Download, FlaskConical, LucideAngularModule, X } from "lucide-angular";
+import { SpiderGraphComponent } from "../../../features/inventory/components/spider-graph/spider-graph.component";
+import { RouterLink } from "@angular/router";
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
+import { Muestra } from "../../models/muestra";
+import { Lote } from "../../models/lote";
+import { Analisis } from "../../models/analisis";
+import { AnalisisSensorial } from "../../models/analisis-sensorial";
+import { AnalisisFisico } from "../../models/analisis-fisico";
+import { AnalisisDefectos } from "../../models/analisis-defectos";
+import { switchMap, tap } from "rxjs";
+import { LoteService } from "../../../features/inventory/service/lote.service";
+import { MuestraService } from "../../../features/inventory/service/muestra.service";
+import { AnalisisService } from "../../../features/analysis/service/analisis.service";
+import { AnalisisFisicoService } from "../../../features/analysis/service/analisis-fisico.service";
+import { AnalisisSensorialService } from "../../../features/analysis/service/analisis-sensorial.service";
+import { AnalisisDefectosService } from "../../../features/analysis/service/analisis-defectos.service";
+import { UiService } from "../../services/ui.service";
+import { AnalisisPdfComponent } from "../../../features/inventory/components/analisis-pdf/analisis-pdf.component";
 
 @Component({
   selector: 'report-lote',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, NgIf, NgFor, SpiderGraphComponent, PdfComponent, RouterLink],
+  imports: [CommonModule, FormsModule, LucideAngularModule, NgIf, NgFor, SpiderGraphComponent, AnalisisPdfComponent, RouterLink],
   templateUrl: './report-lote.component.html'
 })
 export class ReportLoteComponent implements OnInit {
   @Input() loteId?: string;
   @Input() MuestraId?: string
   @Output() close = new EventEmitter<void>();
-  @ViewChild('pdfChild') pdfChild!: PdfComponent;
+  @ViewChild('pdfChild') pdfChild!: AnalisisPdfComponent;
 
   readonly X = X;
   readonly Coffee = Coffee;

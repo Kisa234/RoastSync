@@ -1,26 +1,26 @@
-import { UiService } from './../../../shared/services/ui.service';
 import { Component } from '@angular/core';
 import { AsyncPipe, CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus } from 'lucide-angular';
 import { Search, Eye, Edit2, Trash2 } from 'lucide-angular';
 import { map, Observable } from 'rxjs';
+import { AddLoteComponent } from '../../components/add-lote/add-lote.component';
+import { AddMuestraComponent } from '../../components/add-muestra/add-muestra.component';
+import { ReportLoteComponent } from '../../../../shared/components/report-lote/report-lote.component';
+import { FichaTuesteComponent } from '../../../../shared/components/ficha-tueste/ficha-tueste.component';
+import { BlendLoteComponent } from '../../components/blend-lote/blend-lote.component';
+import { BlendTueste } from '../../components/blend-tueste/blend-tueste.component';
+import { Muestra } from '../../../../shared/models/muestra';
+import { Lote } from '../../../../shared/models/lote';
+import { LoteTostado } from '../../../../shared/models/lote-tostado';
+import { MuestraService } from '../../service/muestra.service';
+import { LoteService } from '../../service/lote.service';
+import { LoteTostadoService } from '../../service/lote-tostado.service';
+import { UserService } from '../../../users/service/users-service.service';
+import { UiService } from '../../../../shared/services/ui.service';
+import { User } from '../../../../shared/models/user';
 
-import { Muestra } from '../../../shared/models/muestra';
-import { Lote } from '../../../shared/models/lote';
-import { LoteTostado } from '../../../shared/models/lote-tostado';
 
-import { MuestraService } from '../service/muestra.service';
-import { LoteService } from '../service/lote.service';
-import { LoteTostadoService } from '../service/lote-tostado.service';
-import { AddLoteComponent } from '../components/add-lote/add-lote.component';
-import { AddMuestraComponent } from '../components/add-muestra/add-muestra.component';
-import { ReportLoteComponent } from '../components/report-lote/report-lote.component';
-import { UserService } from '../../users/service/users-service.service';
-import { User } from '../../../shared/models/user';
-import { FichaTuesteComponent } from "../components/ficha-tueste/ficha-tueste.component";
-import { BlendLoteComponent } from '../components/blend-lote/blend-lote.component';
-import { BlendTueste } from "../components/blend-tueste/blend-tueste.component";
 
 type InventoryTab = 'muestras' | 'verde' | 'tostado';
 
@@ -216,8 +216,5 @@ export class InventoryPage {
     this.loadMuestras();
   }
 
-  // acciones de fila (placeholder)
-  onView(item: any)   { /* navegar a detalle */ }
-  onEdit(item: any)   { /* abrir modal edición */ }
-  onDelete(item: any) { /* confirmar y eliminar */ }
+  
 }

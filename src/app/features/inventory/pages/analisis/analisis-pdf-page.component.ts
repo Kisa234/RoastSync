@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
-import { PdfComponent } from '../pdf.component';
+import { AnalisisPdfComponent } from '../../components/analisis-pdf/analisis-pdf.component';
 import { ActivatedRoute } from '@angular/router';
 import { LucideAngularModule, Download } from 'lucide-angular';
 
 @Component({
   selector: 'app-pdf-page',
-  imports: [PdfComponent, LucideAngularModule],
-  templateUrl: './pdf-page.component.html',
+  imports: [AnalisisPdfComponent, LucideAngularModule],
+  templateUrl: './analisis-pdf-page.component.html',
   styles: ``
 })
 export class PdfPageComponent {

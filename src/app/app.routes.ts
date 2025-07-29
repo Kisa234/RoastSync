@@ -6,7 +6,6 @@ import { MainLayoutComponent } from './layouts/main/main-layout.component';
 
 // Páginas protegidas
 import { OverviewComponent } from './features/dashboard/page/overview/overview.component';
-import { InventoryPage } from './features/inventory/page/inventory-page.component';
 import { UsersPageComponent } from './features/users/page/users-page.component';
 import { OrdersPage } from './features/orders/page/orders-page.component';
 import { RoastsPage } from './features/roasts/page/roast-page.component';
@@ -19,7 +18,7 @@ import { AuthComponent } from './features/auth/page/auth.component';
 import { authGuard } from './features/auth/service/auth.guard';
 import { smartRedirectGuard } from './features/auth/service/smart-redirect.guard';
 import { NotFoundRedirectComponent } from './shared/components/not-found-redirect/not-found-redirect.component';
-import { PdfPageComponent } from './features/inventory/components/pdf/pages/pdf-page.component';
+import { InventoryPage } from './features/inventory/pages/inventory/inventory-page.component';
 
 export const appRoutes: Routes = [
   // 1) Login
@@ -55,7 +54,7 @@ export const appRoutes: Routes = [
         path: 'pdf/:type/:id',
         loadComponent: () =>
           import(
-            './features/inventory/components/pdf/pages/pdf-page.component'
+            './features/inventory/pages/analisis/analisis-pdf-page.component'
           ).then(m => m.PdfPageComponent)
       },
       // Cualquier otra:  

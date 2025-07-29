@@ -15,6 +15,8 @@ import { OrderRoastsComponent } from '../components/order-roasts/order-roasts.co
 import { EditRoastComponent } from '../components/edit-roast/edit-roast.component';
 import { EditOrderComponent } from '../components/edit-order/edit-order.component';
 import { UiService } from '../../../shared/services/ui.service';
+import { LoteTostado } from '../../../shared/models/lote-tostado';
+import { FichaTuesteComponent } from "../../../shared/components/ficha-tueste/ficha-tueste.component";
 
 interface ExtendedPedido extends Pedido {
   userName?: string;
@@ -31,8 +33,9 @@ interface ExtendedPedido extends Pedido {
     LucideAngularModule,
     AddRoasterComponent,
     OrderRoastsComponent,
-    EditOrderComponent
-  ],
+    EditOrderComponent,
+    FichaTuesteComponent
+],
   templateUrl: './roast-page.component.html',
 })
 export class RoastsPage {
@@ -56,6 +59,9 @@ export class RoastsPage {
   showRoastsModal = false;
   showEditRoastModal = false;
   selectedOrder?: Pedido;
+  selectedTuesteId = '';
+  showFichaTueste = false;
+
 
   constructor(
     private pedidoSvc: PedidoService,
@@ -163,6 +169,11 @@ export class RoastsPage {
         });
       }
     });
+  }
+
+  onFichaTueste(t: string) {
+      this.selectedTuesteId = t;
+      this.showFichaTueste = true;
   }
 
 }

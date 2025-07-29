@@ -1,8 +1,8 @@
-import { AnalisisDefectos } from './../../../../shared/models/analisis-defectos';
-import { Muestra } from './../../../../shared/models/muestra';
-import { LoteService } from './../../service/lote.service';
-import { AnalisisDefectosService } from './../../../analysis/service/analisis-defectos.service';
-import { AnalisisService } from './../../../analysis/service/analisis.service';
+import { AnalisisDefectos } from '../../../../shared/models/analisis-defectos';
+import { Muestra } from '../../../../shared/models/muestra';
+import { LoteService } from '../../service/lote.service';
+import { AnalisisDefectosService } from '../../../analysis/service/analisis-defectos.service';
+import { AnalisisService } from '../../../analysis/service/analisis.service';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { AnalisisFisico } from '../../../../shared/models/analisis-fisico';
 import { AnalisisSensorial } from '../../../../shared/models/analisis-sensorial';
@@ -18,12 +18,12 @@ import { SpiderGraphComponent } from '../spider-graph/spider-graph.component';
 import { Download, LucideAngularModule } from 'lucide-angular';
 
 @Component({
-  selector: 'app-pdf',
+  selector: 'analisis-pdf',
   imports: [NgIf, CommonModule, SpiderGraphComponent, LucideAngularModule],
-  templateUrl: './pdf.component.html',
+  templateUrl: './analisis-pdf.component.html',
   styles: ``
 })
-export class PdfComponent implements OnInit {
+export class AnalisisPdfComponent implements OnInit {
   @Input() id: string = '';
   @Input() type: string = '';
   @ViewChild('pdfContent') pdfContent!: ElementRef<HTMLElement>;

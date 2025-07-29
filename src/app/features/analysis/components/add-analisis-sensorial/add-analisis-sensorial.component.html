@@ -1,4 +1,5 @@
 <div class="bg-white rounded-lg shadow-lg w-full overflow-auto" (click)="$event.stopPropagation()">
+
   <!-- Header -->
   <div class="flex justify-between items-center px-6 py-4 border-b">
     <div>
@@ -10,207 +11,199 @@
   </div>
 
   <!-- Formulario -->
-  <form class="grid grid-cols-4 gap-4 p-6">
-    <!-- Fila 1 -->
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Fragancia / Aroma</mat-label>
-      <input matInput type="number" name="fragancia_aroma" [(ngModel)]="form.fragancia_aroma" #fragancia="ngModel"
-        required min="6" max="10" (ngModelChange)="persist()" />
-      <mat-error *ngIf="fragancia.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="fragancia.hasError('min')">
-        El valor mínimo es 6
-      </mat-error>
-      <mat-error *ngIf="fragancia.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Sabor</mat-label>
-      <input matInput type="number" name="sabor" [(ngModel)]="form.sabor" #sabor="ngModel" required min="6" max="10"
-        (ngModelChange)="persist()" />
-      <mat-error *ngIf="sabor.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="sabor.hasError('min')">
-        El valor mínimo es 6
-      </mat-error>
-      <mat-error *ngIf="sabor.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Sabor Residual</mat-label>
-      <input matInput type="number" name="sabor_residual" [(ngModel)]="form.sabor_residual" #saborRes="ngModel" required
-        min="6" max="10" (ngModelChange)="persist()" />
-      <mat-error *ngIf="saborRes.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="saborRes.hasError('min')">
-        El valor mínimo es 6
-      </mat-error>
-      <mat-error *ngIf="saborRes.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Acidez</mat-label>
-      <input matInput type="number" name="acidez" [(ngModel)]="form.acidez" #acidez="ngModel" required min="6" max="10"
-        (ngModelChange)="persist()" />
-      <mat-error *ngIf="acidez.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="acidez.hasError('min')">
-        El valor mínimo es 6
-      </mat-error>
-      <mat-error *ngIf="acidez.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <!-- Fila 2 -->
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Cuerpo</mat-label>
-      <input matInput type="number" name="cuerpo" [(ngModel)]="form.cuerpo" #cuerpo="ngModel" required min="6" max="10"
-        (ngModelChange)="persist()" />
-      <mat-error *ngIf="cuerpo.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="cuerpo.hasError('min')">
-        El valor mínimo es 6
-      </mat-error>
-      <mat-error *ngIf="cuerpo.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Uniformidad</mat-label>
-      <input matInput type="number" name="uniformidad" [(ngModel)]="form.uniformidad" #uniform="ngModel" required
-        min="2" max="10" (ngModelChange)="persist()" />
-      <mat-error *ngIf="uniform.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="uniform.hasError('min')">
-        El valor mínimo es 2
-      </mat-error>
-      <mat-error *ngIf="uniform.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Balance</mat-label>
-      <input matInput type="number" name="balance" [(ngModel)]="form.balance" #balance="ngModel" required min="6"
-        max="10" (ngModelChange)="persist()" />
-      <mat-error *ngIf="balance.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="balance.hasError('min')">
-        El valor mínimo es 6
-      </mat-error>
-      <mat-error *ngIf="balance.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Taza Limpia</mat-label>
-      <input matInput type="number" name="taza_limpia" [(ngModel)]="form.taza_limpia" #tazaL="ngModel" required min="2"
-        max="10" (ngModelChange)="persist()" />
-      <mat-error *ngIf="tazaL.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="tazaL.hasError('min')">
-        El valor mínimo es 2
-      </mat-error>
-      <mat-error *ngIf="tazaL.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <!-- Fila 3 -->
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Dulzor</mat-label>
-      <input matInput type="number" name="dulzor" [(ngModel)]="form.dulzor" #dul="ngModel" required min="2" max="10"
-        (ngModelChange)="persist()" />
-      <mat-error *ngIf="dul.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="dul.hasError('min')">
-        El valor mínimo es 2
-      </mat-error>
-      <mat-error *ngIf="dul.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label>Puntaje Catador</mat-label>
-      <input matInput type="number" name="puntaje_catador" [(ngModel)]="form.puntaje_catador" #puntCat="ngModel"
-        required min="6" max="10" (ngModelChange)="persist()" />
-      <mat-error *ngIf="puntCat.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="puntCat.hasError('min')">
-        El valor mínimo es 6
-      </mat-error>
-      <mat-error *ngIf="puntCat.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label># Taza defecto leve</mat-label>
-      <input matInput type="number" name="taza_defecto_ligero" [(ngModel)]="form.taza_defecto_ligero" #defLig="ngModel"
-        required min="0" max="10" (ngModelChange)="persist()" />
-      <mat-error *ngIf="defLig.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="defLig.hasError('min')">
-        El valor mínimo es 0
-      </mat-error>
-      <mat-error *ngIf="defLig.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="w-full">
-      <mat-label># Taza defecto fuerte</mat-label>
-      <input matInput type="number" name="tazas_defecto_rechazo" [(ngModel)]="form.tazas_defecto_rechazo"
-        #defF="ngModel" required min="0" max="10" (ngModelChange)="persist()" />
-      <mat-error *ngIf="defF.hasError('required')">
-        Este campo es obligatorio
-      </mat-error>
-      <mat-error *ngIf="defF.hasError('min')">
-        El valor mínimo es 0
-      </mat-error>
-      <mat-error *ngIf="defF.hasError('max')">
-        El valor máximo es 10
-      </mat-error>
-    </mat-form-field>
-
-    <!-- Fila 4 -->
-    <div class="col-span-3">
-      <mat-form-field appearance="fill" class="w-full">
-        <mat-label>Puntaje Taza</mat-label>
-        <input matInput type="number" name="puntaje_taza" [(ngModel)]="form.puntaje_taza" #puntT="ngModel" required
-          min="0" max="100" readonly />
-      </mat-form-field>
+  <form class="grid grid-cols-6 gap-4 p-6">
+    <!-- Fragancia / Aroma -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Fragancia / Aroma</label>
+      <mat-slider class="!w-[90%]" min="6" max="10" step="0.25" tickInterval="0.25">
+        <input matSliderThumb name="fragancia_aroma" [(ngModel)]="form.fragancia_aroma" #fragancia="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.fragancia_aroma }}</div>
+      <div *ngIf="fragancia.invalid && (fragancia.dirty || fragancia.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="fragancia.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="fragancia.errors?.['min']">El valor mínimo es 6</div>
+        <div *ngIf="fragancia.errors?.['max']">El valor máximo es 10</div>
+      </div>
     </div>
 
-    <!-- Comentario -->
-    <div class="col-span-4">
-      <mat-form-field appearance="fill" class="w-full">
-        <mat-label>Comentario</mat-label>
-        <textarea matInput rows="3" name="comentario" [(ngModel)]="form.comentario" #coment="ngModel" required maxlength="500"
-          (ngModelChange)="persist()"></textarea>
-        <mat-hint align="end">{{ coment.value?.length || 0 }}/500</mat-hint>
-      </mat-form-field>
+    <!-- Sabor -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Sabor</label>
+      <mat-slider class="!w-[90%]" min="6" max="10" step="0.25" tickInterval="0.25 ">
+        <input matSliderThumb name="sabor" [(ngModel)]="form.sabor" #sabor="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.sabor }}</div>
+      <div *ngIf="sabor.invalid && (sabor.dirty || sabor.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="sabor.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="sabor.errors?.['min']">El valor mínimo es 6</div>
+        <div *ngIf="sabor.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+    <!-- Sabor Residual -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Sabor Residual</label>
+      <mat-slider class="!w-[90%]" min="6" max="10" step="0.25" tickInterval="0.25">
+        <input matSliderThumb name="sabor_residual" [(ngModel)]="form.sabor_residual" #saborRes="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.sabor_residual }}</div>
+      <div *ngIf="saborRes.invalid && (saborRes.dirty || saborRes.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="saborRes.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="saborRes.errors?.['min']">El valor mínimo es 6</div>
+        <div *ngIf="saborRes.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+    <!-- Acidez -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Acidez</label>
+      <mat-slider class="!w-[90%]" min="6" max="10" step="0.25" tickInterval="0.25">
+        <input matSliderThumb name="acidez" [(ngModel)]="form.acidez" #acidez="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.acidez }}</div>
+      <div *ngIf="acidez.invalid && (acidez.dirty || acidez.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="acidez.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="acidez.errors?.['min']">El valor mínimo es 6</div>
+        <div *ngIf="acidez.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+    <!-- Cuerpo -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Cuerpo</label>
+      <mat-slider class="!w-[90%]" min="6" max="10" step="0.25" tickInterval="0.25">
+        <input matSliderThumb name="cuerpo" [(ngModel)]="form.cuerpo" #cuerpo="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.cuerpo }}</div>
+      <div *ngIf="cuerpo.invalid && (cuerpo.dirty || cuerpo.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="cuerpo.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="cuerpo.errors?.['min']">El valor mínimo es 6</div>
+        <div *ngIf="cuerpo.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+    <!-- Balance -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Balance</label>
+      <mat-slider class="!w-[90%]" min="6" max="10" step="0.25" tickInterval="0.25">
+        <input matSliderThumb name="balance" [(ngModel)]="form.balance" #balance="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.balance }}</div>
+      <div *ngIf="balance.invalid && (balance.dirty || balance.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="balance.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="balance.errors?.['min']">El valor mínimo es 6</div>
+        <div *ngIf="balance.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+
+
+
+
+    <!-- Puntaje Catador -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Puntaje Catador</label>
+      <mat-slider class="!w-[90%]" min="6" max="10" step="0.25" tickInterval="0.25">
+        <input matSliderThumb name="puntaje_catador" [(ngModel)]="form.puntaje_catador" #puntCat="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.puntaje_catador }}</div>
+      <div *ngIf="puntCat.invalid && (puntCat.dirty || puntCat.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="puntCat.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="puntCat.errors?.['min']">El valor mínimo es 6</div>
+        <div *ngIf="puntCat.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+    <!-- Uniformidad -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Uniformidad</label>
+      <mat-slider class="!w-[90%]" min="2" max="10" step="2" tickInterval="2">
+        <input matSliderThumb name="uniformidad" [(ngModel)]="form.uniformidad" #uniform="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.uniformidad }}</div>
+      <div *ngIf="uniform.invalid && (uniform.dirty || uniform.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="uniform.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="uniform.errors?.['min']">El valor mínimo es 2</div>
+        <div *ngIf="uniform.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+    <!-- Taza Limpia -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Taza Limpia</label>
+      <mat-slider class="!w-[90%]" min="2" max="10" step="2" tickInterval="2">
+        <input matSliderThumb name="taza_limpia" [(ngModel)]="form.taza_limpia" #tazaL="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.taza_limpia }}</div>
+      <div *ngIf="tazaL.invalid && (tazaL.dirty || tazaL.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="tazaL.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="tazaL.errors?.['min']">El valor mínimo es 2</div>
+        <div *ngIf="tazaL.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Dulzor</label>
+      <mat-slider class="!w-[90%]" min="2" max="10" step="2" tickInterval="2">
+        <input matSliderThumb name="dulzor" [(ngModel)]="form.dulzor" #tazaL="ngModel" required
+          (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.dulzor }}</div>
+      <div *ngIf="tazaL.invalid && (tazaL.dirty || tazaL.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="tazaL.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="tazaL.errors?.['min']">El valor mínimo es 2</div>
+        <div *ngIf="tazaL.errors?.['max']">El valor máximo es 10</div>
+      </div>
+    </div>
+
+    <!-- Taza Defecto Leve -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1"># Taza defecto leve</label>
+      <mat-slider class="!w-[90%]" min="0" max="5" step="1" tickInterval="1">
+        <input matSliderThumb name="taza_defecto_ligero" [(ngModel)]="form.taza_defecto_ligero" #defLig="ngModel"
+          required (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.taza_defecto_ligero }}</div>
+      <div *ngIf="defLig.invalid && (defLig.dirty || defLig.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="defLig.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="defLig.errors?.['min']">El valor mínimo es 0</div>
+        <div *ngIf="defLig.errors?.['max']">El valor máximo es 5</div>
+      </div>
+    </div>
+
+    <!-- Taza Defecto Fuerte -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-1"># Taza defecto fuerte</label>
+      <mat-slider class="!w-[90%]" min="0" max="5" step="1" tickInterval="1">
+        <input matSliderThumb name="tazas_defecto_rechazo" [(ngModel)]="form.tazas_defecto_rechazo" #defF="ngModel"
+          required (ngModelChange)="persist()" />
+      </mat-slider>
+      <div class="text-left text-xs text-gray-500 mt-1">Valor: {{ form.tazas_defecto_rechazo }}</div>
+      <div *ngIf="defF.invalid && (defF.dirty || defF.touched)" class="text-red-600 text-sm mt-1">
+        <div *ngIf="defF.errors?.['required']">Este campo es obligatorio</div>
+        <div *ngIf="defF.errors?.['min']">El valor mínimo es 0</div>
+        <div *ngIf="defF.errors?.['max']">El valor máximo es 5</div>
+      </div>
     </div>
   </form>
+
+  <!-- Puntaje Taza (readonly) -->
+  <div class="p-6 w-full flex justify-between">
+    <div>{{form.comentario? form.comentario : 'Sin Notas'}}</div>
+    <div class="">Puntaje Taza {{ form.puntaje_taza }}</div>
+  </div>
+
+  <app-sensorial-notes (sensorialData)="onSensorialData($event)">
+  </app-sensorial-notes>
+
+
 </div>

@@ -96,8 +96,13 @@
                   'bg-yellow-100 text-yellow-800': h.comentario==='Tueste Medio',
                   'bg-gray-800 text-white': h.comentario==='Tueste Oscuro'
                 }">{{ h.comentario }}</span>
-              <span class="inline-block px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded-full">
+              <span class="inline-block text-xs bg-green-100 text-green-800 rounded-full">
                 Completado
+              </span>
+              <span class="text-right text-xs">
+                <button (click)="onFichaTueste(h.id_nuevoLote_tostado!)" class="text-gray-500 hover:text-gray-700">
+                  <lucide-icon [img]="Eye" class="w-5 h-5" />
+                </button>
               </span>
             </div>
           </div>
@@ -124,3 +129,6 @@
 </order-roasts>
 
 <edit-order *ngIf="showEditRoastModal" [OrderId]="selectedOrder?.id_pedido!" (close)="showEditRoastModal=false"></edit-order> 
+
+<ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false">
+</ficha-tueste>
