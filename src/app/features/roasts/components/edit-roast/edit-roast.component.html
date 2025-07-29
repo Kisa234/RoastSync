@@ -5,7 +5,7 @@
       <!-- Header -->
       <div class="flex justify-between items-center px-6 py-4 border-b">
         <div>
-          <h2 class="text-lg font-semibold">Editar roast – {{ roastId }}</h2>
+          <h2 class="text-lg font-semibold">Editar Batch – {{ roast.num_batch }}</h2>
           <p class="text-sm text-gray-600">Actualiza los parámetros del proceso de roast</p>
         </div>
         <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600">
@@ -58,15 +58,14 @@
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
           <sub class="block text-xs font-medium mt-1">prom: {{ref.aire_inicial}}</sub>
         </div>
-        <!-- <div>
-          <label class="block text-sm font-medium mb-1">Punto No Retorno (min)</label>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">Punto No Retorno (°C)</label>
           <input type="number" [(ngModel)]="roast.punto_no_retorno" name="puntoNoRetorno"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
           <sub class="block text-xs font-medium mt-1">prom: {{ref.punto_no_retorno}}</sub>
-        </div> -->
-        <app-time-input label="Punto No Retorno" [prom]="ref.punto_no_retorno" [(ngModel)]="roast.punto_no_retorno"
-          name="puntoNoRetorno">
-        </app-time-input>
+        </div>
+
         <!-- <div>
           <label class="block text-sm font-medium mb-1">Tiempo Después Crack (min)</label>
           <input type="number" [(ngModel)]="roast.tiempo_despues_crack" name="tiempoDespuesCrack"
