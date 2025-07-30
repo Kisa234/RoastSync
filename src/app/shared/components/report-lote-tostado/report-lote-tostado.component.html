@@ -1,1 +1,118 @@
-<p>report-lote-tostado works!</p>
+<!-- report-lote-tostado.component.html -->
+<div #pdfContent class="w-full h-full p-8 bg-white font-sans text-gray-900">
+
+  <!-- HEADER -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <h1 class="text-3xl font-semibold tracking-tight">Reporte Lote Tostado</h1>
+    <div class="mt-4 md:mt-0 text-sm text-gray-600 space-y-1">
+      <p><span class="font-medium">Lote:</span> {{ id }}</p>
+      <p><span class="font-medium">Fecha:</span> {{ currentDate | date:'dd/MM/yyyy' }}</p>
+    </div>
+    <lucide-angular class="text-gray-500 hover:text-black text-2xl mt-4 md:mt-0" (click)="exportPdf()"
+      [img]="Download"></lucide-angular>
+  </div>
+
+  <!-- 1.- DATOS GENERALES -->
+  <section class="mb-12">
+    <h2 class="text-xl font-semibold mb-4">1.- Datos Generales</h2>
+    <div class="shadow rounded-lg p-6 bg-white">
+      <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+        <div>
+          <div class="text-gray-600">Humedad</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.humedad }}%</div>
+        </div>
+        <div>
+          <div class="text-gray-600">Densidad</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.densidad }}</div>
+        </div>
+        <div>
+          <div class="text-gray-600">% Caramelización</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.caramelizacion | number:'1.2-2' }}%</div>
+        </div>
+        <div>
+          <div class="text-gray-600">Desarrollo</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.desarrollo | number:'1.2-2' }}</div>
+        </div>
+        <div>
+          <div class="text-gray-600">Temp. Desarrollo</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.temp_desarrollo }}</div>
+        </div>
+        <div>
+          <div class="text-gray-600">Rot. Comercial</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.agtrom }}</div>
+        </div>
+        <div>
+          <div class="text-gray-600">Tiempo</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">
+            {{ formatTiempoSegundos(ficha.tiempo) }}
+          </div>
+        </div>
+        <div>
+          <div class="text-gray-600">Tueste</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.tueste }}</div>
+        </div>
+        <div>
+          <div class="text-gray-600">Peso Total</div>
+          <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.peso_total }}</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 2.- VARIABLES DE TUESTE -->
+  <section class="mb-12">
+    <h2 class="text-xl font-semibold mb-4">2.- Variables de Tueste</h2>
+    <div class="shadow rounded-lg overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50 sticky top-0">
+          <tr>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Batch</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Peso Entrada</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Tostadora</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Temp Entr.</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Llama Inicial</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Aire Inicial</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Pto No Retorno</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Tiempo ↓ Crack</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Temp Crack</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Temp Salida</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Tiempo Total</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">% Carameliz.</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Desarrollo</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Grados Desarr.</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Comercial</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Gourmet</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Peso Salida</th>
+            <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Merma</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let t of tuestes; let i = index" [ngClass]="{ 'bg-gray-50': i % 2 === 0 }">
+            <td class="px-3 py-2 whitespace-nowrap text-sm">{{ t.num_batch }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.peso_entrada }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm">{{ t.tostadora }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.temperatura_entrada }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.llama_inicial }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.aire_inicial }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.punto_no_retorno }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.tiempo_despues_crack }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.temperatura_crack }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.temperatura_salida }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.tiempo_total }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.porcentaje_caramelizacion }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.desarrollo }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.grados_desarrollo }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.agtrom_comercial }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.agtrom_gourmet }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.peso_salida }}</td>
+            <td class="px-3 py-2 whitespace-nowrap text-sm text-right">{{ t.merma }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3.- ANÁLISIS Defectos (tu sección ya la tienes, podrías pegarla aquí) -->
+  <!-- ... -->
+</div>

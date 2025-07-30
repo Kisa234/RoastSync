@@ -17,9 +17,11 @@ import { AuthComponent } from './features/auth/page/auth.component';
 // Auth Guard
 import { NotFoundRedirectComponent } from './shared/components/not-found-redirect/not-found-redirect.component';
 import { InventoryPage } from './features/inventory/pages/inventory/inventory-page.component';
-import { authGuard } from './guards/auth/auth.guard';
-import { smartRedirectGuard } from './guards/auth/smart-redirect.guard';
-import { AnalysisCompleteGuard } from './guards/analysis/analysis-complete.guard';
+import { smartRedirectGuard } from './guards/smart-redirect.guard';
+import { authGuard } from './guards/auth.guard';
+import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
+import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
+
 
 export const appRoutes: Routes = [
   // 1) Login
@@ -57,7 +59,14 @@ export const appRoutes: Routes = [
           import(
             './features/inventory/pages/analisis/analisis-pdf-page.component'
           ).then(m => m.PdfPageComponent),
-          canActivate: [AnalysisCompleteGuard]
+        canActivate: [AnalysisCompleteGuard]
+      },
+      {
+        path: 'report-lote-tostado/:id',
+        loadComponent: () =>
+          import('./shared/components/report-lote-tostado/report-lote-tostado.component')
+        .then(m => m.ReportLoteTostadoComponent),
+        canActivate: [LoteTostadoExistsGuard],
       },
       // Cualquier otra:  
       // – si no estás auth: authGuard → UrlTree('/login')  

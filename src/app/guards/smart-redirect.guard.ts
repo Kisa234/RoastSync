@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
-import { AuthService } from '../../features/auth/service/auth.service';
+import { AuthService } from '../features/auth/service/auth.service';
 
 export const smartRedirectGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);

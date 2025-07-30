@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { Observable, forkJoin, of } from 'rxjs';
 import { switchMap, map, tap, catchError } from 'rxjs/operators';
+import { LoteService } from '../features/inventory/service/lote.service';
+import { MuestraService } from '../features/inventory/service/muestra.service';
+import { AnalisisService } from '../features/analysis/service/analisis.service';
+import { AnalisisFisicoService } from '../features/analysis/service/analisis-fisico.service';
+import { AnalisisSensorialService } from '../features/analysis/service/analisis-sensorial.service';
+import { AnalisisDefectosService } from '../features/analysis/service/analisis-defectos.service';
+import { Analisis } from '../shared/models/analisis';
 
-import { LoteService } from '../../features/inventory/service/lote.service';
-import { MuestraService } from '../../features/inventory/service/muestra.service';
-import { AnalisisService } from '../../features/analysis/service/analisis.service';
-import { AnalisisFisicoService } from '../../features/analysis/service/analisis-fisico.service';
-import { AnalisisSensorialService } from '../../features/analysis/service/analisis-sensorial.service';
-import { AnalisisDefectosService } from '../../features/analysis/service/analisis-defectos.service';
-import { Analisis } from '../../shared/models/analisis';
+
 
 @Injectable({ providedIn: 'root' })
 export class AnalysisCompleteGuard implements CanActivate {

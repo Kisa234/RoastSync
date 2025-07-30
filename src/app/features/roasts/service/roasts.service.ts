@@ -46,4 +46,8 @@ export class RoastsService {
     return this.http.get<AvgTueste>(`${this.baseUrl}/ref/${id}`);
   }
 
+  getTuestesByLote(idLote: string): Observable<Tueste[]> {
+    return this.http.get<Tueste[]>(`${this.baseUrl}/lote/${idLote}`);
+  }
+
 }

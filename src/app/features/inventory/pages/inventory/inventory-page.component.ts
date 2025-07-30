@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { AsyncPipe, CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus } from 'lucide-angular';
-import { Search, Eye, Edit2, Trash2 } from 'lucide-angular';
+import { Search, Eye, Edit2, Trash2, Clipboard } from 'lucide-angular';
 import { map, Observable } from 'rxjs';
 import { AddLoteComponent } from '../../components/add-lote/add-lote.component';
 import { AddMuestraComponent } from '../../components/add-muestra/add-muestra.component';
@@ -20,6 +20,7 @@ import { UserService } from '../../../users/service/users-service.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { User } from '../../../../shared/models/user';
 import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
+import { Router } from '@angular/router';
 
 
 
@@ -42,7 +43,7 @@ type InventoryTab = 'muestras' | 'verde' | 'tostado';
     FormsModule,
     BlendTueste,
     UserNamePipe
-],
+  ],
   templateUrl: './inventory-page.component.html',
   styles: ``
 })
@@ -52,29 +53,30 @@ export class InventoryPage {
   readonly Eye = Eye;
   readonly Edit2 = Edit2;
   readonly Trash2 = Trash2;
-  readonly Plus =Plus;
+  readonly Plus = Plus;
+  readonly Clipboard = Clipboard;
 
 
   // pestañas
   tabs = [
     { key: 'muestras', label: 'Muestras' },
-    { key: 'verde',    label: 'Lotes Café Verde' },
-    { key: 'tostado',  label: 'Café Tostado' },
+    { key: 'verde', label: 'Lotes Café Verde' },
+    { key: 'tostado', label: 'Café Tostado' },
   ];
   activeTab: 'muestras' | 'verde' | 'tostado' = 'muestras';
 
   // streams de datos
   muestras$!: Observable<Muestra[]>;
-  lotes$!:   Observable<Lote[]>;
+  lotes$!: Observable<Lote[]>;
 
 
-  tostados$!:Observable<LoteTostado[]>;
-  filteredTostados: LoteTostado[] = [];   
+  tostados$!: Observable<LoteTostado[]>;
+  filteredTostados: LoteTostado[] = [];
   startDate: string = '';
   endDate: string = '';
 
   showAddMuestra = false;
-  showAddLote    = false;
+  showAddLote = false;
   showReportLote = false;
   showBlendLote = false;
   showFichaTueste = false;
@@ -89,11 +91,12 @@ export class InventoryPage {
 
   constructor(
     private muestraService: MuestraService,
-    private loteService:   LoteService,
-    private tostService:   LoteTostadoService,
+    private loteService: LoteService,
+    private tostService: LoteTostadoService,
     private userService: UserService,
     private uiService: UiService,
-  ) {}
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.loadMuestras();
@@ -103,8 +106,8 @@ export class InventoryPage {
   }
 
   openAdd() {
-    if (this.activeTab === 'muestras')   this.showAddMuestra = true;
-    else if (this.activeTab === 'verde') this.showAddLote    = true;
+    if (this.activeTab === 'muestras') this.showAddMuestra = true;
+    else if (this.activeTab === 'verde') this.showAddLote = true;
   }
   openBlendLote() {
     this.showBlendLote = true;
@@ -175,7 +178,7 @@ export class InventoryPage {
       }
     })
   }
-  
+
   onFichaTueste(t: LoteTostado) {
     this.selectedTuesteId = t.id_lote_tostado;
     this.showFichaTueste = true;
@@ -184,8 +187,8 @@ export class InventoryPage {
 
   onTabSelect(key: string) {
     this.activeTab = key as InventoryTab;
-    if (key === 'muestras')   this.loadMuestras();
-    else if (key === 'verde')   this.loadLotes();
+    if (key === 'muestras') this.loadMuestras();
+    else if (key === 'verde') this.loadLotes();
     else if (key === 'tostado') this.loadTostados();
   }
 
@@ -218,5 +221,8 @@ export class InventoryPage {
     this.loadMuestras();
   }
 
-  
+  onReportTueste(t: LoteTostado) {
+    this.router.navigate(['/report-lote-tostado', t.id_lote_tostado]);
+  }
+
 }
