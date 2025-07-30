@@ -16,10 +16,12 @@ import { Lote } from '../../../../shared/models/lote';
 import { CommonModule, NgIf } from '@angular/common';
 import { SpiderGraphComponent } from '../spider-graph/spider-graph.component';
 import { Download, LucideAngularModule } from 'lucide-angular';
+import { NotasSensorialesPipe } from '../../../../shared/pipes/notas.pipe';
+import { MultiPieChartComponent } from '../../../../shared/components/multi-pie-chart/multi-pie-chart.component';
 
 @Component({
   selector: 'analisis-pdf',
-  imports: [NgIf, CommonModule, SpiderGraphComponent, LucideAngularModule],
+  imports: [NgIf, CommonModule, SpiderGraphComponent, LucideAngularModule, NotasSensorialesPipe, MultiPieChartComponent],
   templateUrl: './analisis-pdf.component.html',
   styles: ``
 })
@@ -174,6 +176,7 @@ export class AnalisisPdfComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('AnalisisPdfComponent initialized with id:', this.id, 'and type:', this.type);
     this.loadData();
   }
 
@@ -249,7 +252,18 @@ export class AnalisisPdfComponent implements OnInit {
       });
     }
 
-    
+
+  }
+
+
+  get origen(): string {
+    const fuente = this.type === 'lote' ? this.lote : this.muestra;
+    if (!fuente) return '';
+    const segmentos: string[] = [];
+    if (fuente.departamento) segmentos.push(fuente.departamento);
+    if (fuente.region) segmentos.push(fuente.region);
+    if (fuente.finca) segmentos.push(fuente.finca);
+    return segmentos.length ? segmentos.join(' - ') : '';
   }
 
   calcGrado() {
@@ -290,70 +304,29 @@ export class AnalisisPdfComponent implements OnInit {
   }
 
   async exportPdf(): Promise<void> {
-
     const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
       import('html2canvas-pro'),
       import('jspdf')
     ]);
 
-    const original = this.pdfContent.nativeElement;
+    const original = this.pdfContent.nativeElement as HTMLElement;
 
-    // 1) Clonar el elemento y fijar su ancho
-    const clone = original.cloneNode(true) as HTMLElement;
-    clone.style.width = `${original.offsetWidth}px`;
-    clone.style.boxSizing = 'border-box';
-
-    // 2) Crear un contenedor off-screen
-    const container = document.createElement('div');
-    Object.assign(container.style, {
-      position: 'fixed',
-      top: '0',
-      left: '-10000px',
-      width: clone.style.width
-    });
-    container.appendChild(clone);
-    document.body.appendChild(container);
-
-    // 3) Renderizar con html2canvas
-    html2canvas(clone, {
+    // 1) Asegúrate de que está totalmente visible (scrollX/scrollY)
+    const canvas = await html2canvas(original, {
       useCORS: true,
-      scrollX: 0,
-      scrollY: 0,
+      scrollX: -window.scrollX,
+      scrollY: -window.scrollY,
       width: original.scrollWidth,
       height: original.scrollHeight
-    })
-      .then(canvas => {
-        // siempre limpiar el contenedor
-        document.body.removeChild(container);
+    });
 
-        // 4) Generar imagen en DataURL y preparar jsPDF
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'pt', 'a4');
-        const pageW = pdf.internal.pageSize.getWidth();
-        const pageH = pdf.internal.pageSize.getHeight();
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'pt', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        // altura proporcional de la imagen
-        const imgH = (canvas.height * pageW) / canvas.width;
-        let offsetY = 0;
-
-        // 5) Agregar páginas mientras quede contenido
-        pdf.addImage(imgData, 'PNG', 0, 0, pageW, imgH);
-        while (imgH - offsetY > pageH) {
-          offsetY += pageH;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, -offsetY, pageW, imgH);
-        }
-
-        // 6) Descargar
-        pdf.save(`analisis_${this.type}_${this.id}.pdf`);
-      })
-      .catch(err => {
-        // limpiar en caso de error
-        if (document.body.contains(container)) {
-          document.body.removeChild(container);
-        }
-        console.error('Error al generar PDF', err);
-      });
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`${this.lote.id_lote || this.muestra.id_muestra}.pdf`);
   }
 
 

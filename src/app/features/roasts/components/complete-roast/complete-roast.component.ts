@@ -30,7 +30,7 @@ export class CompleteRoastComponent implements OnInit {
   };
 
   calcAgtrom(){
-    this.roast.agtrom_comercial = parseFloat(((this.roast.agtrom_gourmet! * 1.528) * 0.74294).toFixed(1));
+    this.roast.agtrom_comercial = parseFloat(((this.roast.agtrom_gourmet! * 1.528) * 0.74294 ).toFixed(1));
   }
 
   constructor(private roastSvc: RoastsService) {}

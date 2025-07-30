@@ -19,11 +19,12 @@ import { AnalisisSensorialService } from "../../../features/analysis/service/ana
 import { AnalisisDefectosService } from "../../../features/analysis/service/analisis-defectos.service";
 import { UiService } from "../../services/ui.service";
 import { AnalisisPdfComponent } from "../../../features/inventory/components/analisis-pdf/analisis-pdf.component";
+import { NotasSensorialesPipe } from "../../pipes/notas.pipe";
 
 @Component({
   selector: 'report-lote',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, NgIf, NgFor, SpiderGraphComponent, AnalisisPdfComponent, RouterLink],
+  imports: [CommonModule, FormsModule, LucideAngularModule, NgIf, NgFor, SpiderGraphComponent, AnalisisPdfComponent, RouterLink, NotasSensorialesPipe],
   templateUrl: './report-lote.component.html'
 })
 export class ReportLoteComponent implements OnInit {

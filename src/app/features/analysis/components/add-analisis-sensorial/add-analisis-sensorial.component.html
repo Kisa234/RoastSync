@@ -197,12 +197,12 @@
   </form>
 
   <!-- Puntaje Taza (readonly) -->
-  <div class="p-6 w-full flex justify-between">
-    <div>{{form.comentario? form.comentario : 'Sin Notas'}}</div>
+  <div class="p-6 w-full flex justify-between pt-0">
+    <div>{{ form.comentario ? (this.form.comentario| notasSensoriales) : 'Sin Notas' }}</div>
     <div class="">Puntaje Taza {{ form.puntaje_taza }}</div>
   </div>
 
-  <app-sensorial-notes (sensorialData)="onSensorialData($event)">
+  <app-sensorial-notes [comentario]="form.comentario" (sensorialData)="onSensorialData($event)">
   </app-sensorial-notes>
 
 

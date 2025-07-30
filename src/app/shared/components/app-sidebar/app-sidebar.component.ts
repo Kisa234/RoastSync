@@ -30,7 +30,7 @@ export class SidebarComponent {
   readonly Coffee = Coffee;
   links = [
     { label: 'Dashboard',    path: '/dashboard', icon: House },
-    { label: 'Órdenes',      path: '/orders',    icon: ShoppingCart },
+    { label: 'Pedidos',      path: '/orders',    icon: ShoppingCart },
     { label: 'Inventario',   path: '/inventory', icon: Box },
     { label: 'Usuarios',     path: '/clients',   icon: Users },
     { label: 'Tostado',      path: '/roasts',    icon: Flame },

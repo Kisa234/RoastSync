@@ -1,244 +1,243 @@
 export interface ICoffeeFlavor {
-  name: String;
-  color: String;
+  name: string;
+  color: string;
   children?: ICoffeeFlavor[];
 }
 
 export const CoffeeFlavors: ICoffeeFlavor[] = [
   {
-    "name": "tostado",
-    "color": "#d33727",
-    "children": [
-      { "name": "tabaco de pipa", "color": "#a49663" },
-      { "name": "tabaco", "color": "#cfb480" },
+    name: 'floral',
+    color: '#da0d68',
+    children: [
+      { name: 'té negro', color: '#975e6d' },
       {
-        "name": "quemado",
-        "color": "#b6804d",
-        "children": [
-          { "name": "acre", "color": "#b0a068" },
-          { "name": "ceniza", "color": "#94a993" },
-          { "name": "ahumado", "color": "#a97f34" },
-          { "name": "marrón tostado", "color": "#835621" }
-        ]
+        name: 'floral',
+        color: '#e0719c',
+        children: [
+          { name: 'manzanilla', color: '#f99e1c' },
+          { name: 'rosa', color: '#ef5a78' },
+          { name: 'jazmín', color: '#f7f1bd' },
+        ],
       },
-      {
-        "name": "cereal",
-        "color": "#e4bd2d",
-        "children": [
-          { "name": "grano", "color": "#d0a588" },
-          { "name": "malta", "color": "#ec9b65" }
-        ]
-      }
-    ]
+    ],
   },
   {
-    "name": "especias",
-    "color": "#b90d41",
-    "children": [
-      { "name": "pungente", "color": "#734864" },
-      { "name": "pimienta", "color": "#bc4747" },
+    name: 'frutal',
+    color: '#da1d23',
+    children: [
       {
-        "name": "especias cálidas",
-        "color": "#be404c",
-        "children": [
-          { "name": "anís", "color": "#c99f19" },
-          { "name": "nuez moscada", "color": "#a61619" },
-          { "name": "canela", "color": "#e6922f" },
-          { "name": "clavo", "color": "#b5796e" }
-        ]
-      }
-    ]
+        name: 'bayas',
+        color: '#dd4c51',
+        children: [
+          { name: 'mora', color: '#3e0317' },
+          { name: 'frambuesa', color: '#e62969' },
+          { name: 'arándano', color: '#6569b0' },
+          { name: 'fresa', color: '#ef2d36' },
+        ],
+      },
+      {
+        name: 'fruta seca',
+        color: '#c94a44',
+        children: [
+          { name: 'pasa', color: '#b53b54' },
+          { name: 'ciruela pasa', color: '#a5446f' },
+        ],
+      },
+      {
+        name: 'otras frutas',
+        color: '#dd4c51',
+        children: [
+          { name: 'coco', color: '#f2684b' },
+          { name: 'cereza', color: '#e73451' },
+          { name: 'granada', color: '#e65656' },
+          { name: 'piña', color: '#f89a1c' },
+          { name: 'uva', color: '#aeb92c' },
+          { name: 'manzana', color: '#4eb849' },
+          { name: 'durazno', color: '#f68a5c' },
+          { name: 'pera', color: '#baa635' },
+        ],
+      },
+      {
+        name: 'cítricos',
+        color: '#f7a128',
+        children: [
+          { name: 'pomelo', color: '#f26355' },
+          { name: 'naranja', color: '#e2631e' },
+          { name: 'limón', color: '#fde404' },
+          { name: 'lima', color: '#7eb138' },
+        ],
+      },
+    ],
   },
   {
-    "name": "nueces/cacao",
-    "color": "#9a7b79",
-    "children": [
+    name: 'agrio/fermentado',
+    color: '#ebb40f',
+    children: [
       {
-        "name": "nueces",
-        "color": "#b59287",
-        "children": [
-          { "name": "cacahuetes", "color": "#e4b509" },
-          { "name": "avellana", "color": "#935f21" },
-          { "name": "almendra", "color": "#d9a99c" }
-        ]
+        name: 'agrio',
+        color: '#e1c315',
+        children: [
+          { name: 'aromas agrios', color: '#9ea718' },
+          { name: 'ácido acético', color: '#94a76f' },
+          { name: 'ácido butírico', color: '#d0b24f' },
+          { name: 'ácido isovalérico', color: '#8eb646' },
+          { name: 'ácido cítrico', color: '#faef07' },
+          { name: 'ácido málico', color: '#c1ba07' },
+        ],
       },
       {
-        "name": "cacao",
-        "color": "#b37122",
-        "children": [
-          { "name": "chocolate", "color": "#6b271f" },
-          { "name": "chocolate negro", "color": "#4a271d" }
-        ]
-      }
-    ]
+        name: 'alcohol/fermentado',
+        color: '#b09733',
+        children: [
+          { name: 'vinoso', color: '#8f1c53' },
+          { name: 'whisky', color: '#b34039' },
+          { name: 'fermentado', color: '#ba9232' },
+          { name: 'sobremaduro', color: '#8b6439' },
+        ],
+      },
+    ],
   },
   {
-    "name": "dulce",
-    "color": "#f36421",
-    "children": [
+    name: 'vegetal/verde',
+    color: '#187a2f',
+    children: [
+      { name: 'aceite de oliva', color: '#a2b029' },
+      { name: 'crudo', color: '#718933' },
       {
-        "name": "azúcar moreno",
-        "color": "#ce7c92",
-        "children": [
-          { "name": "melaza", "color": "#230007" },
-          { "name": "jarabe de arce", "color": "#d85e25" },
-          { "name": "caramelizado", "color": "#e2a227" },
-          { "name": "miel", "color": "#f47e2a" }
-        ]
+        name: 'vegetal verde',
+        color: '#3aa255',
+        children: [
+          { name: 'poco maduro', color: '#a2bb2b' },
+          { name: 'vaina de guisante', color: '#62aa3c' },
+          { name: 'fresco', color: '#03a653' },
+          { name: 'verde oscuro', color: '#038549' },
+          { name: 'vegetal', color: '#28b44b' },
+          { name: 'a heno', color: '#a3a830' },
+          { name: 'herbáceo', color: '#7ac141' },
+        ],
       },
-      { "name": "vainilla", "color": "#f6997d" },
-      { "name": "vanilina", "color": "#f38088" },
-      { "name": "dulzura general", "color": "#de707a" },
-      { "name": "aromas dulces", "color": "#ce3e6c" }
-    ]
+      { name: 'leguminoso', color: '#5e9a80' },
+    ],
   },
   {
-    "name": "floral",
-    "color": "#ec008c",
-    "children": [
-      { "name": "té negro", "color": "#ae667d" },
+    name: 'otro',
+    color: '#0aa3b5',
+    children: [
       {
-        "name": "floral",
-        "color": "#f05794",
-        "children": [
-          { "name": "manzanilla", "color": "#fbaf25" },
-          { "name": "rosa", "color": "#e472a7" },
-          { "name": "jazmín", "color": "#f8f7e5" }
-        ]
-      }
-    ]
+        name: 'papeloso/mohoso',
+        color: '#9db2b7',
+        children: [
+          { name: 'rancio', color: '#8b8c90' },
+          { name: 'cartón', color: '#beb276' },
+          { name: 'a papel', color: '#fefef4' },
+          { name: 'amaderado', color: '#744e03' },
+          { name: 'mohoso/húmedo', color: '#a3a36f' },
+          { name: 'mohoso/polvoriento', color: '#c9b583' },
+          { name: 'mohoso/terroso', color: '#978847' },
+          { name: 'animal', color: '#9d977f' },
+          { name: 'caldo cárnico', color: '#cc7b6a' },
+          { name: 'fenólico', color: '#db646a' },
+        ],
+      },
+      {
+        name: 'químico',
+        color: '#76c0cb',
+        children: [
+          { name: 'amargo', color: '#80a89d' },
+          { name: 'salado', color: '#def2fd' },
+          { name: 'medicinal', color: '#7a9bae' },
+          { name: 'petróleo', color: '#039fb8' },
+          { name: 'olor a mofeta', color: '#5e777b' },
+          { name: 'caucho', color: '#120c0c' },
+        ],
+      },
+    ],
   },
   {
-    "name": "frutal",
-    "color": "#ee1d23",
-    "children": [
+    name: 'tostado',
+    color: '#c94930',
+    children: [
+      { name: 'tabaco de pipa', color: '#caa465' },
+      { name: 'tabaco', color: '#dfbd7e' },
       {
-        "name": "bayas",
-        "color": "#ed2c4b",
-        "children": [
-          { "name": "mora", "color": "#090819" },
-          { "name": "frambuesa", "color": "#e32487" },
-          { "name": "arándano", "color": "#666aac" },
-          { "name": "fresa", "color": "#ee293b" }
-        ]
+        name: 'quemado',
+        color: '#be8663',
+        children: [
+          { name: 'acre', color: '#b9a449' },
+          { name: 'ceniza', color: '#899893' },
+          { name: 'ahumado', color: '#a1743b' },
+          { name: 'marrón tostado', color: '#894810' },
+        ],
       },
       {
-        "name": "fruta seca",
-        "color": "#d7444f",
-        "children": [
-          { "name": "pasa", "color": "#9e1e79" },
-          { "name": "ciruela pasa", "color": "#85558f" }
-        ]
+        name: 'cereal',
+        color: '#ddaf61',
+        children: [
+          { name: 'grano', color: '#b7906f' },
+          { name: 'malta', color: '#eb9d5f' },
+        ],
       },
-      {
-        "name": "otras frutas",
-        "color": "#f26648",
-        "children": [
-          { "name": "coco", "color": "#e48e2a" },
-          { "name": "cereza", "color": "#e71158" },
-          { "name": "granada", "color": "#ef4b60" },
-          { "name": "piña", "color": "#f89d1c" },
-          { "name": "uva", "color": "#9ec536" },
-          { "name": "manzana", "color": "#69c071" },
-          { "name": "durazno", "color": "#f37f51" },
-          { "name": "pera", "color": "#b2aa1e" }
-        ]
-      },
-      {
-        "name": "cítricos",
-        "color": "#fcb914",
-        "children": [
-          { "name": "pomelo", "color": "#f05a5e" },
-          { "name": "naranja", "color": "#f47921" },
-          { "name": "limón", "color": "#f5da02" },
-          { "name": "lima", "color": "#91c355" }
-        ]
-      }
-    ]
+    ],
   },
   {
-    "name": "agrio/fermentado",
-    "color": "#f5ce02",
-    "children": [
+    name: 'especias',
+    color: '#ad213e',
+    children: [
+      { name: 'pungente', color: '#794752' },
+      { name: 'pimienta', color: '#cc3d41' },
       {
-        "name": "agrio",
-        "color": "#e2d925",
-        "children": [
-          { "name": "aromas agrios", "color": "#c0bd1e" },
-          { "name": "ácido acético", "color": "#9fc78a" },
-          { "name": "ácido butírico", "color": "#d6c509" },
-          { "name": "ácido isovalérico", "color": "#71c05a" },
-          { "name": "ácido cítrico", "color": "#e4d711" },
-          { "name": "ácido málico", "color": "#b4c425" }
-        ]
+        name: 'especias cálidas',
+        color: '#b14d57',
+        children: [
+          { name: 'anís', color: '#c78936' },
+          { name: 'nuez moscada', color: '#8c292c' },
+          { name: 'canela', color: '#e5762e' },
+          { name: 'clavo', color: '#a16c5a' },
+        ],
       },
-      {
-        "name": "alcohol/fermentado",
-        "color": "#b2a113",
-        "children": [
-          { "name": "vinoso", "color": "#a50a71" },
-          { "name": "whisky", "color": "#b03a53" },
-          { "name": "fermentado", "color": "#d2a808" },
-          { "name": "sobremaduro", "color": "#7e7029" }
-        ]
-      }
-    ]
+    ],
   },
   {
-    "name": "vegetal/verde",
-    "color": "#17803b",
-    "children": [
-      { "name": "aceite de oliva", "color": "#a0b127" },
-      { "name": "crudo", "color": "#6c8c39" },
+    name: 'nueces/cacao',
+    color: '#a87b64',
+    children: [
       {
-        "name": "vegetal verde",
-        "color": "#21b252",
-        "children": [
-          { "name": "poco maduro", "color": "#aaca47" },
-          { "name": "vaina de guisante", "color": "#47b44a" },
-          { "name": "fresco", "color": "#00ab6f" },
-          { "name": "verde oscuro", "color": "#00603d" },
-          { "name": "vegetal", "color": "#1eb26a" },
-          { "name": "a heno", "color": "#9fa122" },
-          { "name": "herbáceo", "color": "#79c359" }
-        ]
+        name: 'nueces',
+        color: '#c78869',
+        children: [
+          { name: 'cacahuetes', color: '#d4ad12' },
+          { name: 'avellana', color: '#9d5433' },
+          { name: 'almendra', color: '#c89f83' },
+        ],
       },
-      { "name": "leguminoso", "color": "#6f9f95" }
-    ]
+      {
+        name: 'cacao',
+        color: '#bb764c',
+        children: [
+          { name: 'chocolate', color: '#692a19' },
+          { name: 'chocolate negro', color: '#470604' },
+        ],
+      },
+    ],
   },
   {
-    "name": "otro",
-    "color": "#00a7d2",
-    "children": [
+    name: 'dulce',
+    color: '#e65832',
+    children: [
       {
-        "name": "químico",
-        "color": "#61c6dd",
-        "children": [
-          { "name": "amargo", "color": "#6fc9bf" },
-          { "name": "salado", "color": "#ced2ca" },
-          { "name": "medicinal", "color": "#61a8c4" },
-          { "name": "petróleo", "color": "#00a9c1" },
-          { "name": "olor a mofeta", "color": "#5c8296" },
-          { "name": "caucho", "color": "#001631" }
-        ]
+        name: 'azúcar moreno',
+        color: '#d45a59',
+        children: [
+          { name: 'melaza', color: '#310d0f' },
+          { name: 'jarabe de arce', color: '#ae341f' },
+          { name: 'caramelizado', color: '#d78823' },
+          { name: 'miel', color: '#da5c1f' },
+        ],
       },
-      {
-        "name": "papeloso/mohoso",
-        "color": "#9bbccc",
-        "children": [
-          { "name": "rancio", "color": "#657d6b" },
-          { "name": "cartón", "color": "#dac346" },
-          { "name": "a papel", "color": "#ffffff" },
-          { "name": "amaderado", "color": "#725c26" },
-          { "name": "mohoso/húmedo", "color": "#a1ac74" },
-          { "name": "mohoso/polvoriento", "color": "#caa669" },
-          { "name": "mohoso/terroso", "color": "#948547" },
-          { "name": "animal", "color": "#a0a277" },
-          { "name": "caldo cárnico", "color": "#cb817a" },
-          { "name": "fenólico", "color": "#e97e89" }
-        ]
-      }
-    ]
-  }
-]
-
+      { name: 'vainilla', color: '#f89a80' },
+      { name: 'vanilina', color: '#f37674' },
+      { name: 'dulzura general', color: '#e75b68' },
+      { name: 'aromas dulces', color: '#d0545f' },
+    ],
+  },
+];

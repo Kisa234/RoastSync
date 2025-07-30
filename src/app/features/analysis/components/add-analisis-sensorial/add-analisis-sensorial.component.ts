@@ -9,7 +9,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
-import { SensorialData, SensorialNotesComponent } from '../sensorial-notes/sensorial-notes.component';
+import { SensorialNotesComponent } from '../sensorial-notes/sensorial-notes.component';
+import { SensorialData } from '../../../../shared/models/sensorial-data';
+import { NotasSensorialesPipe } from '../../../../shared/pipes/notas.pipe';
 
 
 @Component({
@@ -23,7 +25,8 @@ import { SensorialData, SensorialNotesComponent } from '../sensorial-notes/senso
     MatButtonModule,
     MatIconModule,
     MatSliderModule,
-    SensorialNotesComponent
+    SensorialNotesComponent,
+    NotasSensorialesPipe
   ],
   templateUrl: './add-analisis-sensorial.component.html'
 })
@@ -89,12 +92,16 @@ export class AddAnalisisSensorial implements OnInit, OnChanges {
     if (stored) {
       try {
         this.form = JSON.parse(stored);
+        if (typeof this.form.comentario === 'string') {
+          try {
+            const data = JSON.parse(this.form.comentario) as SensorialData;
+          } catch {
+          }
+        }
       } catch {
-        // JSON inválido, ignorar
       }
     }
   }
-
   persist() {
     this.calculateScore();
     const key = this.storageKey();
@@ -117,27 +124,13 @@ export class AddAnalisisSensorial implements OnInit, OnChanges {
     ) - (this.form.taza_defecto_ligero! * 2) - (this.form.tazas_defecto_rechazo! * 4));
   }
 
+  
 
-  sensorialJson!: SensorialData;
+
+
 
   onSensorialData(data: SensorialData) {
-    const lines: string[] = [];
-    if (data.notas && data.notas.length > 0) {
-      lines.push(`Notas a ${data.notas.join(', ')}`);
-    }
-    if (data.base && data.base.length > 0) {
-      lines.push(`con base a ${data.base.join(', ')}`);
-    }
-    if (data.fondo && data.fondo.length > 0) {
-      lines.push(`y con fondo a ${data.fondo.join(', ')}.`);
-    }
-    if (data.acidez !== undefined && data.acidez !== null && data.acidez !== '') {
-      lines.push(`presenta una acidez ${data.acidez}`);
-    }
-    if (data.cuerpo !== undefined && data.cuerpo !== null && data.cuerpo !== '') {
-      lines.push(`y un cuerpo ${data.cuerpo}`);
-    }
-    this.form.comentario = lines.join('\n');
+    this.form.comentario = JSON.stringify(data);
     this.persist();
   }
 

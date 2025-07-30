@@ -1,12 +1,12 @@
 import { UiService } from './../../../shared/services/ui.service';
 // src/app/features/orders/page/orders-page.component.ts
-import { Component }                             from '@angular/core';
-import {CommonModule, NgFor, AsyncPipe, DatePipe} from '@angular/common';
-import { FormsModule }                          from '@angular/forms';
-import { LucideAngularModule }                  from 'lucide-angular';
-import { Plus, Search, Eye, Edit2, Trash2,Check }     from 'lucide-angular';
+import { Component } from '@angular/core';
+import { CommonModule, NgFor, AsyncPipe, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
+import { Plus, Search, Eye, Edit2, Trash2, Check } from 'lucide-angular';
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map }                                  from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Pedido } from '../../../shared/models/pedido';
 import { PedidoService } from '../service/orders.service';
 import { AddOrderComponent } from '../components/add-order/add-order.component';
@@ -22,31 +22,30 @@ import { ViewOrderComponent } from '../components/view-order/view-order.componen
     CommonModule,
     FormsModule,
     NgFor,
-    AsyncPipe,
     DatePipe,
     LucideAngularModule,
     AddOrderComponent,
     EditOrderComponent,
-    ViewOrderComponent    
+    ViewOrderComponent
   ],
   templateUrl: './orders-page.component.html',
   styles: [``]
 })
 export class OrdersPage {
   // íconos
-  readonly Plus   = Plus;
+  readonly Plus = Plus;
   readonly Search = Search;
-  readonly Eye    = Eye;
-  readonly Edit2  = Edit2;
+  readonly Eye = Eye;
+  readonly Edit2 = Edit2;
   readonly Trash2 = Trash2;
-  readonly Check  = Check;
+  readonly Check = Check;
 
   // búsqueda
   filterText = '';
   private filter$ = new BehaviorSubject<string>('');
 
   // stream filtrado
-  pedidos$!: Observable<Pedido[]>;
+  pedidos: Pedido[] = [];
 
   // modal
   showAddOrder = false;
@@ -57,13 +56,10 @@ export class OrdersPage {
   constructor(
     private pedidoSvc: PedidoService,
     private uiSvc: UiService
-  ) {}
+  ) { }
 
   ngOnInit() {
-    const raw$ = this.pedidoSvc.getPedidos();
-    this.pedidos$ = combineLatest([raw$, this.filter$]).pipe(
-      map(([list, term]) => this.filterList(list, term))
-    );
+    this.getData();
   }
 
   private filterList(list: Pedido[], term: string): Pedido[] {
@@ -76,6 +72,14 @@ export class OrdersPage {
     );
   }
 
+  getData():void {
+    this.pedidoSvc.getPedidos().subscribe(list => {
+      const filtrados = list.filter(p => p.tipo_pedido !== 'Orden Tueste');
+      console.log('>>> filtrados:', filtrados.length, filtrados);
+      this.pedidos = filtrados;
+    });
+  }
+
   onSearchChange() {
     this.filter$.next(this.filterText);
   }
@@ -86,25 +90,25 @@ export class OrdersPage {
 
   onOrderCreated(p: Pedido) {
     this.showAddOrder = false;
-    // recarga la lista
-    this.pedidoSvc.getPedidos().subscribe(list => this.filter$.next(this.filterText));
+    this.getData();
   }
 
   onOrderEdit(p: Pedido) {
     this.showEditOrder = false;
-    this.pedidoSvc.getPedidos().subscribe(list => this.filter$.next(this.filterText));
+    this.getData();
   }
 
-  view(p: Pedido)   { 
+  view(p: Pedido) {
     this.selectedOrderId = p.id_pedido;
     this.showViewOrder = true;
   }
-  edit(p: Pedido)   { 
+  edit(p: Pedido) {
     this.selectedOrderId = p.id_pedido;
     this.showEditOrder = true;
+
   }
 
-  delete(p: Pedido){
+  delete(p: Pedido) {
     this.uiSvc.confirm({
       title: 'Eliminar Pedido',
       message: `¿Está seguro de eliminar el pedido?`,
@@ -113,8 +117,9 @@ export class OrdersPage {
     }).then((confirmed: boolean) => {
       if (confirmed) {
         this.pedidoSvc.deletePedido(p.id_pedido)
-          .subscribe(() => this.pedidoSvc.getPedidos().subscribe(() => this.filter$.next(this.filterText)));
-      }})
+          .subscribe(() => this.getData());
+      }
+    })
   }
 
   complete(p: Pedido) {
@@ -127,11 +132,9 @@ export class OrdersPage {
     }).then((confirmed: boolean) => {
       if (confirmed) {
         this.pedidoSvc.completarPedido(p.id_pedido)
-      .subscribe(() => this.pedidoSvc.getPedidos().subscribe(() => this.filter$.next(this.filterText)));
-
-        
+          .subscribe(() => this.getData());
       }
     })
-    
+
   }
 }

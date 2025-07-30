@@ -19,6 +19,7 @@ import { LoteTostadoService } from '../../service/lote-tostado.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { User } from '../../../../shared/models/user';
+import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
 
 
 
@@ -39,7 +40,8 @@ type InventoryTab = 'muestras' | 'verde' | 'tostado';
     FichaTuesteComponent,
     BlendLoteComponent,
     FormsModule,
-    BlendTueste
+    BlendTueste,
+    UserNamePipe
 ],
   templateUrl: './inventory-page.component.html',
   styles: ``

@@ -1,9 +1,9 @@
 // src/app/features/auth/service/token-refresh.interceptor.ts
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
+import { AuthService } from '../features/auth/service/auth.service';
 
 export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);

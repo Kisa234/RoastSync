@@ -1,15 +1,10 @@
-import {  Component,  EventEmitter,  HostListener,  ElementRef,  Output,  OnInit} from '@angular/core';
+import {  Component,  EventEmitter,  HostListener,  ElementRef,  Output,  OnInit, Input} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CoffeeFlavors, ICoffeeFlavor } from '../../../../shared/models/rueda-sabores';
+import { SensorialData } from '../../../../shared/models/sensorial-data';
 
-export interface SensorialData {
-  notas: string[];
-  base: string[];
-  fondo: string[];
-  acidez: string;
-  cuerpo: string;
-}
+
 
 @Component({
   selector: 'app-sensorial-notes',
@@ -22,11 +17,10 @@ export interface SensorialData {
 })
 export class SensorialNotesComponent implements OnInit {
   @Output() sensorialData = new EventEmitter<SensorialData>();
+  @Input() comentario?: string = '';
 
   form: SensorialData = {
     notas: [],
-    base: [],
-    fondo: [],
     acidez: '',
     cuerpo: ''
   };
@@ -49,6 +43,14 @@ export class SensorialNotesComponent implements OnInit {
 
   ngOnInit() {
     this.flavorOptions = this.flattenFlavors(CoffeeFlavors);
+    if (this.comentario && this.comentario !== '{}') {
+      try {
+        const data = JSON.parse(this.comentario) as SensorialData;
+        this.form = data;
+      } catch (e) {
+        console.error('Error parsing comentario:', e);
+      }
+    }
   }
 
   private flattenFlavors(arr: ICoffeeFlavor[]): string[] {
@@ -70,33 +72,7 @@ export class SensorialNotesComponent implements OnInit {
     e.stopPropagation();
     this.form.notas = this.form.notas.filter(n => n !== opt);
     this.emitChange();
-  }
-
-  // Base
-  toggleBase(opt: string) {
-    const i = this.form.base.indexOf(opt);
-    if (i > -1) this.form.base.splice(i, 1);
-    else        this.form.base.push(opt);
-    this.emitChange();
-  }
-  removeBase(opt: string, e: MouseEvent) {
-    e.stopPropagation();
-    this.form.base = this.form.base.filter(b => b !== opt);
-    this.emitChange();
-  }
-
-  // Fondo
-  toggleFondo(opt: string) {
-    const i = this.form.fondo.indexOf(opt);
-    if (i > -1) this.form.fondo.splice(i, 1);
-    else        this.form.fondo.push(opt);
-    this.emitChange();
-  }
-  removeFondo(opt: string, e: MouseEvent) {
-    e.stopPropagation();
-    this.form.fondo = this.form.fondo.filter(f => f !== opt);
-    this.emitChange();
-  }
+  }  
 
   // Emitir al padre
   private emitChange() {

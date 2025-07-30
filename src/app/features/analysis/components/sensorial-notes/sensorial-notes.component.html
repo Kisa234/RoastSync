@@ -1,174 +1,60 @@
-<div class="p-6">
+<div class="py-18 px-6 pt-0">
   <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
     <!-- Notas -->
-    <div>
+    <!-- Este wrapper debe estar POR ENCIMA del contenedor scrollable -->
+    <div class="relative">
+
+      <!-- Etiqueta y disparador (chips) -->
       <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
-      <div class="relative">
-        <div
-          (click)="notasOpen = !notasOpen"
-          class="flex flex-wrap items-center gap-2 min-h-[3rem] border border-gray-300 rounded-lg
-                 px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
-        >
-          <ng-container *ngIf="form.notas.length; else placeholderNotas">
-            <span *ngFor="let note of form.notas"
-                  class="flex items-center gap-1 bg-gray-100 text-gray-800 rounded-full px-2 py-1">
-              {{ note }}
-              <button type="button"
-                      (click)="removeNota(note, $event)"
-                      class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </span>
-          </ng-container>
-          <ng-template #placeholderNotas>
-            <span class="text-gray-400">Seleccionar notas…</span>
-          </ng-template>
-          <svg class="ml-auto h-5 w-5 text-gray-400 transform transition-transform"
-               [class.rotate-180]="notasOpen"
-               xmlns="http://www.w3.org/2000/svg" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-        <ul *ngIf="notasOpen"
-            class="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow
-                   max-h-60 overflow-y-auto">
-          <li *ngFor="let opt of flavorOptions"
-              (click)="toggleNota(opt)"
-              class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer">
-            <input type="checkbox"
-                   [checked]="form.notas.includes(opt)"
-                   class="h-4 w-4 text-[#B8672E] focus:ring-[#B8672E] rounded"/>
-            <span class="text-gray-700">{{ opt }}</span>
-          </li>
-        </ul>
+      <div (click)="notasOpen = !notasOpen" class="flex flex-wrap items-center gap-2 min-h-[3rem]
+           border border-gray-300 rounded-lg px-3 py-2
+           cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+        <ng-container *ngIf="form.notas.length; else placeholderNotas">
+          <span *ngFor="let note of form.notas" class="flex items-center gap-1 bg-gray-100 text-gray-800
+                   rounded-full px-2 py-1">
+            {{ note }}
+            <button type="button" (click)="removeNota(note, $event)" class="text-gray-500 hover:text-gray-700">
+              <!-- icono -->
+            </button>
+          </span>
+        </ng-container>
+        <ng-template #placeholderNotas>
+          <span class="text-gray-400">Seleccionar notas…</span>
+        </ng-template>
+        <svg class="ml-auto h-5 w-5 text-gray-400 transform transition-transform" [class.rotate-180]="notasOpen"
+          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <!-- flecha -->
+        </svg>
       </div>
+
+      <!-- Dropdown siempre flota POR ENCIMA -->
+      <ul *ngIf="notasOpen" class="absolute z-50 mt-1 w-full bg-white border
+           border-gray-300 rounded-lg shadow max-h-40 overflow-y-auto">
+        <li *ngFor="let opt of flavorOptions" (click)="toggleNota(opt)"
+          class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer">
+          <input type="checkbox" [checked]="form.notas.includes(opt)"
+            class="h-4 w-4 text-[#B8672E] focus:ring-[#B8672E] rounded" />
+          <span class="text-gray-700">{{ opt }}</span>
+        </li>
+      </ul>
+
     </div>
 
-    <!-- Base -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Base</label>
-      <div class="relative">
-        <div
-          (click)="baseOpen = !baseOpen"
-          class="flex flex-wrap items-center gap-2 min-h-[3rem] border border-gray-300 rounded-lg
-                 px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
-        >
-          <ng-container *ngIf="form.base.length; else placeholderBase">
-            <span *ngFor="let b of form.base"
-                  class="flex items-center gap-1 bg-gray-100 text-gray-800 rounded-full px-2 py-1">
-              {{ b }}
-              <button type="button"
-                      (click)="removeBase(b, $event)"
-                      class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </span>
-          </ng-container>
-          <ng-template #placeholderBase>
-            <span class="text-gray-400">Seleccionar base…</span>
-          </ng-template>
-          <svg class="ml-auto h-5 w-5 text-gray-400 transform transition-transform"
-               [class.rotate-180]="baseOpen"
-               xmlns="http://www.w3.org/2000/svg" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-        <ul *ngIf="baseOpen"
-            class="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow
-                   max-h-60 overflow-y-auto">
-          <li *ngFor="let opt of flavorOptions"
-              (click)="toggleBase(opt)"
-              class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer">
-            <input type="checkbox"
-                   [checked]="form.base.includes(opt)"
-                   class="h-4 w-4 text-[#B8672E] focus:ring-[#B8672E] rounded"/>
-            <span class="text-gray-700">{{ opt }}</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Fondo -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Fondo</label>
-      <div class="relative">
-        <div
-          (click)="fondoOpen = !fondoOpen"
-          class="flex flex-wrap items-center gap-2 min-h-[3rem] border border-gray-300 rounded-lg
-                 px-3 py-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
-        >
-          <ng-container *ngIf="form.fondo.length; else placeholderFondo">
-            <span *ngFor="let f of form.fondo"
-                  class="flex items-center gap-1 bg-gray-100 text-gray-800 rounded-full px-2 py-1">
-              {{ f }}
-              <button type="button"
-                      (click)="removeFondo(f, $event)"
-                      class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </span>
-          </ng-container>
-          <ng-template #placeholderFondo>
-            <span class="text-gray-400">Seleccionar fondo…</span>
-          </ng-template>
-          <svg class="ml-auto h-5 w-5 text-gray-400 transform transition-transform"
-               [class.rotate-180]="fondoOpen"
-               xmlns="http://www.w3.org/2000/svg" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-        <ul *ngIf="fondoOpen"
-            class="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow
-                   max-h-60 overflow-y-auto">
-          <li *ngFor="let opt of flavorOptions"
-              (click)="toggleFondo(opt)"
-              class="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer">
-            <input type="checkbox"
-                   [checked]="form.fondo.includes(opt)"
-                   class="h-4 w-4 text-[#B8672E] focus:ring-[#B8672E] rounded"/>
-            <span class="text-gray-700">{{ opt }}</span>
-          </li>
-        </ul>
-      </div>
-    </div>
 
     <!-- Acidez -->
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Acidez</label>
       <div class="relative">
-        <select [(ngModel)]="form.acidez"
-                (ngModelChange)="onChange()"
-                name="acidez"
-                class="block w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg
+        <select [(ngModel)]="form.acidez" (ngModelChange)="onChange()" name="acidez" class="block w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg
                        bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#B8672E]
-                       appearance-none"
-        >
+                       appearance-none">
           <option *ngFor="let opt of acidityOptions" [value]="opt">{{ opt }}</option>
         </select>
         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-          <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 9l-7 7-7-7" />
+          <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </div>
       </div>
@@ -178,20 +64,15 @@
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">Cuerpo</label>
       <div class="relative">
-        <select [(ngModel)]="form.cuerpo"
-                (ngModelChange)="onChange()"
-                name="cuerpo"
-                class="block w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg
+        <select [(ngModel)]="form.cuerpo" (ngModelChange)="onChange()" name="cuerpo" class="block w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg
                        bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#B8672E]
-                       appearance-none"
-        >
+                       appearance-none">
           <option *ngFor="let opt of bodyOptions" [value]="opt">{{ opt }}</option>
         </select>
         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-          <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-               viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 9l-7 7-7-7" />
+          <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </div>
       </div>

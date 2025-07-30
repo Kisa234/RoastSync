@@ -40,7 +40,7 @@ export class AddMuestraComponent {
 
   // Listas de opciones
   variedadesArabica: string[] = [
-    'Typica', 'Bourbon', 'Mundo Novo', 'Maragogipe', 'Caturra', 'Villa Sarchí',
+    'Blend','Typica', 'Bourbon', 'Mundo Novo', 'Maragogipe', 'Caturra', 'Villa Sarchí',
     'Pacas', 'Catuaí', 'Geisha', 'Pacamara', 'Sarchimor', 'Catimor',
     'SL28', 'SL34', 'Castillo', 'Cenicafé 1', 'Tabi', 'Híbridos F1', 'Moka',
     'Jamaica Blue Mountain', 'Kona', 'Marshell', 'Sidra', 'Bourbon Amarillo',

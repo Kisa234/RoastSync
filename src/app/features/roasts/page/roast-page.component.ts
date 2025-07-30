@@ -147,6 +147,8 @@ export class RoastsPage {
   onEditRoast(o: Pedido) {
     this.selectedOrder = o;
     this.showEditRoastModal = true;
+    this.loadPending();
+    this.loadHistory();
   }
 
   onRoasterCreated(data: any) {
