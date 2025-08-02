@@ -9,14 +9,12 @@ type ECharts = echarts.ECharts;
   selector: 'multi-pie-chart',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div #chartContainer style="width: 100%; height: 400px;"></div>
-  `
+  templateUrl: './multi-pie-chart.component.html',
 })
 export class MultiPieChartComponent implements OnChanges, AfterViewInit {
   @Input() comentario!: string;
   @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef;
-  private chart!: ECharts;
+  private chart!: echarts.ECharts;
 
   ngAfterViewInit(): void {
     this.chart = echarts.init(this.chartContainer.nativeElement);
@@ -27,6 +25,14 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit {
     if (changes['comentario'] && this.chart) {
       this.updateChart();
     }
+  }
+
+  public getChartImage(): string {
+    return this.chart.getDataURL({
+      type: 'png',
+      pixelRatio: 2,
+      backgroundColor: '#fff'
+    });
   }
 
   private updateChart(): void {
@@ -51,7 +57,7 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit {
           {},
           { r0: '0%', r: '25%', label: { rotate: 'tangential', fontSize: 16, color: '#fff' }, itemStyle: { borderWidth: 2, borderColor: '#fff' } },
           { r0: '25%', r: '60%', label: { rotate: 'tangential', fontSize: 14 }, itemStyle: { borderWidth: 1, borderColor: '#fff' } },
-          { r0: '60%', r: '90%', label: { align: 'right', fontSize: 12 }, itemStyle: { borderWidth: 1, borderColor: '#fff' } }
+          { r0: '60%', r: '90%', label: { rotate: 'tangential', fontSize: 12 }, itemStyle: { borderWidth: 1, borderColor: '#fff' } }
         ]
       }
     };

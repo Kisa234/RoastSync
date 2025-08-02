@@ -18,17 +18,23 @@ import { SpiderGraphComponent } from '../spider-graph/spider-graph.component';
 import { Download, LucideAngularModule } from 'lucide-angular';
 import { NotasSensorialesPipe } from '../../../../shared/pipes/notas.pipe';
 import { MultiPieChartComponent } from '../../../../shared/components/multi-pie-chart/multi-pie-chart.component';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import printJS from 'print-js';
+
 
 @Component({
   selector: 'analisis-pdf',
   imports: [NgIf, CommonModule, SpiderGraphComponent, LucideAngularModule, NotasSensorialesPipe, MultiPieChartComponent],
   templateUrl: './analisis-pdf.component.html',
-  styles: ``
+  styles: `
+ 
+  
+  `
 })
 export class AnalisisPdfComponent implements OnInit {
   @Input() id: string = '';
   @Input() type: string = '';
-  @ViewChild('pdfContent') pdfContent!: ElementRef<HTMLElement>;
   readonly Download = Download;
 
   lote: Lote = {
@@ -164,6 +170,8 @@ export class AnalisisPdfComponent implements OnInit {
   };
 
   total: number = 0;
+
+
 
   constructor(
     private loteService: LoteService,
@@ -303,33 +311,63 @@ export class AnalisisPdfComponent implements OnInit {
     this.calc.broca_leva = Math.floor(this.analisisDefectos.broca_leva! / 10);
   }
 
-  async exportPdf(): Promise<void> {
-    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-      import('html2canvas-pro'),
-      import('jspdf')
-    ]);
-
-    const original = this.pdfContent.nativeElement as HTMLElement;
-
-    // 1) Asegúrate de que está totalmente visible (scrollX/scrollY)
-    const canvas = await html2canvas(original, {
-      useCORS: true,
-      scrollX: -window.scrollX,
-      scrollY: -window.scrollY,
-      width: original.scrollWidth,
-      height: original.scrollHeight
-    });
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'pt', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`${this.lote.id_lote || this.muestra.id_muestra}.pdf`);
+  getAssetUrl(nombre: string): string {
+    return `${window.location.origin}/assets/img/${nombre}`;
   }
 
+  @ViewChild(MultiPieChartComponent) multiPie!: MultiPieChartComponent;
 
+  exportPdf(): void {
+    const content = document.getElementById('pdfContent');
+    if (!content) return;
+
+    // 1. Saca la imagen completa del sunburst
+    const dataUrl = this.multiPie.getChartImage();
+
+    // 2. Clona el innerHTML y sustituye TODO el tag <multi-pie-chart>
+    let html = content.innerHTML.replace(
+      /<multi-pie-chart[\s\S]*?<\/multi-pie-chart>/,
+      `<img src="${dataUrl}" style="width:100%; height:auto;" />`
+    );
+
+    // 3. Extrae tus estilos
+    const styles = Array.from(document.styleSheets)
+      .map(sheet => {
+        try {
+          return Array.from(sheet.cssRules || [])
+            .map(r => r.cssText)
+            .join('\n');
+        } catch {
+          return '';
+        }
+      })
+      .join('\n');
+
+    // 4. Abre la ventana de impresión
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    if (!printWindow) return;
+
+    printWindow.document.open();
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Reporte PDF</title>
+          <style>${styles}</style>
+        </head>
+        <body class="bg-white text-black">
+          ${html}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+
+    // 5. Dale tiempo a render y manda a imprimir
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }, 500);
+  }
 
 
 }

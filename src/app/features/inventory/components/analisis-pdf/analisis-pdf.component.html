@@ -1,344 +1,383 @@
-<div #pdfContent class="p-6 bg-white font-sans text-gray-800 relative">
+<div id="pdfContent" #pdfContent class="print-wrapper p-6 pb-0 bg-white font-sans text-gray-800 relative">
     <lucide-angular class="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl" (click)="exportPdf()"
         [img]="Download"></lucide-angular>
 
-    <!-- 1ERA PARTE -->
-    <div class="text-center p-4 bg-white text-gray-800 mb-8 mx-8">
-        <!-- Título -->
-        <h1 class="text-2xl md:text-3xl font-bold">ANÁLISIS Y SENSORIAL</h1>
-        <p class="text-xl md:text-2xl font-light mt-1">FÍSICO DE CAFÉ</p>
-        <!-- Datos en línea -->
-        <div class="flex justify-center flex-wrap space-x-6 text-sm text-gray-600 mt-6">
-            <div *ngIf="type === 'lote'" class="flex gap-4">
-                <span>
-                    <strong>Matriz de Lote:</strong> {{ lote.id_lote }};
-                </span>
-                <span>
-                    <strong>Cliente:</strong> {{ user.nombre }}
-                </span>
-                <span>
-                    <strong>Proveedor:</strong> {{ lote.productor? lote.productor : 'N/A' }}
-                </span>
-                <span *ngIf="origen">
-                    <strong>Origen:</strong> {{ origen }}
-                </span>
-                <span>
-                    <strong>Variedad:</strong> {{ lote.variedades.join(', ') }}
-                </span>
+    <div class="page-1 print-page">
+        <!-- 1ERA PARTE -->
+        <div class="text-center p-4 bg-white text-gray-800 mb-8 mx-8 relative">
+            <!-- Título -->
+            <h1 class="text-2xl md:text-3xl font-bold">ANÁLISIS Y SENSORIAL</h1>
+            <p class="text-xl md:text-2xl font-light mt-1">FÍSICO DE CAFÉ</p>
+            <!-- Datos en línea -->
+            <div class="flex justify-center flex-wrap space-x-6 text-sm text-gray-600 mt-6">
+                <div *ngIf="type === 'lote'" class="flex gap-4">
+                    <span>
+                        <strong>Matriz de Lote:</strong> {{ lote.id_lote }};
+                    </span>
+                    <span>
+                        <strong>Cliente:</strong> {{ user.nombre }}
+                    </span>
+                    <span>
+                        <strong>Proveedor:</strong> {{ lote.productor? lote.productor : 'N/A' }}
+                    </span>
+                    <span *ngIf="origen">
+                        <strong>Origen:</strong> {{ origen }}
+                    </span>
+                    <span>
+                        <strong>Variedad:</strong> {{ lote.variedades.join(', ') }}
+                    </span>
+                </div>
+                <div *ngIf="type === 'muestra'" class="flex gap-4">
+                    <span>
+                        <strong>Matriz de Muestra:</strong> {{ muestra.id_muestra }}
+                    </span>
+                    <span>
+                        <strong>Cliente:</strong> {{ user.nombre }}
+                    </span>
+                    <span>
+                        <strong>Proveedor:</strong> {{ muestra.productor }}
+                    </span>
+                    <span>
+                        <strong>Variedad:</strong> {{ muestra.variedades.join(', ') }}
+                    </span>
+                </div>
             </div>
-            <div *ngIf="type === 'muestra'" class="flex gap-4">
-                <span>
-                    <strong>Matriz de Muestra:</strong> {{ muestra.id_muestra }}
-                </span>
-                <span>
-                    <strong>Cliente:</strong> {{ user.nombre }}
-                </span>
-                <span>
-                    <strong>Proveedor:</strong> {{ muestra.productor }}
-                </span>
-                <span>
-                    <strong>Variedad:</strong> {{ muestra.variedades.join(', ') }}
-                </span>
+            <!-- images -->
+            <img [src]="getAssetUrl('lo-bueno-negro-rojo.png')" alt="Lo bueno de la vida nunca es instantaneo"
+                class="absolute top-0 left-0 w-25 h-auto">
+            <img [src]="getAssetUrl('fortunato-logo.png')" alt="Logo Fortunato"
+                class="absolute top-0 right-0 w-40 h-auto">
+
+        </div>
+        <!-- 2PARTE -->
+        <div class="flex gap-6 mx-8">
+            <div class="flex-1">
+                <!-- Análisis físico -->
+                <section class="">
+                    <h2 class="font-bold text-lg mb-4">1.- ANÁLISIS <span class="font-light">Físico</span></h2>
+
+                    <!-- Primer bloque de parámetros -->
+                    <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm border-b border-gray-300 pb-4">
+                        <dt>Peso de la muestra</dt>
+                        <dd class="text-right">{{ analisisFisico.peso_muestra | number:'1.2-2' }} gr</dd>
+
+                        <dt>Peso pergamino</dt>
+                        <dd class="text-right">{{ analisisFisico.peso_pergamino | number:'1.2-2' }} gr</dd>
+
+                        <dt>WA</dt>
+                        <dd class="text-right">{{ analisisFisico.wa | number:'1.2-2' }}</dd>
+
+                        <dt>Temperatura WA</dt>
+                        <dd class="text-right">{{ analisisFisico.temperatura_wa }} °C</dd>
+
+                        <dt>Humedad</dt>
+                        <dd class="text-right">{{ analisisFisico.humedad | number:'1.2-2' }} %</dd>
+
+                        <dt>Temperatura Humedad</dt>
+                        <dd class="text-right">{{ analisisFisico.temperatura_humedad }} °C</dd>
+
+                        <dt>Densidad</dt>
+                        <dd class="text-right">{{ analisisFisico.densidad }}</dd>
+
+                        <dt>Color de grano en verde</dt>
+                        <dd class="text-right">{{ analisisFisico.color_grano_verde }}</dd>
+
+                        <dt>Olor</dt>
+                        <dd class="text-right">{{ analisisFisico.olor }}</dd>
+                    </dl>
+
+                    <!-- Segundo bloque: mallas -->
+                    <hr class="my-4 border-gray-300" />
+                    <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm border-b border-gray-300 pb-4">
+                        <dt>Superior a malla 18</dt>
+                        <dd class="text-right">{{ analisisFisico.superior_malla_18 | number:'1.2-2' }} %</dd>
+
+                        <dt>Superior a malla 16</dt>
+                        <dd class="text-right">{{ analisisFisico.superior_malla_16 | number:'1.2-2' }} %</dd>
+
+                        <dt>Superior a malla 14</dt>
+                        <dd class="text-right">{{ analisisFisico.superior_malla_14 | number:'1.2-2' }} %</dd>
+
+                        <dt>Menor a malla 14</dt>
+                        <dd class="text-right">{{ analisisFisico.menor_malla_14 | number:'1.2-2' }} %</dd>
+                    </dl>
+
+                    <!-- Tercer bloque: otros parámetros -->
+                    <hr class="my-4 border-gray-300" />
+                    <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm">
+                        <dt>Peso de defectos</dt>
+                        <dd class="text-right">{{ analisisFisico.peso_defectos | number:'1.0-0' }} gr</dd>
+
+                        <dt>Quáquers</dt>
+                        <dd class="text-right">{{ analisisFisico.quaquers }}</dd>
+
+                        <dt>Peso de muestra tostada</dt>
+                        <dd class="text-right">{{ analisisFisico.peso_muestra_tostada | number:'1.2-2' }}</dd>
+
+                        <dt>Desarrollo</dt>
+                        <dd class="text-right">{{ analisisFisico.desarrollo | number:'1.2-2' }}</dd>
+
+                        <dt>% de caramelización</dt>
+                        <dd class="text-right">{{ analisisFisico.porcentaje_caramelizacion | number:'1.2-2' }} %</dd>
+
+                        <dt>C° Desarrollo</dt>
+                        <dd class="text-right">{{ analisisFisico.c_desarrollo | number:'1.2-2' }}</dd>
+                    </dl>
+
+                    <!-- Comentario -->
+                    <hr class="my-4 border-gray-300" />
+                    <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm">
+                        <dt class="font-medium">Comentario</dt>
+                        <dd class="text-right">{{ analisisFisico.comentario }}</dd>
+                    </dl>
+                </section>
+            </div>
+            <div class="flex-1">
+                <!-- Defectos -->
+                <section class="">
+                    <h2 class="font-bold text-lg mb-4">2.- ANÁLISIS <span class="font-light">Defectos</span></h2>
+                    <div class="flex flex-col gap-2">
+                        <!-- Defectos Primarios -->
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-2 text-left font-medium">Defecto Primario</th>
+                                    <th class="p-2 text-right font-medium">N° de granos</th>
+                                    <th class="p-2 text-right font-medium">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Grano Negro</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.grano_negro }}</td>
+                                    <td class="p-2 text-right">{{ calc.grano_negro }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Grano Agrio</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.grano_agrio }}</td>
+                                    <td class="p-2 text-right">{{ calc.grano_agrio }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Grano con Hongos</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.grano_con_hongos }}</td>
+                                    <td class="p-2 text-right">{{ calc.grano_con_hongos }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Cereza Seca</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.cereza_seca }}</td>
+                                    <td class="p-2 text-right">{{ calc.cereza_seca }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Materia extraña</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.materia_estrana }}</td>
+                                    <td class="p-2 text-right">{{ calc.materia_estrana }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Broca severa</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.broca_severa }}</td>
+                                    <td class="p-2 text-right">{{ calc.broca_severa }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- Defectos Secundarios -->
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-2 text-left font-medium">Defecto Secundario</th>
+                                    <th class="p-2 text-right font-medium">N° de granos</th>
+                                    <th class="p-2 text-right font-medium">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Negro parcial</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.negro_parcial }}</td>
+                                    <td class="p-2 text-right">{{ calc.negro_parcial }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Agrio parcial</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.agrio_parcial }}</td>
+                                    <td class="p-2 text-right">{{ calc.agrio_parcial }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Pergamino</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.pergamino }}</td>
+                                    <td class="p-2 text-right">{{ calc.pergamino }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Flotadores</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.flotadores }}</td>
+                                    <td class="p-2 text-right">{{ calc.flotadores }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Inmaduro</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.inmaduro }}</td>
+                                    <td class="p-2 text-right">{{ calc.inmaduro }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Averanado</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.averanado }}</td>
+                                    <td class="p-2 text-right">{{ calc.averanado }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Conchas</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.conchas }}</td>
+                                    <td class="p-2 text-right">{{ calc.conchas }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Cáscara pulpa seca</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.cascara_pulpa_seca }}</td>
+                                    <td class="p-2 text-right">{{ calc.cascara_pulpa_seca }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Partido mordido o cortado</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.partido_mordido_cortado }}</td>
+                                    <td class="p-2 text-right">{{ calc.partido_mordido_cortado }}</td>
+                                </tr>
+                                <tr class="border-t border-b border-gray-200">
+                                    <td class="p-2">Broca Leva</td>
+                                    <td class="p-2 text-right">{{ analisisDefectos.broca_leva }}</td>
+                                    <td class="p-2 text-right">{{ calc.broca_leva }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                        <!-- Tabla de Grado Total -->
+                        <table class="w-full mt-2 text-sm ">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-2 text-left font-medium">Grado</th>
+                                    <th class="p-2 text-right font-medium">N° de defectos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-2">Grado {{ analisisDefectos.grado }}</td>
+                                    <td class="p-2 text-right">{{ total }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
 
-    <!-- 2PARTE -->
-    <div class="flex gap-6 mx-8">
-        <div class="flex-1">
-            <!-- Análisis físico -->
-            <section class="">
-                <h2 class="font-bold text-lg mb-4">1.- ANÁLISIS <span class="font-light">Físico</span></h2>
+    <div class="break-after-page"></div>
 
-                <!-- Primer bloque de parámetros -->
-                <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm border-b border-gray-300 pb-4">
-                    <dt>Peso de la muestra</dt>
-                    <dd class="text-right">{{ analisisFisico.peso_muestra | number:'1.2-2' }} gr</dd>
-
-                    <dt>Peso pergamino</dt>
-                    <dd class="text-right">{{ analisisFisico.peso_pergamino | number:'1.2-2' }} gr</dd>
-
-                    <dt>WA</dt>
-                    <dd class="text-right">{{ analisisFisico.wa | number:'1.2-2' }}</dd>
-
-                    <dt>Temperatura WA</dt>
-                    <dd class="text-right">{{ analisisFisico.temperatura_wa }} °C</dd>
-
-                    <dt>Humedad</dt>
-                    <dd class="text-right">{{ analisisFisico.humedad | number:'1.2-2' }} %</dd>
-
-                    <dt>Temperatura Humedad</dt>
-                    <dd class="text-right">{{ analisisFisico.temperatura_humedad }} °C</dd>
-
-                    <dt>Densidad</dt>
-                    <dd class="text-right">{{ analisisFisico.densidad }}</dd>
-
-                    <dt>Color de grano en verde</dt>
-                    <dd class="text-right">{{ analisisFisico.color_grano_verde }}</dd>
-
-                    <dt>Olor</dt>
-                    <dd class="text-right">{{ analisisFisico.olor }}</dd>
-                </dl>
-
-                <!-- Segundo bloque: mallas -->
-                <hr class="my-4 border-gray-300" />
-                <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm border-b border-gray-300 pb-4">
-                    <dt>Superior a malla 18</dt>
-                    <dd class="text-right">{{ analisisFisico.superior_malla_18 | number:'1.2-2' }} %</dd>
-
-                    <dt>Superior a malla 16</dt>
-                    <dd class="text-right">{{ analisisFisico.superior_malla_16 | number:'1.2-2' }} %</dd>
-
-                    <dt>Superior a malla 14</dt>
-                    <dd class="text-right">{{ analisisFisico.superior_malla_14 | number:'1.2-2' }} %</dd>
-
-                    <dt>Menor a malla 14</dt>
-                    <dd class="text-right">{{ analisisFisico.menor_malla_14 | number:'1.2-2' }} %</dd>
-                </dl>
-
-                <!-- Tercer bloque: otros parámetros -->
-                <hr class="my-4 border-gray-300" />
-                <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm">
-                    <dt>Peso de defectos</dt>
-                    <dd class="text-right">{{ analisisFisico.peso_defectos | number:'1.0-0' }} gr</dd>
-
-                    <dt>Quáquers</dt>
-                    <dd class="text-right">{{ analisisFisico.quaquers }}</dd>
-
-                    <dt>Peso de muestra tostada</dt>
-                    <dd class="text-right">{{ analisisFisico.peso_muestra_tostada | number:'1.2-2' }}</dd>
-
-                    <dt>Desarrollo</dt>
-                    <dd class="text-right">{{ analisisFisico.desarrollo | number:'1.2-2' }}</dd>
-
-                    <dt>% de caramelización</dt>
-                    <dd class="text-right">{{ analisisFisico.porcentaje_caramelizacion | number:'1.2-2' }} %</dd>
-
-                    <dt>C° Desarrollo</dt>
-                    <dd class="text-right">{{ analisisFisico.c_desarrollo | number:'1.2-2' }}</dd>
-                </dl>
-
-                <!-- Comentario -->
-                <hr class="my-4 border-gray-300" />
-                <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm">
-                    <dt class="font-medium">Comentario</dt>
-                    <dd class="text-right">{{ analisisFisico.comentario }}</dd>
-                </dl>
-            </section>
-        </div>
-        <div class="flex-1">
-            <!-- Defectos -->
-            <section class="">
-                <h2 class="font-bold text-lg mb-4">3.- ANÁLISIS <span class="font-light">Defectos</span></h2>
-                <div class="flex flex-col gap-6">
-                    <!-- Defectos Primarios -->
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="p-2 text-left font-medium">Defecto Primario</th>
-                                <th class="p-2 text-right font-medium">N° de granos</th>
-                                <th class="p-2 text-right font-medium">Valor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Grano Negro</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.grano_negro }}</td>
-                                <td class="p-2 text-right">{{ calc.grano_negro }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Grano Agrio</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.grano_agrio }}</td>
-                                <td class="p-2 text-right">{{ calc.grano_agrio }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Grano con Hongos</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.grano_con_hongos }}</td>
-                                <td class="p-2 text-right">{{ calc.grano_con_hongos }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Cereza Seca</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.cereza_seca }}</td>
-                                <td class="p-2 text-right">{{ calc.cereza_seca }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Materia extraña</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.materia_estrana }}</td>
-                                <td class="p-2 text-right">{{ calc.materia_estrana }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Broca severa</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.broca_severa }}</td>
-                                <td class="p-2 text-right">{{ calc.broca_severa }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <!-- Defectos Secundarios -->
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="p-2 text-left font-medium">Defecto Secundario</th>
-                                <th class="p-2 text-right font-medium">N° de granos</th>
-                                <th class="p-2 text-right font-medium">Valor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Negro parcial</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.negro_parcial }}</td>
-                                <td class="p-2 text-right">{{ calc.negro_parcial }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Agrio parcial</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.agrio_parcial }}</td>
-                                <td class="p-2 text-right">{{ calc.agrio_parcial }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Pergamino</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.pergamino }}</td>
-                                <td class="p-2 text-right">{{ calc.pergamino }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Flotadores</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.flotadores }}</td>
-                                <td class="p-2 text-right">{{ calc.flotadores }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Inmaduro</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.inmaduro }}</td>
-                                <td class="p-2 text-right">{{ calc.inmaduro }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Averanado</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.averanado }}</td>
-                                <td class="p-2 text-right">{{ calc.averanado }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Conchas</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.conchas }}</td>
-                                <td class="p-2 text-right">{{ calc.conchas }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Cáscara pulpa seca</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.cascara_pulpa_seca }}</td>
-                                <td class="p-2 text-right">{{ calc.cascara_pulpa_seca }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-2">Partido mordido o cortado</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.partido_mordido_cortado }}</td>
-                                <td class="p-2 text-right">{{ calc.partido_mordido_cortado }}</td>
-                            </tr>
-                            <tr class="border-t border-b border-gray-200">
-                                <td class="p-2">Broca Leva</td>
-                                <td class="p-2 text-right">{{ analisisDefectos.broca_leva }}</td>
-                                <td class="p-2 text-right">{{ calc.broca_leva }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </div>
-
-                <!-- Tabla de Grado Total -->
-                <table class="w-full mt-6 text-sm ">
+    <div class="page-2 print-page">
+        <!-- 3RA PARTE -->
+        <h2 class="font-bold text-lg mb-4 mx-8">3.- ANÁLISIS <span class="font-light">Sensorial</span></h2>
+        <div class="flex justify-start gap-4">
+            <!-- Análisis Sensorial -->
+            <section class="flex-1">
+                <table class="w-full text-sm ">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="p-2 text-left font-medium">Grado</th>
-                            <th class="p-2 text-right font-medium">N° de defectos</th>
+                            <th class="p-2 text-left font-medium">Métrica</th>
+                            <th class="p-2 text-right font-medium">Valor</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="border-t border-gray-100">
-                            <td class="p-2">Grado {{ analisisDefectos.grado }}</td>
-                            <td class="p-2 text-right">{{ total }}</td>
+                            <td class="p-2">Aroma / Fragancia</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.fragancia_aroma | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Sabor</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.sabor | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Sabor Residual</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.sabor_residual | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Acidez</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.acidez | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Cuerpo</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.cuerpo | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Balance</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.balance | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">General</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.puntaje_catador | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Uniformidad</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.uniformidad | number:'1.0-0' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Taza Limpia</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.taza_limpia | number:'1.0-0' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Dulzor</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.dulzor | number:'1.0-0' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Defecto Leve</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.taza_defecto_ligero | number:'1.0-0' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Defecto Grave</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.tazas_defecto_rechazo | number:'1.0-0' }}
+                            </td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2">Puntaje Final</td>
+                            <td class="p-2 text-right">{{ analisisSensorial.puntaje_taza | number:'1.2-2' }}</td>
+                        </tr>
+                        <tr class="border-t border-gray-100">
+                            <td class="p-2 font-semibold" colspan="2">
+                                {{ analisisSensorial.comentario | notasSensoriales }}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </section>
-        </div>
-    </div>
+            <!-- Gráficos -->
+            <div class="flex flex-col justify-center items-center flex-1 border-[#E5E5E5]">
+                <div class="flex-1 w-80 h-fit">
+                    <spider-graph [aS]="analisisSensorial"></spider-graph>
+                </div>
+                <div class="flex-1 w-60 h-fit">
+                    <multi-pie-chart [comentario]="analisisSensorial.comentario"></multi-pie-chart>
+                </div>
 
-    <!-- 3RA PARTE -->
-    <h2 class="font-bold text-lg mb-4 mx-8">2.- ANÁLISIS <span class="font-light">Sensorial</span></h2>
-    <div class="flex justify-start gap-6 mx-8">
-        <!-- Análisis Sensorial -->
-        <section class="flex-2">
-            <table class="w-full text-sm ">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="p-2 text-left font-medium">Métrica</th>
-                        <th class="p-2 text-right font-medium">Valor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Aroma / Fragancia</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.fragancia_aroma | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Sabor</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.sabor | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Sabor Residual</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.sabor_residual | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Acidez</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.acidez | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Cuerpo</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.cuerpo | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Balance</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.balance | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">General</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.puntaje_catador | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Uniformidad</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.uniformidad | number:'1.0-0' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Taza Limpia</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.taza_limpia | number:'1.0-0' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Dulzor</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.dulzor | number:'1.0-0' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Defecto Leve</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.taza_defecto_ligero | number:'1.0-0' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Defecto Grave</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.tazas_defecto_rechazo | number:'1.0-0' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2">Puntaje Final</td>
-                        <td class="p-2 text-right">{{ analisisSensorial.puntaje_taza | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr class="border-t border-gray-100">
-                        <td class="p-2 font-semibold" colspan="2">
-                            {{ analisisSensorial.comentario | notasSensoriales }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-        <!-- Gráficos -->
-        <div class="flex flex-4 justify-center items-center border-[#E5E5E5]">
-            <div class="flex-1 p-4">
-                <spider-graph [aS]="analisisSensorial" class="w-full h-full"></spider-graph>
-            </div>
-            <div  class="flex-1 p-4">
-                <multi-pie-chart [comentario]="analisisSensorial.comentario" class="w-full h-full"></multi-pie-chart>
+
             </div>
         </div>
+
+        <!-- 4TA PARTE -->
+        <!-- Firma -->
+
     </div>
 
+
+    <!-- Footer -->
+    <footer class="text-center p-4 relative">
+        <div class="absolute top-0 left-0 p-4  ">
+            <div class="text-center w-fit">
+                <!-- Imagen de la firma -->
+                <img [src]="getAssetUrl('firma-renato.png')" alt="Firma" class="w-30 h-auto mb-1" />
+                <div class="border-t border-gray-300 pt-2 mt-2">
+                    <p class="text-sm font-semibold">RENATO MARTiNETTi</p>
+                    <p class="text-sm font-semibold">CEO - FORTUNATO COFFEE</p>
+                    <p class="text-xs">Fecha: {{ analisis.fecha_registro | date:'dd/MM/yyyy' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="">
+            <img [src]="getAssetUrl('logotipo.png')" alt="Logotipo-Rojo-Fortunato" class="mx-auto mb-2 w-32 h-auto">
+            <p class="text-xs absolute left-1/2 transform -translate-x-1/2 font-bold">Este análisis se hizo para de
+                muestra
+                de café de los 350 gr.y es válido solo para esta misma</p>
+        </div>
+    </footer>
 </div>
