@@ -35,7 +35,7 @@ export class SidebarComponent {
     { label: 'Usuarios',     path: '/clients',   icon: Users },
     { label: 'Tostado',      path: '/roasts',    icon: Flame },
     { label: 'Analisis',         path: '/analisis',    icon: FlaskConical  },
+    { label: 'Configuración',path: '/settings',  icon: Settings },
     // { label: 'Reportes',     path: '/reports',   icon: ChartColumn },
-    // { label: 'Configuración',path: '/settings',  icon: Settings },
   ];
 }

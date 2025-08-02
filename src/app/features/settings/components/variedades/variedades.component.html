@@ -1,0 +1,83 @@
+<div
+  class="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center z-50 p-4"
+  (click)="onClose()"
+>
+  <div
+    class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- CERRAR -->
+    <lucide-icon
+      [img]="X"
+      class="absolute top-4 right-4 w-5 h-5 cursor-pointer text-gray-400 hover:text-gray-600"
+      (click)="onClose()"
+    />
+
+    <h2 class="text-xl font-semibold mb-2">Variedades</h2>
+    <p class="text-gray-600 mb-4">Aquí puedes gestionar las variedades de café.</p>
+
+    <!-- BUSCADOR + BOTÓN AGREGAR -->
+    <div class="flex items-center gap-2 mb-4">
+      <input
+        type="text"
+        [(ngModel)]="search"
+        (ngModelChange)="filter()"
+        [ngModelOptions]="{ standalone: true }"
+        name="search"
+        placeholder="Buscar variedades..."
+        class="flex-1 border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+               focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition"
+      />
+
+      <button
+        type="button"
+        (click)="agregarVariedad(search)"
+        class="flex-none p-2 bg-[#B8672E] rounded-lg text-white hover:bg-[#995d26] transition"
+        [disabled]="!search.trim()"
+        title="Agregar variedad"
+      >
+        <lucide-icon [img]="Plus" class="w-4 h-4" />
+      </button>
+    </div>
+
+    <!-- LISTA -->
+    <ul class="max-h-60 overflow-y-auto border border-[#E5E5E5] rounded-lg divide-y divide-gray-100">
+      <li
+        *ngFor="let v of filteredVariedades"
+        class="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer"
+      >
+        <span>{{ v.nombre }}</span>
+        <button
+          type="button"
+          (click)="eliminarVariedad(v)"
+          class="text-gray-400 hover:text-red-600 transition"
+          title="Eliminar variedad"
+        >
+          <lucide-icon [img]="Trash2" class="w-4 h-4" />
+        </button>
+      </li>
+
+      <li *ngIf="!filteredVariedades.length" class="px-4 py-2 text-gray-500">
+        No se encontraron resultados.
+      </li>
+    </ul>
+
+    <!-- ACCIONES -->
+    <div class="mt-4 flex justify-end gap-2">
+      <button
+        type="button"
+        (click)="onClose()"
+        class="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="onClose()"
+        class="px-4 py-2 rounded-lg bg-[#B8672E] text-white hover:bg-[#995d26] transition"
+      >
+        Listo
+      </button>
+    </div>
+  </div>
+</div>

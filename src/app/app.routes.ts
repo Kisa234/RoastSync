@@ -21,6 +21,7 @@ import { smartRedirectGuard } from './guards/smart-redirect.guard';
 import { authGuard } from './guards/auth.guard';
 import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
+import { SettingsPageComponent } from './features/settings/page/settings-page.component';
 
 
 export const appRoutes: Routes = [
@@ -50,6 +51,7 @@ export const appRoutes: Routes = [
       { path: 'roasts', component: RoastsPage },
       { path: 'analisis', component: AnalisisPage },
       { path: 'clients', component: UsersPageComponent },
+      { path: 'settings', component: SettingsPageComponent },
 
 
       // ...otras rutas
