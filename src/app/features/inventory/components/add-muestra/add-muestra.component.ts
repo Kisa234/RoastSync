@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, ElementRef, HostListener, OnInit } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -6,6 +6,11 @@ import { X, Check, ChevronDown } from 'lucide-angular';
 
 import { MuestraService } from '../../service/muestra.service';
 import { Muestra } from '../../../../shared/models/muestra';
+import { VariedadService } from '../../../../shared/services/variedad.service';
+import { Variedad } from '../../../../shared/models/variedad';
+import { UserService } from '../../../users/service/users-service.service';
+import { User } from '../../../../shared/models/user';
+import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
 
 @Component({
   selector: 'add-muestra',
@@ -14,11 +19,26 @@ import { Muestra } from '../../../../shared/models/muestra';
     CommonModule,
     FormsModule,
     LucideAngularModule,
-    NgIf
+    SelectSearchComponent
   ],
   templateUrl: './add-muestra.component.html'
 })
-export class AddMuestraComponent {
+export class AddMuestraComponent implements OnInit {
+
+  constructor(
+    private MuestraSvc: MuestraService,
+    private VariedadSvc: VariedadService,
+    private userSvc: UserService,
+    
+  ) { }
+
+  ngOnInit() {
+    this.VariedadSvc.getAllVariedades().subscribe(variedades => {
+      this.variedades = variedades;
+    });
+    this.userSvc.getUsers().subscribe(u => this.clientes = u);
+  }
+
   // icons
   readonly X = X;
   readonly Check = Check;
@@ -39,64 +59,23 @@ export class AddMuestraComponent {
   };
 
   // Listas de opciones
-  variedadesArabica: string[] = [
-    'Blend','Typica', 'Bourbon', 'Mundo Novo', 'Maragogipe', 'Caturra', 'Villa Sarchí',
-    'Pacas', 'Catuaí', 'Geisha', 'Pacamara', 'Sarchimor', 'Catimor',
-    'SL28', 'SL34', 'Castillo', 'Cenicafé 1', 'Tabi', 'Híbridos F1', 'Moka',
-    'Jamaica Blue Mountain', 'Kona', 'Marshell', 'Sidra', 'Bourbon Amarillo',
-    'Bourbon Rosado', 'Bourbon Enano', 'Caturra Amarillo', 'Papayo', 'Arara'
-  ];
+  variedades: Variedad[] = [];
+  clientes: User[] = [];
   procesos = ['Lavado', 'Natural', 'Honey'];
 
   // Dropdown Propio
   showVarDropdown = false;
   filterVar = '';
 
-  @ViewChild('varietyContainer', { static: true }) varietyContainer!: ElementRef;
-
-
-  toggleVarDropdown() {
-    this.showVarDropdown = !this.showVarDropdown;
-    if (this.showVarDropdown) {
-      this.filterVar = '';
-    }
-  }
-
-  @HostListener('document:click', ['$event.target'])
-  closeVarDropdown(target: HTMLElement) {
-    if (
-      this.showVarDropdown &&
-      !this.varietyContainer.nativeElement.contains(target)
-    ) {
-      this.showVarDropdown = false;
-    }
-  }
-
-  // Retorna todas las opciones que coincidan con el filtro
-  get filteredVariedades(): string[] {
-    const q = this.filterVar.trim().toLowerCase();
-    return this.variedadesArabica
-      .filter(v => !q || v.toLowerCase().includes(q));
-  }
-
-  // Añade/quita al array
-  onVarToggle(v: string) {
-    const arr = this.model.variedades || [];
-    this.model.variedades = arr.includes(v)
-      ? arr.filter(x => x !== v)
-      : [...arr, v];
-  }
-
   onCancel() {
     this.close.emit();
   }
 
   onSave() {
-    this.svc.create(this.model).subscribe(m => {
+    this.MuestraSvc.create(this.model).subscribe(m => {
       this.create.emit();
       this.close.emit();
     });
   }
 
-  constructor(private svc: MuestraService) { }
 }

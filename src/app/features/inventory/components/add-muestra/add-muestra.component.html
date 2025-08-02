@@ -62,44 +62,13 @@
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
       </div>
 
+      <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre" valueField="id_user"
+        placeholder="Seleccionar cliente" ></select-search>
+
 
       <!-- Variedades -->
-      <div class="col-span-2 relative" #varietyContainer>
-        <label class="block text-gray-700 text-sm mb-1">Variedades</label>
-
-        <!-- “textbox” que abre/cierra -->
-        <div (click)="toggleVarDropdown()" class="flex items-center justify-between border border-[#E5E5E5] rounded-lg px-3 py-2 cursor-pointer
-           focus-within:ring-2 focus-within:ring-[#B8672E]">
-          <span class="flex-1 text-gray-700 truncate">
-            {{ (model.variedades?.length
-            ? (model.variedades || []).join(', ')
-            : 'Ej: Caturra, Castillo') }}
-          </span>
-          <lucide-icon name="ChevronDown" class="w-4 h-4 text-gray-400" />
-        </div>
-
-        <!-- desplegable -->
-        <div *ngIf="showVarDropdown" class="absolute z-10 mt-1 w-full bg-white border border-[#E5E5E5]
-           rounded-lg shadow max-h-52 overflow-auto">
-          <!-- **Fíjate que hemos añadido name="filterVar"** -->
-          <input type="text" name="filterVar" [(ngModel)]="filterVar" placeholder="Filtrar..."
-            class="w-full px-3 py-2 border-b border-[#E5E5E5] focus:outline-none" />
-
-          <ul>
-            <li *ngFor="let v of filteredVariedades" (click)="onVarToggle(v)"
-              class="px-3 py-2 hover:bg-gray-100 flex items-center cursor-pointer">
-              <!-- Elimina pointer-events-none para que el li reciba el click -->
-              <input type="checkbox" [checked]="model.variedades?.includes(v)" class="mr-2" />
-              <span class="flex-1">{{ v }}</span>
-            </li>
-            <li *ngIf="!filteredVariedades.length" class="px-3 py-2 text-gray-500">
-              No hay coincidencias
-            </li>
-          </ul>
-        </div>
-      </div>
-
-
+      <select-search class="w-full"  name="variedades" [(ngModel)]="model.variedades" [items]="variedades" displayField="nombre" valueField="nombre"
+        placeholder="Seleccionar variedades" [multiple]="true"  ></select-search>
 
       <!-- Proceso -->
       <div class="col-span-2">
@@ -111,7 +80,7 @@
             <option *ngFor="let p of procesos" [value]="p">{{ p }}</option>
           </select>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <lucide-icon name="ChevronDown" class="w-4 h-4 text-gray-400" />
+            <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
           </div>
         </div>
       </div>
