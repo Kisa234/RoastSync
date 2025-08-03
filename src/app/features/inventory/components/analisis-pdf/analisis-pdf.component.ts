@@ -318,7 +318,7 @@ export class AnalisisPdfComponent implements OnInit {
   getPorcentage(valor: number, total: number): string {
     if (total === 0) return '0%';
     const porcentaje = (valor / total) * 100;
-    return `${porcentaje.toFixed(2)}%`;
+    return `${porcentaje.toFixed(1)}%`;
   }
 
   @ViewChild(MultiPieChartComponent) multiPie!: MultiPieChartComponent;
