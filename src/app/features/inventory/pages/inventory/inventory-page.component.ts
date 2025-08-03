@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AsyncPipe, CommonModule, NgFor, NgIf } from '@angular/common';
+import { AsyncPipe, CommonModule, JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus } from 'lucide-angular';
 import { Search, Eye, Edit2, Trash2, Clipboard } from 'lucide-angular';
@@ -42,7 +42,7 @@ type InventoryTab = 'muestras' | 'verde' | 'tostado';
     BlendLoteComponent,
     FormsModule,
     BlendTueste,
-    UserNamePipe
+    UserNamePipe,
   ],
   templateUrl: './inventory-page.component.html',
   styles: ``

@@ -28,10 +28,10 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
   open = false;
   selected: any = this.multiple ? [] : null;
 
-  private onChange = (v: any) => {};
-  private onTouch = () => {};
+  private onChange = (v: any) => { };
+  private onTouch = () => { };
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef) { }
 
   ngOnInit() {
     this.filtered = [...this.items];
@@ -109,5 +109,26 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
     if (this.open && !this.elementRef.nativeElement.contains(target)) {
       this.open = false;
     }
+  }
+
+  addNew() {
+    const value = this.search.trim();
+    if (!value) return;
+
+    // Construimos un nuevo objeto dinámico
+    const newItem: any = {
+      [this.displayField]: value,
+      [this.valueField]: value
+    };
+
+    // Lo añadimos a la lista y actualizamos filtrados
+    this.items = [...this.items, newItem];
+    this.filtered = [...this.items];
+
+    // Seleccionamos el ítem recién agregado
+    this.select(newItem);
+
+    // Limpiamos el input de búsqueda
+    this.search = '';
   }
 }

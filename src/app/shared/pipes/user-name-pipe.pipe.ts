@@ -9,14 +9,26 @@ import { User } from '../models/user';
 export class UserNamePipe implements PipeTransform {
   private user: User | null = null;
 
-  constructor(private userSvc: UserService) {}
+  constructor(private userSvc: UserService) { }
 
   transform(id: string): string | null {
     if (!this.user) {
       this.userSvc.getUserById(id)
         .subscribe(u => this.user = u);
     }
-    return this.user?.nombre ?? null;
+    return this.capitalizeWords(this.user?.nombre!) ?? null;
   }
+
+  capitalizeWords(sentence: string): string {
+    const words = sentence.split(' ');
+    const capitalizedWords = words.map(word => {
+      if (word.length === 0) {
+        return ''; 
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    });
+    return capitalizedWords.join(' ');
+  }
+
 }
 

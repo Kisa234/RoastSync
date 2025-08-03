@@ -18,7 +18,7 @@
                         <strong>Cliente:</strong> {{ user.nombre }}
                     </span>
                     <span>
-                        <strong>Proveedor:</strong> {{ lote.productor? lote.productor : 'N/A' }}
+                        <strong>Productor:</strong> {{ lote.productor? lote.productor : 'N/A' }}
                     </span>
                     <span *ngIf="origen">
                         <strong>Origen:</strong> {{ origen }}
@@ -35,7 +35,7 @@
                         <strong>Cliente:</strong> {{ user.nombre }}
                     </span>
                     <span>
-                        <strong>Proveedor:</strong> {{ muestra.productor }}
+                        <strong>Productor:</strong> {{ muestra.productor }}
                     </span>
                     <span>
                         <strong>Variedad:</strong> {{ muestra.variedades.join(', ') }}
