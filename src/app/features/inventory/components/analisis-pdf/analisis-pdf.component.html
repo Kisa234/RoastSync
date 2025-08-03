@@ -90,16 +90,16 @@
                     <hr class="my-4 border-gray-300" />
                     <dl class="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 text-sm border-b border-gray-300 pb-4">
                         <dt>Superior a malla 18</dt>
-                        <dd class="text-right">{{ analisisFisico.superior_malla_18 | number:'1.2-2' }} gr</dd>
+                        <dd class="text-right">{{ analisisFisico.superior_malla_18 | number:'1.2-2' }} gr | {{ getPorcentage(analisisFisico.superior_malla_18, analisisFisico.peso_muestra) }} </dd>
 
                         <dt>Superior a malla 16</dt>
-                        <dd class="text-right">{{ analisisFisico.superior_malla_16 | number:'1.2-2' }} gr</dd>
+                        <dd class="text-right">{{ analisisFisico.superior_malla_16 | number:'1.2-2' }} gr | {{ getPorcentage(analisisFisico.superior_malla_16, analisisFisico.peso_muestra) }}</dd>
 
                         <dt>Superior a malla 14</dt>
-                        <dd class="text-right">{{ analisisFisico.superior_malla_14 | number:'1.2-2' }} gr</dd>
+                        <dd class="text-right">{{ analisisFisico.superior_malla_14 | number:'1.2-2' }} gr | {{ getPorcentage(analisisFisico.superior_malla_14, analisisFisico.peso_muestra) }}</dd>
 
                         <dt>Menor a malla 14</dt>
-                        <dd class="text-right">{{ analisisFisico.menor_malla_14 | number:'1.2-2' }} gr</dd>
+                        <dd class="text-right">{{ analisisFisico.menor_malla_14 | number:'1.2-2' }} gr | {{ getPorcentage(analisisFisico.menor_malla_14, analisisFisico.peso_muestra) }}</dd>
                     </dl>
 
                     <!-- Tercer bloque: otros parámetros -->

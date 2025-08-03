@@ -315,6 +315,12 @@ export class AnalisisPdfComponent implements OnInit {
     return `${window.location.origin}/assets/img/${nombre}`;
   }
 
+  getPorcentage(valor: number, total: number): string {
+    if (total === 0) return '0%';
+    const porcentaje = (valor / total) * 100;
+    return `${porcentaje.toFixed(2)}%`;
+  }
+
   @ViewChild(MultiPieChartComponent) multiPie!: MultiPieChartComponent;
 
   exportPdf(): void {
