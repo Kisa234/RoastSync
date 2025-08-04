@@ -1,4 +1,13 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, forwardRef, ElementRef, HostListener } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  forwardRef,
+  ElementRef,
+  HostListener
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { LucideAngularModule, ChevronDown } from 'lucide-angular';
@@ -26,12 +35,12 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
   search = '';
   filtered: any[] = [];
   open = false;
-  selected: any = this.multiple ? [] : null;
+  selected: any = null;
 
-  private onChange = (v: any) => { };
-  private onTouch = () => { };
+  private onChange = (v: any) => {};
+  private onTouch = () => {};
 
-  constructor(private elementRef: ElementRef) { }
+  constructor(private elementRef: ElementRef) {}
 
   ngOnInit() {
     this.filtered = [...this.items];
@@ -40,12 +49,19 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['items']) {
-      this.filtered = [...this.items];
+      this.filtered = [...(this.items ?? [])];
+
       if (this.multiple) {
-        const values = (this.selected as any[]).map(s => s[this.valueField] || s);
+        // Si selected no es array, lo tratamos como vacío
+        const values = Array.isArray(this.selected)
+          ? this.selected.map(s => s[this.valueField] ?? s)
+          : [];
         this.selected = this.items.filter(i => values.includes(i[this.valueField]));
-      } else if (this.selected) {
-        this.selected = this.items.find(i => i[this.valueField] === this.selected[this.valueField]) || null;
+      } else {
+        // Sólo reasignamos si ya había un selected válido
+        if (this.selected && typeof this.selected === 'object') {
+          this.selected = this.items.find(i => i[this.valueField] === this.selected[this.valueField]) || null;
+        }
       }
     }
   }
@@ -67,25 +83,29 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
 
   filter() {
     const term = this.search.toLowerCase();
-    this.filtered = this.items.filter(i =>
+    this.filtered = (this.items ?? []).filter(i =>
       ('' + i[this.displayField]).toLowerCase().includes(term)
     );
   }
 
   select(item: any) {
     if (this.multiple) {
-      const exists = (this.selected as any[]).some(i => i[this.valueField] === item[this.valueField]);
+      const arr = Array.isArray(this.selected) ? [...this.selected] : [];
+      const exists = arr.some(i => i[this.valueField] === item[this.valueField]);
+
       this.selected = exists
-        ? (this.selected as any[]).filter(i => i[this.valueField] !== item[this.valueField])
-        : [...(this.selected as any[]), item];
+        ? arr.filter(i => i[this.valueField] !== item[this.valueField])
+        : [...arr, item];
+
       this.onChange((this.selected as any[]).map(i => i[this.valueField]));
     } else {
       this.selected = item;
       this.open = false;
       this.onChange(item[this.valueField]);
     }
+
     this.search = '';
-    this.filtered = [...this.items];
+    this.filtered = [...(this.items ?? [])];
     this.onTouch();
   }
 
@@ -115,20 +135,14 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
     const value = this.search.trim();
     if (!value) return;
 
-    // Construimos un nuevo objeto dinámico
     const newItem: any = {
       [this.displayField]: value,
       [this.valueField]: value
     };
 
-    // Lo añadimos a la lista y actualizamos filtrados
-    this.items = [...this.items, newItem];
+    this.items = [...(this.items ?? []), newItem];
     this.filtered = [...this.items];
-
-    // Seleccionamos el ítem recién agregado
     this.select(newItem);
-
-    // Limpiamos el input de búsqueda
     this.search = '';
   }
 }

@@ -41,10 +41,8 @@ export class LoteService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  createByMuestra(id:string,peso:number): Observable<Lote> {
-    return this.http.post<Lote>(`${this.baseUrl}/muestra/${id}`, {
-      'peso': peso
-    });
+  createByMuestra(id:string,data: Partial<Lote>): Observable<Lote> {
+    return this.http.post<Lote>(`${this.baseUrl}/muestra/${id}`, data);
   }
 
   blendlote(data:BlendLotes): Observable<BlendLotes> {

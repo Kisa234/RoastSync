@@ -7,28 +7,43 @@ import { User } from '../models/user';
   pure: false
 })
 export class UserNamePipe implements PipeTransform {
-  private user: User | null = null;
+  private userCache = new Map<string, User | null>();
 
-  constructor(private userSvc: UserService) { }
+  constructor(private userSvc: UserService) {}
 
-  transform(id: string): string | null {
-    if (!this.user) {
-      this.userSvc.getUserById(id)
-        .subscribe(u => this.user = u);
+  transform(id: string): string {
+    if (!id) {
+      return '';
     }
-    return this.capitalizeWords(this.user?.nombre!) ?? null;
+
+    // Si aún no hemos intentado cargar este ID, lo iniciamos
+    if (!this.userCache.has(id)) {
+      // Marcamos como “cargando”
+      this.userCache.set(id, null);
+      this.userSvc.getUserById(id).subscribe(u => {
+        this.userCache.set(id, u);
+      });
+      // Devolvemos el ID (o cadena vacía) mientras llega la respuesta
+      return id;
+    }
+
+    const user = this.userCache.get(id)!;
+    // Si sigue siendo null significa que aún no llegó la respuesta
+    if (!user) {
+      return id;
+    }
+
+    // Ya tenemos el user, capitalizamos su nombre
+    return this.capitalizeWords(user.nombre ?? '');
   }
 
-  capitalizeWords(sentence: string): string {
-    const words = sentence.split(' ');
-    const capitalizedWords = words.map(word => {
-      if (word.length === 0) {
-        return ''; 
-      }
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    });
-    return capitalizedWords.join(' ');
+  private capitalizeWords(sentence: string): string {
+    if (!sentence) {
+      return '';
+    }
+    return sentence
+      .split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
   }
-
 }
-

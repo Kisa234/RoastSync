@@ -34,24 +34,21 @@
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
       </div>
 
-      <!-- Región -->
-      <div class="col-span-2 sm:col-span-1">
-        <label class="block text-gray-700 text-sm mb-1" for="region">
-          Región
-        </label>
-        <input id="region" type="text" [(ngModel)]="model.region" name="region" placeholder="Ej: Jaen" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
-           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
-      </div>
-
       <!-- Departamento -->
       <div class="col-span-2 sm:col-span-1">
-        <label class="block text-gray-700 text-sm mb-1" for="departamento">
-          Departamento
-        </label>
-        <input id="departamento" type="text" [(ngModel)]="model.departamento" name="departamento"
-          placeholder="Ej: Cajamarca" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
-           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+        <select-search name="depto" [items]="departamentos" displayField="nombre" valueField="nombre"
+          placeholder="Departamento *" [(ngModel)]="model.departamento" (ngModelChange)="onDeptoChange($event)">
+        </select-search>
       </div>
+
+      <!-- Provincia -->
+      <div class="col-span-2 sm:col-span-1">
+        <select-search name="prov" [items]="provincias" displayField="nombre" valueField="nombre"
+          placeholder="Provincia *" [(ngModel)]="model.provincia" [disabled]="!model.departamento">
+        </select-search>
+      </div>
+
+
 
       <!-- Peso (kg) -->
       <div class="col-span-2 sm:col-span-1">
@@ -62,13 +59,23 @@
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
       </div>
 
-      <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre" valueField="id_user"
-        placeholder="Seleccionar cliente" ></select-search>
+      <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
+        valueField="id_user" placeholder="Seleccionar cliente"></select-search>
 
 
       <!-- Variedades -->
-      <select-search class="w-full col-span-2"  name="variedades" [(ngModel)]="model.variedades" [items]="variedades" displayField="nombre" valueField="nombre"
-        placeholder="Seleccionar variedades" [multiple]="true"  ></select-search>
+      <select-search class="w-full col-span-2" name="variedades" [(ngModel)]="model.variedades" [items]="variedades"
+        displayField="nombre" valueField="nombre" placeholder="Seleccionar variedades"
+        [multiple]="true"></select-search>
+
+      <!-- Nombre de Muestra -->
+      <div class="col-span-2">
+        <label class="block text-gray-700 text-sm mb-1" for="peso">
+          Nombre de Muestra 
+        </label>
+        <input id="nombre" type="text" [(ngModel)]="model.nombre_muestra" name="nombre" required class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+      </div>
 
       <!-- Proceso -->
       <div class="col-span-2">
@@ -85,6 +92,7 @@
         </div>
       </div>
     </form>
+
 
     <!-- Footer -->
     <div class="flex justify-end items-center space-x-4 px-6 py-4 border-t border-[#E5E5E5]">

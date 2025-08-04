@@ -2,7 +2,7 @@ export interface Lote {
   id_lote: string;
   productor?: string;
   finca?: string;
-  region?: string;
+  provincia?: string;
   departamento?: string;
   peso: number;
   variedades: string[];
@@ -10,6 +10,7 @@ export interface Lote {
   tipo_lote: string;
   fecha_registro: Date;
   eliminado: boolean;
+  clasificacion?:string;
   id_user?: string;
   id_analisis?: string;
   peso_tostado?: number;

@@ -11,6 +11,8 @@ import { Variedad } from '../../../../shared/models/variedad';
 import { UserService } from '../../../users/service/users-service.service';
 import { User } from '../../../../shared/models/user';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
+import { UbigeoService } from '../../../../shared/services/ubigeo.service';
+import { Departamento, Provincia } from '../../../../shared/models/ubigeo';
 
 @Component({
   selector: 'add-muestra',
@@ -29,7 +31,7 @@ export class AddMuestraComponent implements OnInit {
     private MuestraSvc: MuestraService,
     private VariedadSvc: VariedadService,
     private userSvc: UserService,
-    
+    private ubigeoSvc: UbigeoService
   ) { }
 
   ngOnInit() {
@@ -37,6 +39,8 @@ export class AddMuestraComponent implements OnInit {
       this.variedades = variedades;
     });
     this.userSvc.getUsers().subscribe(u => this.clientes = u);
+    this.ubigeoSvc.getDepartamentos().subscribe(deps => this.departamentos = deps);
+
   }
 
   // icons
@@ -51,11 +55,12 @@ export class AddMuestraComponent implements OnInit {
   model: Partial<Muestra> = {
     productor: '',
     finca: '',
-    region: '',
+    provincia: '',
     departamento: '',
     peso: 0,
     variedades: [],
-    proceso: ''
+    proceso: '',
+    nombre_muestra: '',
   };
 
   // Listas de opciones
@@ -67,11 +72,34 @@ export class AddMuestraComponent implements OnInit {
   showVarDropdown = false;
   filterVar = '';
 
+
+  // ubigeo 
+  departamentos: Departamento[] = [];
+  provincias: Provincia[] = [];
+
+  selectedDeptoId?: string;
+  selectedProvId?: string;
+
+  @Output() selection = new EventEmitter<{ depto: Departamento; prov: Provincia }>();
+
+  onDeptoChange(deptoNombre: string) {
+    this.model.provincia = '';
+    this.provincias   = [];
+
+    // buscamos el código interno a partir del nombre
+    const dept = this.departamentos.find(d => d.nombre === deptoNombre);
+    if (!dept) return;
+
+    this.ubigeoSvc.getProvincias(dept.codigo)
+      .subscribe(provs => this.provincias = provs);
+  }
+
   onCancel() {
     this.close.emit();
   }
 
   onSave() {
+    console.log('Muestra creada:', this.model);
     this.MuestraSvc.create(this.model).subscribe(m => {
       this.create.emit();
       this.close.emit();

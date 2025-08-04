@@ -12,6 +12,8 @@ import { UserService } from '../../../users/service/users-service.service';
 import { Variedad } from '../../../../shared/models/variedad';
 import { VariedadService } from '../../../../shared/services/variedad.service';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
+import { Departamento, Provincia } from '../../../../shared/models/ubigeo';
+import { UbigeoService } from '../../../../shared/services/ubigeo.service';
 
 @Component({
   selector: 'add-lote',
@@ -30,7 +32,8 @@ export class AddLoteComponent implements OnInit {
     private loteSvc: LoteService,
     private muestraSvc: MuestraService,
     private userSvc: UserService,
-    private variedadSvc: VariedadService
+    private variedadSvc: VariedadService,
+    private ubigeoSvc: UbigeoService
   ) { }
 
   // icons
@@ -46,25 +49,29 @@ export class AddLoteComponent implements OnInit {
   tabs: { key: string; label: string }[] = [
     { key: 'manual', label: 'Manual' },
     { key: 'desde-muestra', label: 'Desde Muestra' },
-    { key: 'lote-cliente', label: 'Lote Cliente' }
   ];
   activeTab = 'manual';
 
   // modelo manual
-  model: Partial<Lote> = {
+  model: Lote = {
     productor: '',
     finca: '',
-    region: '',
+    provincia: '',
     departamento: '',
     peso: 0,
     variedades: [],
     proceso: '',
     tipo_lote: 'Lote Verde',
     id_user: '',
+    clasificacion: '',
+    id_lote: '',
+    fecha_registro: new Date(),
+    eliminado: false
   };
 
   variedades: Variedad[] = [];
   procesos = ['Lavado', 'Natural', 'Honey'];
+  clasificaciones = ['Selecto', 'Clasico', 'Exclusivo', 'Especial'];
 
 
   // datos de muestras
@@ -73,13 +80,31 @@ export class AddLoteComponent implements OnInit {
   muestraPeso = 0;
   clientes: any[] = [];
 
-
   ngOnInit() {
     this.muestraSvc.getAll().subscribe(list => this.muestras = list);
     this.userSvc.getUsers().subscribe(u => this.clientes = u);
     this.variedadSvc.getAllVariedades().subscribe(variedades => {
       this.variedades = variedades;
     });
+    this.ubigeoSvc.getDepartamentos().subscribe(deps => {
+      this.departamentos = deps;
+    });
+  }
+
+  onMuestraChange(muestraId: string) {
+    this.selectedMuestraId = muestraId;
+    this.cleanModel();
+    this.muestraSvc.getById(muestraId).subscribe(muestra => {
+      this.model.productor = muestra.productor,
+      this.model.finca = muestra.finca,
+      this.model.provincia = muestra.provincia,
+      this.model.departamento = muestra.departamento,
+      this.model.variedades = muestra.variedades,
+      this.model.proceso = muestra.proceso,
+      this.model.id_user = muestra.id_user,
+
+      this.model.peso = 0;
+    })
   }
 
   selectTab(key: string) {
@@ -87,6 +112,29 @@ export class AddLoteComponent implements OnInit {
     // limpiar selección
     this.selectedMuestraId = '';
     this.muestraPeso = 0;
+    this.cleanModel();
+  }
+
+  cleanModel() {
+    this.model = {
+      productor: '',
+      finca: '',
+      provincia: '',
+      departamento: '',
+      peso: 0,
+      variedades: [],
+      proceso: '',
+      tipo_lote: 'Lote Verde',
+      id_user: '',
+      clasificacion: '',
+      id_lote: '',
+      fecha_registro: new Date(),
+      eliminado: false
+    };
+  }
+
+  isButtonDisabled(): boolean {
+    return !this.selectedMuestraId || (this.model.peso ?? 0) <= 0;
   }
 
   onCancel() {
@@ -100,6 +148,28 @@ export class AddLoteComponent implements OnInit {
     });
   }
 
+  // ubigeo 
+  departamentos: Departamento[] = [];
+  provincias: Provincia[] = [];
+
+  selectedDeptoId?: string;
+  selectedProvId?: string;
+
+  @Output() selection = new EventEmitter<{ depto: Departamento; prov: Provincia }>();
+
+  onDeptoChange(deptoNombre: string) {
+    this.model.provincia = '';
+    this.provincias = [];
+
+    // buscamos el código interno a partir del nombre
+    const dept = this.departamentos.find(d => d.nombre === deptoNombre);
+    if (!dept) return;
+
+    this.ubigeoSvc.getProvincias(dept.codigo)
+      .subscribe(provs => this.provincias = provs);
+  }
+
+
   onSave() {
     if (this.activeTab === 'manual') {
       this.saveManual();
@@ -109,14 +179,9 @@ export class AddLoteComponent implements OnInit {
   }
 
   saveFromMuestra() {
-    this.loteSvc.createByMuestra(this.selectedMuestraId, this.muestraPeso).subscribe(l => {
-      this.create.emit();
-      this.close.emit();
-    });
-  }
-
-  saveLoteCliente() {
-    this.loteSvc.createRapido(this.model).subscribe(l => {
+    console.log(this.selectedMuestraId);
+    console.log(this.model);
+    this.loteSvc.createByMuestra(this.selectedMuestraId, this.model).subscribe(l => {
       this.create.emit();
       this.close.emit();
     });
