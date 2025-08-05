@@ -78,7 +78,7 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit {
           {},
           { r0: '0%', r: '25%', label: { rotate: 'tangential', fontSize: 16, color: '#fff' }, itemStyle: { borderWidth: 2, borderColor: '#fff' } },
           { r0: '25%', r: '60%', label: { rotate: 'tangential', fontSize: 14 }, itemStyle: { borderWidth: 1, borderColor: '#fff' } },
-          { r0: '60%', r: '90%', label: { rotate: 'tangential', fontSize: 12 }, itemStyle: { borderWidth: 1, borderColor: '#fff' } }
+          { r0: '60%', r: '90%', label: { rotate: 'tangential', fontSize: 12, color:'#fff'}, itemStyle: { borderWidth: 1, borderColor: '#fff' } }
         ]
       }
     };

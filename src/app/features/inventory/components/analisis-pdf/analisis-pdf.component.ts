@@ -441,7 +441,7 @@ export class AnalisisPdfComponent implements OnInit {
     w.document.close();
 
     // 6) Imprime
-    setTimeout(() => { w.focus(); w.print(); w.close(); }, 1000);
+    setTimeout(() => { w.focus(); w.print(); w.close(); }, 2000);
   }
 
 }

@@ -7,7 +7,7 @@
         <div class="page-1 print-page flex flex-col justify-between">
 
             <!-- 1ERA PARTE -->
-            <div class="text-center p-4 pb-0 text-gray-800 mb-8 relative mt-20 ">
+            <div class="text-center p-4 pb-0 text-gray-800 mb-8 relative mt-15 ">
                 <!-- Título -->
                 <!-- <h1 class="text-2xl md:text-3xl font-bold">ANÁLISIS Y SENSORIAL</h1> -->
                 <!-- <p class="text-xl md:text-2xl font-light mt-1">FÍSICO DE CAFÉ</p> -->
@@ -269,113 +269,122 @@
 
         <div class="page-2 relative print-page flex flex-col justify-between">
             <!-- 3RA PARTE -->
-            <h2 class="font-bold text-lg mb-4 mt-20">3.- ANÁLISIS <span class="font-light">Sensorial</span></h2>
-            <div class="flex justify-start gap-4">
-                <!-- Análisis Sensorial -->
-                <section class="flex-1">
-                    <table class="w-full text-sm ">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="p-1 text-left font-medium">Métrica</th>
-                                <th class="p-1 text-right font-medium">Valor</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Aroma / Fragancia</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.fragancia_aroma | number:'1.2-2' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Sabor</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.sabor | number:'1.2-2' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Sabor Residual</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.sabor_residual | number:'1.2-2' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Acidez</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.acidez | number:'1.2-2' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Cuerpo</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.cuerpo | number:'1.2-2' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Balance</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.balance | number:'1.2-2' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">General</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.puntaje_catador | number:'1.2-2' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Uniformidad</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.uniformidad | number:'1.0-0' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Taza Limpia</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.taza_limpia | number:'1.0-0' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Dulzor</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.dulzor | number:'1.0-0' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Puntaje Final</td>
-                                <td class="p-1 text-right">{{ analisisSensorial.puntaje_taza | number:'1.2-2' }}</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1 font-semibold" colspan="2">
-                                    {{ analisisSensorial.comentario | notasSensoriales }}
-                                </td>
-                            </tr>
-                        </tbody>
+            <div class="flex flex-col justify-start w-full">
+                <h2 class="font-bold text-lg mb-4 mt-20">3.- ANÁLISIS <span class="font-light">Sensorial</span></h2>
+                <div class="flex gap-10">
+                    <!-- Análisis Sensorial -->
+                    <section class="flex-1">
+                        <table class="w-full text-sm ">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-1 text-left font-medium">Métrica</th>
+                                    <th class="p-1 text-right font-medium">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Aroma / Fragancia</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.fragancia_aroma | number:'1.2-2' }}
+                                    </td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Sabor</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.sabor | number:'1.2-2' }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Sabor Residual</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.sabor_residual | number:'1.2-2' }}
+                                    </td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Acidez</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.acidez | number:'1.2-2' }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Cuerpo</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.cuerpo | number:'1.2-2' }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Balance</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.balance | number:'1.2-2' }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">General</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.puntaje_catador | number:'1.2-2' }}
+                                    </td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Uniformidad</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.uniformidad | number:'1.0-0' }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Taza Limpia</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.taza_limpia | number:'1.0-0' }}</td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Dulzor</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.dulzor | number:'1.0-0' }}</td>
+                                </tr>
 
-                    </table>
+                            </tbody>
 
-                    <br>
-                    <br>
+                        </table>
 
-                    <table class="w-full text-sm">
+                    </section>
+                    <div class="flex-1">
+                        <table class="w-full text-sm">
 
-                        <tbody class="border-t border-gray-100">
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Defecto Leve</td>
-                                <td class="p-1 text-right">
-                                    {{ analisisSensorial.taza_defecto_ligero | number:'1.0-0' }} x -2 =
-                                    {{(analisisSensorial.taza_defecto_ligero * -2)}}
-                                </td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="p-1">Defecto Grave</td>
-                                <td class="p-1 text-right">
-                                    {{ analisisSensorial.tazas_defecto_rechazo | number:'1.0-0'}} x -4 =
-                                    {{(analisisSensorial.tazas_defecto_rechazo * -4)}}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
+                            <tbody class="border-t border-gray-100">
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Defecto Leve</td>
+                                    <td class="p-1 text-right">
+                                        {{ analisisSensorial.taza_defecto_ligero | number:'1.0-0' }} x -2 =
+                                        {{(analisisSensorial.taza_defecto_ligero * -2)}}
+                                    </td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Defecto Grave</td>
+                                    <td class="p-1 text-right">
+                                        {{ analisisSensorial.tazas_defecto_rechazo | number:'1.0-0'}} x -4 =
+                                        {{(analisisSensorial.tazas_defecto_rechazo * -4)}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <br>
+                        <br>
+
+                        <table class="w-full text-sm">
+                            <tbody class="border-t border-gray-100">
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1">Puntaje Final</td>
+                                    <td class="p-1 text-right">{{ analisisSensorial.puntaje_taza | number:'1.2-2' }}
+                                    </td>
+                                </tr>
+                                <tr class="border-t border-gray-100">
+                                    <td class="p-1 font-semibold" colspan="2">
+                                        {{ analisisSensorial.comentario | notasSensoriales }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 <!-- Gráficos -->
-                <div class="flex flex-col justify-center items-center flex-1 border-[#E5E5E5]">
-                    <div class="flex-1 w-80 h-fit">
-                        <spider-graph [aS]="analisisSensorial"></spider-graph>
+                <div class="flex justify-around items-center mb-10 border-[#E5E5E5]">
+                    <div class="">
+                        <spider-graph class="" [aS]="analisisSensorial"></spider-graph>
                     </div>
-                    <div class="flex-1 w-100 h-fit">
-                        <multi-pie-chart [comentario]="analisisSensorial.comentario"></multi-pie-chart>
+                    <div class="w-80 h-80">
+                        <multi-pie-chart class="w-full h-full"
+                            [comentario]="analisisSensorial.comentario"></multi-pie-chart>
                     </div>
-
-
                 </div>
             </div>
-
             <!-- 4TA PARTE -->
-            <!-- Firma -->
-            <!-- Footer -->
             <footer class="w-full p-4 box-border">
-                <div class="flex justify-between items-end">
-                    <!-- Firma a la izquierda -->
+                <div class="flex flex-col justify-between items-start gap-6">
                     <div class="flex flex-col items-start">
                         <img [src]="getAssetUrl('firma-renato.png')" alt="Firma" class="w-30 h-auto mb-1" />
                         <div class="border-t border-gray-300 pt-2">
@@ -384,18 +393,13 @@
                             <p class="text-xs">Fecha: {{ analisis.fecha_registro | date:'dd/MM/yyyy' }}</p>
                         </div>
                     </div>
-
-                    <!-- Nota centrada en el eje horizontal -->
-                    <sub class="text-xs font-bold text-center max-w-xs">
+                    <sub class="text-[10px] text-center">
                         Este análisis se hizo para de muestra de café de los
-                        {{ type=='muestra'? muestra.peso : lote.peso }} gr. y es válido solo
+                        {{ type=='muestra'? muestra.peso : lote.peso }} gr. y es válido solo
                         para esta misma
                     </sub>
                 </div>
             </footer>
         </div>
-
     </div>
-
-
 </div>
