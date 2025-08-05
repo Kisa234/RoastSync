@@ -27,10 +27,7 @@ import printJS from 'print-js';
   selector: 'analisis-pdf',
   imports: [NgIf, CommonModule, SpiderGraphComponent, LucideAngularModule, NotasSensorialesPipe, MultiPieChartComponent],
   templateUrl: './analisis-pdf.component.html',
-  styles: `
- 
-  
-  `
+  styles: ` `
 })
 export class AnalisisPdfComponent implements OnInit {
   @Input() id: string = '';
@@ -170,6 +167,8 @@ export class AnalisisPdfComponent implements OnInit {
   };
 
   total: number = 0;
+  totalPrimarios : number = 0;
+  totalSecundarios: number = 0;
 
 
 
@@ -263,6 +262,10 @@ export class AnalisisPdfComponent implements OnInit {
 
   }
 
+  getBackgroundUrl(): string {
+    return this.getAssetUrl('fondo-analisis.png');
+  }
+
 
   get origen(): string {
     const fuente = this.type === 'lote' ? this.lote : this.muestra;
@@ -277,42 +280,58 @@ export class AnalisisPdfComponent implements OnInit {
   calcGrado() {
     // defectos primarios
     this.total += Math.floor(this.analisisDefectos.grano_negro! / 1);
+    this.totalPrimarios += Math.floor(this.analisisDefectos.grano_negro! / 1);
     this.calc.grano_agrio = Math.floor(this.analisisDefectos.grano_agrio! / 1);
     this.total += Math.floor(this.analisisDefectos.grano_agrio! / 1);
+    this.totalPrimarios += Math.floor(this.analisisDefectos.grano_agrio! / 1);
     this.calc.grano_agrio = Math.floor(this.analisisDefectos.grano_agrio! / 1);
     this.total += Math.floor(this.analisisDefectos.grano_con_hongos! / 1);
+    this.totalPrimarios += Math.floor(this.analisisDefectos.grano_con_hongos! / 1);
     this.calc.grano_con_hongos = Math.floor(this.analisisDefectos.grano_con_hongos! / 1);
     this.total += Math.floor(this.analisisDefectos.cereza_seca! / 1);
+    this.totalPrimarios += Math.floor(this.analisisDefectos.cereza_seca! / 1);
     this.calc.cereza_seca = Math.floor(this.analisisDefectos.cereza_seca! / 1);
     this.total += Math.floor(this.analisisDefectos.materia_estrana! / 1);
+    this.totalPrimarios += Math.floor(this.analisisDefectos.materia_estrana! / 1);
     this.calc.materia_estrana = Math.floor(this.analisisDefectos.materia_estrana! / 1);
     this.total += Math.floor(this.analisisDefectos.broca_severa! / 5);
+    this.totalPrimarios += Math.floor(this.analisisDefectos.broca_severa! / 5);
     this.calc.broca_severa = Math.floor(this.analisisDefectos.broca_severa! / 5);
     // defectos secundarios
     this.total += Math.floor(this.analisisDefectos.negro_parcial! / 3);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.negro_parcial! / 3);
     this.calc.negro_parcial = Math.floor(this.analisisDefectos.negro_parcial! / 3);
     this.total += Math.floor(this.analisisDefectos.agrio_parcial! / 3);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.agrio_parcial! / 3);
     this.calc.agrio_parcial = Math.floor(this.analisisDefectos.agrio_parcial! / 3);
     this.total += Math.floor(this.analisisDefectos.pergamino! / 5);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.pergamino! / 5);
     this.calc.pergamino = Math.floor(this.analisisDefectos.pergamino! / 5);
     this.total += Math.floor(this.analisisDefectos.flotadores! / 5);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.flotadores! / 5);
     this.calc.flotadores = Math.floor(this.analisisDefectos.flotadores! / 5);
     this.total += Math.floor(this.analisisDefectos.inmaduro! / 5);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.inmaduro! / 5);
     this.calc.inmaduro = Math.floor(this.analisisDefectos.inmaduro! / 5);
     this.total += Math.floor(this.analisisDefectos.averanado! / 5);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.averanado! / 5);
     this.calc.averanado = Math.floor(this.analisisDefectos.averanado! / 5);
     this.total += Math.floor(this.analisisDefectos.conchas! / 5);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.conchas! / 5);
     this.calc.conchas = Math.floor(this.analisisDefectos.conchas! / 5);
     this.total += Math.floor(this.analisisDefectos.cascara_pulpa_seca! / 5);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.cascara_pulpa_seca! / 5);
     this.calc.cascara_pulpa_seca = Math.floor(this.analisisDefectos.cascara_pulpa_seca! / 5);
     this.total += Math.floor(this.analisisDefectos.partido_mordido_cortado! / 5);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.partido_mordido_cortado! / 5);
     this.calc.partido_mordido_cortado = Math.floor(this.analisisDefectos.partido_mordido_cortado! / 5);
     this.total += Math.floor(this.analisisDefectos.broca_leva! / 10);
+    this.totalSecundarios += Math.floor(this.analisisDefectos.broca_leva! / 10);
     this.calc.broca_leva = Math.floor(this.analisisDefectos.broca_leva! / 10);
   }
 
   getAssetUrl(nombre: string): string {
-    return `${window.location.origin}/assets/img/${nombre}`;
+    return `/assets/img/${nombre}`;
   }
 
   getPorcentage(valor: number, total: number): string {
@@ -327,17 +346,27 @@ export class AnalisisPdfComponent implements OnInit {
     const content = document.getElementById('pdfContent');
     if (!content) return;
 
-    // 1. Saca la imagen completa del sunburst
+    // 1) Imagen del sunburst
     const dataUrl = this.multiPie.getChartImage();
 
-    // 2. Clona el innerHTML y sustituye TODO el tag <multi-pie-chart>
-    let html = content.innerHTML.replace(
-      /<multi-pie-chart[\s\S]*?<\/multi-pie-chart>/,
-      `<img src="${dataUrl}" style="width:100%; height:auto;" />`
+    // 2) Solo page-containers
+    const containers = Array.from(
+      content.querySelectorAll<HTMLElement>('.page-container')
     );
+    let html = containers
+      .map(pc => {
+        // dentro de cada container: inyecta la img del sunburst
+        const inner = pc.innerHTML.replace(
+          /<multi-pie-chart[\s\S]*?<\/multi-pie-chart>/,
+          `<img src="${dataUrl}" style="width:100%;height:auto" />`
+        );
+        // y lo envuelves de nuevo en su propio contenedor
+        return `<div class="page-container">${inner}</div>`;
+      })
+      .join('');
 
-    // 3. Extrae tus estilos
-    const styles = Array.from(document.styleSheets)
+    // 3) Extrae estilos
+    const extractedStyles = Array.from(document.styleSheets)
       .map(sheet => {
         try {
           return Array.from(sheet.cssRules || [])
@@ -349,31 +378,70 @@ export class AnalisisPdfComponent implements OnInit {
       })
       .join('\n');
 
-    // 4. Abre la ventana de impresión
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
-    if (!printWindow) return;
+    // 4) CSS de impresión (ruta ABSOLUTA al fondo)
+    const pageCss = `
+      @page { size: A4; margin: 0; }
 
-    printWindow.document.open();
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Reporte PDF</title>
-          <style>${styles}</style>
-        </head>
-        <body class="bg-white text-black">
-          ${html}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+      .page-container {
+        position: relative;
+        width: 210mm; height: 297mm;
+        page-break-after: always;
+        overflow: hidden;
+      }
+          
+      .page-container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-image: url('${this.getAssetUrl('fondo-analisis.png')}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        z-index: -1;
 
-    // 5. Dale tiempo a render y manda a imprimir
-    setTimeout(() => {
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
-    }, 500);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+          
+      .print-page {
+        position: relative;
+        padding: 20mm 20mm 25mm 20mm; 
+        box-sizing: border-box;
+      }
+          
+      .page-container .print-page footer {
+        position: absolute;
+        width: calc(100% - 40mm);
+        bottom: 10mm;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        box-sizing:border-box;
+      }
+          
+      @media print {
+        .no-print { display: none !important; }
+      }
+  `;
+
+    // 5) Abre print-window
+    const w = window.open('', '_blank', 'width=800,height=600');
+    if (!w) return;
+    w.document.open();
+    w.document.write(`
+    <html>
+      <head>
+        <title>Reporte PDF</title>
+        <style>${pageCss}${extractedStyles}</style>
+      </head>
+      <body>${html}</body>
+    </html>
+  `);
+    w.document.close();
+
+    // 6) Imprime
+    setTimeout(() => { w.focus(); w.print(); w.close(); }, 1000);
   }
-
 
 }
