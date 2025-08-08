@@ -18,21 +18,23 @@
       <div class="grid grid-cols-4 gap-4 mb-6">
         <div>
           <label class="block text-sm font-medium mb-1">Tipo de Target</label>
-          <select [(ngModel)]="selectedTargetType"  (ngModelChange)="onTargetTypeChange($event)"
+          <select [(ngModel)]="selectedTargetType" (ngModelChange)="onTargetTypeChange($event)"
             class="w-full border rounded px-3 py-2">
             <option *ngFor="let t of targetTypes" [value]="t">{{ t }}</option>
           </select>
         </div>
-        <div *ngIf="selectedTargetType!=='Muestra'">
+        <div *ngIf="selectedTargetType!=='Café Tostado'">
           <label class="block text-sm font-medium mb-1">Cliente</label>
-          <select [(ngModel)]="selectedClient" (ngModelChange)="onClientChange($event)" class="w-full border rounded px-3 py-2">
+          <select [(ngModel)]="selectedClient" (ngModelChange)="onClientChange($event)"
+            class="w-full border rounded px-3 py-2">
             <option value="" disabled selected>Selecciona cliente</option>
             <option *ngFor="let c of clientes" [value]="c.id_user">{{ c.nombre }}</option>
           </select>
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">{{ selectLabel }}</label>
-          <select [(ngModel)]="selectedLot" class="w-full border rounded px-3 py-2">
+          <select [(ngModel)]="selectedLot" (ngModelChange)="onTargetIdChange($event)"
+            (ngModelChange)="onMuestraChange($event)" class="w-full border rounded px-3 py-2">
             <option value="">{{ selectLabel }}</option>
             <ng-container *ngIf="selectedTargetType==='Lote'">
               <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
@@ -45,64 +47,71 @@
             </ng-container>
           </select>
         </div>
+        <div *ngIf="selectedTargetType=='Muestra'">
+          <label class="block text-sm font-medium mb-1">Nombre de Muestra</label>
+          <div class="w-full border rounded px-3 py-2 " *ngIf="muestraPicked as m; else noNombre">
+            {{ m.nombre_muestra }}
+          </div>
+          <ng-template #noNombre>
+            <div class="w-full border rounded px-3 py-2 ">
+              N/A
+            </div>
+          </ng-template>
+        </div>
       </div>
 
       <!-- Pestañas -->
       <div class="flex border-b border-[#E5E5E5] mb-6">
         <button *ngIf="selectedTargetType!=='Café Tostado'" (click)="onTabChange('fisico')" [ngClass]="selectedTab==='fisico'
-                  ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
-          class="px-4 py-2 transition">Análisis Físico</button>
+            ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
+          class="px-4 py-2 transition flex items-center gap-2">
+          Análisis Físico
+          <span class="inline-block w-2 h-2 rounded-full" [ngClass]="statusDotClass('fisico')"></span>
+        </button>
+
         <button *ngIf="selectedTargetType!=='Café Tostado'" (click)="onTabChange('sensorial')" [ngClass]="selectedTab==='sensorial'
-                  ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
-          class="px-4 py-2 transition">Análisis Sensorial</button>
+            ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
+          class="px-4 py-2 transition flex items-center gap-2">
+          Análisis Sensorial
+          <span class="inline-block w-2 h-2 rounded-full" [ngClass]="statusDotClass('sensorial')"></span>
+        </button>
+
         <button *ngIf="selectedTargetType!=='Café Tostado'" (click)="onTabChange('defectos')" [ngClass]="selectedTab==='defectos'
-                  ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
-          class="px-4 py-2 transition">Análisis Defectos</button>
+            ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
+          class="px-4 py-2 transition flex items-center gap-2">
+          Análisis Defectos
+          <span class="inline-block w-2 h-2 rounded-full" [ngClass]="statusDotClass('defectos')"></span>
+        </button>
+
         <button *ngIf="selectedTargetType==='Café Tostado'" (click)="onTabChange('rapido')" [ngClass]="selectedTab==='rapido'
-                  ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
-          class="px-4 py-2 transition">Análisis Rápido</button>
-        
+            ? 'border-b-2 border-[#B8672E] text-[#1F1F1F]' : 'text-gray-500'"
+          class="px-4 py-2 transition flex items-center gap-2">
+          Análisis Rápido
+          <span class="inline-block w-2 h-2 rounded-full" [ngClass]="statusDotClass('rapido')"></span>
+        </button>
       </div>
 
-      
+
+
 
       <div *ngIf="showModal && selectedTab==='fisico'" class="mb-6 w-full">
-        <add-analisis-fisico
-          class="w-full"
-          [targetType]="selectedTargetType"
-          [targetId]="selectedLot"
-          [mode]="selectedMode"
-          [initialData]="currentAnalysis!"
-        ></add-analisis-fisico>
+        <add-analisis-fisico class="w-full" [targetType]="selectedTargetType" [targetId]="selectedLot"
+          [mode]="selectedMode" [initialData]="currentAnalysis!"></add-analisis-fisico>
       </div>
-      
+
       <div *ngIf="showModal && selectedTab==='sensorial'" class="mb-6 w-full">
-        <add-analisis-sensorial
-          class="w-full"
-          [targetType]="selectedTargetType"
-          [targetId]="selectedLot"
-          [mode]="selectedMode"
-          [initialData]="currentAnalysis!"
-        ></add-analisis-sensorial>
+        <add-analisis-sensorial class="w-full" [targetType]="selectedTargetType" [targetId]="selectedLot"
+          [mode]="selectedMode" [initialData]="currentAnalysis!"></add-analisis-sensorial>
       </div>
 
       <div *ngIf="showModal && selectedTab==='rapido'" class="mb-6 w-full">
-        <add-analisis-rapido
-          class="w-full"
-          [targetType]="selectedTargetType"
-          [targetId]="selectedLot"
-          [mode]="selectedMode"
-          [initialData]="currentAnalysis!"
-        ></add-analisis-rapido>
+        <add-analisis-rapido class="w-full" [targetType]="selectedTargetType" [targetId]="selectedLot"
+          [mode]="selectedMode" [initialData]="currentAnalysis!"></add-analisis-rapido>
       </div>
 
-      <div *ngIf="showModal && selectedTab==='defectos'" class="mb-6 w-full">        
-        <add-analisis-defectos
-          class="w-full"
-          [targetType]="selectedTargetType"
-          [targetId]="selectedLot"
-          [mode]="selectedMode"
-          [initialData]="currentAnalysis!">
+      <div *ngIf="showModal && selectedTab==='defectos'" class="mb-6 w-full">
+        <add-analisis-defectos class="w-full" [targetType]="selectedTargetType" [targetId]="selectedLot"
+          [mode]="selectedMode" [initialData]="currentAnalysis!">
         </add-analisis-defectos>
       </div>
 
@@ -125,7 +134,7 @@
       <div class="">
         <h2 class="text-lg font-semibold mb-4">Historial</h2>
         <ul class="space-y-2">
-            <li *ngFor="let h of history; let i = index" class="cursor-pointer flex p-2 border rounded hover:bg-gray-100"
+          <li *ngFor="let h of history; let i = index" class="cursor-pointer flex p-2 border rounded hover:bg-gray-100"
             (click)="onSelectHistory(h)">
             <div class="flex w-full items-center justify-between">
               <div class="">
@@ -143,13 +152,11 @@
           </li>
         </ul>
       </div>
-      
-      <button (click)="saveAll()"
-        class="bg-[#B8672E] text-white px-4 py-2 rounded">
+
+      <button (click)="saveAll()" class="bg-[#B8672E] text-white px-4 py-2 rounded">
         Guardar Físico & Sensorial
       </button>
     </aside>
 
   </div>
 </div>
-

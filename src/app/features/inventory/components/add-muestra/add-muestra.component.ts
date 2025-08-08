@@ -12,7 +12,7 @@ import { UserService } from '../../../users/service/users-service.service';
 import { User } from '../../../../shared/models/user';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
 import { UbigeoService } from '../../../../shared/services/ubigeo.service';
-import { Departamento, Provincia } from '../../../../shared/models/ubigeo';
+import { Departamento, Distrito, Provincia } from '../../../../shared/models/ubigeo';
 
 @Component({
   selector: 'add-muestra',
@@ -55,7 +55,7 @@ export class AddMuestraComponent implements OnInit {
   model: Partial<Muestra> = {
     productor: '',
     finca: '',
-    provincia: '',
+    distrito: '',
     departamento: '',
     peso: 0,
     variedades: [],
@@ -75,7 +75,7 @@ export class AddMuestraComponent implements OnInit {
 
   // ubigeo 
   departamentos: Departamento[] = [];
-  provincias: Provincia[] = [];
+  distritos: Distrito[] = [];
 
   selectedDeptoId?: string;
   selectedProvId?: string;
@@ -83,15 +83,15 @@ export class AddMuestraComponent implements OnInit {
   @Output() selection = new EventEmitter<{ depto: Departamento; prov: Provincia }>();
 
   onDeptoChange(deptoNombre: string) {
-    this.model.provincia = '';
-    this.provincias   = [];
+    this.model.distrito = '';
+    this.distritos   = [];
 
     // buscamos el código interno a partir del nombre
     const dept = this.departamentos.find(d => d.nombre === deptoNombre);
     if (!dept) return;
 
-    this.ubigeoSvc.getProvincias(dept.codigo)
-      .subscribe(provs => this.provincias = provs);
+    this.ubigeoSvc.getDistritoByDepartamento(dept.codigo)
+      .subscribe(provs => this.distritos = provs);
   }
 
   onCancel() {

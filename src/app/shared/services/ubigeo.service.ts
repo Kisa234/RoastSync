@@ -6,7 +6,9 @@ import {
   DepartamentoRaw,
   ProvinciaRaw,
   Departamento,
-  Provincia
+  Provincia,
+  Distrito,
+  DistritoRaw
 } from '../models/ubigeo';
 
 interface DepartamentosResponse {
@@ -15,6 +17,10 @@ interface DepartamentosResponse {
 
 interface ProvinciasResponse {
   ubigeo_provincias: ProvinciaRaw[];
+}
+
+interface DistritoResponse{
+  ubigeo_distritos: DistritoRaw[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -56,6 +62,23 @@ export class UbigeoService {
             .map(p => ({
               id:            p.id,
               nombre:        p.provincia,
+              codigo:        p.ubigeo,
+              departamentoId: p.departamento_id
+            }))
+        )
+      );
+  }
+
+  getDistritoByDepartamento(deptoCodigo: string): Observable<Distrito[]>{
+    return this.http
+      .get<DistritoResponse>(`${this.basePath}/3_ubigeo_distritos.json`)
+      .pipe(
+        map(resp =>
+          resp.ubigeo_distritos
+            .filter (p => p.ubigeo.startsWith(deptoCodigo))
+            .map(p => ({
+              id:            p.id,
+              nombre:        p.distrito,
               codigo:        p.ubigeo,
               departamentoId: p.departamento_id
             }))

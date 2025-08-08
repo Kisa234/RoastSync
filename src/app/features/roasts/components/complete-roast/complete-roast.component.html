@@ -35,22 +35,20 @@
             <!-- Rendimiento: {{ ((pesoSalida/roast.peso_entrada)*100) | number:'1.1-1' }}% -->
           </p>
         </div>
-
-        <!-- Agrton Gourmet -->
-        <div>
-          <label class="block text-sm font-medium mb-1">Agrton Gourmet *</label>
-          <input type="number" [(ngModel)]="roast.agtrom_gourmet" name="agrtonG" (ngModelChange)="calcAgtrom()"
-            class="w-full border rounded px-3 py-2 focus:ring focus:ring-green-400" />
-        </div>
-
+        
         <!-- Agrton Comercial -->
         <div>
           <label class="block text-sm font-medium mb-1">Agrton Comercial *</label>
-          <input type="number" [(ngModel)]="roast.agtrom_comercial" name="agrtonC" disabled 
+          <input type="number" [(ngModel)]="roast.agtrom_comercial" name="agrtonC" (ngModelChange)="calcAgtrom()"
             class="w-full border rounded px-3 py-2 focus:ring focus:ring-green-400" />
         </div>
 
-
+        <!-- Agrton Gourmet -->
+        <div>
+          <label class="block text-sm font-medium mb-1">Agrton Gourmet</label>
+          <input type="number" [(ngModel)]="roast.agtrom_gourmet" name="agrtonG" disabled
+            class="w-full border rounded px-3 py-2 focus:ring focus:ring-green-400" />
+        </div>
 
       </form>
 

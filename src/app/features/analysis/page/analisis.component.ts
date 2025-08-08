@@ -1,5 +1,5 @@
+import { Muestra } from './../../../shared/models/muestra';
 import { AnalisisFisico } from './../../../shared/models/analisis-fisico';
-// src/app/features/analysis/page/analisis.component.ts
 import { CommonModule, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +11,6 @@ import { MuestraService } from '../../inventory/service/muestra.service';
 import { LoteTostadoService } from '../../inventory/service/lote-tostado.service';
 import { LoteService } from '../../inventory/service/lote.service';
 import { Lote } from '../../../shared/models/lote';
-import { Muestra } from '../../../shared/models/muestra';
 import { LoteTostado } from '../../../shared/models/lote-tostado';
 import { LucideAngularModule, X } from 'lucide-angular';
 import { AnalisisService } from '../service/analisis.service';
@@ -49,6 +48,7 @@ export class AnalisisPage implements OnInit {
   lotesAll: Lote[] = [];
   lotes: Lote[] = [];
   muestras: Muestra[] = [];
+  muestrasAll: Muestra[] = [];
   tostados: LoteTostado[] = [];
   clientes: User[] = [];
 
@@ -56,6 +56,11 @@ export class AnalisisPage implements OnInit {
   targetTypes = ['Lote', 'Muestra', 'Café Tostado'];
   selectedTargetType = this.targetTypes[0];
   selectedLot = '';
+
+  selectedMuest = '';
+  muestraPicked: Muestra | null = null;
+
+  selectedRoast = '';
   selectedClient = '';
 
   selectedMode: 'Crear' | 'Editar' = 'Crear';
@@ -92,8 +97,12 @@ export class AnalisisPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.muestraSvc.getAll().subscribe((list) => (this.muestras = list));
     this.tostadoSvc.getAll().subscribe((list) => (this.tostados = list));
+    this.loadUsersLote();
+    this.loadHistory();
+  }
+
+  loadUsersLote() {
     this.userSvc.getUsers().subscribe(usuarios => {
       this.loteSvc.getAll().subscribe(lotes => {
         this.lotesAll = lotes;
@@ -102,7 +111,16 @@ export class AnalisisPage implements OnInit {
         );
       });
     });
-    this.loadHistory();
+  }
+
+  loadUsersMuestra() {
+    this.userSvc.getUsers().subscribe(usuarios => {
+      this.muestraSvc.getAll().subscribe(muestra => {
+        this.muestrasAll = muestra;
+        this.muestras = this.muestrasAll;
+        this.clientes = usuarios.filter(u => muestra.some(m => m.id_user === u.id_user));
+      });
+    });
   }
 
   onClientChange(id: string) {
@@ -110,11 +128,35 @@ export class AnalisisPage implements OnInit {
     this.loteSvc.getAll().subscribe((list) => {
       this.lotes = list.filter(lote => lote.id_user === id);
       if (this.lotes.length > 0) {
-        this.selectedLot = this.lotes[0].id_lote; // Selecciona el primer lote por defecto
+        this.selectedLot = this.lotes[0].id_lote;
       } else {
         this.selectedLot = '';
       }
     });
+    this.muestraSvc.getAll().subscribe((list) => {
+      this.muestras = list.filter(muestra => muestra.id_user === id);
+      if (this.muestras.length > 0) {
+        this.selectedMuest = this.muestras[0].id_muestra;
+      } else {
+        this.selectedMuest = '';
+      }
+    });
+    // this.tostadoSvc.getAll().subscribe((list) => {
+    //   this.tostados = list.filter(tostado => tostado.id === id);
+    //   if (this.tostados.length > 0) {
+    //     this.selectedRoast = this.tostados[0].id_lote_tostado;
+    //   } else {
+    //     this.selectedRoast = '';
+    //   }
+    // });
+  }
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
   }
 
   private loadHistory() {
@@ -144,15 +186,85 @@ export class AnalisisPage implements OnInit {
     this.selectedTargetType = type;
     this.selectedTab = type === 'Café Tostado' ? 'rapido' : 'fisico';
     this.selectedMode = 'Crear';
+    this.selectedClient = '';
+    this.selectedLot = '';
+    this.muestraPicked = null;
+
+    if (type === this.targetTypes[1]) {
+      this.loadUsersMuestra();
+    } else if (type === this.targetTypes[0]) {
+      this.loadUsersLote();
+    }
   }
 
-  openModal() {
-    this.showModal = true;
+  analysisStatus: { fisico: boolean | null; sensorial: boolean | null; defectos: boolean | null; rapido: boolean | null } = {
+    fisico: null, sensorial: null, defectos: null, rapido: null
+  };
+
+  ColourEmptyTypeAnalisis(): void {
+    // reset
+    this.analysisStatus = { fisico: null, sensorial: null, defectos: null, rapido: null };
+
+    const id = this.selectedLot;
+    if (!id) return;
+
+    if (this.selectedTargetType === 'Lote') {
+      this.analisisSvc.getAnalisisByLoteId(id).subscribe({
+        next: (a) => {
+          this.analysisStatus.fisico = !!a?.analisisFisico_id;
+          this.analysisStatus.sensorial = !!a?.analisisSensorial_id;
+          this.analysisStatus.defectos = !!a?.analisisDefectos_id;
+        },
+        error: () => {
+          this.analysisStatus = { fisico: false, sensorial: false, defectos: false, rapido: null };
+        }
+      });
+    } else if (this.selectedTargetType === 'Muestra') {
+      this.analisisSvc.getAnalisisByMuestraId(id).subscribe({
+        next: (a) => {
+          this.analysisStatus.fisico = !!a?.analisisFisico_id;
+          this.analysisStatus.sensorial = !!a?.analisisSensorial_id;
+          this.analysisStatus.defectos = !!a?.analisisDefectos_id;
+        },
+        error: () => {
+          this.analysisStatus = { fisico: false, sensorial: false, defectos: false, rapido: null };
+        }
+      });
+    } else if (this.selectedTargetType === 'Café Tostado') {
+      this.tostadoSvc.getById(id).subscribe({
+        next: (t) => { this.analysisStatus.rapido = !!t?.id_analisis_rapido; },
+        error: () => { this.analysisStatus.rapido = false; }
+      });
+    }
   }
 
-  closeModal() {
-    this.showModal = false;
+  // Clase para el puntito (verde/rojo/gris)
+  statusDotClass(tab: 'fisico' | 'sensorial' | 'defectos' | 'rapido') {
+    const v = this.analysisStatus[tab];
+    return v === true ? 'bg-green-500' : v === false ? 'bg-red-500' : 'bg-gray-300';
   }
+
+  get nombreMuestra(): string {
+    return this.muestraPicked?.nombre_muestra ?? 'N/A';
+  }
+
+  onMuestraChange(id: string) {
+    if (this.selectedTargetType !== 'Muestra') return;
+    if (!id) { this.muestraPicked = null; return; }
+
+    this.muestraSvc.getById(id).subscribe(m => {
+      this.muestraPicked = m;
+    });
+  }
+
+  onTargetIdChange(id: string) {
+    this.selectedLot = id;
+    if (this.selectedTargetType === 'Muestra') {
+      this.onMuestraChange(id);
+    }
+    this.ColourEmptyTypeAnalisis();
+  }
+
 
   async addAnalysis() {
 

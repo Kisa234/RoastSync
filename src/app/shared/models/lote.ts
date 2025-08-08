@@ -2,7 +2,7 @@ export interface Lote {
   id_lote: string;
   productor?: string;
   finca?: string;
-  provincia?: string;
+  distrito?: string;
   departamento?: string;
   peso: number;
   variedades: string[];

@@ -12,6 +12,14 @@ export interface ProvinciaRaw {
   departamento_id: number;
 }
 
+export interface DistritoRaw{
+  id:number;
+  distrito:string;
+  ubigeo:string;
+  provincia_id:string;
+  departamento_id:number;
+}
+
 // tipos limpios para los selects
 export interface Departamento {
   id: number;
@@ -23,5 +31,12 @@ export interface Provincia {
   id: number;
   nombre: string;
   codigo: string;
+  departamentoId: number;
+}
+
+export interface Distrito{
+  id:number;
+  nombre:string;
+  codigo:string;
   departamentoId: number;
 }

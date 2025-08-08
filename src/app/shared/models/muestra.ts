@@ -3,7 +3,7 @@ export interface Muestra {
   nombre_muestra?: string;
   productor: string;
   finca: string;
-  provincia: string;
+  distrito: string;
   departamento: string;
   peso: number;
   variedades: string[];

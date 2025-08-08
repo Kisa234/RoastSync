@@ -73,12 +73,12 @@
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
           </div>
 
-          <!-- Provincia -->
+          <!-- Distrito -->
           <div class="col-span-2 sm:col-span-1">
-            <label class="block text-gray-700 text-sm mb-1" for="provincia">
-              Provincia
+            <label class="block text-gray-700 text-sm mb-1" for="distrito">
+              Distrito
             </label>
-            <input id="provincia" type="text" [(ngModel)]="model.provincia" name="provincia" disabled
+            <input id="Distrito" type="text" [(ngModel)]="model.distrito" name="Distrito" disabled
               placeholder="Ej: Simon Brown" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
           </div>
@@ -160,10 +160,10 @@
           </select-search>
         </div>
 
-        <!-- Provincia -->
+        <!-- Distrito -->
         <div class="col-span-2 sm:col-span-1">
-          <select-search name="prov" [items]="provincias" displayField="nombre" valueField="nombre"
-            placeholder="Provincia *" [(ngModel)]="model.provincia" [disabled]="!model.departamento">
+          <select-search name="prov" [items]="distritos" displayField="nombre" valueField="nombre"
+            placeholder="Distrito *" [(ngModel)]="model.distrito" [disabled]="!model.departamento">
           </select-search>
         </div>
 

@@ -53,7 +53,7 @@ export class AnalisisPdfComponent implements OnInit {
     eliminado: false,
     productor: '',
     finca: '',
-    provincia: '',
+    distrito: '',
     departamento: ''
   }
 
@@ -272,7 +272,7 @@ export class AnalisisPdfComponent implements OnInit {
     if (!fuente) return '';
     const segmentos: string[] = [];
     if (fuente.departamento) segmentos.push(fuente.departamento);
-    if (fuente.provincia) segmentos.push(fuente.provincia);
+    if (fuente.distrito) segmentos.push(fuente.distrito);
     if (fuente.finca) segmentos.push(fuente.finca);
     return segmentos.length ? segmentos.join(' - ') : '';
   }

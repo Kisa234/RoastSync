@@ -12,7 +12,7 @@ import { UserService } from '../../../users/service/users-service.service';
 import { Variedad } from '../../../../shared/models/variedad';
 import { VariedadService } from '../../../../shared/services/variedad.service';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
-import { Departamento, Provincia } from '../../../../shared/models/ubigeo';
+import { Departamento, Distrito, Provincia } from '../../../../shared/models/ubigeo';
 import { UbigeoService } from '../../../../shared/services/ubigeo.service';
 
 @Component({
@@ -56,7 +56,7 @@ export class AddLoteComponent implements OnInit {
   model: Lote = {
     productor: '',
     finca: '',
-    provincia: '',
+    distrito: '',
     departamento: '',
     peso: 0,
     variedades: [],
@@ -97,7 +97,7 @@ export class AddLoteComponent implements OnInit {
     this.muestraSvc.getById(muestraId).subscribe(muestra => {
       this.model.productor = muestra.productor,
       this.model.finca = muestra.finca,
-      this.model.provincia = muestra.provincia,
+      this.model.distrito = muestra.distrito,
       this.model.departamento = muestra.departamento,
       this.model.variedades = muestra.variedades,
       this.model.proceso = muestra.proceso,
@@ -119,7 +119,7 @@ export class AddLoteComponent implements OnInit {
     this.model = {
       productor: '',
       finca: '',
-      provincia: '',
+      distrito: '',
       departamento: '',
       peso: 0,
       variedades: [],
@@ -150,23 +150,23 @@ export class AddLoteComponent implements OnInit {
 
   // ubigeo 
   departamentos: Departamento[] = [];
-  provincias: Provincia[] = [];
+  distritos: Distrito[]= []
 
   selectedDeptoId?: string;
-  selectedProvId?: string;
+  selecterDistId?:string
 
-  @Output() selection = new EventEmitter<{ depto: Departamento; prov: Provincia }>();
+  @Output() selection = new EventEmitter<{ depto: Departamento; distrito: Distrito }>();
 
   onDeptoChange(deptoNombre: string) {
-    this.model.provincia = '';
-    this.provincias = [];
+    this.model.distrito = '';
+    this.distritos = [];
 
     // buscamos el código interno a partir del nombre
     const dept = this.departamentos.find(d => d.nombre === deptoNombre);
     if (!dept) return;
 
-    this.ubigeoSvc.getProvincias(dept.codigo)
-      .subscribe(provs => this.provincias = provs);
+    this.ubigeoSvc.getDistritoByDepartamento(dept.codigo)
+      .subscribe(provs => this.distritos = provs);
   }
 
 
