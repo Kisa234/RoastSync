@@ -29,7 +29,7 @@
           <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm print:text-[12px]">
             <div>
               <div class="text-gray-600">Humedad</div>
-              <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.humedad }}%</div>
+              <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.humedad | number:'1.2-2'}}%</div>
             </div>
             <div>
               <div class="text-gray-600">Densidad</div>
@@ -45,11 +45,11 @@
             </div>
             <div>
               <div class="text-gray-600">Temp. Desarrollo</div>
-              <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.temp_desarrollo }}</div>
+              <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.temp_desarrollo | number:'1.2-2' }}</div>
             </div>
             <div>
-              <div class="text-gray-600">Rot. Comercial</div>
-              <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.agtrom }}</div>
+              <div class="text-gray-600">Agtrom Comercial</div>
+              <div class="border-b border-gray-400 pb-1 font-medium">{{ ficha.agtrom | number:'1.2-2' }}</div>
             </div>
             <div>
               <div class="text-gray-600">Tiempo</div>
@@ -90,8 +90,8 @@
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">% Carameliz.</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Desarrollo</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Grados Desarr.</th>
-                <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Comercial</th>
-                <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Gourmet</th>
+                <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Agtrom Comercial</th>
+                <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Agtrom Gourmet</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Peso Salida</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Merma</th>
               </tr>

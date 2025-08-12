@@ -29,7 +29,7 @@
             <div>
                 <div class="text-gray-600">Humedad</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.humedad }}%
+                    {{ data.humedad | number:'1.2-2' }}%
                 </div>
             </div>
 
@@ -37,7 +37,7 @@
             <div>
                 <div class="text-gray-600">Densidad</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.densidad }}
+                    {{ data.densidad | number:'1.2-2' }}
                 </div>
             </div>
 
@@ -69,7 +69,7 @@
             <div>
                 <div class="text-gray-600">Agtrom Comercial</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.agtrom }}
+                    {{ data.agtrom | number:'1.2-2' }}
                 </div>
             </div>
 
