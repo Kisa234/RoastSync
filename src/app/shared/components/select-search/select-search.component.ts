@@ -30,6 +30,7 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
   @Input() placeholder = 'Select...';
   @Input() multiple = false;
 
+
   readonly ChevronDown = ChevronDown;
 
   search = '';

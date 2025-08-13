@@ -8,8 +8,9 @@
         <div class="flex gap-10">
           <h1 class="text-3xl font-semibold tracking-tight print:text-2xl">Reporte Lote Tostado</h1>
           <div class="mt-4 md:mt-0 text-sm text-gray-600 space-y-1 print:mt-0">
-            <p><span class="font-medium">Lote:</span> {{ id }}</p>
-            <p><span class="font-medium">Fecha:</span> {{ currentDate | date:'dd/MM/yyyy' }}</p>
+            <p><span class="font-medium">Cliente: </span>{{ tuestes[0].id_cliente | userName}}</p>
+            <p><span class="font-medium">Lote: </span> {{ id }}</p>
+            <p><span class="font-medium">Fecha: </span> {{ currentDate | date:'dd/MM/yyyy' }}</p>
           </div>
         </div>
 
@@ -83,7 +84,7 @@
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Llama Inicial</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Aire Inicial</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Pto No Retorno</th>
-                <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Tiempo ↓ Crack</th>
+                <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Tiempo Crack</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Temp Crack</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Temp Salida</th>
                 <th class="px-3 py-2 text-right text-xs font-medium text-gray-700 uppercase">Tiempo Total</th>
@@ -106,10 +107,10 @@
                 <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.llama_inicial }}</td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.aire_inicial }}</td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.punto_no_retorno }}</td>
-                <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.tiempo_despues_crack }}</td>
+                <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.tiempo_despues_crack | minSec}}</td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.temperatura_crack }}</td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.temperatura_salida }}</td>
-                <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.tiempo_total }}</td>
+                <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.tiempo_total | minSec}}</td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.porcentaje_caramelizacion }}</td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.desarrollo }}</td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm print:px-1 print:py-1 text-right">{{ t.grados_desarrollo }}</td>

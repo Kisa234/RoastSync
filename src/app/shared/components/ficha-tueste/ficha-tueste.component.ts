@@ -1,8 +1,12 @@
+import { LoteService } from './../../../features/inventory/service/lote.service';
+import { UserService } from './../../../features/users/service/users-service.service';
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, output, ViewChild } from '@angular/core';
 import { LucideAngularModule, Download, X, Printer } from 'lucide-angular';
 import { FichaTueste } from '../../models/ficha-tueste';
 import { LoteTostadoService } from '../../../features/inventory/service/lote-tostado.service';
+import { User } from '../../models/user';
+import { Lote } from '../../models/lote';
 
 @Component({
   selector: 'ficha-tueste',
@@ -31,8 +35,30 @@ export class FichaTuesteComponent implements OnInit {
     peso_total: 0,
   }
 
+  user: User ={
+    id_user: '',
+    nombre: '',
+    email: '',
+    rol: '',
+    password: '',
+    numero_telefono: 0,
+    eliminado: false,
+    fecha_registro: new Date()
+  }
+  lote:Lote={
+    id_lote: '',
+    peso: 0,
+    variedades: [],
+    proceso: '',
+    tipo_lote: '',
+    fecha_registro: new Date(),
+    eliminado: false
+  }
+
   constructor(
-    readonly loteTostadoSvc: LoteTostadoService
+    readonly loteTostadoSvc: LoteTostadoService,
+    readonly userService: UserService,
+    readonly loteService: LoteService, 
   ) { }
 
   ngOnInit() {
@@ -40,8 +66,14 @@ export class FichaTuesteComponent implements OnInit {
   }
 
   private loadData() {
-    this.loteTostadoSvc.getFichaTueste(this.id).subscribe(data => {
-      this.data = data;
+    this.loteTostadoSvc.getFichaTueste(this.id).subscribe(loteTostado => {
+      this.data = loteTostado;
+      this.loteService.getById(loteTostado.id_lote).subscribe(lote => {
+        this.lote=lote;
+        this.userService.getUserById(lote.id_user!).subscribe(user =>{
+          this.user= user; 
+        })
+      })
     });
   }
 

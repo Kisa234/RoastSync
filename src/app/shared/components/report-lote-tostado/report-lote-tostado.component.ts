@@ -10,6 +10,8 @@ import { FichaTueste } from '../../models/ficha-tueste';
 import { formatDate } from '@angular/common';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { UserNamePipe } from "../../pipes/user-name-pipe.pipe";
+import { MinSecPipe } from "../../pipes/time.pipe";
 
 @Component({
   selector: 'report-lote-tostado',
@@ -19,8 +21,10 @@ import { jsPDF } from 'jspdf';
   imports: [
     LucideAngularModule,
     FormsModule,
-    CommonModule
-  ]
+    CommonModule,
+    UserNamePipe,
+    MinSecPipe
+]
 })
 export class ReportLoteTostadoComponent implements OnInit {
   @Input() id!: string;

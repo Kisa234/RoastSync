@@ -10,6 +10,7 @@ import { User }            from '../../../../shared/models/user';
 import { PedidoService } from '../../service/orders.service';
 import { LoteService } from '../../../inventory/service/lote.service';
 import { UserService } from '../../../users/service/users-service.service';
+import { SelectSearchComponent } from "../../../../shared/components/select-search/select-search.component";
 
 @Component({
   selector: 'add-order',
@@ -18,7 +19,8 @@ import { UserService } from '../../../users/service/users-service.service';
     CommonModule,
     FormsModule,
     LucideAngularModule,
-  ],
+    SelectSearchComponent
+],
   templateUrl: './add-order.component.html'
 })
 export class AddOrderComponent implements OnInit {
@@ -77,8 +79,9 @@ export class AddOrderComponent implements OnInit {
   }
 
   onSave() {
+    console.log(this.model);
     if (!this.model.tipo_pedido || !this.model.cantidad || !this.model.id_user || !this.model.id_lote) {
-      return; // podrías mostrar un error o marcar required
+      return; 
     }
     this.pedidoSvc.createPedido(this.model).subscribe(p => {
       this.create.emit(p);

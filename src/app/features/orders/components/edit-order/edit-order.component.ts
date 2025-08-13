@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
     CommonModule,
     FormsModule,
     LucideAngularModule,
-  ],
+],
   templateUrl: './edit-order.component.html',
   styles: ``
 })
