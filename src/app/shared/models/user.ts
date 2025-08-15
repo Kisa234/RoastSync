@@ -7,5 +7,6 @@ export interface User {
   numero_telefono: number;
   eliminado: boolean;
   fecha_registro: Date;
+  nombre_comercial?:string;
   fecha_editado?: Date;
 }

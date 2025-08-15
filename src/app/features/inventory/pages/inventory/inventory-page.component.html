@@ -225,6 +225,7 @@
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">ID Tostado</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">ID Lote</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">CLiente</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Perfil</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso (Gr)</th>
@@ -235,6 +236,7 @@
             <tr *ngFor="let t of filteredTostados">
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ t.id_lote_tostado }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.id_lote }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ t.id_user | userName }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.perfil_tostado }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">
                 {{ t.fecha_tostado | date:'dd/MM/yyyy' }}

@@ -36,6 +36,7 @@
 
       <!-- Departamento -->
       <div class="col-span-2 sm:col-span-1">
+        <label class="block text-gray-700 text-sm mb-1" for="peso"> Departamento*</label>
         <select-search name="depto" [items]="departamentos" displayField="nombre" valueField="nombre"
           placeholder="Departamento *" [(ngModel)]="model.departamento" (ngModelChange)="onDeptoChange($event)">
         </select-search>
@@ -43,6 +44,7 @@
 
       <!-- Distrito -->
       <div class="col-span-2 sm:col-span-1">
+        <label class="block text-gray-700 text-sm mb-1" for="peso"> Distrito*</label>
         <select-search name="prov" [items]="distritos" displayField="nombre" valueField="nombre"
           placeholder="Distrito *" [(ngModel)]="model.distrito" [disabled]="!model.departamento">
         </select-search>
@@ -52,26 +54,30 @@
 
       <!-- Peso (kg) -->
       <div class="col-span-2 sm:col-span-1">
-        <label class="block text-gray-700 text-sm mb-1" for="peso">
-          Peso (gr) *
-        </label>
+        <label class="block text-gray-700 text-sm mb-1" for="peso"> Peso (gr) *</label>
         <input id="peso" type="number" min="0" [(ngModel)]="model.peso" name="peso" required class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
       </div>
 
-      <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
-        valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+      <div class="col-span-2 sm:col-span-1">
+        <label class="block text-gray-700 text-sm mb-1" for="peso"> Cliente</label>
+        <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
+          valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+      </div>
 
 
       <!-- Variedades -->
-      <select-search class="w-full col-span-2" name="variedades" [(ngModel)]="model.variedades" [items]="variedades"
-        displayField="nombre" valueField="nombre" placeholder="Seleccionar variedades"
-        [multiple]="true"></select-search>
+      <div class="col-span-2">
+        <label class="block text-gray-700 text-sm mb-1" for="peso"> Variedades*</label>
+        <select-search class="w-full col-span-2" name="variedades" [(ngModel)]="model.variedades" [items]="variedades"
+          displayField="nombre" valueField="nombre" placeholder="Seleccionar variedades"
+          [multiple]="true"></select-search>
+      </div>
 
       <!-- Nombre de Muestra -->
       <div class="col-span-2">
         <label class="block text-gray-700 text-sm mb-1" for="peso">
-          Nombre de Muestra 
+          Nombre de Muestra
         </label>
         <input id="nombre" type="text" [(ngModel)]="model.nombre_muestra" name="nombre" required class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />

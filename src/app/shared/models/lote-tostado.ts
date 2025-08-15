@@ -5,6 +5,7 @@ export interface LoteTostado {
   perfil_tostado: string;
   peso: number;
   fecha_registro: Date;
+  id_user:string;
   id_analisis_rapido?: string;
   entregado?: Date;
 }

@@ -23,7 +23,7 @@
             <option *ngFor="let t of targetTypes" [value]="t">{{ t }}</option>
           </select>
         </div>
-        <div *ngIf="selectedTargetType!=='Café Tostado'">
+        <div>
           <label class="block text-sm font-medium mb-1">Cliente</label>
           <select [(ngModel)]="selectedClient" (ngModelChange)="onClientChange($event)"
             class="w-full border rounded px-3 py-2">
@@ -53,6 +53,17 @@
             {{ m.nombre_muestra }}
           </div>
           <ng-template #noNombre>
+            <div class="w-full border rounded px-3 py-2 ">
+              N/A
+            </div>
+          </ng-template>
+        </div>
+        <div *ngIf="selectedTargetType=='Café Tostado'">
+          <label class="block text-sm font-medium mb-1">Lote</label>
+          <div class="w-full border rounded px-3 py-2 " *ngIf="roastPicked as m; else noLote">
+            {{ m.id_lote }}
+          </div>
+          <ng-template #noLote>
             <div class="w-full border rounded px-3 py-2 ">
               N/A
             </div>

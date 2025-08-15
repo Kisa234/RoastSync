@@ -34,7 +34,7 @@ export class UserNamePipe implements PipeTransform {
     }
 
     // Ya tenemos el user, capitalizamos su nombre
-    return this.capitalizeWords(user.nombre ?? '');
+    return this.capitalizeWords(user.nombre_comercial? user.nombre_comercial : user.nombre );
   }
 
   private capitalizeWords(sentence: string): string {

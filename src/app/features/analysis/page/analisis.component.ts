@@ -47,21 +47,26 @@ export class AnalisisPage implements OnInit {
 
   lotesAll: Lote[] = [];
   lotes: Lote[] = [];
+  selectedLot = '';
+
   muestras: Muestra[] = [];
   muestrasAll: Muestra[] = [];
+  selectedMuest = '';
+  muestraPicked: Muestra | null = null;
+
+  tostadosAll: LoteTostado[]=[];
   tostados: LoteTostado[] = [];
+  selectedRoast = '';
+  roastPicked: LoteTostado | null = null;
+
   clientes: User[] = [];
+  selectedClient = '';
 
 
   targetTypes = ['Lote', 'Muestra', 'Café Tostado'];
   selectedTargetType = this.targetTypes[0];
-  selectedLot = '';
 
-  selectedMuest = '';
-  muestraPicked: Muestra | null = null;
 
-  selectedRoast = '';
-  selectedClient = '';
 
   selectedMode: 'Crear' | 'Editar' = 'Crear';
   tabs = ['fisico', 'sensorial', 'rapido', 'defectos'];
@@ -119,6 +124,16 @@ export class AnalisisPage implements OnInit {
         this.muestrasAll = muestra;
         this.muestras = this.muestrasAll;
         this.clientes = usuarios.filter(u => muestra.some(m => m.id_user === u.id_user));
+      });
+    });
+  }
+
+  loadUsersCafeTostado(){
+    this.userSvc.getUsers().subscribe(usuarios => {
+      this.tostadoSvc.getAll().subscribe(lotesTostados => {
+        this.tostadosAll = lotesTostados;
+        this.tostados = this.tostadosAll;
+        this.clientes = usuarios.filter(u => this.tostados.some(m => m.id_user === u.id_user));
       });
     });
   }
@@ -188,12 +203,17 @@ export class AnalisisPage implements OnInit {
     this.selectedMode = 'Crear';
     this.selectedClient = '';
     this.selectedLot = '';
+    this.selectedMuest = '';
     this.muestraPicked = null;
+    this.selectedRoast = "";
+    this.roastPicked = null;
 
     if (type === this.targetTypes[1]) {
       this.loadUsersMuestra();
     } else if (type === this.targetTypes[0]) {
       this.loadUsersLote();
+    } else if (type ==this.targetTypes[2]){
+      this.loadUsersCafeTostado();
     }
   }
 
@@ -257,11 +277,24 @@ export class AnalisisPage implements OnInit {
     });
   }
 
+  onRoastChange(id:string){
+    if (this.selectedTargetType !== 'Café Tostado') return;
+    if (!id) { this.roastPicked = null; return; }
+    
+    this.tostadoSvc.getById(id).subscribe(t=>{
+      this.roastPicked = t;
+    })
+    
+  }
+
   onTargetIdChange(id: string) {
     this.selectedLot = id;
     if (this.selectedTargetType === 'Muestra') {
       this.onMuestraChange(id);
     }
+    if (this.selectedTargetType == 'Café Tostado') {
+      this.onRoastChange(id);
+    };
     this.ColourEmptyTypeAnalisis();
   }
 
