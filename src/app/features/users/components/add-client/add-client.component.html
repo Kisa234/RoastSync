@@ -29,6 +29,19 @@
         />
       </div>
 
+      <div class="col-span-2">
+        <label for="nombre_comercial" class="block text-gray-700 text-sm mb-1">Nombre Comercial *</label>
+        <input
+          id="nombre_comercial"
+          name="nombre_comercial"
+          type="text"
+          [(ngModel)]="model.nombre_comercial"
+          placeholder="Ej: Quiro"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+                 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition"
+        />
+      </div>
+
       <!-- Email -->
       <div class="col-span-2">
         <label for="email" class="block text-gray-700 text-sm mb-1">Email *</label>
@@ -60,7 +73,7 @@
       </div>
 
       <!-- Teléfono -->
-      <div class="col-span-2 sm:col-span-1">
+      <div class="col-span-2">
         <label for="telefono" class="block text-gray-700 text-sm mb-1">Teléfono</label>
         <input
           id="telefono"
@@ -74,7 +87,7 @@
       </div>
 
       <!-- Rol -->
-      <div class="col-span-2 sm:col-span-1">
+      <!-- <div class="col-span-2 sm:col-span-1">
         <label for="rol" class="block text-gray-700 text-sm mb-1">Rol *</label>
         <div class="relative">
           <select
@@ -92,7 +105,7 @@
             <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
           </div>
         </div>
-      </div>
+      </div> -->
     </form>
 
     <!-- Footer -->

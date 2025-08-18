@@ -24,7 +24,7 @@ export class AddClientComponent {
 
   // modelo
   model: Partial<User> = {
-    
+    rol:'cliente'
   };
 
 
