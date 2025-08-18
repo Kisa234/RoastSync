@@ -26,10 +26,13 @@ import { LucideAngularModule, ChevronDown } from 'lucide-angular';
 export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnChanges {
   @Input() items: any[] = [];
   @Input() displayField = '';
+  @Input() secondDisplayField = '';
   @Input() valueField = '';
   @Input() placeholder = 'Select...';
   @Input() multiple = false;
 
+  /** OPCIONAL: lógica de display (ej: (c) => c.nombre_comercial || c.nombre ) */
+  @Input() displayFn?: (item: any) => string;
 
   readonly ChevronDown = ChevronDown;
 
@@ -53,15 +56,15 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
       this.filtered = [...(this.items ?? [])];
 
       if (this.multiple) {
-        // Si selected no es array, lo tratamos como vacío
         const values = Array.isArray(this.selected)
-          ? this.selected.map(s => s[this.valueField] ?? s)
+          ? this.selected.map(s => this.getValueByPath(s, this.valueField) ?? s)
           : [];
-        this.selected = this.items.filter(i => values.includes(i[this.valueField]));
+        this.selected = this.items.filter(i => values.includes(this.getValueByPath(i, this.valueField)));
       } else {
-        // Sólo reasignamos si ya había un selected válido
         if (this.selected && typeof this.selected === 'object') {
-          this.selected = this.items.find(i => i[this.valueField] === this.selected[this.valueField]) || null;
+          const currentVal = this.getValueByPath(this.selected, this.valueField);
+          this.selected =
+            this.items.find(i => this.getValueByPath(i, this.valueField) === currentVal) || null;
         }
       }
     }
@@ -69,40 +72,63 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
 
   writeValue(obj: any): void {
     if (this.multiple && Array.isArray(obj)) {
-      this.selected = this.items.filter(i => obj.includes(i[this.valueField]));
+      this.selected = this.items.filter(i => obj.includes(this.getValueByPath(i, this.valueField)));
     } else if (!this.multiple) {
-      this.selected = this.items.find(i => i[this.valueField] === obj) || null;
+      this.selected = this.items.find(i => this.getValueByPath(i, this.valueField) === obj) || null;
     }
   }
 
   registerOnChange(fn: any): void { this.onChange = fn; }
   registerOnTouched(fn: any): void { this.onTouch = fn; }
 
-  toggle() {
-    this.open = !this.open;
+  toggle() { this.open = !this.open; }
+
+  /** Soporta rutas con punto: 'cliente.nombre' */
+  private getValueByPath(obj: any, path?: string): any {
+    if (!obj || !path) return undefined;
+    return path.split('.').reduce((acc, k) => (acc?.[k]), obj);
+  }
+
+  /** Etiqueta a mostrar: displayFn > secondDisplayField > displayField */
+  getLabel(item: any): string {
+    if (!item) return '';
+    if (this.displayFn) {
+      try { return String(this.displayFn(item) ?? ''); } catch { return ''; }
+    }
+    const s2 = this.secondDisplayField?.trim();
+    const s1 = this.displayField?.trim();
+    const val = (s2 && this.getValueByPath(item, s2)) ?? this.getValueByPath(item, s1);
+    return String(val ?? '');
   }
 
   filter() {
     const term = this.search.toLowerCase();
-    this.filtered = (this.items ?? []).filter(i =>
-      ('' + i[this.displayField]).toLowerCase().includes(term)
-    );
+    this.filtered = (this.items ?? []).filter(i => {
+      const parts = [
+        this.getValueByPath(i, this.displayField),
+        this.getValueByPath(i, this.secondDisplayField)
+      ]
+      .filter(v => v !== undefined && v !== null)
+      .map(v => String(v).toLowerCase());
+      return parts.some(p => p.includes(term));
+    });
   }
 
   select(item: any) {
     if (this.multiple) {
       const arr = Array.isArray(this.selected) ? [...this.selected] : [];
-      const exists = arr.some(i => i[this.valueField] === item[this.valueField]);
+      const itemVal = this.getValueByPath(item, this.valueField);
+      const exists = arr.some(i => this.getValueByPath(i, this.valueField) === itemVal);
 
       this.selected = exists
-        ? arr.filter(i => i[this.valueField] !== item[this.valueField])
+        ? arr.filter(i => this.getValueByPath(i, this.valueField) !== itemVal)
         : [...arr, item];
 
-      this.onChange((this.selected as any[]).map(i => i[this.valueField]));
+      this.onChange((this.selected as any[]).map(i => this.getValueByPath(i, this.valueField)));
     } else {
       this.selected = item;
       this.open = false;
-      this.onChange(item[this.valueField]);
+      this.onChange(this.getValueByPath(item, this.valueField));
     }
 
     this.search = '';
@@ -112,17 +138,18 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
 
   isSelected(item: any): boolean {
     return this.multiple && Array.isArray(this.selected)
-      ? (this.selected as any[]).some(i => i[this.valueField] === item[this.valueField])
+      ? (this.selected as any[]).some(i =>
+          this.getValueByPath(i, this.valueField) === this.getValueByPath(item, this.valueField))
       : false;
   }
 
   get displayValue(): string {
     if (this.multiple && Array.isArray(this.selected)) {
       return this.selected.length
-        ? (this.selected as any[]).map(i => i[this.displayField]).join(', ')
+        ? (this.selected as any[]).map(i => this.getLabel(i)).join(', ')
         : this.placeholder;
     }
-    return this.selected ? this.selected[this.displayField] : this.placeholder;
+    return this.selected ? this.getLabel(this.selected) : this.placeholder;
   }
 
   @HostListener('document:click', ['$event.target'])

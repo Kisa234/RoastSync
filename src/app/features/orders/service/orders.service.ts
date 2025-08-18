@@ -63,4 +63,9 @@ export class PedidoService {
   getPedidosOrdenTuesteByFecha(fecha: string): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(`${this.base}/orden/tueste/${fecha}`);
   }
+
+  /** Obtener pedidos por lote */
+  getPedidosByLote(idLote:string):Observable<Pedido[]>{
+    return this.http.get<Pedido[]>(`${this.base}/lote/${idLote}`);
+  }
 }

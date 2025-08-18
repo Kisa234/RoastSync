@@ -1,17 +1,17 @@
+import { UserService } from './../../../features/users/service/users-service.service';
+import { UserNamePipe } from './../../pipes/user-name-pipe.pipe';
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { LucideAngularModule, FileSpreadsheet, Download } from 'lucide-angular';
+import { LucideAngularModule, FileSpreadsheet, Download, TestTube } from 'lucide-angular';
 import { RoastsService } from '../../../features/roasts/service/roasts.service';
 import { LoteTostadoService } from '../../../features/inventory/service/lote-tostado.service';
 import { Tueste } from '../../models/tueste';
 import { FichaTueste } from '../../models/ficha-tueste';
-import { formatDate } from '@angular/common';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import { UserNamePipe } from "../../pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../pipes/time.pipe";
+import { firstValueFrom } from 'rxjs';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'report-lote-tostado',
@@ -24,14 +24,15 @@ import { MinSecPipe } from "../../pipes/time.pipe";
     CommonModule,
     UserNamePipe,
     MinSecPipe
-]
+  ]
 })
 export class ReportLoteTostadoComponent implements OnInit {
   @Input() id!: string;
   @ViewChild('pdfContent', { static: false }) pdfContent!: ElementRef<HTMLElement>;
 
   readonly Download = Download;
-  readonly FileSpreadsheet = FileSpreadsheet
+  readonly FileSpreadsheet = FileSpreadsheet;
+  readonly TestTube = TestTube;
 
   currentDate: Date = new Date();
   ficha: FichaTueste = {
@@ -44,7 +45,8 @@ export class ReportLoteTostadoComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private roastSvc: RoastsService,
-    private loteTostadoSvc: LoteTostadoService
+    private loteTostadoSvc: LoteTostadoService,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -202,10 +204,11 @@ export class ReportLoteTostadoComponent implements OnInit {
 
     .print-page { box-sizing: border-box; height: 100%; }
 
-    /* ❗ Quitar scroll para que no se corte a la derecha */
     .overflow-x-auto, .overflow-auto, .overflow-hidden, .overflow-scroll {
       overflow: visible !important;
     }
+    
+
 
     table { width: 100% !important; border-collapse: collapse !important; table-layout: auto; }
     thead { display: table-header-group; }
@@ -213,10 +216,8 @@ export class ReportLoteTostadoComponent implements OnInit {
     tbody tr { break-inside: avoid; page-break-inside: avoid; }
     th, td { padding: 2px 4px !important; font-size: 11px !important; }
 
-    /* Evitar bugs de sticky en impresión */
     .sticky, .sticky th, .sticky td { position: static !important; }
 
-    /* Opcional: limpiar sombras para que no pixelen */
     .shadow, .shadow-md, .shadow-lg { box-shadow: none !important; }
   `;
 
@@ -252,4 +253,71 @@ export class ReportLoteTostadoComponent implements OnInit {
   }
 
 
+  async exportSticker(t: Tueste) {
+    const lote = t.id_lote ?? this.id ?? '';
+    const fecha = formatDate(this.currentDate, 'dd/MM/yyyy', 'es-PE');
+    const batch = String(t.num_batch ?? '');
+
+    // 1) Traer cliente antes de dibujar
+    let cliente = '';
+    try {
+      const user = await firstValueFrom(this.userService.getUserById(t.id_cliente));
+      cliente = user?.nombre_comercial || user?.nombre || '';
+    } catch { }
+
+    // 2) Lienzo más grande (ancho ↑, altura ↑)
+    const W = 1400, H = 360, dpr = window.devicePixelRatio || 1;
+    const canvas = document.createElement('canvas');
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d')!; ctx.scale(dpr, dpr);
+
+    // Fondo y borde
+    ctx.fillStyle = '#FFF'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, W - 2, H - 2);
+
+    // Layout (sum = 1400). Amplié la columna de FECHA a 260.
+    const cols = [140, 520, 480, 260]; // Batch, Lote, Cliente, Fecha
+    const x = [20, 20 + cols[0], 20 + cols[0] + cols[1], 20 + cols[0] + cols[1] + cols[2]];
+    const yHeader = 70, yValue = 170;
+
+    // Encabezados
+    ctx.font = '600 26px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+    ctx.fillStyle = '#111';
+    ['Batch', 'Lote', 'Cliente', 'Fecha'].forEach((h, i) => ctx.fillText(h, x[i], yHeader));
+    ctx.beginPath(); ctx.moveTo(20, yHeader + 16); ctx.lineTo(W - 20, yHeader + 16);
+    ctx.lineWidth = 1; ctx.strokeStyle = '#999'; ctx.stroke();
+
+    // Valores: 36px. NO achicar la fecha.
+    const valueFont = '500 36px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    ctx.font = valueFont; ctx.fillStyle = '#111';
+
+    const drawFit = (text: string, xi: number, maxW: number) => {
+      // permite achicar SOLO para batch/lote/cliente (no fecha)
+      let size = 36;
+      ctx.font = valueFont;
+      while (ctx.measureText(text).width > maxW && size > 12) {
+        size -= 1;
+        ctx.font = valueFont.replace(/\d+px/, size + 'px');
+      }
+      ctx.fillText(text, xi, yValue);
+      ctx.font = valueFont; // reset
+    };
+
+    drawFit(batch, x[0], cols[0] - 30);
+    drawFit(String(lote), x[1], cols[1] - 30);
+    drawFit(cliente, x[2], cols[2] - 30);
+
+    // Fecha fija a 36px, sin truncar
+    ctx.font = valueFont;
+    ctx.fillText(fecha, x[3], yValue);
+
+    // Descargar
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `Sticker_${lote}_B${batch}_${formatDate(t.fecha_tueste, 'yyyyMMdd', 'es-PE')}.png`;
+    a.click(); a.remove();
+  }
 }
+
+

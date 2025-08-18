@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { AsyncPipe, CommonModule, JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Plus } from 'lucide-angular';
-import { Search, Eye, Edit2, Trash2, Clipboard } from 'lucide-angular';
+import { LucideAngularModule, Plus, History } from 'lucide-angular';
+import { Search, Eye, Edit2, Trash2, Clipboard, TestTube } from 'lucide-angular';
 import { map, Observable } from 'rxjs';
 import { AddLoteComponent } from '../../components/add-lote/add-lote.component';
 import { AddMuestraComponent } from '../../components/add-muestra/add-muestra.component';
@@ -21,7 +21,9 @@ import { UiService } from '../../../../shared/services/ui.service';
 import { User } from '../../../../shared/models/user';
 import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
 import { Router } from '@angular/router';
-
+import { HistoricLoteComponent } from '../../components/historic-lote/historic-lote.component';
+import { firstValueFrom } from 'rxjs';
+import { formatDate } from '@angular/common';
 
 
 type InventoryTab = 'muestras' | 'verde' | 'tostado';
@@ -40,6 +42,7 @@ type InventoryTab = 'muestras' | 'verde' | 'tostado';
     ReportLoteComponent,
     FichaTuesteComponent,
     BlendLoteComponent,
+    HistoricLoteComponent,
     FormsModule,
     BlendTueste,
     UserNamePipe,
@@ -55,6 +58,8 @@ export class InventoryPage {
   readonly Trash2 = Trash2;
   readonly Plus = Plus;
   readonly Clipboard = Clipboard;
+  readonly History = History;
+  readonly TestTube = TestTube;
 
 
   // pestañas
@@ -81,6 +86,7 @@ export class InventoryPage {
   showBlendLote = false;
   showFichaTueste = false;
   showBlendTueste = false;
+  showHistoricLote = false;
 
   filterText = '';
   selectedLoteId = '';
@@ -145,6 +151,12 @@ export class InventoryPage {
       }
     });
   }
+
+  openHistoricLote(l: Lote) {
+    this.selectedLoteId = l.id_lote;
+    this.showHistoricLote = true;
+  }
+
 
   getLotesCliente(lotes: Lote[]) {
     return lotes.filter(l => {
@@ -223,6 +235,84 @@ export class InventoryPage {
 
   onReportTueste(t: LoteTostado) {
     this.router.navigate(['/report-lote-tostado', t.id_lote_tostado]);
+  }
+
+
+  async exportStickerTostado(t: any) {
+    const lote = t?.id_lote ?? '';
+    const fecha = t?.fecha_tostado
+      ? formatDate(new Date(t.fecha_tostado), 'dd/MM/yyyy', 'es-PE')
+      : formatDate(new Date(), 'dd/MM/yyyy', 'es-PE');
+
+    // 1) Obtener cliente antes de dibujar (tiene id_user en esta tabla)
+    let cliente = '';
+    try {
+      const user = await firstValueFrom(this.userService.getUserById(t.id_user));
+      cliente = user?.nombre_comercial || user?.nombre || '';
+    } catch { /* fallback vacío */ }
+
+    // 2) Canvas más grande para que la fecha no se corte (fecha a 36px)
+    const W = 1400, H = 320, dpr = window.devicePixelRatio || 1;
+    const canvas = document.createElement('canvas');
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.scale(dpr, dpr);
+
+    // Fondo + borde
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#111111';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, W - 2, H - 2);
+
+    // Layout (sum = 1400). Amplié fecha a 260px y cliente bien ancho.
+    const cols = [700, 440, 260]; // Lote, Cliente, Fecha
+    const x = [20, 20 + cols[0], 20 + cols[0] + cols[1]];
+    const yHeader = 70, yValue = 170;
+
+    // Encabezados
+    ctx.font = '600 26px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+    ctx.fillStyle = '#111111';
+    ['Lote', 'Cliente', 'Fecha'].forEach((h, i) => ctx.fillText(h, x[i], yHeader));
+
+    // Línea divisoria
+    ctx.beginPath();
+    ctx.moveTo(20, yHeader + 16);
+    ctx.lineTo(W - 20, yHeader + 16);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#999999';
+    ctx.stroke();
+
+    // Valores (36px). Lote/Cliente pueden achicarse para encajar; la fecha NO.
+    const valueFont = '500 36px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+    ctx.fillStyle = '#111111';
+
+    const drawFit = (text: string, xi: number, maxW: number) => {
+      let size = 36;
+      ctx.font = valueFont;
+      while (ctx.measureText(text).width > maxW && size > 12) {
+        size -= 1;
+        ctx.font = valueFont.replace(/\d+px/, size + 'px');
+      }
+      ctx.fillText(text, xi, yValue);
+      ctx.font = valueFont; // reset para el siguiente
+    };
+
+    drawFit(String(lote), x[0], cols[0] - 30);
+    drawFit(String(cliente), x[1], cols[1] - 30);
+
+    // Fecha fija a 36px
+    ctx.font = valueFont;
+    ctx.fillText(String(fecha), x[2], yValue);
+
+    // Descargar PNG
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `StickerTostado_${lote}_${formatDate(new Date(), 'yyyyMMdd_HHmm', 'es-PE')}.png`;
+    a.click();
+    a.remove();
   }
 
 }
