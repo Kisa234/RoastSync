@@ -26,7 +26,7 @@ import { LucideAngularModule, ChevronDown } from 'lucide-angular';
 export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnChanges {
   @Input() items: any[] = [];
   @Input() displayField = '';
-  @Input() secondDisplayField = '';
+  @Input() secondDisplayField?:string;
   @Input() valueField = '';
   @Input() placeholder = 'Select...';
   @Input() multiple = false;

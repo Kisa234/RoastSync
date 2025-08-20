@@ -155,15 +155,21 @@
 
         <!-- Departamento -->
         <div class="col-span-2 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="productor">
+            Departamento
+          </label>
           <select-search name="depto" [items]="departamentos" displayField="nombre" valueField="nombre"
-            placeholder="Departamento *" [(ngModel)]="model.departamento" (ngModelChange)="onDeptoChange($event)">
+            placeholder="Departamento" [(ngModel)]="model.departamento" (ngModelChange)="onDeptoChange($event)">
           </select-search>
         </div>
 
         <!-- Distrito -->
         <div class="col-span-2 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="productor">
+            Distrito
+          </label>
           <select-search name="prov" [items]="distritos" displayField="nombre" valueField="nombre"
-            placeholder="Distrito *" [(ngModel)]="model.distrito" [disabled]="!model.departamento">
+            placeholder="Distrito" [(ngModel)]="model.distrito" [disabled]="!model.departamento">
           </select-search>
         </div>
 
@@ -180,15 +186,24 @@
         </div>
 
         <!-- cliente -->
-        <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
-          valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+        <div class="col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="productor">
+            Cliente
+          </label>
+          <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
+            valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+        </div>
 
 
         <!-- Variedades -->
-        <select-search class="w-full col-span-2" name="variedades" [(ngModel)]="model.variedades" [items]="variedades"
-          displayField="nombre" valueField="nombre" placeholder="Seleccionar variedades *"
-          [multiple]="true"></select-search>
-
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1" for="productor">
+            Variedades *
+          </label>
+          <select-search class="w-full col-span-2" name="variedades" [(ngModel)]="model.variedades" [items]="variedades"
+            displayField="variedades" valueField="variedades" placeholder="Seleccionar variedades "
+            [multiple]="true"></select-search>
+        </div>
 
 
         <!-- Proceso -->
@@ -238,10 +253,8 @@
         class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] flex items-center">
         <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />Guardar
       </button>
-      <button *ngIf="activeTab==='desde-muestra'" (click)="saveFromMuestra()"
-        class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52]
-        disabled:opacity-50 flex items-center"
-        [disabled]="isButtonDisabled()">
+      <button *ngIf="activeTab==='desde-muestra'" (click)="saveFromMuestra()" class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52]
+        disabled:opacity-50 flex items-center" [disabled]="isButtonDisabled()">
         <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />
         Crear Lote
       </button>
