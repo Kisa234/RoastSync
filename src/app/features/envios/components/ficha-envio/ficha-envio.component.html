@@ -1,0 +1,126 @@
+<div class="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50 p-4 print:hidden">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-5xl overflow-visible">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center px-6 pt-4">
+            <div>
+                <h2 class="text-xl font-semibold text-[#1F1F1F]">Ficha de Envío</h2>
+                <p class="text-gray-600 text-sm">Completa los datos del destinatario</p>
+            </div>
+            <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+                <lucide-icon [img]="X" class="w-5 h-5" />
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="px-6 py-5">
+            <!-- GRID: 3 columnas, 2 filas -->
+            <div class="grid grid-cols-3 gap-6">
+                <!-- Formulario (ocupa las 3 columnas en la fila 1) -->
+                <form class="col-span-3 grid grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-gray-700 text-sm mb-1">Nombre *</label>
+                        <input type="text" [(ngModel)]="model.nombre" name="nombre"
+                            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm mb-1">Celular *</label>
+                        <input type="text" [(ngModel)]="model.celular" name="celular"
+                            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm mb-1">Dirección *</label>
+                        <input type="text" [(ngModel)]="model.direccion" name="direccion"
+                            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm mb-1">Distrito *</label>
+                        <input type="text" [(ngModel)]="model.distrito" name="distrito"
+                            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm mb-1">DNI</label>
+                        <input type="text" [(ngModel)]="model.dni" name="dni"
+                            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm mb-1">Referencia</label>
+                        <input rows="=1" [(ngModel)]="model.referencia" name="referencia"
+                            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+                    </div>
+                </form>
+
+                <!-- Vista previa -->
+                <div class="col-span-3 flex justify-center">
+                    <!-- Contenedor con el tamaño exacto (o escalado) de la imagen -->
+                    <div #preview class="relative overflow-hidden bg-white" [style.width.px]="bgW"
+                        [style.height.px]="bgH">
+
+                        <!-- Fondo: la imagen completa, sin recortes ni márgenes -->
+                        <img #bgImg [src]="getAssetUrl('ficha-envio-bg.png')" (load)="onBgLoad(bgImg)"
+                            class="absolute inset-0 w-full h-full object-fill select-none pointer-events-none" />
+
+                        <!-- Overlay de datos, dentro del área de la imagen -->
+                        <div class="absolute inset-0 flex items-end mb-2.5 ml-2.5">
+                            <div class="grid gap-1 text-[12px] leading-5">
+                                <div><span class="font-semibold">Nombre:</span> {{ model.nombre || '—' }}</div>
+                                <div><span class="font-semibold">Celular:</span> {{ model.celular || '—' }}</div>
+                                <div><span class="font-semibold">Dirección:</span> {{ model.direccion || '—' }}</div>
+                                <div><span class="font-semibold">Distrito:</span> {{ model.distrito || '—' }}</div>
+                                <div><span class="font-semibold">DNI:</span> {{ model.dni || '—' }}</div>
+                                <div><span class="font-semibold">Referencia:</span> {{ model.referencia || '—' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón (no se incluye en la captura gracias a .print-hidden) -->
+                <div class="col-span-3 flex justify-end mt-2">
+                    <button (click)="downloadPreviewPNG()"
+                        class="print-hidden flex items-center text-gray-600 hover:text-[#B8672E] text-sm">
+                        <lucide-icon [img]="Printer" class="w-4 h-4 mr-1" /> Imprimir
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Footer -->
+            <div class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5] space-x-2">
+                <button (click)="onCancel()" class="px-4 py-2 rounded border border-[#A67C52] hover:bg-[#F3F2F1]">
+                    Cancelar
+                </button>
+                <button (click)="save()"
+                    class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] flex items-center disabled:opacity-50"
+                    [disabled]="saving || !canSave()">
+                    <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Versión imprimible (sólo print) -->
+    <div class="hidden print:block">
+        <div style="
+      width: 210mm;
+      height: 148mm; /* A5 apaisado; cambia a 297mm x 210mm para A4 */
+      background-image: url('assets/ficha-envio-bg.png');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      ">
+            <div style="position:absolute; left:24mm; bottom:20mm; right:24mm; font-size:14pt; line-height:1.4;">
+                <div><strong>Nombre:</strong> {{ model.nombre || '—' }}</div>
+                <div><strong>Celular:</strong> {{ model.celular || '—' }}</div>
+                <div><strong>Dirección:</strong> {{ model.direccion || '—' }}</div>
+                <div><strong>Distrito:</strong> {{ model.distrito || '—' }}</div>
+                <div><strong>DNI:</strong> {{ model.dni || '—' }}</div>
+                <div><strong>Referencia:</strong> {{ model.referencia || '—' }}</div>
+            </div>
+        </div>
+    </div>

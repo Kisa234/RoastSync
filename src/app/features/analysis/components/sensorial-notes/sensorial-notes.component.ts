@@ -1,9 +1,10 @@
-import {  Component,  EventEmitter,  HostListener,  ElementRef,  Output,  OnInit, Input} from '@angular/core';
+import { Component, EventEmitter, HostListener, ElementRef, Output, OnInit, Input, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CoffeeFlavors, ICoffeeFlavor } from '../../../../shared/models/rueda-sabores';
-import { SensorialData } from '../../../../shared/models/sensorial-data';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
+import { NotasService } from '../../../../shared/services/notas.service';
+import { Nota } from '../../../../shared/models/notas';
+import { Subject, takeUntil } from 'rxjs';
 
 interface Option {
   label: string;
@@ -20,9 +21,11 @@ interface Option {
   ],
   templateUrl: './sensorial-notes.component.html'
 })
-export class SensorialNotesComponent implements OnInit {
+export class SensorialNotesComponent implements OnInit, OnDestroy {
   @Output() sensorialData = new EventEmitter<SensorialData>();
   @Input() comentario?: string = '';
+
+  private destroy$ = new Subject<void>();
 
   form: SensorialData = {
     notas: [],
@@ -31,6 +34,9 @@ export class SensorialNotesComponent implements OnInit {
   };
 
   flavorOptions: Option[] = [];
+  loadingNotas = false;
+  loadError: string | null = null;
+
   acidityOptions = [
     'neutra','leve','suave','melosa','vinoza',
     'brillante','jugosa','agrio','acre'
@@ -44,14 +50,13 @@ export class SensorialNotesComponent implements OnInit {
   baseOpen    = false;
   fondoOpen   = false;
 
-  constructor(private elRef: ElementRef) {}
+  constructor(
+    private elRef: ElementRef,
+    private notasService: NotasService
+  ) {}
 
   ngOnInit() {
-    const flat = this.flattenFlavors(CoffeeFlavors);
-    this.flavorOptions = flat.map(f => ({
-      label: f,
-      value: f
-    }));
+    // 1) Si viene comentario JSON, restauro el form
     if (this.comentario && this.comentario !== '{}') {
       try {
         const data = JSON.parse(this.comentario) as SensorialData;
@@ -60,15 +65,69 @@ export class SensorialNotesComponent implements OnInit {
         console.error('Error parsing comentario:', e);
       }
     }
-    
+
+    // 2) Cargar notas desde el servicio y aplanar por jerarquía
+    this.loadingNotas = true;
+    this.loadError = null;
+
+    this.notasService.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (notas) => {
+          const flatOrdered = this.flattenNotasByHierarchy(notas);
+          // Usamos el "name" como valor (igual que antes con el JSON)
+          // y evitamos duplicados por seguridad
+          const uniqueNames = Array.from(new Set(flatOrdered.map(n => n.name)));
+          this.flavorOptions = uniqueNames.map(name => ({ label: name, value: name }));
+          this.loadingNotas = false;
+        },
+        error: (err) => {
+          console.error('Error cargando notas:', err);
+          this.loadError = 'No se pudieron cargar las notas.';
+          this.loadingNotas = false;
+        }
+      });
   }
 
-  private flattenFlavors(arr: ICoffeeFlavor[]): string[] {
-    return arr.reduce<string[]>((acc, cur) => {
-      acc.push(cur.name);
-      if (cur.children) acc.push(...this.flattenFlavors(cur.children));
-      return acc;
-    }, []);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Aplana las notas en orden jerárquico (padre → hijos),
+   * usando parentId. Ordena alfabéticamente por name en cada nivel.
+   */
+  private flattenNotasByHierarchy(notas: Nota[]): Nota[] {
+    const byParent = new Map<string | null, Nota[]>();
+
+    for (const n of notas) {
+      const key = n.parentId ?? null;
+      const list = byParent.get(key) ?? [];
+      list.push(n);
+      byParent.set(key, list);
+    }
+
+    const sortByName = (a: Nota, b: Nota) =>
+      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
+
+    for (const [k, arr] of byParent.entries()) {
+      arr.sort(sortByName);
+      byParent.set(k, arr);
+    }
+
+    const out: Nota[] = [];
+    const visit = (parentId: string | null) => {
+      const children = byParent.get(parentId) ?? [];
+      for (const child of children) {
+        out.push(child);
+        visit(child.id);
+      }
+    };
+
+    // Raíces = sin parentId (null)
+    visit(null);
+    return out;
   }
 
   // Notas
@@ -78,6 +137,7 @@ export class SensorialNotesComponent implements OnInit {
     else        this.form.notas.push(opt);
     this.emitChange();
   }
+
   removeNota(opt: string, e: MouseEvent) {
     e.stopPropagation();
     this.form.notas = this.form.notas.filter(n => n !== opt);
@@ -100,4 +160,11 @@ export class SensorialNotesComponent implements OnInit {
       this.notasOpen = this.baseOpen = this.fondoOpen = false;
     }
   }
+}
+
+// Asegúrate de tener este tipo importado (lo tenías en tu snippet original)
+export interface SensorialData {
+  notas: string[];
+  acidez: string;
+  cuerpo: string;
 }

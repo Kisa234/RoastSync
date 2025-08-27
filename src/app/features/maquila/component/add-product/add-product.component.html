@@ -1,0 +1,74 @@
+<div class="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg overflow-visible">
+
+    <!-- Header -->
+    <div class="flex justify-between items-start px-6 pt-4">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Nuevo Producto</h2>
+        <p class="text-gray-600 text-sm">Crea la ficha comercial que agrupa tus SKUs</p>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+        <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-5">
+      <form class="grid grid-cols-2 gap-x-6 gap-y-4">
+
+        <!-- Nombre -->
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1">Nombre del producto*</label>
+          <input
+            type="text"
+            [(ngModel)]="model.nombre"
+            name="nombre"
+            class="w-full border border-[#E5E5E5] rounded px-3 py-2 placeholder-gray-500"
+            placeholder="Ej: Bolsa Timoteo Huaman" />
+          <small class="text-xs text-gray-500">Este nombre se muestra en catálogo y agrupa los SKUs.</small>
+        </div>
+
+        <!-- Descripción -->
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1">Descripción</label>
+          <textarea
+            rows="3"
+            [(ngModel)]="model.descripcion"
+            name="descripcion"
+            class="w-full border border-[#E5E5E5] rounded px-3 py-2 placeholder-gray-500"
+            placeholder="Notas, proceso, finca…"></textarea>
+        </div>
+
+        <!-- Lote (opcional) -->
+        <!-- Si luego pasas una lista de lotes por @Input, aquí podrías renderizar tu <select-search>. -->
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1">ID de Lote Verde (opcional)</label>
+          <select-search
+            name="producto"
+            [(ngModel)]="model.id_lote"
+            [items]="lotes"
+            displayField="id_lote"
+            valueField="id_lote"
+            placeholder="Buscar lote"
+          >
+          </select-search>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5] space-x-2">
+      <button (click)="onCancel()" class="px-4 py-2 rounded border border-[#A67C52] hover:bg-[#F3F2F1]">
+        Cancelar
+      </button>
+      <button
+        (click)="save()"
+        class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] flex items-center disabled:opacity-50"
+        [disabled]="saving || !canSave()">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2"></lucide-icon>
+        Guardar
+      </button>
+    </div>
+
+  </div>
+</div>

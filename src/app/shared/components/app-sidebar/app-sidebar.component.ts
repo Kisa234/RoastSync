@@ -12,7 +12,10 @@ import {
   Flame,
   ChartColumn,
   Settings,
-  FlaskConical 
+  FlaskConical,
+  Truck,
+  Factory
+  
 } from 'lucide-angular';
 
 @Component({
@@ -32,6 +35,8 @@ export class SidebarComponent {
     { label: 'Dashboard',    path: '/dashboard', icon: House },
     { label: 'Inventario',   path: '/inventory', icon: Box },
     { label: 'Pedidos',      path: '/orders',    icon: ShoppingCart },
+    { label: 'Maquila',      path: '/maquila',    icon: Factory },
+    { label: 'Envios',      path: '/envio',    icon: Truck },
     { label: 'Tostado',      path: '/roasts',    icon: Flame },
     { label: 'Analisis',         path: '/analisis',    icon: FlaskConical  },
     { label: 'Usuarios',     path: '/clients',   icon: Users },

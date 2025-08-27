@@ -1,0 +1,118 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Envíos</h1>
+      <p class="text-gray-600">Gestiona y revisa tus envíos</p>
+    </div>
+    <button
+      class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+      (click)="openAddEnvio()"
+    >
+      <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+      Agregar Envío
+    </button>
+  </div>
+
+  <!-- Card principal -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 space-y-6">
+
+    <!-- Título -->
+    <div>
+      <h2 class="text-xl font-semibold text-[#1F1F1F]">Lista de Envíos</h2>
+    </div>
+
+    <!-- Filtros: Fecha -->
+    <div class="flex flex-wrap gap-3">
+      <div class="w-40">
+        <label class="block text-xs text-gray-600 mb-1">Desde</label>
+        <input
+          type="date"
+          [(ngModel)]="startDate"
+          (ngModelChange)="onFilterChange()"
+          class="w-full border border-[#E5E5E5] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        />
+      </div>
+      <div class="w-40">
+        <label class="block text-xs text-gray-600 mb-1">Hasta</label>
+        <input
+          type="date"
+          [(ngModel)]="endDate"
+          (ngModelChange)="onFilterChange()"
+          class="w-full border border-[#E5E5E5] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        />
+      </div>
+      <div class="flex items-end">
+        <button
+          type="button"
+          class="text-sm text-gray-600 hover:text-[#B8672E] underline"
+          (click)="resetRange()"
+        >
+          Últimos 30 días
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto m-1 rounded-lg shadow-sm">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote Tostado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad (Gr)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Clasificación</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let e of envios; trackBy: trackByEnvioId" class="hover:bg-[#F9F9F9]">
+            <td class="px-6 py-4 text-sm text-gray-700 font-mono">{{ e.id_lote_tostado }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ e.id_cliente | userName }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ e.cantidad.toLocaleString('en-US') }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">
+              <span class="inline-block px-2 py-0.5 text-xs rounded-full border"
+                [ngClass]="{
+                  'bg-blue-50 text-blue-700 border-blue-200': e.clasificacion === 'Muestra',
+                  'bg-emerald-50 text-emerald-700 border-emerald-200': e.clasificacion === 'Venta'
+                }">
+                {{ e.clasificacion || '—' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ e.fecha | date:'dd/MM/yyyy' }}</td>
+            <td class="px-6 py-4 text-right text-sm">
+              <button (click)="view(e)" class="text-gray-500 hover:text-[#B8672E]">
+                <lucide-icon [img]="Eye" class="w-5 h-5" />
+              </button>
+            </td>
+          </tr>
+
+          <!-- Estado vacío -->
+          <tr *ngIf="(envios)?.length === 0">
+            <td colspan="7" class="px-6 py-6 text-center text-gray-500">
+              No hay envíos en el periodo seleccionado.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Modales -->
+  <add-envio
+    *ngIf="showAddEnvio"
+    (close)="showAddEnvio = false"
+    (create)="onEnvioCreated($event)"
+  ></add-envio>
+
+  <ficha-envio
+    *ngIf="showFichaEnvio"
+    [id]="selectedEnvioId"
+    (close)="showFichaEnvio = false"
+  ></ficha-envio>
+
+</div>

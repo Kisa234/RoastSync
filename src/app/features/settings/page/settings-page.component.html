@@ -11,9 +11,20 @@
             <a (click)="openModule('variedades')" class="text-[#B8672E] hover:underline">abrir variedades</a>
         </div>
 
+        <div class="col-span-1 bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-semibold text-[#1F1F1F] mb-2">Rueda de sabores</h2>
+            <p class="text-gray-600 text-sm mb-4">Administra las notas sensoriales</p>
+            <a (click)="openModule('notas')" class="text-[#B8672E] hover:underline">abrir notas</a>
+        </div>
+
     </div>
 </div>
 
+<notas
+    *ngIf="moduleNotas"
+    (close)="closeModules()"
+>
+</notas>
 
 <variedades 
     *ngIf="moduleVariedades"

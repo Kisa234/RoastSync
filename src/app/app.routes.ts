@@ -22,6 +22,8 @@ import { authGuard } from './guards/auth.guard';
 import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { SettingsPageComponent } from './features/settings/page/settings-page.component';
+import { EnvioPageComponent } from './features/envios/pages/envio.page/envio.page.component';
+import { MaquilaPageComponent } from './features/maquila/pages/maquila.page/maquila.page.component';
 
 
 export const appRoutes: Routes = [
@@ -48,10 +50,12 @@ export const appRoutes: Routes = [
       { path: 'dashboard', component: OverviewComponent },
       { path: 'inventory', component: InventoryPage },
       { path: 'orders', component: OrdersPage },
+      { path: 'envio', component:EnvioPageComponent},
       { path: 'roasts', component: RoastsPage },
       { path: 'analisis', component: AnalisisPage },
       { path: 'clients', component: UsersPageComponent },
       { path: 'settings', component: SettingsPageComponent },
+      { path: 'maquila', component: MaquilaPageComponent },
 
 
       // ...otras rutas

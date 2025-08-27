@@ -1,8 +1,26 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild, ElementRef, AfterViewInit, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as echarts from 'echarts';
 import type { EChartsOption, SunburstSeriesOption } from 'echarts';
-import { CoffeeFlavors, ICoffeeFlavor } from '../../models/rueda-sabores';
+import { NotasService } from '../../services/notas.service';
+import { Nota } from '../../models/notas';
+import { Subject, takeUntil } from 'rxjs';
+
+interface FlavorNode {
+  id?: string;
+  name: string;
+  color: string;
+  children?: FlavorNode[];
+}
 
 @Component({
   selector: 'multi-pie-chart',
@@ -11,31 +29,49 @@ import { CoffeeFlavors, ICoffeeFlavor } from '../../models/rueda-sabores';
   templateUrl: './multi-pie-chart.component.html',
   styles: [':host { display: block; width: 100%; height: 400px; }']
 })
-export class MultiPieChartComponent implements OnChanges, AfterViewInit {
+export class MultiPieChartComponent implements OnChanges, AfterViewInit, OnDestroy {
   @Input() comentario!: string;
   @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef;
-  private chart!: echarts.ECharts;
-  private validFlavorNames = new Set<string>();
 
-  constructor() {
-    this.buildFlavorNameSet(CoffeeFlavors);
-  }
+  private chart!: echarts.ECharts;
+  private destroy$ = new Subject<void>();
+  private resizeHandler = () => this.chart?.resize();
+
+  // Árbol de sabores proveniente del backend
+  private flavorTree: FlavorNode[] = [];
+  // Set para validar los nombres de notas seleccionadas
+  private validFlavorNames = new Set<string>();
+  // Estado de carga
+  loading = false;
+  error: string | null = null;
+
+  constructor(private notasService: NotasService) {}
 
   ngAfterViewInit(): void {
     const el = this.chartContainer.nativeElement as HTMLElement;
-    // Ensure container has explicit size
-    if (!el.style.height) {
-      el.style.height = '100%';
-    }
+    if (!el.style.height) el.style.height = '100%';
     this.chart = echarts.init(el);
-    this.updateChart();
-    // Handle window resize
-    window.addEventListener('resize', () => this.chart.resize());
+
+    // Cargar notas desde API
+    this.fetchNotasAndRender();
+
+    // Resize handler
+    window.addEventListener('resize', this.resizeHandler);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['comentario'] && this.chart) {
+      // Si cambiaron las notas seleccionadas, re-render con el árbol ya cargado
       this.updateChart();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    window.removeEventListener('resize', this.resizeHandler);
+    if (this.chart) {
+      this.chart.dispose();
     }
   }
 
@@ -47,16 +83,90 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit {
     });
   }
 
-  updateChart(): void {
-    // Parse and filter notas
+  // --- Carga de datos ---
+
+  private fetchNotasAndRender(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.notasService.getAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (notas) => {
+          this.flavorTree = this.buildTree(notas);
+          this.validFlavorNames = this.buildNameSet(this.flavorTree);
+          this.loading = false;
+          this.updateChart();
+        },
+        error: (err) => {
+          console.error('Error cargando notas:', err);
+          this.error = 'No se pudieron cargar las notas.';
+          this.loading = false;
+          // Aún así limpiamos chart para mostrar vacío
+          this.updateChart();
+        }
+      });
+  }
+
+  private buildTree(notas: Nota[]): FlavorNode[] {
+    // Map por id para construir jerarquía
+    const byId = new Map<string, FlavorNode>();
+    const roots: FlavorNode[] = [];
+
+    // Inicializar nodos
+    for (const n of notas) {
+      byId.set(n.id, { id: n.id, name: n.name, color: n.color, children: [] });
+    }
+
+    // Enlazar por parentId
+    for (const n of notas) {
+      const node = byId.get(n.id)!;
+      const parentId = n.parentId ?? null;
+      if (parentId && byId.has(parentId)) {
+        byId.get(parentId)!.children!.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+
+    // Ordenar alfabéticamente por nivel
+    const sortRecursive = (nodes: FlavorNode[]) => {
+      nodes.sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+      for (const c of nodes) {
+        if (c.children && c.children.length) sortRecursive(c.children);
+      }
+    };
+    sortRecursive(roots);
+
+    return roots;
+  }
+
+  private buildNameSet(tree: FlavorNode[]): Set<string> {
+    const set = new Set<string>();
+    const walk = (nodes: FlavorNode[]) => {
+      for (const n of nodes) {
+        set.add(n.name.toLowerCase());
+        if (n.children && n.children.length) walk(n.children);
+      }
+    };
+    walk(tree);
+    return set;
+  }
+
+  // --- Render ---
+
+  private updateChart(): void {
+    if (!this.chart) return;
+
+    // Parsear comentario → notas seleccionadas (por nombre)
     let notasRaw: any[] = [];
     try {
-      const parsed = JSON.parse(this.comentario);
-      if (Array.isArray(parsed.notas)) {
+      const parsed = JSON.parse(this.comentario ?? '{}');
+      if (Array.isArray(parsed?.notas)) {
         notasRaw = parsed.notas;
       }
     } catch {
-      console.warn('MultiPieChart: comentario no es JSON válido');
+      // noop
     }
 
     const selectedSet = new Set(
@@ -65,7 +175,7 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit {
         .filter(n => this.validFlavorNames.has(n))
     );
 
-    const sunburstData = this.filterFlavors(CoffeeFlavors, selectedSet);
+    const sunburstData = this.filterFlavors(this.flavorTree, selectedSet);
 
     const option: EChartsOption = {
       tooltip: { trigger: 'item', formatter: '{b}' },
@@ -76,41 +186,40 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit {
         label: { rotate: 'radial', color: '#333' },
         levels: [
           {},
-          { r0: '0%', r: '25%', label: { rotate: 'tangential', fontSize: 16, color: '#fff' }, itemStyle: { borderWidth: 2, borderColor: '#fff' } },
-          { r0: '25%', r: '60%', label: { rotate: 'tangential', fontSize: 14 }, itemStyle: { borderWidth: 1, borderColor: '#fff' } },
-          { r0: '60%', r: '90%', label: { rotate: 'tangential', fontSize: 12, color:'#fff'}, itemStyle: { borderWidth: 1, borderColor: '#fff' } }
+          {
+            r0: '0%', r: '25%',
+            label: { rotate: 'tangential', fontSize: 16, color: '#fff' },
+            itemStyle: { borderWidth: 2, borderColor: '#fff' }
+          },
+          {
+            r0: '25%', r: '60%',
+            label: { rotate: 'tangential', fontSize: 14 },
+            itemStyle: { borderWidth: 1, borderColor: '#fff' }
+          },
+          {
+            r0: '60%', r: '90%',
+            label: { rotate: 'tangential', fontSize: 12, color: '#fff' },
+            itemStyle: { borderWidth: 1, borderColor: '#fff' }
+          }
         ]
       }
     };
 
-    // Clear previous
     this.chart.clear();
     this.chart.setOption(option, { notMerge: true });
   }
 
-  private buildFlavorNameSet(nodes: ICoffeeFlavor[]): void {
-    for (const node of nodes) {
-      this.validFlavorNames.add(node.name.toLowerCase());
-      if (node.children) {
-        this.buildFlavorNameSet(node.children);
-      }
-    }
-  }
-
-  private filterFlavors(nodes: ICoffeeFlavor[], selected: Set<string>): any[] {
+  private filterFlavors(nodes: FlavorNode[], selected: Set<string>): any[] {
     return nodes.reduce<any[]>((acc, node) => {
-      const nameLower = node.name.toLowerCase();
       let children: any[] | undefined;
-      if (node.children) {
+      if (node.children && node.children.length) {
         children = this.filterFlavors(node.children, selected);
       }
-      if (selected.has(nameLower) || (children && children.length)) {
+      const isSelected = selected.has(node.name.toLowerCase());
+      if (isSelected || (children && children.length)) {
         const item: any = { name: node.name, itemStyle: { color: node.color } };
-        if (children && children.length) {
-          item.children = children;
-        } else {
-          item.value = 1;
-        }
+        if (children && children.length) item.children = children;
+        else item.value = 1;
         acc.push(item);
       }
       return acc;

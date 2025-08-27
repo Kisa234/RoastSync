@@ -21,6 +21,7 @@
 
     <!-- Notas -->
     <div class="relative">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
       <select-search name="notas" [items]="flavorOptions" displayField="label" valueField="value" [multiple]="true"
         placeholder="Seleccionar notas…" [(ngModel)]="form.notas" (ngModelChange)="onChange()">
       </select-search>
