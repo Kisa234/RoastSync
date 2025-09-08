@@ -31,6 +31,7 @@
       <div *ngIf="activeTab==='desde-muestra'" class="grid grid-cols-2 gap-x-6 gap-y-4">
         <!-- Selector de muestra -->
         <div class="col-span-1 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Muestra *</label>
           <select-search name="muestra" [(ngModel)]="selectedMuestraId" (ngModelChange)="onMuestraChange($event)"
             [items]="muestras" displayField="id_muestra" valueField="id_muestra"
             placeholder="Seleccionar Muestra"></select-search>
@@ -84,10 +85,11 @@
           </div>
 
 
-
-          <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
-            valueField="id_user" placeholder="Seleccionar cliente"></select-search>
-
+          <div class="col-span-2 sm:col-span-1">
+            <label for="cliente" class="block text-gray-700 text-sm mb-1">Cliente *</label>
+            <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
+              valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+          </div>
 
           <!-- Variedades -->
           <div class="col-span-2 sm:col-span-1">
@@ -197,13 +199,12 @@
 
         <!-- Variedades -->
         <div class="col-span-2">
-          <label class="block text-gray-700 text-sm mb-1" for="productor">
-            Variedades *
-          </label>
+          <label class="block text-gray-700 text-sm mb-1" for="peso"> Variedades*</label>
           <select-search class="w-full col-span-2" name="variedades" [(ngModel)]="model.variedades" [items]="variedades"
-            displayField="variedades" valueField="variedades" placeholder="Seleccionar variedades "
+            displayField="nombre" valueField="nombre" placeholder="Seleccionar variedades"
             [multiple]="true"></select-search>
         </div>
+
 
 
         <!-- Proceso -->
