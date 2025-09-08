@@ -23,7 +23,7 @@ export class HistoricLoteComponent implements OnInit {
   readonly X = X;
   
   @Output() close = new EventEmitter<void>();
-  @Input() loteId: string = 'THBL-3';
+  @Input() loteId: string = '';
 
   pedidos: Pedido[] = []
   lote: Lote ={

@@ -54,7 +54,8 @@ export class AnalisisPdfComponent implements OnInit {
     productor: '',
     finca: '',
     distrito: '',
-    departamento: ''
+    departamento: '',
+    completado: false
   }
 
   analisisFisico: AnalisisFisico = {

@@ -1,0 +1,113 @@
+<div class="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-40 p-8 md:p-10">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl md:max-w-3xl lg:max-w-4xl overflow-visible relative">
+    <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600 absolute right-2 top-3">
+        <lucide-icon [img]="X" class="w-5 h-5" />
+    </button>
+    <div class="w-full mx-auto space-y-8 px-8 py-6">
+
+      <!-- TOP: Datos del Lote -->
+      <section class="rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+        <div class="flex flex-wrap items-start justify-between gap-6">
+          <div>
+            <h2 class="text-lg font-semibold text-zinc-900">Histórico del Lote</h2>
+            <p class="text-sm text-zinc-500">
+              ID: <span class="font-mono">{{ LoteTostado.id_lote_tostado }}</span>
+            </p>
+            <p class="text-xs text-zinc-500">
+              Registrado: {{ LoteTostado.fecha_registro | date:'dd/MM/yyyy' }}
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <p class="text-xs text-zinc-500">
+              Cliente: {{ LoteTostado.id_user! | userName }}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-x-12 gap-y-6">
+          <div>
+            <span class="block text-xs text-zinc-500">Peso</span>
+            <span class="mt-1 block text-zinc-900 font-medium leading-7">
+              {{ LoteTostado.peso | number:'1.0-2' }} gr
+            </span>
+          </div>
+
+          <div>
+            <span class="block text-xs text-zinc-500">Variedades</span>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <span *ngFor="let v of lote.variedades"
+                    class="px-2.5 py-1 rounded-full text-xs bg-zinc-100 text-zinc-700 leading-6">
+                {{ v }}
+              </span>
+              <span *ngIf="!lote?.variedades?.length" class="text-sm text-zinc-400">—</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-1">
+            <span class="block text-xs text-zinc-500">Proceso</span>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <span
+                class="px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+                {{ lote.proceso }}
+              </span>
+            </div>
+          </div>
+
+          <div class="hidden lg:block"></div>
+        </div>
+      </section>
+
+      <!-- BOTTOM: Tabla de pedidos -->
+      <section class="rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+        <div class="mb-5 flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-zinc-900">Movimientos (Pedidos)</h3>
+          <span class="text-xs text-zinc-500">
+            {{ envios.length || 0 }} registro{{ (envios.length || 0) === 1 ? '' : 's' }}
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-[13px] sm:text-sm">
+            <thead class="text-left text-zinc-500 border-b border-zinc-200">
+              <tr class="text-nowrap">
+                <th class="py-3.5 pr-5 font-medium">Tipo de Pedido</th>
+                <th class="py-3.5 pr-5 font-medium">Cantidad</th>
+                <th class="py-3.5 pr-5 font-medium">Cliente</th>
+                <th class="py-3.5 pr-5 font-medium">Comentario</th>
+                <th class="py-3.5 pr-5 font-medium">Fecha de Envio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of envios" class="border-b border-zinc-100 last:border-0 align-middle">
+                <td class="py-3.5 pr-5 text-zinc-800 font-medium leading-7 whitespace-nowrap">
+                  {{ p.clasificacion }}
+                </td>
+                <td class="py-3.5 pr-5 text-zinc-800 tabular-nums leading-7 whitespace-nowrap">
+                  {{ p.cantidad | number:'1.0-2' }} gr
+                </td>
+                <td class="py-3.5 pr-5 text-zinc-700 leading-7 whitespace-nowrap">
+                  {{ p.id_cliente| userName }}
+                </td>
+                <td class="py-3.5 pr-5 text-zinc-700 leading-7">
+                  {{ p.comentario || '—' }}
+                </td>
+
+                <td class="py-3.5 text-zinc-700 leading-7 whitespace-nowrap">
+                  {{ p.fecha ? (p.fecha | date:'dd/MM/yyyy') : 'N/A' }}
+                </td>
+              </tr>
+
+              <tr *ngIf="!envios?.length">
+                <td class="py-9 text-center text-zinc-500" colspan="6">
+                  Sin movimientos para este lote.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>

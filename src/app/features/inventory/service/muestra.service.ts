@@ -32,4 +32,8 @@ export class MuestraService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  complete(id: string): Observable<Muestra> {
+    return this.http.patch<Muestra>(`${this.baseUrl}/complete/${id}`, {});
+  }
 }

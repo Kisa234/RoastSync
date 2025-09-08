@@ -5,7 +5,7 @@ export interface Envio {
   cantidad: number;
   fecha: string;          
   clasificacion?: string;       
-  observaciones?: string;
+  comentario?: string;
 }
 
 export interface CreateEnvio {
@@ -14,5 +14,5 @@ export interface CreateEnvio {
   cantidad: number;
   fecha?: string;         
   clasificacion?: string;
-  observaciones?: string;
+  comentario?: string;
 }

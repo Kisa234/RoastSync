@@ -55,7 +55,7 @@ export const appRoutes: Routes = [
       { path: 'analisis', component: AnalisisPage },
       { path: 'clients', component: UsersPageComponent },
       { path: 'settings', component: SettingsPageComponent },
-      { path: 'maquila', component: MaquilaPageComponent },
+      // { path: 'maquila', component: MaquilaPageComponent },
 
 
       // ...otras rutas

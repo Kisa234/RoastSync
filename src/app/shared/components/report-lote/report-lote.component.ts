@@ -49,7 +49,8 @@ export class ReportLoteComponent implements OnInit {
     variedades: [],
     proceso: '',
     fecha_registro: new Date(),
-    eliminado: false
+    eliminado: false,
+    completado: false
   }
 
   lote: Lote = {

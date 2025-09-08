@@ -32,7 +32,6 @@ type MaquilaRow = {
     LucideAngularModule,
     AddProductComponent,
     AddProductSkuComponent,
-    ViewStickerComponent
   ],
   templateUrl: './maquila.page.component.html'
 })

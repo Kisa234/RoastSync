@@ -9,6 +9,7 @@ export interface Muestra {
   variedades: string[];
   proceso: string;
   fecha_registro: Date;
+  completado: boolean;
   eliminado: boolean;
   id_user?: string;
   id_analisis?: string;

@@ -46,8 +46,19 @@
     <section *ngIf="activeTab==='muestras'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Muestras de Café</h2>
 
+      <div class="mb-4 flex gap-x-2.5">
+        <button *ngFor="let f of filtersMuestras" (click)="filter = f.key; aplicarFiltro()"
+          [ngClass]="filter === f.key ? 'bg-[#B8672E] text-white' : 'bg-gray-700 text-white hover:bg-[#B8672E]'"
+          class="transition rounded-lg px-4 py-2">
+          {{ f.label }}
+        </button>
+      </div>
+
+
+
+
       <!-- Tabla -->
-      <div class=" m-1 rounded-lg shadow-sm  overflow-x-auto">
+      <div class="rounded-lg shadow-sm  overflow-x-auto">
         <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
           <thead class="bg-[#F9F9F9]">
             <tr>
@@ -92,6 +103,10 @@
               <td class="px-6 py-4 text-right text-sm space-x-2">
                 <button (click)="onReportMuestra(m)" class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="Eye" class="w-5 h-5" />
+                </button>
+                <button *ngIf="m.completado == false" (click)="onCompleteMuestra(m)"
+                  class="text-gray-500 hover:text-green-600" title="Marcar como completa">
+                  <lucide-icon [img]="CheckCircle" class="w-5 h-5" />
                 </button>
                 <!-- <button (click)="onEdit(m)"   class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="Edit2" class="w-5 h-5" />
@@ -209,9 +224,6 @@
       </div>
     </section>
 
-
-
-
     <!-- 3) CAFÉ TOSTADO -->
     <section *ngIf="activeTab==='tostado'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Café Tostado</h2>
@@ -259,6 +271,9 @@
                   <button type="button" class="text-gray-500 hover:text-gray-700" (click)="exportStickerTostado(t)">
                     <lucide-icon [img]="TestTube" class="w-5 h-5" />
                   </button>
+                  <button (click)="openHistoricLoteTostado(t)" class=" text-gray-500 hover:text-gray-700">
+                    <lucide-icon [img]="History" class="w-5 h-5" />
+                  </button>
                 </div>
               </td>
             </tr>
@@ -286,5 +301,8 @@
 </ficha-tueste>
 
 <historic-lote [loteId]="selectedLoteId" *ngIf="showHistoricLote" (close)="showHistoricLote=false">
-
 </historic-lote>
+
+<historic-lote-tostado [loteId]="selectedTuesteId" *ngIf="showHistoricLoteTostado"
+  (close)="showHistoricLoteTostado=false">
+</historic-lote-tostado>

@@ -118,15 +118,19 @@ export class AnalisisPage implements OnInit {
     });
   }
 
-  loadUsersMuestra() {
+    loadUsersMuestra() {
     this.userSvc.getUsers().subscribe(usuarios => {
       this.muestraSvc.getAll().subscribe(muestra => {
-        this.muestrasAll = muestra;
+        // Filtrar solo las muestras incompletas
+        this.muestrasAll = muestra.filter(m => !m.completado);
         this.muestras = this.muestrasAll;
-        this.clientes = usuarios.filter(u => muestra.some(m => m.id_user === u.id_user));
+        this.clientes = usuarios.filter(u => 
+          this.muestrasAll.some(m => m.id_user === u.id_user)
+        );
       });
     });
   }
+
 
   loadUsersCafeTostado(){
     this.userSvc.getUsers().subscribe(usuarios => {
