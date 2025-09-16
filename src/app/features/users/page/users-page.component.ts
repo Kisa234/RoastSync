@@ -52,7 +52,7 @@ export class UsersPageComponent implements OnInit {
     { label: 'Cliente', value: 'cliente' },
     { label: 'Administrador', value: 'admin' }
   ];
-  selectedRole = '';
+  selectedRole = 'cliente';
 
   showAddClient = false;
   showEditClient = false;
