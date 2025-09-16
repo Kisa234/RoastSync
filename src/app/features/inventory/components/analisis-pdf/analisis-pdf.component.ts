@@ -433,7 +433,7 @@ export class AnalisisPdfComponent implements OnInit {
     w.document.write(`
     <html>
       <head>
-        <title>Reporte PDF</title>
+        <title>${this.id}</title>
         <style>${pageCss}${extractedStyles}</style>
       </head>
       <body>${html}</body>

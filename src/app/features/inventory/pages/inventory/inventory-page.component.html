@@ -46,14 +46,24 @@
     <section *ngIf="activeTab==='muestras'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Muestras de Café</h2>
 
-      <div class="mb-4 flex gap-x-2.5">
-        <button *ngFor="let f of filtersMuestras" (click)="filter = f.key; aplicarFiltro()"
-          [ngClass]="filter === f.key ? 'bg-[#B8672E] text-white' : 'bg-gray-700 text-white hover:bg-[#B8672E]'"
-          class="transition rounded-lg px-4 py-2">
-          {{ f.label }}
-        </button>
-      </div>
+      <!-- Filtros y búsqueda -->
+      <div class="flex gap-2.5 ">
 
+        <div class="mb-4 relative w-full max-w-lg">
+          <lucide-icon [img]="Search" class="absolute left-1 top-1 w-5 h-5 text-gray-400"></lucide-icon>
+          <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+            placeholder="Buscar por cliente, productor, finca o provincia..."
+            class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+        </div>
+
+        <div class="mb-4 flex gap-x-2.5">
+          <button *ngFor="let f of filtersMuestras" (click)="filter = f.key; aplicarFiltro()"
+            [ngClass]="filter === f.key ? 'bg-[#B8672E] text-white' : 'bg-gray-700 text-white hover:bg-[#B8672E]'"
+            class="transition rounded-lg px-4 py-2">
+            {{ f.label }}
+          </button>
+        </div>
+      </div>
 
 
 

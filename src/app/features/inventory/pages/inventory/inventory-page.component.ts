@@ -191,17 +191,43 @@ export class InventoryPage {
     this.muestras$ = this.muestraService.getAll().pipe(
       map(muestras => {
         if (!muestras) return [];
+
+        // 1) Filtro por estado
+        let filtradas = muestras;
         switch (this.filter) {
           case 'completadas':
-            return muestras.filter(m => m.completado === true);
+            filtradas = filtradas.filter(m => m.completado === true);
+            break;
           case 'sin-completar':
-            return muestras.filter(m => m.completado === false);
-          default:
-            return muestras;
+            filtradas = filtradas.filter(m => m.completado === false);
+            break;
         }
+
+        // 2) Filtro por texto
+        if (this.filterText && this.filterText.trim() !== '') {
+          const term = this.filterText.toLowerCase();
+          filtradas = filtradas.filter(m => {
+            // Obtener el usuario correspondiente
+            const user = this.usuarios?.find((u: User) => u.id_user === m.id_user);
+
+            // Nombre a mostrar
+            const nombreCliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
+
+            return (
+              (m.productor?.toLowerCase().includes(term)) ||
+              (m.finca?.toLowerCase().includes(term)) ||
+              (m.distrito?.toLowerCase().includes(term)) ||
+              (nombreCliente.includes(term)) // <-- aquí se filtra por nombre
+            );
+          });
+        }
+
+        return filtradas;
       })
     );
   }
+
+
 
   getLotesCliente(lotes: Lote[]) {
     return lotes.filter(l => {
