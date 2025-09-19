@@ -1,9 +1,10 @@
-<!-- src/app/features/roasts/components/order-roasts-modal/order-roasts-modal.component.html -->
 <div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-40 p-4" (click)="onClose()">
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl overflow-auto" (click)="$event.stopPropagation()">
+  <div
+    class="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[480px] flex flex-col overflow-hidden"
+    (click)="$event.stopPropagation()">
 
     <!-- Header -->
-    <div class="flex justify-between items-center px-6 py-4 border-b border-[#E5E5E5]">
+    <div class="flex justify-between items-center px-6 py-4 border-b border-[#E5E5E5] flex-shrink-0">
       <div>
         <h2 class="text-xl font-semibold text-[#1F1F1F]">☕ Tuestes</h2>
         <p class="text-gray-600 text-sm">
@@ -16,7 +17,7 @@
     </div>
 
     <!-- Body -->
-    <div class="p-6 space-y-4">
+    <div class="p-6 space-y-4 overflow-y-auto flex-1">
       <ng-container *ngIf="!isLoading; else loading">
         <ng-container *ngIf="roasts.length; else none">
           <ul class="space-y-4">
@@ -53,7 +54,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5]">
+    <div class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5] flex-shrink-0">
       <button (click)="onClose()"
         class="px-4 py-2 border border-[#A67C52] text-[#1F1F1F] rounded hover:bg-[#F3F2F1] transition">
         Cerrar
@@ -62,9 +63,3 @@
 
   </div>
 </div>
-
-<edit-roast *ngIf="showEdit" [roastId]="selectedId" (saved)="onRoasterUpdated($event)"
-  (close)="showEdit=false"></edit-roast>
-
-<complete-roast *ngIf="showComplete" [roastId]="selectedId" (saved)="onCompleted($event)"
-  (close)="showComplete = false"></complete-roast>

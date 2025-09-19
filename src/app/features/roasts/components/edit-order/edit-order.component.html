@@ -1,7 +1,7 @@
 <!-- overlay -->
 <div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-10 p-4">
   <!-- modal card -->
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl overflow-auto" (click)="$event.stopPropagation()">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-7xl overflow-auto" (click)="$event.stopPropagation()">
 
     <!-- Header -->
     <div class="flex justify-between items-center px-6 py-4 border-b border-[#E5E5E5]">
@@ -14,132 +14,137 @@
       </button>
     </div>
 
-    <!-- Form -->
-    <form class="grid grid-cols-2 gap-x-6 gap-y-4 px-6 py-5">
+    <div class="flex w-full h-[480px]">
 
-      <!-- Cliente -->
-      <div>
-        <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
-        <select [(ngModel)]="orden.id_user" name="id_user"  disabled
-          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
-          <option value="" disabled selected>Selecciona cliente</option>
-          <option *ngFor="let u of clientes" [value]="u.id_user">{{ u.nombre }}</option>
-        </select>
-      </div>
 
-      <!-- Lote -->
-      <div>
-        <label class="block text-gray-700 text-sm mb-1">Lote *</label>
-        <select [(ngModel)]="orden.id_lote" name="id_lote"  disabled
-          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
-          <option value="" disabled selected>Selecciona lote</option>
-          <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
-        </select>
-      </div>
+      <!-- Form -->
+      <form class="grid grid-cols-2 gap-x-6 gap-y-4 px-6 py-5 flex-1">
 
-      <!-- Verde Disponible -->
-      <div>
-        <label class="block text-gray-700 text-sm mb-1">Verde disponible (Gr)</label>
-        <input [value]="pesoVerdeDisp" disabled
-          class="w-full bg-gray-50 text-gray-700 border border-[#E5E5E5] rounded-lg px-3 py-2" />
-      </div>
-
-      <!-- Tostado Disponible -->
-      <div>
-        <label class="block text-gray-700 text-sm mb-1">Tostado disponible (Gr)</label>
-        <input [value]="pesoTostadoDisp" disabled
-          class="w-full bg-gray-50 text-gray-700 border border-[#E5E5E5] rounded-lg px-3 py-2" />
-      </div>
-
-      <!-- Fecha de Tueste -->
-      <div>
-        <label class="block text-gray-700 text-sm mb-1">Fecha de Tueste</label>
-        <input type="date" [(ngModel)]="orden.fecha_tueste" name="fecha_tueste"
-          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
-      </div>
-
-      <!-- Tipo Tueste -->
-      <div>
-        <label class="block text-gray-700 text-sm mb-1">Tipo de Tueste</label>
-        <select [(ngModel)]="orden.comentario" name="tipo_tueste"
-          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
-          <option value="" disabled selected>Selecciona tipo</option>
-          <option *ngFor="let t of tiposTueste" [value]="t">{{ t }}</option>
-        </select>
-      </div>
-
-      <!-- Tostadora -->
-      <div>
-        <label class="block text-gray-700 text-sm mb-1">Tostadora</label>
-        <select [(ngModel)]="orden.tostadora" name="tostadora"
-          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
-          <option value="" disabled selected>Selecciona tostadora</option>
-          <option *ngFor="let t of Tostadoras" [value]="t">{{ t }}</option>
-        </select>
-      </div>
-
-      <!-- Cantidad para nuevo batch -->
-      <div class="col-span-2 grid grid-cols-2 gap-x-6">
+        <!-- Cliente -->
         <div>
-          <label class="block text-gray-700 text-sm mb-1">Batch Verde (Gr)</label>
-          <input type="number" [(ngModel)]="orden.cantidad" (ngModelChange)="BatchVerde()" name="batchVerde"
-            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] transition" />
+          <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
+          <select [(ngModel)]="orden.id_user" name="id_user" disabled
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="" disabled selected>Selecciona cliente</option>
+            <option *ngFor="let u of clientes" [value]="u.id_user">{{ u.nombre }}</option>
+          </select>
         </div>
+
+        <!-- Lote -->
         <div>
-          <label class="block text-gray-700 text-sm mb-1">Batch Tostado (Gr)</label>
-          <input type="number" [(ngModel)]="batchTostado" (ngModelChange)="BatchTostado()" name="batchTostado"
-            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] transition" />
+          <label class="block text-gray-700 text-sm mb-1">Lote *</label>
+          <select [(ngModel)]="orden.id_lote" name="id_lote" disabled
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="" disabled selected>Selecciona lote</option>
+            <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
+          </select>
         </div>
-      </div>
 
-      <!-- Botón Agregar batch -->
-      <div class="col-span-2">
-        <button type="button" (click)="agregarBatch()"
-          class="w-full bg-[#B8672E] text-white rounded-lg px-4 py-2 hover:bg-[#A67C52] transition">
-          Agregar Batch
-        </button>
-      </div>
-    </form>
+        <!-- Verde Disponible -->
+        <div>
+          <label class="block text-gray-700 text-sm mb-1">Verde disponible (Gr)</label>
+          <input [value]="pesoVerdeDisp" disabled
+            class="w-full bg-gray-50 text-gray-700 border border-[#E5E5E5] rounded-lg px-3 py-2" />
+        </div>
 
-    <!-- Tabla de batches -->
-    <div class="px-6 pb-6">
-      <div class="overflow-x-auto bg-gray-50 p-4 rounded-lg">
-        <table class="min-w-full table-auto text-left">
-          <thead class="border-b border-[#E5E5E5]">
-            <tr>
-              <th class="px-4 py-2 text-sm font-medium text-gray-600">#</th>
-              <th class="px-4 py-2 text-sm font-medium text-gray-600">Verde (Gr)</th>
-              <th class="px-4 py-2 text-sm font-medium text-gray-600">Tostado (Gr)</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#E5E5E5]">
-            <tr *ngFor="let b of batches">
-              <td class="px-4 py-2 text-gray-700">{{ b.id }}</td>
-              <td class="px-4 py-2">
-                <input type="number" [(ngModel)]="b.pesoVerde" (ngModelChange)="onBatchVerdeChange(b)" min="0"
-                  class="w-full border rounded px-2 py-1" />
-              </td>
-              <td class="px-4 py-2">
-                <input type="number" [(ngModel)]="b.pesoTostado" (ngModelChange)="onBatchTostadoChange(b)" min="0"
-                  class="w-full border rounded px-2 py-1" />
-              </td>
+        <!-- Tostado Disponible -->
+        <div>
+          <label class="block text-gray-700 text-sm mb-1">Tostado disponible (Gr)</label>
+          <input [value]="pesoTostadoDisp" disabled
+            class="w-full bg-gray-50 text-gray-700 border border-[#E5E5E5] rounded-lg px-3 py-2" />
+        </div>
 
-              <td class="px-4 py-2">
-                <button (click)="quitarBatch(b)" class="text-red-600 hover:text-red-800">
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-            <tr class="font-semibold">
-              <td class="px-4 py-2">TOTAL</td>
-              <td class="px-4 py-2">{{ totalVerde.toFixed(2) }}</td>
-              <td class="px-4 py-2">{{ totalTostado.toFixed(2) }}</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Fecha de Tueste -->
+        <div>
+          <label class="block text-gray-700 text-sm mb-1">Fecha de Tueste</label>
+          <input type="date" [(ngModel)]="orden.fecha_tueste" name="fecha_tueste"
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+        </div>
+
+        <!-- Tipo Tueste -->
+        <div>
+          <label class="block text-gray-700 text-sm mb-1">Tipo de Tueste</label>
+          <select [(ngModel)]="orden.comentario" name="tipo_tueste"
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="" disabled selected>Selecciona tipo</option>
+            <option *ngFor="let t of tiposTueste" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <!-- Tostadora -->
+        <div>
+          <label class="block text-gray-700 text-sm mb-1">Tostadora</label>
+          <select [(ngModel)]="orden.tostadora" name="tostadora"
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="" disabled selected>Selecciona tostadora</option>
+            <option *ngFor="let t of Tostadoras" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <!-- Cantidad para nuevo batch -->
+        <div class="col-span-2 grid grid-cols-2 gap-x-6">
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Batch Verde (Gr)</label>
+            <input type="number" [(ngModel)]="orden.cantidad" (ngModelChange)="BatchVerde()" name="batchVerde"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] transition" />
+          </div>
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Batch Tostado (Gr)</label>
+            <input type="number" [(ngModel)]="batchTostado" (ngModelChange)="BatchTostado()" name="batchTostado"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] transition" />
+          </div>
+        </div>
+
+        <!-- Botón Agregar batch -->
+        <div class="col-span-2">
+          <button type="button" (click)="agregarBatch()"
+            class="w-full bg-[#B8672E] text-white rounded-lg px-4 py-2 hover:bg-[#A67C52] transition">
+            Agregar Batch
+          </button>
+        </div>
+      </form>
+
+      <!-- Tabla de batches -->
+      <div class="px-6 py-6 flex-1 overflow-y-auto">
+        <div class="bg-gray-50 p-4 rounded-lg w-full h-full overflow-y-auto">
+          <table class="w-full table-auto text-left">
+            <thead class="border-b border-[#E5E5E5]">
+              <tr>
+                <th class="px-4 py-2 text-sm font-medium text-gray-600">#</th>
+                <th class="px-4 py-2 text-sm font-medium text-gray-600">Verde (Gr)</th>
+                <th class="px-4 py-2 text-sm font-medium text-gray-600">Tostado (Gr)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#E5E5E5]">
+              <tr *ngFor="let b of batches">
+                <td class="px-4 py-2 text-gray-700">{{ b.id }}</td>
+                <td class="px-4 py-2">
+                  <input type="number" [(ngModel)]="b.pesoVerde" (ngModelChange)="onBatchVerdeChange(b)" min="0"
+                    class="w-full border rounded px-2 py-1" />
+                </td>
+                <td class="px-4 py-2">
+                  <input type="number" [(ngModel)]="b.pesoTostado" (ngModelChange)="onBatchTostadoChange(b)" min="0"
+                    class="w-full border rounded px-2 py-1" />
+                </td>
+
+                <td class="px-4 py-2">
+                  <button (click)="quitarBatch(b)" class="text-red-600 hover:text-red-800">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+              <tr class="font-semibold">
+                <td class="px-4 py-2">TOTAL</td>
+                <td class="px-4 py-2">{{ totalVerde.toFixed(2) }}</td>
+                <td class="px-4 py-2">{{ totalTostado.toFixed(2) }}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
+
 
     <!-- Footer -->
     <div class="flex justify-end items-center space-x-4 px-6 py-4 border-t border-[#E5E5E5]">
