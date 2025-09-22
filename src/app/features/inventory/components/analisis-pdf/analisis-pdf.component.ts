@@ -168,7 +168,7 @@ export class AnalisisPdfComponent implements OnInit {
   };
 
   total: number = 0;
-  totalPrimarios : number = 0;
+  totalPrimarios: number = 0;
   totalSecundarios: number = 0;
 
 
@@ -433,7 +433,7 @@ export class AnalisisPdfComponent implements OnInit {
     w.document.write(`
     <html>
       <head>
-        <title>${this.id}</title>
+        <title>${(this.user.nombre_comercial ? this.user.nombre_comercial : this.user.nombre) + ' ' + this.id}</title>
         <style>${pageCss}${extractedStyles}</style>
       </head>
       <body>${html}</body>

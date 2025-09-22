@@ -50,10 +50,7 @@ export class EditClientComponent implements OnInit{
   }
 
   onSave() {
-    this.svc.updateUser(this.userId!,{
-      email: this.model.email,
-      numero_telefono: this.model.numero_telefono,
-    }).subscribe(u => {
+    this.svc.updateUser(this.userId!, this.model).subscribe(u => {
       this.update.emit(u);
       this.close.emit();
     });

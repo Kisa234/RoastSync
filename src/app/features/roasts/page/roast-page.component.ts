@@ -17,6 +17,10 @@ import { EditOrderComponent } from '../components/edit-order/edit-order.componen
 import { UiService } from '../../../shared/services/ui.service';
 import { LoteTostado } from '../../../shared/models/lote-tostado';
 import { FichaTuesteComponent } from "../../../shared/components/ficha-tueste/ficha-tueste.component";
+import { RoastsService } from '../service/roasts.service';
+import { Tueste } from '../../../shared/models/tueste';
+import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
+import { MinSecPipe } from "../../../shared/pipes/time.pipe";
 
 interface ExtendedPedido extends Pedido {
   userName?: string;
@@ -34,7 +38,9 @@ interface ExtendedPedido extends Pedido {
     AddRoasterComponent,
     OrderRoastsComponent,
     EditOrderComponent,
-    FichaTuesteComponent
+    FichaTuesteComponent,
+    UserNamePipe,
+    MinSecPipe
 ],
   templateUrl: './roast-page.component.html',
 })
@@ -49,6 +55,7 @@ export class RoastsPage {
   pendingOrders: ExtendedPedido[] = [];
   allHistoryRoasts: ExtendedPedido[] = [];
   filteredHistoryRoasts: ExtendedPedido[] = [];
+  allRoasts: Tueste[] = [];
 
   startDate = '';
   endDate = '';
@@ -58,6 +65,7 @@ export class RoastsPage {
   roastLevels = ['Claro', 'Medio', 'Oscuro'];
   showRoastsModal = false;
   showEditRoastModal = false;
+  showAllRoasts = false;
   selectedOrder?: Pedido;
   selectedTuesteId = '';
   showFichaTueste = false;
@@ -65,6 +73,7 @@ export class RoastsPage {
 
   constructor(
     private pedidoSvc: PedidoService,
+    private roastsSvc: RoastsService,
     private userSvc: UserService,
     private uiSvc: UiService,
   ) { }
@@ -107,6 +116,21 @@ export class RoastsPage {
       );
       // Aplica filtro la primera vez
       this.applyFilter();
+    });
+  }
+
+  toggleAllRoasts() {
+    this.showAllRoasts = !this.showAllRoasts;
+    if (this.showAllRoasts) {
+      this.loadAllRoasts();
+    }
+  }
+
+
+  loadAllRoasts() {
+    this.roastsSvc.getAllTuestes().subscribe(list => {
+      this.allRoasts = list;
+      console.log(list);
     });
   }
 
@@ -174,8 +198,8 @@ export class RoastsPage {
   }
 
   onFichaTueste(t: string) {
-      this.selectedTuesteId = t;
-      this.showFichaTueste = true;
+    this.selectedTuesteId = t;
+    this.showFichaTueste = true;
   }
 
 }

@@ -31,7 +31,7 @@ export class RoastsService {
   }
 
   getAllTuestes(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrlP}`);
+    return this.http.get<any[]>(`${this.baseUrl}`);
   }
 
   getTuestesByPedido(id: string): Observable<Tueste[]> {
