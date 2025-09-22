@@ -216,6 +216,7 @@ export class InventoryPage {
             return (
               (m.productor?.toLowerCase().includes(term)) ||
               (m.finca?.toLowerCase().includes(term)) ||
+              (m.nombre_muestra?.toLowerCase().includes(term)) ||
               (m.distrito?.toLowerCase().includes(term)) ||
               (nombreCliente.includes(term)) // <-- aquí se filtra por nombre
             );

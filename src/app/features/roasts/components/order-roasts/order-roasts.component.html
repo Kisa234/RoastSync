@@ -1,6 +1,5 @@
 <div class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-40 p-4" (click)="onClose()">
-  <div
-    class="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[480px] flex flex-col overflow-hidden"
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[480px] flex flex-col overflow-hidden"
     (click)="$event.stopPropagation()">
 
     <!-- Header -->
@@ -63,3 +62,9 @@
 
   </div>
 </div>
+
+<!-- Modals -->
+<edit-roast *ngIf="showEdit" [roastId]="selectedId" (saved)="onRoasterUpdated($event)"
+  (close)="showEdit=false"></edit-roast> 
+<complete-roast *ngIf="showComplete" [roastId]="selectedId"
+  (saved)="onCompleted($event)" (close)="showComplete = false"></complete-roast>
