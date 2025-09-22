@@ -26,7 +26,7 @@ export class LoteService {
   }
 
   create(data: Partial<Lote>): Observable<Lote> {
-    return this.http.post<Lote>(`${this.baseUrl}/`, data);
+    return this.http.post<Lote>(`${this.baseUrl}`, data);
   }
 
   createRapido(data: Partial<Lote>): Observable<Lote> {
