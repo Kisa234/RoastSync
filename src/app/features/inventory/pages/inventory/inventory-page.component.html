@@ -51,13 +51,13 @@
 
         <div class="mb-4 relative w-full max-w-lg">
           <lucide-icon [img]="Search" class="absolute left-1 top-1 w-5 h-5 text-gray-400"></lucide-icon>
-          <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+          <input type="text" [(ngModel)]="filterTextMuestras" (ngModelChange)="onSearchChange()"
             placeholder="Buscar por cliente, productor, finca o provincia..."
             class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
         </div>
 
         <div class="mb-4 flex gap-x-2.5">
-          <button *ngFor="let f of filtersMuestras" (click)="filter = f.key; aplicarFiltro()"
+          <button *ngFor="let f of filtersMuestras" (click)="filter = f.key; aplicarFiltroMuestras()"
             [ngClass]="filter === f.key ? 'bg-[#B8672E] text-white' : 'bg-gray-700 text-white hover:bg-[#B8672E]'"
             class="transition rounded-lg px-4 py-2">
             {{ f.label }}
@@ -135,6 +135,16 @@
     <section *ngIf="activeTab==='verde'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Lotes Café Verde</h2>
 
+      <!-- Filtros y búsqueda -->
+      <div class="flex gap-2.5 ">
+        <div class="mb-4 relative w-full max-w-lg">
+          <lucide-icon [img]="Search" class="absolute left-1 top-1 w-5 h-5 text-gray-400"></lucide-icon>
+          <input type="text" [(ngModel)]="filterTextVerde" (ngModelChange)="onSearchChange()"
+            placeholder="Buscar por cliente, productor, finca o provincia..."
+            class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+        </div>
+      </div>
+
       <div class="m-1 rounded-lg shadow-sm overflow-x-auto">
         <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
           <thead class="bg-[#F9F9F9]">
@@ -142,7 +152,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">ID</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Productor</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Provincia</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Distrito</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso (Gr)</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Variedades</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Proceso</th>
@@ -151,13 +161,13 @@
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-[#E5E5E5]" *ngIf="(lotes$ | async) as lotes">
+          <tbody class="bg-white divide-y divide-[#E5E5E5]" *ngIf="(lotesFiltrados) as lotes">
 
             <!-- ADMIN -->
             <tr class="bg-[#F3F3F3]">
               <td colspan="10" class="text-left text-xs uppercase text-gray-500 py-2 px-6">Lotes de Fortunato</td>
             </tr>
-            <ng-container *ngFor="let l of getLotesAdmin(lotes)">
+            <ng-container *ngFor="let l of getLotesAdmin(lotesFiltrados)">
               <tr>
                 <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | userName }}</td>
@@ -195,7 +205,7 @@
             <tr class="bg-[#F3F3F3]">
               <td colspan="10" class="text-left text-xs uppercase text-gray-500 py-2 px-6">Lotes de Cliente</td>
             </tr>
-            <ng-container *ngFor="let l of getLotesCliente(lotes)">
+            <ng-container *ngFor="let l of getLotesCliente(lotesFiltrados)">
               <tr>
                 <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | userName }}</td>
@@ -238,6 +248,17 @@
     <section *ngIf="activeTab==='tostado'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Café Tostado</h2>
 
+
+      <!-- Filtros y búsqueda -->
+      <div class="flex gap-2.5 ">
+        <div class="mb-4 relative w-full max-w-lg">
+          <lucide-icon [img]="Search" class="absolute left-1 top-1 w-5 h-5 text-gray-400"></lucide-icon>
+          <input type="text" [(ngModel)]="filterTextTostado" (ngModelChange)="onSearchChange()"
+            placeholder="Buscar por cliente, productor, finca o provincia..."
+            class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+        </div>
+      </div>
+
       <!-- Rango de fechas -->
       <div class="mb-4 flex space-x-2 max-w-md">
         <input type="date" [(ngModel)]="startDate" (ngModelChange)="onDateChange()"
@@ -261,7 +282,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-[#E5E5E5]">
-            <tr *ngFor="let t of filteredTostados">
+            <tr *ngFor="let t of tostadosFiltrados">
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ t.id_lote_tostado }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.id_lote }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ t.id_user | userName }}</td>

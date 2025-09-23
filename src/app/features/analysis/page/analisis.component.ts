@@ -153,7 +153,7 @@ export class AnalisisPage implements OnInit {
       }
     });
     this.muestraSvc.getAll().subscribe((list) => {
-      this.muestras = list.filter(muestra => muestra.id_user === id);
+      this.muestras = list.filter(muestra => muestra.id_user === id && !muestra.completado);
       if (this.muestras.length > 0) {
         this.selectedMuest = this.muestras[0].id_muestra;
       } else {

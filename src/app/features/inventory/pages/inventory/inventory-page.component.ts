@@ -86,12 +86,13 @@ export class InventoryPage {
   // streams de datos
   muestras$!: Observable<Muestra[]>;
 
-  lotes$!: Observable<Lote[]>;
+  lotes: Lote[] = [];
+  lotesFiltrados: Lote[] = [];
+
+  tostados: LoteTostado[] = [];
+  tostadosFiltrados: LoteTostado[] = [];
 
 
-
-  tostados$!: Observable<LoteTostado[]>;
-  filteredTostados: LoteTostado[] = [];
   startDate: string = '';
   endDate: string = '';
 
@@ -104,7 +105,11 @@ export class InventoryPage {
   showHistoricLote = false;
   showHistoricLoteTostado = false;
 
-  filterText = '';
+  // en InventoryPage
+  filterTextMuestras = '';
+  filterTextVerde = '';
+  filterTextTostado = '';
+
   selectedLoteId = '';
   selectedMuestraId = '';
   selectedTuesteId = '';
@@ -114,7 +119,7 @@ export class InventoryPage {
   constructor(
     private muestraService: MuestraService,
     private loteService: LoteService,
-    private tostService: LoteTostadoService,
+    private loteTostadoService: LoteTostadoService,
     private userService: UserService,
     private uiService: UiService,
     private router: Router
@@ -123,9 +128,9 @@ export class InventoryPage {
   ngOnInit() {
     this.loadMuestras();
     this.loadUsuarios();
-    this.tostados$ = this.tostService.getAll();
-    this.tostados$.subscribe(list => this.filteredTostados = list);
+    this.loadLotes();
   }
+
 
   openAdd() {
     if (this.activeTab === 'muestras') this.showAddMuestra = true;
@@ -187,47 +192,92 @@ export class InventoryPage {
     this.showHistoricLoteTostado = true;
   }
 
-  aplicarFiltro() {
+  // BUSQUEDA DE MUESTRAS Y LOTES 
+  aplicarFiltroMuestras() {
     this.muestras$ = this.muestraService.getAll().pipe(
       map(muestras => {
         if (!muestras) return [];
-
-        // 1) Filtro por estado
         let filtradas = muestras;
+
+        // filtro por estado (igual que ya lo tienes)
         switch (this.filter) {
-          case 'completadas':
-            filtradas = filtradas.filter(m => m.completado === true);
-            break;
-          case 'sin-completar':
-            filtradas = filtradas.filter(m => m.completado === false);
-            break;
+          case 'completadas': filtradas = filtradas.filter(m => m.completado); break;
+          case 'sin-completar': filtradas = filtradas.filter(m => !m.completado); break;
         }
 
-        // 2) Filtro por texto
-        if (this.filterText && this.filterText.trim() !== '') {
-          const term = this.filterText.toLowerCase();
+        // filtro por texto usando filterTextMuestras
+        if (this.filterTextMuestras.trim() !== '') {
+          const term = this.filterTextMuestras.toLowerCase();
           filtradas = filtradas.filter(m => {
-            // Obtener el usuario correspondiente
             const user = this.usuarios?.find((u: User) => u.id_user === m.id_user);
-
-            // Nombre a mostrar
             const nombreCliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
 
             return (
-              (m.productor?.toLowerCase().includes(term)) ||
-              (m.finca?.toLowerCase().includes(term)) ||
-              (m.nombre_muestra?.toLowerCase().includes(term)) ||
-              (m.distrito?.toLowerCase().includes(term)) ||
-              (nombreCliente.includes(term)) // <-- aquí se filtra por nombre
+              m.productor?.toLowerCase().includes(term) ||
+              m.finca?.toLowerCase().includes(term) ||
+              m.nombre_muestra?.toLowerCase().includes(term) ||
+              m.distrito?.toLowerCase().includes(term) ||
+              nombreCliente.includes(term)
             );
           });
         }
-
         return filtradas;
       })
     );
   }
 
+  aplicarFiltroLotesVerde() {
+    if (!this.lotes) return;
+
+    if (this.filterTextVerde.trim() === '') {
+      this.lotesFiltrados = this.lotes;
+      return;
+    }
+
+    const term = this.filterTextVerde.toLowerCase();
+    this.lotesFiltrados = this.lotes.filter(l => {
+      const user = this.usuarios?.find((u: User) => u.id_user === l.id_user);
+      const nombreCliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
+
+      return (
+        l.id_lote.toLowerCase().includes(term) ||
+        l.distrito?.toLowerCase().includes(term) ||
+        l.productor?.toLowerCase().includes(term) ||
+        l.variedades?.join(' ').toLowerCase().includes(term) ||
+        l.clasificacion?.toLowerCase().includes(term) ||
+        l.proceso?.toLowerCase().includes(term) ||
+        nombreCliente.includes(term)
+      );
+    });
+  }
+
+  aplicarFiltroLotesTostados() {
+    if (!this.tostados) return;
+
+    if (this.filterTextTostado.trim() === '') {
+      this.tostadosFiltrados = this.tostados;
+      return;
+    }
+
+    const term = this.filterTextTostado.toLowerCase();
+    this.tostadosFiltrados = this.tostados.filter(t => {
+      const user = this.usuarios?.find((u: User) => u.id_user === t.id_user);
+      const nombreCliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
+      const loteVerde = this.lotes.find(l => l.id_lote === t.id_lote);
+
+      return (
+        t.id_lote_tostado?.toLowerCase().includes(term) ||
+        t.perfil_tostado?.toLowerCase().includes(term) ||
+        nombreCliente.includes(term) ||
+        loteVerde?.productor?.toLowerCase().includes(term) ||
+        loteVerde?.distrito?.toLowerCase().includes(term) ||
+        loteVerde?.variedades.join(' ').toLowerCase().includes(term) ||
+        loteVerde?.clasificacion?.toLowerCase().includes(term) ||
+        loteVerde?.proceso.toLowerCase().includes(term) ||
+        loteVerde?.id_lote.toLowerCase().includes(term) 
+      );
+    });
+  }
 
 
   getLotesCliente(lotes: Lote[]) {
@@ -243,6 +293,11 @@ export class InventoryPage {
       return user?.rol === 'admin';
     });
   }
+
+  loadMuestras() {
+    this.aplicarFiltroMuestras();
+  }
+
 
   loadUsuarios() {
     this.userService.getUsers().subscribe(users => {
@@ -277,32 +332,40 @@ export class InventoryPage {
   }
 
   onDateChange() {
-    this.tostados$.pipe(
-      map(list =>
-        list.filter(t => {
-          const fecha = new Date(t.fecha_tostado);
-          const desde = this.startDate ? new Date(this.startDate) : null;
-          const hasta = this.endDate ? new Date(this.endDate) : null;
-          return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
-        })
-      )
-    ).subscribe(filtered => this.filteredTostados = filtered);
+    if (!this.tostados) return;
+
+    const desde = this.startDate ? new Date(this.startDate) : null;
+    const hasta = this.endDate ? new Date(this.endDate) : null;
+
+    this.tostadosFiltrados = this.tostados.filter(t => {
+      const fecha = new Date(t.fecha_tostado);
+      return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
+    });
   }
 
-  loadMuestras() {
-    this.aplicarFiltro();
-  }
+
 
   loadLotes() {
-    this.lotes$ = this.loteService.getAll();
+    this.loteService.getAll().subscribe(lotes => {
+      this.lotes = lotes;
+      this.lotesFiltrados = lotes;
+      this.aplicarFiltroLotesVerde();
+    });
   }
 
   loadTostados() {
-    this.tostados$ = this.tostService.getAll();
+    this.loteTostadoService.getAll().subscribe(tostados => {
+      this.tostados = tostados;
+      this.tostadosFiltrados = tostados;
+      this.aplicarFiltroLotesTostados();
+    });
   }
+
 
   onSearchChange() {
     this.loadMuestras();
+    this.loadLotes();
+    this.loadTostados();
   }
 
   onReportTueste(t: LoteTostado) {
