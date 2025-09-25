@@ -26,7 +26,7 @@ import { LucideAngularModule, ChevronDown } from 'lucide-angular';
 export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnChanges {
   @Input() items: any[] = [];
   @Input() displayField = '';
-  @Input() secondDisplayField?:string;
+  @Input() secondDisplayField?: string;
   @Input() valueField = '';
   @Input() placeholder = 'Select...';
   @Input() multiple = false;
@@ -41,10 +41,10 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
   open = false;
   selected: any = null;
 
-  private onChange = (v: any) => {};
-  private onTouch = () => {};
+  private onChange = (v: any) => { };
+  private onTouch = () => { };
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef) { }
 
   ngOnInit() {
     this.filtered = [...this.items];
@@ -89,17 +89,25 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
     return path.split('.').reduce((acc, k) => (acc?.[k]), obj);
   }
 
+  isValid(value: any) {
+    return value !== null && value !== undefined && value !== '';
+  }
+
   /** Etiqueta a mostrar: displayFn > secondDisplayField > displayField */
   getLabel(item: any): string {
     if (!item) return '';
+
     if (this.displayFn) {
       try { return String(this.displayFn(item) ?? ''); } catch { return ''; }
     }
-    const s2 = this.secondDisplayField?.trim();
-    const s1 = this.displayField?.trim();
-    const val = (s2 && this.getValueByPath(item, s2)) ?? this.getValueByPath(item, s1);
-    return String(val ?? '');
+
+    const valSecond = this.secondDisplayField ? this.getValueByPath(item, this.secondDisplayField) : null;
+    const valFirst = this.displayField ? this.getValueByPath(item, this.displayField) : null;
+
+    return String(this.isValid(valSecond) ? valSecond : this.isValid(valFirst) ? valFirst : '');
   }
+
+
 
   filter() {
     const term = this.search.toLowerCase();
@@ -108,8 +116,8 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
         this.getValueByPath(i, this.displayField),
         this.getValueByPath(i, this.secondDisplayField)
       ]
-      .filter(v => v !== undefined && v !== null)
-      .map(v => String(v).toLowerCase());
+        .filter(v => v !== undefined && v !== null)
+        .map(v => String(v).toLowerCase());
       return parts.some(p => p.includes(term));
     });
   }
@@ -139,7 +147,7 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
   isSelected(item: any): boolean {
     return this.multiple && Array.isArray(this.selected)
       ? (this.selected as any[]).some(i =>
-          this.getValueByPath(i, this.valueField) === this.getValueByPath(item, this.valueField))
+        this.getValueByPath(i, this.valueField) === this.getValueByPath(item, this.valueField))
       : false;
   }
 

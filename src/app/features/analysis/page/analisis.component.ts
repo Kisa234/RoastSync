@@ -160,14 +160,14 @@ export class AnalisisPage implements OnInit {
         this.selectedMuest = '';
       }
     });
-    // this.tostadoSvc.getAll().subscribe((list) => {
-    //   this.tostados = list.filter(tostado => tostado.id === id);
-    //   if (this.tostados.length > 0) {
-    //     this.selectedRoast = this.tostados[0].id_lote_tostado;
-    //   } else {
-    //     this.selectedRoast = '';
-    //   }
-    // });
+    this.tostadoSvc.getAll().subscribe((list) => {
+      this.tostados = list.filter(tostado => tostado.id_user === id);
+      if (this.tostados.length > 0) {
+        this.selectedRoast = this.tostados[0].id_lote_tostado;
+      } else {
+        this.selectedRoast = '';
+      }
+    });
   }
 
   openModal() {
