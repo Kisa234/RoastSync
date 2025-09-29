@@ -12,6 +12,7 @@ import { PedidoService } from '../service/orders.service';
 import { AddOrderComponent } from '../components/add-order/add-order.component';
 import { EditOrderComponent } from '../components/edit-order/edit-order.component';
 import { ViewOrderComponent } from '../components/view-order/view-order.component';
+import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
 
 
 
@@ -26,8 +27,9 @@ import { ViewOrderComponent } from '../components/view-order/view-order.componen
     LucideAngularModule,
     AddOrderComponent,
     EditOrderComponent,
-    ViewOrderComponent
-  ],
+    ViewOrderComponent,
+    UserNamePipe
+],
   templateUrl: './orders-page.component.html',
   styles: [``]
 })

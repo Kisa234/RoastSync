@@ -31,6 +31,7 @@
         <thead class="bg-[#F9F9F9]">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo Pedido</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad (Gr)</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
@@ -41,6 +42,7 @@
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
           <tr *ngFor="let p of pedidos" class="hover:bg-[#F9F9F9]">
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.tipo_pedido }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_user | userName }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.cantidad.toLocaleString('en-US') }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_lote }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.estado_pedido }}</td>
