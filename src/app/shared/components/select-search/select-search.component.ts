@@ -24,27 +24,31 @@ import { LucideAngularModule, ChevronDown } from 'lucide-angular';
   }]
 })
 export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnChanges {
+  @HostListener('document:click', ['$event.target'])
+
+
   @Input() items: any[] = [];
   @Input() displayField = '';
   @Input() secondDisplayField?: string;
   @Input() valueField = '';
   @Input() placeholder = 'Select...';
   @Input() multiple = false;
-
-  /** OPCIONAL: lógica de display (ej: (c) => c.nombre_comercial || c.nombre ) */
+  @Input() multipleAsString = false;
   @Input() displayFn?: (item: any) => string;
-
-  readonly ChevronDown = ChevronDown;
 
   search = '';
   filtered: any[] = [];
   open = false;
   selected: any = null;
 
+
+  private pendingValue: any = null;
   private onChange = (v: any) => { };
   private onTouch = () => { };
 
   constructor(private elementRef: ElementRef) { }
+
+  readonly ChevronDown = ChevronDown;
 
   ngOnInit() {
     this.filtered = [...this.items];
@@ -55,11 +59,16 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
     if (changes['items']) {
       this.filtered = [...(this.items ?? [])];
 
-      if (this.multiple) {
+      if (this.pendingValue !== null && this.items.length > 0) {
+        this.writeValue(this.pendingValue);
+        this.pendingValue = null;
+      } else if (this.multiple) {
         const values = Array.isArray(this.selected)
           ? this.selected.map(s => this.getValueByPath(s, this.valueField) ?? s)
           : [];
-        this.selected = this.items.filter(i => values.includes(this.getValueByPath(i, this.valueField)));
+        this.selected = this.items.filter(i =>
+          values.includes(this.getValueByPath(i, this.valueField))
+        );
       } else {
         if (this.selected && typeof this.selected === 'object') {
           const currentVal = this.getValueByPath(this.selected, this.valueField);
@@ -70,13 +79,50 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
     }
   }
 
+
   writeValue(obj: any): void {
-    if (this.multiple && Array.isArray(obj)) {
-      this.selected = this.items.filter(i => obj.includes(this.getValueByPath(i, this.valueField)));
-    } else if (!this.multiple) {
-      this.selected = this.items.find(i => this.getValueByPath(i, this.valueField) === obj) || null;
+    if (this.multiple) {
+      if (this.multipleAsString && typeof obj === 'string') {
+        const values = obj.split(',').map(v => v.trim()).filter(v => v !== '');
+        if (!this.items || this.items.length === 0) {
+          // <-- guardar pendiente hasta que lleguen los items
+          this.pendingValue = obj;
+          this.selected = [];
+        } else {
+          this.selected = this.items.filter(i =>
+            values.includes(this.getValueByPath(i, this.valueField))
+          );
+        }
+      } else if (Array.isArray(obj)) {
+        if (!this.items || this.items.length === 0) {
+          this.pendingValue = obj;
+          this.selected = [];
+        } else {
+          this.selected = this.items.filter(i =>
+            obj.includes(this.getValueByPath(i, this.valueField))
+          );
+        }
+      } else {
+        this.selected = [];
+      }
+    } else {
+      // flujo normal single
+      const found = this.items.find(i => this.getValueByPath(i, this.valueField) === obj);
+      if (found) {
+        this.selected = found;
+        this.pendingValue = null;
+      } else if (this.items.length === 0 && obj) {
+        this.pendingValue = obj;
+        this.selected = null;
+      } else {
+        this.selected = null;
+        this.pendingValue = null;
+      }
     }
   }
+
+
+
 
   registerOnChange(fn: any): void { this.onChange = fn; }
   registerOnTouched(fn: any): void { this.onTouch = fn; }
@@ -107,8 +153,6 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
     return String(this.isValid(valSecond) ? valSecond : this.isValid(valFirst) ? valFirst : '');
   }
 
-
-
   filter() {
     const term = this.search.toLowerCase();
     this.filtered = (this.items ?? []).filter(i => {
@@ -132,7 +176,13 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
         ? arr.filter(i => this.getValueByPath(i, this.valueField) !== itemVal)
         : [...arr, item];
 
-      this.onChange((this.selected as any[]).map(i => this.getValueByPath(i, this.valueField)));
+      if (this.multipleAsString) {
+        this.onChange((this.selected as any[])
+          .map(i => this.getValueByPath(i, this.valueField))
+          .join(', '));
+      } else {
+        this.onChange((this.selected as any[]).map(i => this.getValueByPath(i, this.valueField)));
+      }
     } else {
       this.selected = item;
       this.open = false;
@@ -144,6 +194,7 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
     this.onTouch();
   }
 
+
   isSelected(item: any): boolean {
     return this.multiple && Array.isArray(this.selected)
       ? (this.selected as any[]).some(i =>
@@ -153,14 +204,19 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
 
   get displayValue(): string {
     if (this.multiple && Array.isArray(this.selected)) {
-      return this.selected.length
-        ? (this.selected as any[]).map(i => this.getLabel(i)).join(', ')
+      const unique = this.selected.filter(
+        (item, index, self) =>
+          index === self.findIndex(i =>
+            this.getValueByPath(i, this.valueField) === this.getValueByPath(item, this.valueField)
+          )
+      );
+      return unique.length
+        ? unique.map(i => this.getLabel(i)).join(', ')
         : this.placeholder;
     }
     return this.selected ? this.getLabel(this.selected) : this.placeholder;
   }
 
-  @HostListener('document:click', ['$event.target'])
   onClickOutside(target: HTMLElement) {
     if (this.open && !this.elementRef.nativeElement.contains(target)) {
       this.open = false;

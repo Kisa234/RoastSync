@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AsyncPipe, CommonModule, JsonPipe, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Plus, History, CheckCircle } from 'lucide-angular';
+import { LucideAngularModule, Plus, History, CheckCircle, Pencil } from 'lucide-angular';
 import { Search, Eye, Edit2, Trash2, Clipboard, TestTube } from 'lucide-angular';
 import { map, Observable, tap } from 'rxjs';
 import { AddLoteComponent } from '../../components/add-lote/add-lote.component';
@@ -25,6 +25,7 @@ import { HistoricLoteComponent } from '../../components/historic-lote/historic-l
 import { firstValueFrom } from 'rxjs';
 import { formatDate } from '@angular/common';
 import { HistoricLoteTostadoComponent } from "../../components/historic-lote-tostado/historic-lote-tostado.component";
+import { EditLoteComponent } from '../../components/edit-lote/edit-lote.component';
 
 
 type InventoryTab = 'muestras' | 'verde' | 'tostado';
@@ -42,6 +43,7 @@ type FilterKey = 'todas' | 'sin-completar' | 'completadas';
     AddLoteComponent,
     AddMuestraComponent,
     ReportLoteComponent,
+    EditLoteComponent,
     FichaTuesteComponent,
     BlendLoteComponent,
     HistoricLoteComponent,
@@ -65,6 +67,7 @@ export class InventoryPage {
   readonly History = History;
   readonly TestTube = TestTube;
   readonly CheckCircle = CheckCircle;
+  readonly Pen = Pencil
 
 
   // pestañas
@@ -104,6 +107,7 @@ export class InventoryPage {
   showBlendTueste = false;
   showHistoricLote = false;
   showHistoricLoteTostado = false;
+  showEditLote = false;
 
   // en InventoryPage
   filterTextMuestras = '';
@@ -111,6 +115,7 @@ export class InventoryPage {
   filterTextTostado = '';
 
   selectedLoteId = '';
+  selectedLote!: Lote;
   selectedMuestraId = '';
   selectedTuesteId = '';
 
@@ -131,14 +136,15 @@ export class InventoryPage {
     this.loadLotes();
   }
 
-
   openAdd() {
     if (this.activeTab === 'muestras') this.showAddMuestra = true;
     else if (this.activeTab === 'verde') this.showAddLote = true;
   }
+
   openBlendLote() {
     this.showBlendLote = true;
   }
+
   openBlendTueste() {
     this.showBlendTueste = true;
   }
@@ -147,10 +153,17 @@ export class InventoryPage {
     this.showAddMuestra = false;
     this.loadMuestras();
   }
+
   onLoteCreated() {
     this.showAddLote = false;
     this.loadLotes();
   }
+
+  onLoteUpdated() {
+    this.showEditLote = false;
+    this.loadLotes();
+  }
+
   onCreateBlend() {
     this.showBlendLote = false;
     this.loadLotes();
@@ -190,6 +203,11 @@ export class InventoryPage {
   openHistoricLoteTostado(t: LoteTostado) {
     this.selectedTuesteId = t.id_lote_tostado;
     this.showHistoricLoteTostado = true;
+  }
+
+  openEditLote(l: Lote) {
+    this.showEditLote = true;
+    this.selectedLoteId = l.id_lote;
   }
 
   // BUSQUEDA DE MUESTRAS Y LOTES 
@@ -279,7 +297,6 @@ export class InventoryPage {
     });
   }
 
-
   getLotesCliente(lotes: Lote[]) {
     return lotes.filter(l => {
       const user = this.usuarios.find((u: User) => u.id_user === l.id_user);
@@ -297,7 +314,6 @@ export class InventoryPage {
   loadMuestras() {
     this.aplicarFiltroMuestras();
   }
-
 
   loadUsuarios() {
     this.userService.getUsers().subscribe(users => {
@@ -323,7 +339,6 @@ export class InventoryPage {
     this.showFichaTueste = true;
   }
 
-
   onTabSelect(key: string) {
     this.activeTab = key as InventoryTab;
     if (key === 'muestras') this.loadMuestras();
@@ -343,8 +358,6 @@ export class InventoryPage {
     });
   }
 
-
-
   loadLotes() {
     this.loteService.getAll().subscribe(lotes => {
       this.lotes = lotes;
@@ -361,7 +374,6 @@ export class InventoryPage {
     });
   }
 
-
   onSearchChange() {
     this.loadMuestras();
     this.loadLotes();
@@ -371,7 +383,6 @@ export class InventoryPage {
   onReportTueste(t: LoteTostado) {
     this.router.navigate(['/report-lote-tostado', t.id_lote_tostado]);
   }
-
 
   async exportStickerTostado(t: any) {
     const lote = t?.id_lote ?? '';

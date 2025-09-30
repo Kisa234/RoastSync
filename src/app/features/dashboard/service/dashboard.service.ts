@@ -10,14 +10,14 @@ import { Observable } from 'rxjs';
 export class DashboardService {
   private readonly baseUrlP = `${environment.apiUrl}/p`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Get tuestes pendientes
-  getTuestesPendientes() : Observable<Pedido[]> {
+  getTuestesPendientes(): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(`${this.baseUrlP}/tueste/pendientes`);
   }
   // Get Ultimos Pedidos
-  getUltimosPedidos() : Observable<Pedido[]> {
+  getUltimosPedidos(): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(`${this.baseUrlP}/pedidos/ultimos`);
   }
   // Get Stock de Lotes
@@ -25,4 +25,7 @@ export class DashboardService {
     return this.http.get(`${this.baseUrlP}/stock/lotes`);
   }
 
+  getStockLotesPorClasificacion(): Observable<Record<string, number>> {
+    return this.http.get<Record<string, number>>(`${this.baseUrlP}/lotes/clasificacion`);
+  }
 }
