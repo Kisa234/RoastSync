@@ -57,8 +57,8 @@
         </div>
 
         <div class="mb-4 flex gap-x-2.5">
-          <button *ngFor="let f of filtersMuestras" (click)="filter = f.key; aplicarFiltroMuestras()"
-            [ngClass]="filter === f.key ? 'bg-[#B8672E] text-white' : 'bg-gray-700 text-white hover:bg-[#B8672E]'"
+          <button *ngFor="let f of filtersMuestras" (click)="filterMuestra = f.key; aplicarFiltroMuestras()"
+            [ngClass]="filterMuestra === f.key ? 'bg-[#B8672E] text-white' : 'bg-gray-700 text-white hover:bg-[#B8672E]'"
             class="transition rounded-lg px-4 py-2">
             {{ f.label }}
           </button>
@@ -254,7 +254,6 @@
     <section *ngIf="activeTab==='tostado'" class="p-6 bg-white rounded-b-lg shadow-sm">
       <h2 class="text-xl font-semibold text-[#1F1F1F] mb-4">Café Tostado</h2>
 
-
       <!-- Filtros y búsqueda -->
       <div class="flex gap-2.5 ">
         <div class="mb-4 relative w-full max-w-lg">
@@ -262,6 +261,14 @@
           <input type="text" [(ngModel)]="filterTextTostado" (ngModelChange)="onSearchChange()"
             placeholder="Buscar por cliente, productor, finca o provincia..."
             class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+        </div>
+
+        <div class="mb-4 flex gap-x-2.5">
+          <button *ngFor="let f of filtersTostado" (click)="filterTostado = f.key; aplicarFiltroLotesTostados()"
+            [ngClass]="filterTostado === f.key ? 'bg-[#B8672E] text-white' : 'bg-gray-700 text-white hover:bg-[#B8672E]'"
+            class="transition rounded-lg px-4 py-2">
+            {{ f.label }}
+          </button>
         </div>
       </div>
 

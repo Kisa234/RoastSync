@@ -29,7 +29,7 @@ import { EditLoteComponent } from '../../components/edit-lote/edit-lote.componen
 
 
 type InventoryTab = 'muestras' | 'verde' | 'tostado';
-type FilterKey = 'todas' | 'sin-completar' | 'completadas';
+type FilterKey = 'todas' | 'sin-completar' | 'completadas' | 'enviados' | 'no-enviados' | 'todos';
 
 @Component({
   selector: 'inventory-page',
@@ -79,11 +79,17 @@ export class InventoryPage {
 
   activeTab: 'muestras' | 'verde' | 'tostado' = 'muestras';
 
-  filter: FilterKey = 'sin-completar';
+  filterMuestra: FilterKey = 'sin-completar';
+  filterTostado: FilterKey = 'sin-completar';
   filtersMuestras: { key: FilterKey; label: string }[] = [
     { key: 'todas', label: 'TODOS' },
     { key: 'sin-completar', label: 'SIN COMPLETAR' },
     { key: 'completadas', label: 'COMPLETADAS' }
+  ];
+  filtersTostado: { key: FilterKey; label: string }[] = [
+    { key: 'todos', label: 'TODOS' },
+    { key: 'enviados', label: 'ENVIADOS' },
+    { key: 'no-enviados', label: 'NO ENVIADOS' }
   ];
 
   // streams de datos
@@ -218,7 +224,7 @@ export class InventoryPage {
         let filtradas = muestras;
 
         // filtro por estado (igual que ya lo tienes)
-        switch (this.filter) {
+        switch (this.filterMuestra) {
           case 'completadas': filtradas = filtradas.filter(m => m.completado); break;
           case 'sin-completar': filtradas = filtradas.filter(m => !m.completado); break;
         }
@@ -272,30 +278,45 @@ export class InventoryPage {
   aplicarFiltroLotesTostados() {
     if (!this.tostados) return;
 
-    if (this.filterTextTostado.trim() === '') {
-      this.tostadosFiltrados = this.tostados;
-      return;
+    let filtrados = this.tostados;
+
+    // 🔹 Filtro por estado (según la opción seleccionada)
+    switch (this.filterTostado) {
+      case 'enviados':
+        filtrados = filtrados.filter(t => !!t.entregado && t.peso === 0);
+        break;
+      case 'no-enviados':
+        filtrados = filtrados.filter(t => !t.entregado || t.peso > 0);
+        break;
+      // 'todos' no filtra nada
     }
 
-    const term = this.filterTextTostado.toLowerCase();
-    this.tostadosFiltrados = this.tostados.filter(t => {
-      const user = this.usuarios?.find((u: User) => u.id_user === t.id_user);
-      const nombreCliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
-      const loteVerde = this.lotes.find(l => l.id_lote === t.id_lote);
+    // 🔹 Filtro por texto
+    if (this.filterTextTostado.trim() !== '') {
+      const term = this.filterTextTostado.toLowerCase();
 
-      return (
-        t.id_lote_tostado?.toLowerCase().includes(term) ||
-        t.perfil_tostado?.toLowerCase().includes(term) ||
-        nombreCliente.includes(term) ||
-        loteVerde?.productor?.toLowerCase().includes(term) ||
-        loteVerde?.distrito?.toLowerCase().includes(term) ||
-        loteVerde?.variedades.join(' ').toLowerCase().includes(term) ||
-        loteVerde?.clasificacion?.toLowerCase().includes(term) ||
-        loteVerde?.proceso.toLowerCase().includes(term) ||
-        loteVerde?.id_lote.toLowerCase().includes(term) 
-      );
-    });
+      filtrados = filtrados.filter(t => {
+        const user = this.usuarios?.find((u: User) => u.id_user === t.id_user);
+        const nombreCliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
+        const loteVerde = this.lotes.find(l => l.id_lote === t.id_lote);
+
+        return (
+          t.id_lote_tostado?.toLowerCase().includes(term) ||
+          t.perfil_tostado?.toLowerCase().includes(term) ||
+          nombreCliente.includes(term) ||
+          loteVerde?.productor?.toLowerCase().includes(term) ||
+          loteVerde?.distrito?.toLowerCase().includes(term) ||
+          loteVerde?.variedades.join(' ').toLowerCase().includes(term) ||
+          loteVerde?.clasificacion?.toLowerCase().includes(term) ||
+          loteVerde?.proceso.toLowerCase().includes(term) ||
+          loteVerde?.id_lote.toLowerCase().includes(term)
+        );
+      });
+    }
+
+    this.tostadosFiltrados = filtrados;
   }
+
 
   getLotesCliente(lotes: Lote[]) {
     return lotes.filter(l => {
