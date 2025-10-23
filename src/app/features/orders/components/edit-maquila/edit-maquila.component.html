@@ -1,0 +1,154 @@
+<div class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-xl overflow-auto">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-[#E5E5E5]">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Editar Pedido de Maquila</h2>
+        <p class="text-gray-600 text-sm">Modifica los detalles del pedido existente</p>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+        <lucide-icon [img]="X" class="w-5 h-5" />
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form (ngSubmit)="onUpdate()" class="grid grid-cols-2 gap-x-6 gap-y-4 px-6 py-5">
+
+      <!-- Cliente -->
+      <div class="col-span-2">
+        <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
+        <select-search
+          name="cliente"
+          [(ngModel)]="model.id_user"
+          [items]="clientes"
+          displayField="nombre"
+          valueField="id_user"
+          placeholder="Seleccionar cliente"
+          [disabled]="userLote && userLote.rol !== 'admin'"
+        ></select-search>
+        <p *ngIf="userLote && userLote.rol !== 'admin'" class="text-xs text-gray-500 mt-1">
+          Cliente asignado automáticamente por el lote.
+        </p>
+      </div>
+
+      <!-- Producto -->
+      <div>
+        <label class="block text-gray-700 text-sm mb-1">Producto *</label>
+        <select
+          [(ngModel)]="model.id_producto"
+          name="id_producto"
+          required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        >
+          <option value="" disabled>Selecciona producto</option>
+          <option *ngFor="let p of productos" [value]="p.id_producto">{{ p.nombre }}</option>
+        </select>
+      </div>
+
+      <!-- Lote tostado -->
+      <div>
+        <label class="block text-gray-700 text-sm mb-1">Lote Tostado *</label>
+        <select
+          [(ngModel)]="model.id_lote_tostado"
+          name="id_lote_tostado"
+          (change)="onLoteChange()"
+          required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        >
+          <option value="" disabled>Selecciona lote tostado</option>
+          <option *ngFor="let l of lotesTostados" [value]="l.id_lote_tostado">{{ l.id_lote_tostado }}</option>
+        </select>
+        <p *ngIf="userLote" class="text-xs text-gray-500 mt-1">
+          Lote perteneciente a: <span class="font-medium">{{ userLote.nombre_comercial || userLote.nombre }}</span> ({{ userLote.rol }})
+        </p>
+      </div>
+
+      <!-- Disponible -->
+      <div>
+        <label class="block text-gray-700 text-sm mb-1">Disponible (Gr)</label>
+        <input
+          type="text"
+          [value]="availableQty !== null ? (availableQty | number:'1.0-0') : ''"
+          disabled
+          class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700"
+          placeholder="Seleccione un lote"
+        />
+      </div>
+
+      <!-- Gramaje -->
+      <div>
+        <label class="block text-gray-700 text-sm mb-1">Gramaje (g) *</label>
+        <input
+          type="number"
+          min="50"
+          step="50"
+          [(ngModel)]="model.gramaje"
+          name="gramaje"
+          required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        />
+      </div>
+
+      <!-- Molienda -->
+      <div>
+        <label class="block text-gray-700 text-sm mb-1">Molienda *</label>
+        <select
+          [(ngModel)]="model.molienda"
+          name="molienda"
+          required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        >
+          <option value="ENTERO">ENTERO</option>
+          <option value="MOLIENDA_FINA">MOLIENDA FINA</option>
+          <option value="MOLIENDA_MEDIA">MOLIENDA MEDIA</option>
+          <option value="MOLIENDA_GRUESA">MOLIENDA GRUESA</option>
+          <option value="NINGUNO">NINGUNO</option>
+        </select>
+      </div>
+
+      <!-- Cantidad -->
+      <div>
+        <label class="block text-gray-700 text-sm mb-1">Cantidad (bolsas) *</label>
+        <input
+          type="number"
+          min="1"
+          [(ngModel)]="model.cantidad"
+          name="cantidad"
+          required
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        />
+      </div>
+
+      <!-- Comentario -->
+      <div class="col-span-2">
+        <label class="block text-gray-700 text-sm mb-1">Comentario</label>
+        <textarea
+          [(ngModel)]="model.comentario"
+          name="comentario"
+          rows="4"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+        ></textarea>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="flex justify-end items-center space-x-4 px-6 py-4 border-t border-[#E5E5E5]">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="px-4 py-2 border border-[#A67C52] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        (click)="onUpdate()"
+        [disabled]="loading"
+        class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition flex items-center"
+      >
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />Actualizar
+      </button>
+    </div>
+  </div>
+</div>

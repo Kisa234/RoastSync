@@ -1,0 +1,57 @@
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center border-b border-[#E5E5E5] px-6 py-4">
+      <h2 class="text-lg font-semibold text-[#1F1F1F]">Editar Categoría</h2>
+      <button (click)="close()" class="text-gray-500 hover:text-gray-700 transition text-lg font-semibold">
+        ✕
+      </button>
+    </div>
+
+    <!-- Formulario -->
+    <form (ngSubmit)="update()" class="p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+        <input
+          type="text"
+          [(ngModel)]="form.nombre"
+          name="nombre"
+          class="w-full border border-[#E5E5E5] rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-[#B8672E]"
+          placeholder="Ej. Selecto, Clásico..."
+          required
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+        <textarea
+          [(ngModel)]="form.descripcion"
+          name="descripcion"
+          rows="3"
+          class="w-full border border-[#E5E5E5] rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-[#B8672E]"
+          placeholder="Opcional"
+        ></textarea>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-end space-x-3 pt-3 border-t border-[#E5E5E5]">
+        <button
+          type="button"
+          (click)="close()"
+          class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="bg-[#B8672E] text-white px-4 py-2 rounded-lg shadow hover:bg-[#A05622] transition"
+        >
+          {{ loading ? 'Actualizando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

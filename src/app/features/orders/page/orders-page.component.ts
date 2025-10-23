@@ -1,20 +1,16 @@
-import { UiService } from './../../../shared/services/ui.service';
-// src/app/features/orders/page/orders-page.component.ts
 import { Component } from '@angular/core';
 import { CommonModule, NgFor, AsyncPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule } from 'lucide-angular';
-import { Plus, Search, Eye, Edit2, Trash2, Check } from 'lucide-angular';
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { LucideAngularModule, Plus, Eye, Edit2, Trash2, Check, Factory } from 'lucide-angular';
 import { Pedido } from '../../../shared/models/pedido';
 import { PedidoService } from '../service/orders.service';
+import { UiService } from '../../../shared/services/ui.service';
 import { AddOrderComponent } from '../components/add-order/add-order.component';
 import { EditOrderComponent } from '../components/edit-order/edit-order.component';
+import { EditMaquilaOrderComponent } from '../components/edit-maquila/edit-maquila.component';
 import { ViewOrderComponent } from '../components/view-order/view-order.component';
 import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
-
-
+import { AddMaquilaOrderComponent } from '../components/add-maquila/add-maquila.component';
 
 @Component({
   selector: 'app-orders-page',
@@ -26,68 +22,57 @@ import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
     DatePipe,
     LucideAngularModule,
     AddOrderComponent,
+    AddMaquilaOrderComponent,
     EditOrderComponent,
+    EditMaquilaOrderComponent,
     ViewOrderComponent,
     UserNamePipe
-],
-  templateUrl: './orders-page.component.html',
-  styles: [``]
+  ],
+  templateUrl: './orders-page.component.html'
 })
 export class OrdersPage {
-  // íconos
+  // Íconos
   readonly Plus = Plus;
-  readonly Search = Search;
   readonly Eye = Eye;
   readonly Edit2 = Edit2;
   readonly Trash2 = Trash2;
   readonly Check = Check;
+  readonly Factory = Factory;
 
-  // búsqueda
-  filterText = '';
-  private filter$ = new BehaviorSubject<string>('');
-
-  // stream filtrado
   pedidos: Pedido[] = [];
+  selectedOrderId!: string;
+  selectedPedido: Pedido | null = null;
 
-  // modal
   showAddOrder = false;
+  showAddMaquilaOrder = false;
   showEditOrder = false;
   showViewOrder = false;
-  selectedOrderId!: string;
 
   constructor(
     private pedidoSvc: PedidoService,
     private uiSvc: UiService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.getData();
   }
 
-  private filterList(list: Pedido[], term: string): Pedido[] {
-    const q = term.trim().toLowerCase();
-    if (!q) return list;
-    return list.filter(p =>
-      Object.values(p).some(v =>
-        `${v}`.toLowerCase().includes(q)
-      )
-    );
-  }
-
-  getData():void {
-    this.pedidoSvc.getPedidos().subscribe(list => {
-      const filtrados = list.filter(p => p.tipo_pedido !== 'Orden Tueste');
-      console.log('>>> filtrados:', filtrados.length, filtrados);
-      this.pedidos = filtrados;
+  getData() {
+    this.pedidoSvc.getPedidos().subscribe({
+      next: (list) => {
+        const filtrados = list.filter(p => p.tipo_pedido !== 'Orden Tueste');
+        this.pedidos = filtrados;
+      },
+      error: (err) => console.error('Error cargando pedidos:', err)
     });
-  }
-
-  onSearchChange() {
-    this.filter$.next(this.filterText);
   }
 
   openAdd() {
     this.showAddOrder = true;
+  }
+
+  openAddMaquila() {
+    this.showAddMaquilaOrder = true;
   }
 
   onOrderCreated(p: Pedido) {
@@ -95,8 +80,8 @@ export class OrdersPage {
     this.getData();
   }
 
-  onOrderEdit(p: Pedido) {
-    this.showEditOrder = false;
+  onMaquilaCreated(p: Pedido) {
+    this.showAddMaquilaOrder = false;
     this.getData();
   }
 
@@ -104,39 +89,46 @@ export class OrdersPage {
     this.selectedOrderId = p.id_pedido;
     this.showViewOrder = true;
   }
+
   edit(p: Pedido) {
     this.selectedOrderId = p.id_pedido;
+    this.selectedPedido = p;
     this.showEditOrder = true;
+  }
 
+  onOrderEdit(p: Pedido) {
+    this.showEditOrder = false;
+    this.getData();
+  }
+
+  onMaquilaEdit(p: Pedido) {
+    this.showEditOrder = false;
+    this.getData();
   }
 
   delete(p: Pedido) {
     this.uiSvc.confirm({
       title: 'Eliminar Pedido',
-      message: `¿Está seguro de eliminar el pedido?`,
+      message: `¿Está seguro de eliminar este pedido?`,
       confirmText: 'Eliminar',
       cancelText: 'Cancelar'
-    }).then((confirmed: boolean) => {
-      if (confirmed) {
-        this.pedidoSvc.deletePedido(p.id_pedido)
-          .subscribe(() => this.getData());
+    }).then((ok) => {
+      if (ok) {
+        this.pedidoSvc.deletePedido(p.id_pedido).subscribe(() => this.getData());
       }
-    })
+    });
   }
 
   complete(p: Pedido) {
-
     this.uiSvc.confirm({
       title: 'Completar Pedido',
-      message: `¿Está seguro de completar el pedido?`,
+      message: `¿Desea marcar el pedido como completado?`,
       confirmText: 'Completar',
       cancelText: 'Cancelar'
-    }).then((confirmed: boolean) => {
-      if (confirmed) {
-        this.pedidoSvc.completarPedido(p.id_pedido)
-          .subscribe(() => this.getData());
+    }).then((ok) => {
+      if (ok) {
+        this.pedidoSvc.completarPedido(p.id_pedido).subscribe(() => this.getData());
       }
-    })
-
+    });
   }
 }

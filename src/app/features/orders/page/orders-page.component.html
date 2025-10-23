@@ -5,34 +5,41 @@
   <div class="flex justify-between items-center mb-5">
     <div>
       <h1 class="text-2xl font-bold text-[#1F1F1F]">Pedidos</h1>
-      <p class="text-gray-600">Gestiona pedidos de Venta Verde y Tostado Verde</p>
+      <p class="text-gray-600">Gestiona pedidos de Venta Verde, Tostado Verde y Maquila</p>
     </div>
-    <button
-      class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
-      (click)="openAdd()"
-    >
-      <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
-      Agregar Pedido
-    </button>
+
+    <div class="flex space-x-3">
+      <!-- Pedido Normal -->
+      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openAdd()">
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+        Pedido de Lotes
+      </button>
+
+      <!-- Pedido de Maquila -->
+      <button
+        class="flex items-center bg-[#F4F4F4] text-[#1F1F1F] px-4 py-2 rounded shadow hover:bg-[#E5E5E5] transition"
+        (click)="openAddMaquila()">
+        <lucide-icon [img]="Factory" class="w-5 h-5 mr-2" />
+        Pedido de Maquila
+      </button>
+    </div>
   </div>
 
   <!-- Contenedor principal -->
   <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 space-y-6">
-
-    <!-- Título de sección -->
     <div>
       <h2 class="text-xl font-semibold text-[#1F1F1F]">Lista de Pedidos</h2>
     </div>
 
-
-    <!-- Tabla de Pedidos -->
     <div class="overflow-x-auto m-1 rounded-lg shadow-sm ">
       <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
         <thead class="bg-[#F9F9F9]">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo Pedido</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad (Gr)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad (Gr/Un)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Gramaje (Gr)</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
@@ -43,15 +50,16 @@
           <tr *ngFor="let p of pedidos" class="hover:bg-[#F9F9F9]">
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.tipo_pedido }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_user | userName }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ p.cantidad.toLocaleString('en-US') }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_lote }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.cantidad | number }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.gramaje ? p.gramaje : 'N/A' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_lote_tostado || p.id_lote }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.estado_pedido }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.fecha_registro | date:'dd/MM/yyyy' }}</td>
             <td class="px-6 py-4 text-right text-sm space-x-2">
-              <button (click)="view(p)"   class="text-gray-500 hover:text-[#B8672E]">
+              <button (click)="view(p)" class="text-gray-500 hover:text-[#B8672E]">
                 <lucide-icon [img]="Eye" class="w-5 h-5" />
               </button>
-              <button (click)="edit(p)"   class="text-gray-500 hover:text-[#B8672E]">
+              <button (click)="edit(p)" class="text-gray-500 hover:text-[#B8672E]">
                 <lucide-icon [img]="Edit2" class="w-5 h-5" />
               </button>
               <button (click)="delete(p)" class="text-gray-500 hover:text-red-600">
@@ -62,37 +70,33 @@
               </button>
             </td>
           </tr>
-          <tr *ngIf="(pedidos)?.length === 0">
-            <td colspan="8" class="px-6 py-6 text-center text-gray-500">
+
+          <tr *ngIf="pedidos.length === 0">
+            <td colspan="7" class="px-6 py-6 text-center text-gray-500">
               No hay pedidos registrados.
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
   </div>
 
-  <!-- Modal de creación -->
-  <add-order
-    *ngIf="showAddOrder"
-    (close)="showAddOrder = false"
-    (create)="onOrderCreated($event)"
-  ></add-order>
+  <!-- Modales -->
+  <!-- Modales -->
+  <add-order *ngIf="showAddOrder" (close)="showAddOrder = false" (create)="onOrderCreated($event)"></add-order>
 
-  <edit-order
-    *ngIf="showEditOrder"
-    [orderId]="selectedOrderId"
-    (close)="showEditOrder = false"
-    (edit)="onOrderEdit($event)"
-    >
-  </edit-order>
+  <add-maquila *ngIf="showAddMaquilaOrder" (close)="showAddMaquilaOrder = false"
+    (create)="onMaquilaCreated($event)"></add-maquila>
 
-  <view-order
-    *ngIf="showViewOrder"
-    [orderId]="selectedOrderId"
-    (close)="showViewOrder = false"
-    >
-  </view-order>
+  <!-- EDIT NORMAL -->
+  <edit-order *ngIf="showEditOrder && selectedPedido?.tipo_pedido !== 'Maquila'" [orderId]="selectedOrderId"
+    (close)="showEditOrder = false" (edit)="onOrderEdit($event)"></edit-order>
+
+  <!-- EDIT MAQUILA -->
+  <edit-maquila *ngIf="showEditOrder && selectedPedido?.tipo_pedido === 'Maquila'" [pedido]="selectedPedido!"
+    (close)="showEditOrder = false" (updated)="onMaquilaEdit($event)"></edit-maquila>
+
+  <view-order *ngIf="showViewOrder" [orderId]="selectedOrderId" (close)="showViewOrder = false"></view-order>
+
 
 </div>

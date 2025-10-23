@@ -23,7 +23,7 @@ import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { SettingsPageComponent } from './features/settings/page/settings-page.component';
 import { EnvioPageComponent } from './features/envios/pages/envio.page/envio.page.component';
-import { MaquilaPageComponent } from './features/maquila/pages/maquila.page/maquila.page.component';
+import { ProductPageComponent } from './features/products/pages/product/product-page.component';
 
 
 export const appRoutes: Routes = [
@@ -55,7 +55,7 @@ export const appRoutes: Routes = [
       { path: 'analisis', component: AnalisisPage },
       { path: 'clients', component: UsersPageComponent },
       { path: 'settings', component: SettingsPageComponent },
-      // { path: 'maquila', component: MaquilaPageComponent },
+      { path: 'products', component: ProductPageComponent},
 
 
       // ...otras rutas
