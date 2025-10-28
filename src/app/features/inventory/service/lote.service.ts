@@ -37,8 +37,8 @@ export class LoteService {
     return this.http.put<Lote>(`${this.baseUrl}/${id}`, data);
   }
 
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  delete(id: string): Observable<Lote> {
+    return this.http.delete<Lote>(`${this.baseUrl}/${id}`);
   }
 
   createByMuestra(id:string,data: Partial<Lote>): Observable<Lote> {

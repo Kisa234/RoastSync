@@ -11,7 +11,7 @@
         class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
         (click)="openAdd()">
         <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
-        Agregar Muestra
+        Agregar {{select_obj}}
       </button>
       <button *ngIf="activeTab!=='muestras' && activeTab!=='tostado'"
         class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
@@ -200,6 +200,9 @@
                   <button (click)="openEditLote(l)" class="text-gray-500 hover:text-gray-700">
                     <lucide-icon [img]="Edit2" class="w-5 h-5" />
                   </button>
+                  <button (click)="deleteLote(l)" class="text-gray-500 hover:text-gray-700">
+                    <lucide-angular [img]="Trash2" class="w-5 h-5"/>
+                  </button>
                 </td>
               </tr>
             </ng-container>
@@ -309,14 +312,17 @@
                   <button (click)="onReportTueste(t)" class="text-gray-500 hover:text-gray-700">
                     <lucide-icon [img]="Clipboard" class="w-5 h-5" />
                   </button>
+                  <button (click)="openHistoricLoteTostado(t)" class=" text-gray-500 hover:text-gray-700">
+                    <lucide-icon [img]="History" class="w-5 h-5" />
+                  </button>
+                  <button (click)="openReportLoteTostado(t)" class=" text-gray-500 hover:text-gray-700">
+                    <lucide-icon [img]="TestTube" class="w-5 h-5" />
+                  </button>
                   <button (click)="onFichaTueste(t)" class="text-gray-500 hover:text-gray-700">
                     <lucide-icon [img]="Eye" class="w-5 h-5" />
                   </button>
-                  <button type="button" class="text-gray-500 hover:text-gray-700" (click)="exportStickerTostado(t)">
-                    <lucide-icon [img]="TestTube" class="w-5 h-5" />
-                  </button>
-                  <button (click)="openHistoricLoteTostado(t)" class=" text-gray-500 hover:text-gray-700">
-                    <lucide-icon [img]="History" class="w-5 h-5" />
+                  <button (click)="exportStickerTostado(t)" class="text-gray-500 hover:text-gray-700" >
+                    <lucide-icon [img]="Label" class="w-5 h-5" />
                   </button>
                 </div>
               </td>
@@ -337,19 +343,15 @@
 <blend-lote *ngIf="showBlendLote" (close)="showBlendLote = false" (create)="onCreateBlend()"></blend-lote>
 <blend-tueste *ngIf="showBlendTueste" (close)="showBlendTueste = false" (create)="onCreateBlendTueste()"></blend-tueste>
 
-<report-lote [loteId]="selectedLoteId" [MuestraId]="selectedMuestraId" *ngIf="showReportLote"
-  (close)="showReportLote=false">
-</report-lote>
+<report-lote [loteId]="selectedLoteId" [MuestraId]="selectedMuestraId" *ngIf="showReportLote" (close)="showReportLote=false"></report-lote>
 
-<ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false">
-</ficha-tueste>
+<ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false"></ficha-tueste>
 
-<historic-lote [loteId]="selectedLoteId" *ngIf="showHistoricLote" (close)="showHistoricLote=false">
-</historic-lote>
+<historic-lote [loteId]="selectedLoteId" *ngIf="showHistoricLote" (close)="showHistoricLote=false"></historic-lote>
 
-<historic-lote-tostado [loteId]="selectedTuesteId" *ngIf="showHistoricLoteTostado"
-  (close)="showHistoricLoteTostado=false">
-</historic-lote-tostado>
+<historic-lote-tostado [loteId]="selectedTuesteId" *ngIf="showHistoricLoteTostado" (close)="showHistoricLoteTostado=false"></historic-lote-tostado >
+
+<report-lote-tostado [loteId]="selectedTuesteId" *ngIf="showReportLoteTostado" (close)="showReportLoteTostado=false" ></report-lote-tostado>
 
 <add-lote *ngIf="showAddLote" (close)="showAddLote = false" (create)="onLoteCreated()"></add-lote>
 

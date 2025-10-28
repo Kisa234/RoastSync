@@ -1,0 +1,85 @@
+<div class="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-40 p-6 md:p-10">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-3xl overflow-visible relative">
+
+        <!-- BOTÓN CERRAR -->
+        <button class="no-print absolute top-4 right-4 z-50 text-gray-500 hover:text-black transition-colors"
+            (click)="closeModal()" aria-label="Cerrar">
+            <lucide-angular [img]="X" class="w-5 h-5"></lucide-angular>
+        </button>
+
+        <div id="pdfContent" #pdfContent class="font-sans p-10 text-gray-800 relative">
+            <!-- ENCABEZADO -->
+            <div class="text-center mb-6">
+                <h1 class="text-xl font-bold">ANÁLISIS RÁPIDO</h1>
+                <p class="text-sm text-gray-600">
+                    Café Tostado — {{ loteTostado.id_lote_tostado }}
+                </p>
+                <p class="text-xs mt-1">
+                    Fecha: {{ analisisRapido.fecha_registro | date: 'dd/MM/yyyy' }}
+                </p>
+            </div>
+
+            <!-- RESULTADOS -->
+            <section class="mb-6">
+                <h2 class="font-semibold text-base mb-3 border-b border-gray-300 pb-1 text-gray-700">
+                    Resultados del análisis
+                </h2>
+                <div class="grid grid-cols-2 gap-x-6 text-sm leading-relaxed">
+                    <div>
+                        <p><strong>Fragancia:</strong> {{ analisisRapido.fragancia }}</p>
+                        <p><strong>Aroma:</strong> {{ analisisRapido.aroma }}</p>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <h2 class="font-semibold text-base mb-3 border-b border-gray-300 pb-1 text-gray-700">
+                        DESCRIPTORES MARCADOS
+                    </h2>
+
+                    <div class="grid grid-cols-2 gap-x-10 text-sm leading-relaxed">
+                        <!-- Columna izquierda -->
+                        <div class="space-y-1">
+                            <p *ngIf="analisisRapido.floral">Floral</p>
+                            <p *ngIf="analisisRapido.afrutado">Afrutado</p>
+                            <p *ngIf="analisisRapido.bayas">Bayas</p>
+                            <p *ngIf="analisisRapido.frutos_secos">Frutos Secos</p>
+                            <p *ngIf="analisisRapido.citricos">Cítricos</p>
+                            <p *ngIf="analisisRapido.acido_fermentado">Ácido Fermentado</p>
+                            <p *ngIf="analisisRapido.acido">Ácido</p>
+                            <p *ngIf="analisisRapido.fermentado">Fermentado</p>
+                            <p *ngIf="analisisRapido.verde_vegetal">Verde / Vegetal</p>
+                        </div>
+
+                        <!-- Columna derecha -->
+                        <div class="space-y-1">
+                            <p *ngIf="analisisRapido.otros">Otros</p>
+                            <p *ngIf="analisisRapido.quimico">Químico</p>
+                            <p *ngIf="analisisRapido.rancio">Rancio</p>
+                            <p *ngIf="analisisRapido.tierra">Tierra</p>
+                            <p *ngIf="analisisRapido.papel">Papel</p>
+                            <p *ngIf="analisisRapido.tostado">Tostado</p>
+                            <p *ngIf="analisisRapido.nueces_cacao">Nueces Cacao</p>
+                            <p *ngIf="analisisRapido.nueces">Nueces</p>
+                            <p *ngIf="analisisRapido.cocoa">Cocoa</p>
+                            <p *ngIf="analisisRapido.especias">Especias</p>
+                            <p *ngIf="analisisRapido.dulce">Dulce</p>
+                            <p *ngIf="analisisRapido.vainilla">Vainilla</p>
+                            <p *ngIf="analisisRapido.azucar_morena">Azúcar Morena</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COMENTARIO -->
+            <section class="border-t border-gray-300 pt-3 text-sm">
+                <h3 class="font-semibold mb-1">Comentario</h3>
+                <p>
+                    {{
+                    analisisRapido.comentario && analisisRapido.comentario.trim() !== ''
+                    ? analisisRapido.comentario
+                    : 'Sin comentarios adicionales.'
+                    }}
+                </p>
+            </section>
+        </div>
+    </div>
+</div>

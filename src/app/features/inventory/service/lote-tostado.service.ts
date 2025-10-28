@@ -9,15 +9,17 @@ import { FichaTueste } from '../../../shared/models/ficha-tueste';
 export class LoteTostadoService {
   private baseUrl = `${environment.apiUrl}/loteTostado`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<LoteTostado[]> {
     return this.http.get<LoteTostado[]>(this.baseUrl);
   }
 
   getById(id: string): Observable<LoteTostado> {
+    console.log(`${this.baseUrl}/${id}`); // 👈 agrega esto
     return this.http.get<LoteTostado>(`${this.baseUrl}/${id}`);
   }
+
 
   create(data: Partial<LoteTostado>): Observable<LoteTostado> {
     return this.http.post<LoteTostado>(this.baseUrl, data);
