@@ -15,8 +15,25 @@
         <!-- Formulario -->
         <form (ngSubmit)="onSave()" class="grid grid-cols-2 gap-x-6 gap-y-4 px-6 py-5">
 
-            <!-- Cliente -->
+
+            <!-- Lote Tostado -->
             <div class="col-span-2">
+                <label class="block text-gray-700 text-sm mb-1">Lote Tostado *</label>
+                <select [(ngModel)]="model.id_lote_tostado" name="id_lote_tostado" (change)="onLoteChange()" required
+                    class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+                    <option value="" disabled selected>Selecciona lote tostado</option>
+                    <option *ngFor="let l of lotesTostados" [value]="l.id_lote_tostado">{{ l.id_lote_tostado }}</option>
+                </select>
+
+                <!-- Mostrar info del usuario dueño del lote -->
+                <p *ngIf="userLote" class="text-[9px] text-gray-500 mt-1">
+                    Lote perteneciente a: <span class="font-medium">{{ userLote.nombre_comercial || userLote.nombre
+                        }}</span> ({{ userLote.rol }})
+                </p>
+            </div>
+
+            <!-- Cliente -->
+            <div>
                 <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
                 <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
                     valueField="id_user" placeholder="Seleccionar cliente"
@@ -37,21 +54,7 @@
                 </select>
             </div>
 
-            <!-- Lote Tostado -->
-            <div>
-                <label class="block text-gray-700 text-sm mb-1">Lote Tostado *</label>
-                <select [(ngModel)]="model.id_lote_tostado" name="id_lote_tostado" (change)="onLoteChange()" required
-                    class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
-                    <option value="" disabled selected>Selecciona lote tostado</option>
-                    <option *ngFor="let l of lotesTostados" [value]="l.id_lote_tostado">{{ l.id_lote_tostado }}</option>
-                </select>
-
-                <!-- Mostrar info del usuario dueño del lote -->
-                <p *ngIf="userLote" class="text-[9px] text-gray-500 mt-1">
-                    Lote perteneciente a: <span class="font-medium">{{ userLote.nombre_comercial || userLote.nombre
-                        }}</span> ({{ userLote.rol }})
-                </p>
-            </div>
+            
 
 
             <!-- Gramaje -->

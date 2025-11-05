@@ -81,10 +81,10 @@
 <!-- Modales -->
 <productos
   *ngIf="showProductos"
-  (closeModal)="closeProductos()"
+  (closes)="closeProductos()"
 ></productos>
 
 <categorias
   *ngIf="showCategorias"
-  (closeModal)="closeCategorias()"
+  (closes)="closeCategorias()"
 ></categorias>

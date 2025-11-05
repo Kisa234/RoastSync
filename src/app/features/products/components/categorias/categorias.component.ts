@@ -21,7 +21,7 @@ import { UiService } from '../../../../shared/services/ui.service';
   ]
 })
 export class CategoriasComponent implements OnInit {
-  @Output() closeModal = new EventEmitter<void>();
+  @Output() closes = new EventEmitter<void>();
 
   categorias: Categoria[] = [];
   selectedCategoria!: Categoria | null;
@@ -50,7 +50,7 @@ export class CategoriasComponent implements OnInit {
   }
 
   close() {
-    this.closeModal.emit();
+    this.closes.emit();
   }
 
   // 🔹 Modales

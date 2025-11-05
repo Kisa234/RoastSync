@@ -88,3 +88,17 @@
     </div>
   </div>
 </div>
+
+<!-- Modales hijos -->
+<add-product
+  *ngIf="showAdd"
+  (closes)="closeChildModals()"
+  (saved)="reloadProductos()"
+></add-product>
+
+<edit-product
+  *ngIf="showEdit"
+  [producto]="selectedProducto!"
+  (closes)="closeChildModals()"
+  (updated)="reloadProductos()"
+></edit-product>
