@@ -1,0 +1,229 @@
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl overflow-hidden">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b border-[#E5E5E5] px-6 py-4">
+            <h2 class="text-xl font-semibold text-[#1F1F1F]">Crear Box Template</h2>
+            <button (click)="close()"
+                class="text-gray-500 hover:text-gray-700 transition text-xl font-semibold">✕</button>
+        </div>
+
+        <!-- FORM -->
+        <form (ngSubmit)="save()" class="p-6 space-y-6">
+
+            <!-- Nombre -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                <input type="text" [(ngModel)]="form.nombre" name="nombre" readonly
+                    class="w-full border border-[#E5E5E5] rounded-lg p-3 bg-gray-100 text-gray-600 cursor-not-allowed" />
+            </div>
+
+            <!-- 2 COLUMNAS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+
+                <!-- ============================
+            COLUMNA IZQUIERDA (FIJOS)
+        ============================ -->
+                <div class="space-y-8">
+
+                    <!-- CAFÉ FIJO 1 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Café Fijo 1 *</label>
+
+                        <select [(ngModel)]="form.cafe_fijo_1" name="cafe_fijo_1" required
+                            class="w-full border border-[#E5E5E5] rounded-lg p-2.5 focus:outline-none focus:ring-1 focus:ring-[#B8672E]">
+                            <option value="" disabled hidden>Seleccione un lote</option>
+                            <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
+                        </select>
+
+                        <!-- Características -->
+                        <div class="mt-3 border border-[#E5E5E5] bg-[#FAFAFA] p-3 rounded-lg text-xs text-gray-700">
+                            <div class="font-semibold mb-1">Características</div>
+
+                            <ng-container *ngIf="getLoteInfo(form.cafe_fijo_1) as info; else noFijo1">
+                                <div><span class="font-medium">Altura:</span> {{ info.productor }} msnm</div>
+                                <div><span class="font-medium">Variedades:</span> {{ info.variedades }}</div>
+                                <div><span class="font-medium">Proceso:</span> {{ info.proceso }}</div>
+                                <div><span class="font-medium">Disponible:</span> {{ info.peso }}</div>
+                            </ng-container>
+
+                            <ng-template #noFijo1>
+                                <div><span class="font-medium">Altura:</span> —</div>
+                                <div><span class="font-medium">Variedades:</span> —</div>
+                                <div><span class="font-medium">Proceso:</span> —</div>
+                                <div><span class="font-medium">Disponible:</span> —</div>
+                            </ng-template>
+                        </div>
+
+                        <!-- TUESTES -->
+                        <div class="mt-3">
+                            <div class="text-[11px] text-gray-500 mb-1">Tueste disponibles:</div>
+                            <div class="flex gap-2">
+                                <button type="button" (click)="toggleTueste(form.tueste_fijo_1, 'claro')"
+                                    [class.bg-[#B8672E]]="form.tueste_fijo_1.includes('claro')"
+                                    class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                    Claro
+                                </button>
+
+                                <button type="button" (click)="toggleTueste(form.tueste_fijo_1, 'medio')"
+                                    [class.bg-[#B8672E]]="form.tueste_fijo_1.includes('medio')"
+                                    class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                    Medio
+                                </button>
+
+                                <button type="button" (click)="toggleTueste(form.tueste_fijo_1, 'oscuro')"
+                                    [class.bg-[#B8672E]]="form.tueste_fijo_1.includes('oscuro')"
+                                    class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                    Oscuro
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CAFÉ FIJO 2 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Café Fijo 2 *</label>
+
+                        <select [(ngModel)]="form.cafe_fijo_2" name="cafe_fijo_2" required
+                            class="w-full border border-[#E5E5E5] rounded-lg p-2.5 focus:outline-none focus:ring-1 focus:ring-[#B8672E]">
+                            <option value="" disabled hidden>Seleccione un lote</option>
+                            <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
+                        </select>
+
+                        <!-- Características -->
+                        <div class="mt-3 border border-[#E5E5E5] bg-[#FAFAFA] p-3 rounded-lg text-xs text-gray-700">
+                            <div class="font-semibold mb-1">Características</div>
+
+                            <ng-container *ngIf="getLoteInfo(form.cafe_fijo_2) as info; else noFijo2">
+                                <div><span class="font-medium">Altura:</span> {{ info.productor }} msnm</div>
+                                <div><span class="font-medium">Variedades:</span> {{ info.variedades }}</div>
+                                <div><span class="font-medium">Proceso:</span> {{ info.proceso }}</div>
+                                <div><span class="font-medium">Disponible:</span> {{ info.peso }}</div>
+                            </ng-container>
+
+                            <ng-template #noFijo2>
+                                <div><span class="font-medium">Altura:</span> —</div>
+                                <div><span class="font-medium">Variedades:</span> —</div>
+                                <div><span class="font-medium">Proceso:</span> —</div>
+                                <div><span class="font-medium">Disponible:</span> —</div>
+                            </ng-template>
+                        </div>
+
+                        <!-- TUESTES -->
+                        <div class="mt-3">
+                            <div class="text-[11px] text-gray-500 mb-1">Tueste disponibles:</div>
+                            <div class="flex gap-2">
+                                <button type="button" (click)="toggleTueste(form.tueste_fijo_2, 'claro')"
+                                    [class.bg-[#B8672E]]="form.tueste_fijo_2.includes('claro')"
+                                    class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                    Claro
+                                </button>
+
+                                <button type="button" (click)="toggleTueste(form.tueste_fijo_2, 'medio')"
+                                    [class.bg-[#B8672E]]="form.tueste_fijo_2.includes('medio')"
+                                    class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                    Medio
+                                </button>
+
+                                <button type="button" (click)="toggleTueste(form.tueste_fijo_2, 'oscuro')"
+                                    [class.bg-[#B8672E]]="form.tueste_fijo_2.includes('oscuro')"
+                                    class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                    Oscuro
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ============================
+            COLUMNA DERECHA (OPCIONALES)
+        ============================ -->
+                <div class="space-y-6">
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cafés Opcionales</label>
+
+                    <!-- SELECT + BUTTON -->
+                    <div class="flex gap-2">
+                        <select [(ngModel)]="cafeSeleccionado" name="cafeSeleccionado"
+                            class="flex-1 border border-[#E5E5E5] rounded-lg p-2.5 focus:outline-none focus:ring-1 focus:ring-[#B8672E]">
+                            <option value="" disabled hidden>Seleccione un café</option>
+                            <option *ngFor="let lote of lotes" [value]="lote.id_lote">{{ lote.id_lote }}</option>
+                        </select>
+
+                        <button type="button" (click)="agregarCafeOpcion()"
+                            class="bg-[#B8672E] text-white px-4 py-2 rounded-lg hover:bg-[#A05622] transition">
+                            +
+                        </button>
+                    </div>
+
+                    <!-- LISTA OPCIONALES -->
+                    <div class="space-y-4 max-h-110 overflow-y-auto pr-1">
+                        <div *ngFor="let opcion of cafesSeleccionados; let i = index"
+                            class="border rounded-lg p-3 bg-[#FAFAFA]">
+
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-800 font-medium">{{ opcion.id_lote }}</span>
+                                <button class="text-red-600" (click)="eliminarCafeOpcion(i)">✕</button>
+                            </div>
+
+                            <!-- Características -->
+                            <div class="border border-[#E5E5E5] bg-white p-3 rounded-lg text-xs text-gray-700 mb-3">
+                                <div class="font-semibold mb-1">Características</div>
+
+                                <ng-container *ngIf="getLoteInfo(opcion.id_lote) as info">
+                                    <div><span class="font-medium">Altura:</span> {{ info.productor }} msnm</div>
+                                    <div><span class="font-medium">Variedades:</span> {{ info.variedades }}</div>
+                                    <div><span class="font-medium">Proceso:</span> {{ info.proceso }}</div>
+                                    <div><span class="font-medium">Disponible:</span> {{ info.peso }}</div>
+                                </ng-container>
+                            </div>
+
+                            <!-- TUESTES -->
+                            <div>
+                                <div class="text-[11px] text-gray-500 mb-1">Tueste disponibles:</div>
+                                <div class="flex gap-2">
+
+                                    <button type="button" (click)="toggleTueste(opcion.tuestes, 'claro')"
+                                        [class.bg-[#B8672E]]="opcion.tuestes.includes('claro')"
+                                        class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                        Claro
+                                    </button>
+
+                                    <button type="button" (click)="toggleTueste(opcion.tuestes, 'medio')"
+                                        [class.bg-[#B8672E]]="opcion.tuestes.includes('medio')"
+                                        class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                        Medio
+                                    </button>
+
+                                    <button type="button" (click)="toggleTueste(opcion.tuestes, 'oscuro')"
+                                        [class.bg-[#B8672E]]="opcion.tuestes.includes('oscuro')"
+                                        class="border border-[#E5E5E5] px-3 py-1 rounded-md text-sm">
+                                        Oscuro
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-[#E5E5E5]">
+                <button type="button" (click)="close()"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Cancelar</button>
+
+                <button type="submit" [disabled]="loading"
+                    class="px-5 py-2 bg-[#B8672E] text-white rounded-lg shadow hover:bg-[#A05622]">
+                    {{ loading ? 'Guardando…' : 'Guardar' }}
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>

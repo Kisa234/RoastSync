@@ -1,0 +1,187 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Gestión de Boxes</h1>
+      <p class="text-gray-600">Administra los formularios y las suscripciones activas de los usuarios.</p>
+    </div>
+
+    <div class="flex space-x-3">
+      <!-- Crear template -->
+      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openCreateTemplate()">
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+        Nuevo Formulario
+      </button>
+
+      <!-- Asignar box -->
+      <button
+        class="flex items-center bg-[#F4F4F4] text-[#1F1F1F] px-4 py-2 rounded shadow hover:bg-[#E5E5E5] transition"
+        (click)="openRenovateModal()">
+        <lucide-icon [img]="Package" class="w-5 h-5 mr-2" />
+        Nuevas suscripcion
+      </button>
+
+      <button
+        class="flex items-center bg-[#F4F4F4] text-[#1F1F1F] px-4 py-2 rounded shadow hover:bg-[#E5E5E5] transition"
+        (click)="openActiveTemplate()">
+        <lucide-icon [img]="PackagePlus" class="w-5 h-5 mr-2" />
+        Formulario Activo
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Contenedor principal -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 space-y-6">
+
+    <!-- Tabs -->
+    <div class="flex border-b border-[#E5E5E5] mb-4">
+      <button class="px-6 py-3 text-sm font-medium transition" [class.text-[#B8672E]]="tab === 'templates'"
+        [class.border-b-4]="tab === 'templates'" [class.border-[#B8672E]]="tab === 'templates'"
+        (click)="tab = 'templates'">
+        Formularios
+      </button>
+
+      <button class="px-6 py-3 text-sm font-medium transition" [class.text-[#B8672E]]="tab === 'usuarios'"
+        [class.border-b-4]="tab === 'usuarios'" [class.border-[#B8672E]]="tab === 'usuarios'"
+        (click)="tab = 'usuarios'">
+        Usuarios con Suscripciones
+      </button>
+    </div>
+
+    <!-- ==================== TAB 1: Templates ==================== -->
+    <div *ngIf="tab === 'templates'" class="space-y-4">
+
+
+      <!-- tabla -->
+      <div class="overflow-x-auto m-1 rounded-lg shadow-sm">
+        <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+          <thead class="bg-[#F9F9F9]">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Mes</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Café Fijo 1</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Café Fijo 2</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cafés Opcionales</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody class="bg-white divide-y divide-[#E5E5E5]">
+            <tr *ngFor="let t of templates" class="hover:bg-[#F9F9F9]">
+
+              <td class="px-6 py-4 text-sm text-gray-700">{{ t.nombre }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ t.cafe_fijo_1 }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ t.cafe_fijo_2 }}</td>
+
+              <td class="px-6 py-4 text-sm text-gray-700">
+
+                <!-- SECCIÓN OPCIONES -->
+                <ng-container *ngIf="t.opciones as ops; else sinOpciones">
+                  <ng-container *ngIf="ops.length > 0; else sinOpciones">
+                    <span *ngFor="let op of ops" class="inline-block px-2 py-1  text-xs mr-1">
+                      {{ op.id_cafe }}
+                    </span>
+                  </ng-container>
+                </ng-container>
+
+                <ng-template #sinOpciones>
+                  <span class="text-gray-400 text-xs">—</span>
+                </ng-template>
+
+              </td>
+
+              <td class="px-6 py-4 text-sm">
+                <span [class.bg-green-100]="t.activo" [class.text-green-800]="t.activo" [class.bg-red-100]="!t.activo"
+                  [class.text-red-800]="!t.activo" class="px-2 py-1 rounded-full font-semibold text-xs">
+                  {{ t.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+
+
+
+              <td class="px-6 py-4 text-sm text-gray-700 flex space-x-4">
+                <button (click)="openEditTemplate(t)">
+                  <lucide-icon [img]="Pencil" class="w-5 h-5 text-gray-600 hover:text-[#B8672E]" />
+                </button>
+
+                <button (click)="openDeleteTemplate(t)">
+                  <lucide-icon [img]="Trash2" class="w-5 h-5 text-red-600 hover:text-red-700" />
+                </button>
+              </td>
+
+            </tr>
+
+            <!-- vacío -->
+            <tr *ngIf="templates.length === 0">
+              <td colspan="7" class="px-6 py-6 text-center text-gray-500">
+                No hay templates registrados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 2: Usuarios ==================== -->
+    <div *ngIf="tab === 'usuarios'" class="space-y-4">
+
+
+      <div class="overflow-x-auto m-1 rounded-lg shadow-sm">
+        <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+          <thead class="bg-[#F9F9F9]">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Usuario</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Meses Restantes</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Última Respuesta</th>
+            </tr>
+          </thead>
+
+          <tbody class="bg-white divide-y divide-[#E5E5E5]">
+
+            <tr *ngFor="let u of usersWithBoxes" class="hover:bg-[#F9F9F9]">
+              <td class="px-6 py-4 text-sm text-gray-700">{{ u.id_user | userName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-800">{{ u.cant_suscripcion }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ u.lastDate | date:'dd/MM/yyyy' }}</td>
+            </tr>
+
+            <tr *ngIf="usersWithBoxes.length === 0">
+              <td colspan="4" class="px-6 py-6 text-center text-gray-500">
+                No hay usuarios con boxes activos.
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Modales -->
+
+<box-add-form 
+  *ngIf="showAddForm" 
+  (closes)="closeAddForm()" 
+  (saved)="onTemplateCreated($event)">
+</box-add-form>
+<box-edit-form 
+  *ngIf="showTemplateForm" 
+  [template]="selectedTemplate" 
+  (closes)="showTemplateForm = false"
+  (saved)="loadTemplates()">
+</box-edit-form>
+<app-active-template 
+  *ngIf="showActiveTemplate" 
+  (close)="closeActiveTemplate()">
+</app-active-template>
+<app-renovate-subscription 
+  *ngIf="showRenovateModal" 
+  (onClose)="closeRenovateModal()"
+  (onSave)="onSavedRenovation()">
+</app-renovate-subscription>

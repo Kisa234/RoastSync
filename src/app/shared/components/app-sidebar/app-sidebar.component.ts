@@ -14,7 +14,8 @@ import {
   Settings,
   FlaskConical,
   Truck,
-  PackageSearch 
+  PackageSearch,
+  Gift
   
 } from 'lucide-angular';
 
@@ -40,6 +41,7 @@ export class SidebarComponent {
     { label: 'Tostado',      path: '/roasts',    icon: Flame },
     { label: 'Analisis',         path: '/analisis',    icon: FlaskConical  },
     { label: 'Usuarios',     path: '/clients',   icon: Users },
+    { label: 'Suscripcion',path: '/suscriptions',  icon: Gift },
     { label: 'Configuración',path: '/settings',  icon: Settings },
     // { label: 'Reportes',     path: '/reports',   icon: ChartColumn },
   ];

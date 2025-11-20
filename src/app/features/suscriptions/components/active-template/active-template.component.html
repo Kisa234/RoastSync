@@ -1,0 +1,78 @@
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center border-b px-6 py-4">
+      <h2 class="text-xl font-semibold text-[#1F1F1F]">Seleccionar Formulario Activo</h2>
+
+      <button (click)="closeModal()"
+        class="text-gray-500 hover:text-gray-700 transition text-xl font-semibold">
+        ✕
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="p-6">
+
+      <p class="text-gray-600 mb-6">
+        Solo un formulario puede estar activo a la vez.
+      </p>
+
+      <!-- Caja con scroll -->
+      <div class="bg-white p-5 rounded-lg border border-[#E5E5E5] shadow-sm max-h-96 overflow-y-auto">
+
+        <div *ngIf="loading" class="text-center text-gray-500 py-4">
+          Cargando formularios...
+        </div>
+
+        <div *ngIf="!loading && templates.length === 0"
+          class="text-gray-500 text-center py-4">
+          No hay formularios disponibles.
+        </div>
+
+        <div *ngIf="!loading">
+          <div *ngFor="let t of templates"
+            class="flex items-center justify-between border-b border-[#E5E5E5] py-3">
+
+            <label class="flex items-center gap-3 cursor-pointer">
+
+              <input type="radio"
+                     name="activeTemplate"
+                     [value]="t.id_box_template"
+                     [(ngModel)]="selected"
+                     class="h-4 w-4 text-[#B8672E] focus:ring-[#B8672E]">
+
+              <span class="text-gray-800 font-medium">
+                {{ t.nombre }}
+              </span>
+            </label>
+
+            <span class="text-sm"
+              [class.text-green-600]="t.activo"
+              [class.text-gray-500]="!t.activo">
+              {{ t.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="flex justify-end gap-3 px-6 py-4 border-t">
+
+      <button (click)="closeModal()"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+        Cancelar
+      </button>
+
+      <button (click)="save()"
+        [disabled]="loadingSave"
+        class="px-5 py-2 bg-[#B8672E] text-white rounded-lg shadow hover:bg-[#A05622]">
+        {{ loadingSave ? 'Guardando…' : 'Guardar' }}
+      </button>
+
+    </div>
+
+  </div>
+</div>

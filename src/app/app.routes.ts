@@ -24,6 +24,7 @@ import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { SettingsPageComponent } from './features/settings/page/settings-page.component';
 import { EnvioPageComponent } from './features/envios/pages/envio.page/envio.page.component';
 import { ProductPageComponent } from './features/products/pages/product/product-page.component';
+import { SuscriptionPageComponent } from './features/suscriptions/page/suscription-page.component';
 
 
 export const appRoutes: Routes = [
@@ -56,6 +57,7 @@ export const appRoutes: Routes = [
       { path: 'clients', component: UsersPageComponent },
       { path: 'settings', component: SettingsPageComponent },
       { path: 'products', component: ProductPageComponent},
+      { path: 'suscriptions', component: SuscriptionPageComponent},
 
 
       // ...otras rutas

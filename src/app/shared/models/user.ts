@@ -10,6 +10,9 @@ export interface User {
   direccion?: string;
   numero_telefono: number;
   rol: string;
+  tuestes? : number,
+  suscripcion?: boolean,
+  cant_suscripciones?: number,
   password: string;
   eliminado: boolean;
   fecha_registro: Date;
