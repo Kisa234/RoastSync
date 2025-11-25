@@ -267,6 +267,29 @@ export class InventoryPage {
     });
   }
 
+  deleteLoteTostado(l: LoteTostado) {
+    this.uiService.confirm({
+      title: 'Eliminar orden',
+      message: `¿Estás seguro de que deseas eliminar el lote tostado ${l.id_lote_tostado  }?`,
+      confirmText: 'Sí',
+      cancelText: 'No'
+    }).then(confirmed => {
+      if (confirmed) {
+        this.loteTostadoService.delete(l.id_lote_tostado ).subscribe({
+          next: () => {
+            this.uiService.alert('success', 'Éxito', 'Lote eliminado correctamente');
+            this.loadLotes();
+          },
+          error: (err) => {
+            console.error(err);
+            this.uiService.alert('error', 'Error', 'No se pudo eliminar el lote');
+          }
+        });
+      }
+    });
+  }
+
+
 
   // BUSQUEDA DE MUESTRAS Y LOTES 
   aplicarFiltroMuestras() {

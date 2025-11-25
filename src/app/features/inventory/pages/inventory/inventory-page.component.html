@@ -181,11 +181,11 @@
                 </td>
                 <td class="px-6 py-4">
                   <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
-                      'bg-green-100 text-green-800': l.proceso==='Natural',
-                      'bg-blue-100 text-blue-800': l.proceso==='Lavado',
-                      'bg-yellow-100 text-yellow-800': l.proceso==='Honey'
+                      'bg-green-100 text-green-800': l.proceso && l.proceso.trim().toLowerCase() === 'natural',
+                      'bg-blue-100 text-blue-800': l.proceso && l.proceso.trim().toLowerCase() === 'lavado',
+                      'bg-yellow-100 text-yellow-800': l.proceso && l.proceso.trim().toLowerCase() === 'honey'
                     }">
-                    {{ l.proceso }}
+                    {{ l.proceso.toLowerCase() }}
                   </span>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-700"> {{l.clasificacion? l.clasificacion : 'N/A'}}</td>
@@ -201,7 +201,7 @@
                     <lucide-icon [img]="Edit2" class="w-5 h-5" />
                   </button>
                   <button (click)="deleteLote(l)" class="text-gray-500 hover:text-gray-700">
-                    <lucide-angular [img]="Trash2" class="w-5 h-5"/>
+                    <lucide-angular [img]="Trash2" class="w-5 h-5" />
                   </button>
                 </td>
               </tr>
@@ -225,11 +225,11 @@
                 </td>
                 <td class="px-6 py-4">
                   <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
-                      'bg-green-100 text-green-800': l.proceso==='Natural',
-                      'bg-blue-100 text-blue-800': l.proceso==='Lavado',
-                      'bg-yellow-100 text-yellow-800': l.proceso==='Honey'
+                      'bg-green-100 text-green-800': l.proceso && l.proceso.trim().toLowerCase() === 'natural',
+                      'bg-blue-100 text-blue-800': l.proceso && l.proceso.trim().toLowerCase() === 'lavado',
+                      'bg-yellow-100 text-yellow-800': l.proceso && l.proceso.trim().toLowerCase() === 'honey'
                     }">
-                    {{ l.proceso }}
+                    {{ l.proceso.toLowerCase() }}
                   </span>
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-700"> {{l.clasificacion? l.clasificacion : 'N/A'}}</td>
@@ -243,6 +243,9 @@
                   </button>
                   <button (click)="openEditLote(l)" class="text-gray-500 hover:text-gray-700">
                     <lucide-icon [img]="Edit2" class="w-5 h-5" />
+                  </button>
+                  <button (click)="deleteLote(l)" class="text-gray-500 hover:text-gray-700">
+                    <lucide-angular [img]="Trash2" class="w-5 h-5" />
                   </button>
                 </td>
               </tr>
@@ -321,9 +324,12 @@
                   <button (click)="onFichaTueste(t)" class="text-gray-500 hover:text-gray-700">
                     <lucide-icon [img]="Eye" class="w-5 h-5" />
                   </button>
-                  <button (click)="exportStickerTostado(t)" class="text-gray-500 hover:text-gray-700" >
+                  <button (click)="exportStickerTostado(t)" class="text-gray-500 hover:text-gray-700">
                     <lucide-icon [img]="Label" class="w-5 h-5" />
                   </button>
+                  <!-- <button (click)="deleteLoteTostado(t)" class="text-gray-500 hover:text-gray-700">
+                    <lucide-angular [img]="Trash2" class="w-5 h-5" />
+                  </button> -->
                 </div>
               </td>
             </tr>
@@ -343,15 +349,18 @@
 <blend-lote *ngIf="showBlendLote" (close)="showBlendLote = false" (create)="onCreateBlend()"></blend-lote>
 <blend-tueste *ngIf="showBlendTueste" (close)="showBlendTueste = false" (create)="onCreateBlendTueste()"></blend-tueste>
 
-<report-lote [loteId]="selectedLoteId" [MuestraId]="selectedMuestraId" *ngIf="showReportLote" (close)="showReportLote=false"></report-lote>
+<report-lote [loteId]="selectedLoteId" [MuestraId]="selectedMuestraId" *ngIf="showReportLote"
+  (close)="showReportLote=false"></report-lote>
 
 <ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false"></ficha-tueste>
 
 <historic-lote [loteId]="selectedLoteId" *ngIf="showHistoricLote" (close)="showHistoricLote=false"></historic-lote>
 
-<historic-lote-tostado [loteId]="selectedTuesteId" *ngIf="showHistoricLoteTostado" (close)="showHistoricLoteTostado=false"></historic-lote-tostado >
+<historic-lote-tostado [loteId]="selectedTuesteId" *ngIf="showHistoricLoteTostado"
+  (close)="showHistoricLoteTostado=false"></historic-lote-tostado>
 
-<report-lote-tostado [loteId]="selectedTuesteId" *ngIf="showReportLoteTostado" (close)="showReportLoteTostado=false" ></report-lote-tostado>
+<report-lote-tostado [loteId]="selectedTuesteId" *ngIf="showReportLoteTostado"
+  (close)="showReportLoteTostado=false"></report-lote-tostado>
 
 <add-lote *ngIf="showAddLote" (close)="showAddLote = false" (create)="onLoteCreated()"></add-lote>
 

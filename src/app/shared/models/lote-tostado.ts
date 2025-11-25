@@ -8,4 +8,5 @@ export interface LoteTostado {
   id_user:string;
   id_analisis_rapido?: string;
   entregado?: Date;
+  eliminado?: boolean;
 }
