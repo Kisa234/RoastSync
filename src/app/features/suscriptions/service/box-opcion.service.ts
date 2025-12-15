@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BoxOpcionModel } from '../../../shared/models/box-opcion';
+import { BoxOpcion } from '../../../shared/models/box-opcion';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -13,20 +13,20 @@ export class BoxOpcionService {
 
   constructor(private http: HttpClient) {}
 
-  create(data: Partial<BoxOpcionModel>): Observable<BoxOpcionModel> {
-    return this.http.post<BoxOpcionModel>(`${this.baseUrl}`, data);
+  create(data: Partial<BoxOpcion>): Observable<BoxOpcion> {
+    return this.http.post<BoxOpcion>(`${this.baseUrl}`, data);
   }
 
-  getByTemplate(id_box_template: string): Observable<BoxOpcionModel[]> {
-    return this.http.get<BoxOpcionModel[]>(`${this.baseUrl}/template/${id_box_template}`);
+  getByTemplate(id_box_template: string): Observable<BoxOpcion[]> {
+    return this.http.get<BoxOpcion[]>(`${this.baseUrl}/template/${id_box_template}`);
   }
 
-  getById(id: string): Observable<BoxOpcionModel> {
-    return this.http.get<BoxOpcionModel>(`${this.baseUrl}/${id}`);
+  getById(id: string): Observable<BoxOpcion> {
+    return this.http.get<BoxOpcion>(`${this.baseUrl}/${id}`);
   }
 
-  update(id: string, data: Partial<BoxOpcionModel>): Observable<BoxOpcionModel> {
-    return this.http.put<BoxOpcionModel>(`${this.baseUrl}/${id}`, data);
+  update(id: string, data: Partial<BoxOpcion>): Observable<BoxOpcion> {
+    return this.http.put<BoxOpcion>(`${this.baseUrl}/${id}`, data);
   }
 
   delete(id: string): Observable<any> {

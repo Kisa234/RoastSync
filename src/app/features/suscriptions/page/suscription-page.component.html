@@ -103,6 +103,10 @@
 
 
               <td class="px-6 py-4 text-sm text-gray-700 flex space-x-4">
+                <button (click)="openRespuestasBox(t)">
+                  <lucide-icon [img]="Eye" class="w-5 h-5 text-blue-600 hover:text-blue-700" />
+                </button>
+
                 <button (click)="openEditTemplate(t)">
                   <lucide-icon [img]="Pencil" class="w-5 h-5 text-gray-600 hover:text-[#B8672E]" />
                 </button>
@@ -185,3 +189,8 @@
   (onClose)="closeRenovateModal()"
   (onSave)="onSavedRenovation()">
 </app-renovate-subscription>
+<app-box-respuestas
+  *ngIf="showRespuestasBox"
+  [box]="selectedTemplate"
+  (end)="showRespuestasBox = false">
+</app-box-respuestas>

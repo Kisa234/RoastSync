@@ -1,4 +1,4 @@
-export interface BoxTemplateModel {
+export interface BoxTemplate {
   id_box_template: string;
   nombre: string;
   descripcion: string | null;

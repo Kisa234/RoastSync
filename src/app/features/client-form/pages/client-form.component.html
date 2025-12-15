@@ -1,0 +1,397 @@
+<!-- WRAPPER A TODA PANTALLA -->
+<div class="h-screen flex flex-col overflow-hidden bg-white">
+
+  <!-- ========================= -->
+  <!-- 🡐 HEADER SUPERIOR -->
+  <!-- ========================= -->
+  <header *ngIf="stepVisual > 0 && stepVisual <= 5"
+    class="flex-none w-full flex items-center justify-between px-6 h-14">
+
+    <button class="flex items-center gap-1 text-[#B8672E] hover:underline disabled:opacity-40" (click)="prevStep()"
+      [disabled]="stepVisual === 1">
+      ← Volver
+    </button>
+
+  </header>
+
+
+
+
+
+  <!-- ========================= -->
+  <!-- CONTENIDO CENTRAL -->
+  <!-- ========================= -->
+  <main class="flex-1 overflow-hidden">
+
+    <!-- ============================= -->
+    <!--  BOTÓN LOGOUT (esquina izq.) -->
+    <!-- ============================= -->
+    <div *ngIf="stepVisual == 0 || stepVisual == 6" class="absolute top-4 left-4 z-40">
+      <button (click)="logout()" class="flex items-center gap-1 text-[#B8672E] hover:underline text-sm">
+        Salir de la Sesión
+      </button>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- STEP 0 : PRESENTACIÓN MINIMALISTA -->
+    <!-- ===================================================== -->
+    <div *ngIf="stepVisual === 0" class="h-full flex flex-col justify-center items-center text-center space-y-6">
+
+      <h1 class="text-3xl font-semibold text-[#6B3B2A] mb-2">
+        Hola {{ user.nombre }} 👋
+      </h1>
+
+      <p class="text-gray-700 text-lg max-w-xl leading-relaxed">
+        Tu Box del Mes está listo para ser personalizado.
+        Elige tus cafés favoritos, ajusta el tueste y selecciona tu molienda preferida.
+      </p>
+
+      <button class="px-10 py-3 bg-[#B8672E] text-white rounded-xl hover:opacity-90 transition" (click)="nextStep()">
+        Empezar →
+      </button>
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- STEP 1 , STEP 2 , STEP 4 → INFORMACIÓN + TUESTE + MOLIENDA -->
+    <!-- ===================================================== -->
+    <div *ngIf="stepVisual === 1 || stepVisual === 2 || stepVisual === 4"
+      class="h-full w-full flex justify-center items-center overflow-hidden">
+
+      <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10 h-full px-6">
+
+        <!-- ===================================================== -->
+        <!-- COLUMNA IZQUIERDA – FICHA DEL CAFÉ -->
+        <!-- ===================================================== -->
+        <div class="space-y-8 max-h-full overflow-hidden flex flex-col justify-center">
+
+          <!-- TÍTULO / DESCRIPCIÓN -->
+          <div class="space-y-3 text-center lg:text-left">
+
+            <div class="flex flex-col items-center p-1">
+              <h1 class="text-3xl font-semibold text-[#6B3B2A] leading-snug">
+                {{ steps[stepCafe]?.lote?.productor }}
+              </h1>
+              <sub class="text-xl font-semibold text-[#6B3B2A] leading-snug">
+                {{ steps[stepCafe]?.lote?.finca }}
+              </sub>
+            </div>
+
+            <p class="text-gray-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Quo veritatis perferendis nisi ex possimus qui aut voluptatum quas.
+            </p>
+          </div>
+
+          <!-- GRID DE INFORMACIÓN -->
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm mb-0">
+
+            <div>
+              <p class="uppercase text-xs text-gray-400">Origen</p>
+              <p class="font-medium text-[#6B3B2A]">
+                {{ steps[stepCafe]?.lote?.distrito }}, {{ steps[stepCafe]?.lote?.departamento }}
+              </p>
+            </div>
+
+            <div>
+              <p class="uppercase text-xs text-gray-400">Variedad</p>
+              <p class="font-medium text-[#6B3B2A]">
+                {{ steps[stepCafe]?.lote?.variedades | replace: ',': ', ' }}
+              </p>
+            </div>
+
+            <div>
+              <p class="uppercase text-xs text-gray-400">Proceso</p>
+              <p class="font-medium text-[#6B3B2A]">
+                {{ steps[stepCafe]?.lote?.proceso }}
+              </p>
+            </div>
+
+          </div>
+
+          <!-- GRÁFICA RADAR -->
+          <div class="w-full flex justify-center mb-0">
+            <spider-graph [aS]="analisisSensorial"></spider-graph>
+          </div>
+
+          <!-- NOTAS DE CATA -->
+          <div class="space-y-4 pt-2 border-t border-gray-300/40">
+
+            <div class="flex justify-between gap-4">
+              <p class="uppercase text-xs text-gray-400">Notas Sensoriales</p>
+              <span class="font-semibold text-xs text-[#6B3B2A]">
+                {{ analisisSensorial.puntaje_taza }} pts
+              </span>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <span *ngFor="let nota of steps[stepCafe].notas"
+                class="px-4 py-1 rounded-full border-2 text-[#6B3B2A] border-[#FFF6F1] text-sm">
+                {{ nota }}
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- ===================================================== -->
+        <!-- COLUMNA DERECHA – TUESTE & MOLIENDA -->
+        <!-- ===================================================== -->
+        <div class="space-y-8 max-h-full overflow-hidden flex flex-col justify-center">
+
+          <div class="flex justify-center lg:justify-end">
+            <multi-pie-chart [comentario]="analisisSensorial.comentario"></multi-pie-chart>
+          </div>
+
+          <!-- TUESTE -->
+          <div class="space-y-3">
+            <p class="uppercase text-xs text-gray-400">1. Nivel de Tueste</p>
+
+            <div class="flex gap-4 flex-wrap">
+              <button *ngFor="let t of steps[stepCafe]?.tuestes" class="px-6 py-3 rounded-lg border text-sm
+                             hover:bg-[#FFF6F1] hover:border-[#D8A47F] transition"
+                [ngClass]="boxRespuesta[steps[stepCafe].tuesteField] === t ? 'border-[#B8672E] bg-[#FFF0E6]' : ''"
+                (click)="steps[stepCafe]?.tuesteField && (boxRespuesta[steps[stepCafe].tuesteField] = t)">
+                {{ t }}
+              </button>
+            </div>
+          </div>
+
+          <!-- MOLIENDA -->
+          <div class="space-y-3">
+            <p class="uppercase text-xs text-gray-400">2. Tipo de Molienda</p>
+
+            <div class="grid grid-cols-2 gap-4">
+              <button *ngFor="let m of Moliendas"
+                class="px-6 py-3 rounded-lg border text-sm hover:bg-[#FFF6F1] hover:border-[#D8A47F] transition"
+                [ngClass]="boxRespuesta[steps[stepCafe].moliendaField] === MOLIENDA_MAP[m] 
+                      ? 'border-[#B8672E] bg-[#FFF0E6]' 
+                      : ''" (click)="setMolienda(m)">
+                {{ m }}
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- STEP 3 : SELECCIÓN DEL TERCER CAFÉ (MINIMALISTA) -->
+    <!-- ===================================================== -->
+    <div *ngIf="stepVisual === 3" class="h-full w-full flex justify-center items-center overflow-hidden">
+
+      <div class="w-full max-w-4xl space-y-8 px-6">
+
+        <h2 class="text-2xl font-semibold text-[#6B3B2A]">
+          Elige tu tercer café
+        </h2>
+
+        <div class="space-y-8 overflow-auto max-h-[70vh]">
+
+          <div *ngFor="let op of template.opciones" class="cursor-pointer hover:opacity-90 transition"
+            (click)="selectOption(op)">
+
+            <h3 class="text-xl font-semibold text-[#6B3B2A]">
+              {{ op.lote?.finca || op.lote?.productor }} – {{ op.lote?.variedades }}
+            </h3>
+
+            <p class="text-gray-600">
+              {{ op.lote?.distrito }}, {{ op.lote?.departamento }}
+            </p>
+
+            <p class="text-sm text-[#6B3B2A] mt-2">
+              Proceso {{ op.lote?.proceso?.toLowerCase() }}
+            </p>
+
+            <div class="mt-4 ">
+              <p class="uppercase text-xs text-gray-400 mb-1">
+                Notas sensoriales
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span *ngFor="let nota of op.notas" class="px-3 py-1 rounded-full bg-[#FFEDE3] text-[#B8672E] text-xs">
+                  {{ nota }}
+                </span>
+              </div>
+            </div>
+
+            <hr class="my-6 border-gray-300/40" />
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- STEP 5 : RESUMEN FINAL -->
+    <!-- ===================================================== -->
+    <div *ngIf="stepVisual === 5" class="w-full flex flex-col items-center px-6 py-10">
+
+      <!-- Encabezado -->
+      <div class="w-full max-w-4xl mb-8">
+        <p class="text-sm text-[#B8672E]/80 font-medium">
+          Box del Mes · {{ template?.mes }} {{ template?.anio }}
+        </p>
+
+        <h2 class="text-3xl font-semibold text-[#6B3B2A] mt-1">
+          Tu selección
+        </h2>
+      </div>
+
+      <!-- LISTA DE CAFÉS -->
+      <div class="w-full max-w-4xl space-y-8">
+
+        <!-- CARD DE CAFÉ -->
+        <ng-container *ngFor="let cafe of steps; let i = index">
+
+          <div class="pb-6 border-b border-gray-300/40">
+
+            <!-- TÍTULO + EDITAR -->
+            <div class="flex items-start justify-between gap-4">
+
+              <div class="flex items-start gap-3">
+
+
+
+                <!-- Info -->
+                <div>
+                  <h3 class="text-lg font-semibold text-[#6B3B2A] leading-tight">
+                    {{ cafe.lote?.productor }} – {{ cafe.lote?.finca }}
+                  </h3>
+
+                  <p class="text-sm text-gray-600 flex items-center gap-2 mt-1">
+                    <span class="flex items-center gap-1">
+                      <svg width="12" height="12" fill="#B8672E">
+                        <circle cx="6" cy="6" r="6" />
+                      </svg>
+                      {{ cafe.lote?.departamento }}, {{ cafe.lote?.distrito }}
+                    </span>
+
+                    <span class="mx-1">·</span>
+
+                  </p>
+                </div>
+
+              </div>
+
+              <!-- Botón Editar -->
+              <button class="text-[#B8672E] text-sm hover:underline" (click)="editarCafe(i)">
+                Editar
+              </button>
+
+            </div>
+
+            <!-- DETALLES DE SELECCIÓN -->
+            <div class="mt-3  text-[15px] text-[#6B3B2A] space-x-4">
+
+              <span>
+                <strong>Tueste:</strong> {{ boxRespuesta[cafe.tuesteField] }}
+              </span>
+
+              <span>
+                <strong>Molienda:</strong> {{ boxRespuesta[cafe.moliendaField] }}
+              </span>
+            </div>
+
+            <!-- NOTAS SENSORIALES SOLO PARA CAFÉ LIBRE -->
+            <div class="mt-4 ">
+              <p class="uppercase text-xs text-gray-400 mb-1">
+                Notas sensoriales
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span *ngFor="let nota of cafe.notas"
+                  class="px-3 py-1 rounded-full bg-[#FFEDE3] text-[#B8672E] text-xs">
+                  {{ nota }}
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+        </ng-container>
+
+      </div>
+
+      <!-- BOTÓN FINAL -->
+      <button class="mt-10 px-10 py-3 bg-[#B8672E] text-white rounded-xl hover:opacity-90 shadow" (click)="submit()">
+        Confirmar Box
+      </button>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- STEP 6 : PANTALLA DE CONFIRMACIÓN -->
+    <!-- ===================================================== -->
+    <div *ngIf="stepVisual === 6" class="h-full w-full flex flex-col justify-center items-center text-center px-6">
+
+      <!-- Ícono check -->
+      <div class="w-20 h-20 rounded-full bg-[#B8672E]/10 flex items-center justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-[#B8672E]" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      </div>
+
+      <!-- Título -->
+      <h1 class="text-3xl font-semibold text-[#6B3B2A] mb-3">
+        ¡Tu Box ha sido confirmado!
+      </h1>
+
+      <!-- Texto -->
+      <p class="text-gray-600 text-lg max-w-lg leading-relaxed mb-8">
+        Gracias {{ user.nombre }} 🙌<br>
+        Hemos registrado tu selección de cafés para este mes.
+        <br>Pronto recibirás una notificación cuando tu box esté listo.
+      </p>
+
+
+    </div>
+
+
+  </main>
+
+
+
+  <!-- ========================= -->
+  <!-- FOOTER STICKY PROGRESO -->
+  <!-- ========================= -->
+  <footer *ngIf="stepVisual > 0 && stepVisual < 5"
+    class="flex-none w-full bg-white shadow-inner h-14 px-10  py-10 flex justify-between items-center ">
+
+    <div class="flex items-center gap-3 w-1/2">
+      <span class="text-sm text-gray-700">Progreso</span>
+      <div class="flex-1 h-2 bg-gray-300 rounded-full overflow-hidden">
+        <div class="h-full bg-[#B8672E]" [style.width.%]="(stepVisual / 5) * 100"></div>
+      </div>
+      <span class="text-sm text-gray-700">{{ (stepVisual / 5) * 100 }}%</span>
+    </div>
+
+    <button *ngIf="stepVisual > 0 && stepVisual < 5" [disabled]="
+    !lotesLoaded ||
+    !steps[stepCafe]?.moliendaField ||
+    !steps[stepCafe]?.tuesteField ||
+    !boxRespuesta[steps[stepCafe].moliendaField] ||
+    !boxRespuesta[steps[stepCafe].tuesteField]
+  " (click)="nextStep()" class="
+    px-8 py-3 bg-[#B8672E] text-white rounded-xl shadow hover:opacity-90
+    disabled:bg-[#E5C5AB] disabled:text-white/60 disabled:cursor-not-allowed disabled:opacity-50
+  ">
+      Continuar →
+    </button>
+
+
+
+  </footer>
+
+</div>

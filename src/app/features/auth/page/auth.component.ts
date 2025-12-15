@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
 import { NgIf } from '@angular/common';
-import { Coffee ,Mail , Lock , LucideAngularModule} from 'lucide-angular';
+import { Coffee, Mail, Lock, LucideAngularModule } from 'lucide-angular';
 import { Router } from '@angular/router';
 
 @Component({
@@ -17,16 +17,16 @@ import { Router } from '@angular/router';
 })
 export class AuthComponent implements OnInit {
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private authSvc: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   readonly Coffee = Coffee;
   readonly Mail = Mail;
   readonly Lock = Lock;
   readonly LucideAngularModule = LucideAngularModule;
-  
+
   loading = false;
   loginForm!: FormGroup;
   errorMsg: string | null = null;
@@ -53,13 +53,25 @@ export class AuthComponent implements OnInit {
     const { email, password } = this.loginForm.value;
 
     try {
+      // 1) Login y guardar tokens
       await this.authSvc.login(email, password).toPromise();
-      this.router.navigate(['/dashboard']);
+
+      // 2) Obtener rol REAL desde el backend (/me)
+      const user = await this.authSvc.checkSession().toPromise();
+
+      // 3) Redirección según rol
+      if (user!.rol === 'cliente') {
+        this.router.navigate(['/suscriptions']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
+
     } catch (err: any) {
       this.errorMsg = err?.error?.error || 'Error al iniciar sesión';
     } finally {
       this.loading = false;
     }
   }
+
 
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BoxTemplateModel } from '../../../shared/models/box-template';
+import { BoxTemplate } from '../../../shared/models/box-template';
 import { BoxTemplateService } from '../service/box-template.service';
 import { BoxRespuestaService } from '../service/box-respuesta.service';
 import { CommonModule } from '@angular/common';
@@ -12,6 +12,7 @@ import { ActiveTemplateComponent } from '../components/active-template/active-te
 import { RenovateSubscriptionComponent } from '../components/renovate-subscription/renovate-subscription.component';
 import { UserService } from '../../users/service/users-service.service';
 import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
+import { BoxRespuestasComponent } from "../components/box-respuestas/box-respuestas.component";
 
 
 @Component({
@@ -24,14 +25,15 @@ import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
     EditFormComponent,
     ActiveTemplateComponent,
     RenovateSubscriptionComponent,
-    UserNamePipe
-  ]
+    UserNamePipe,
+    BoxRespuestasComponent
+]
 })
 export class SuscriptionPageComponent implements OnInit {
 
   // ===================== DATA =====================
 
-  templates: BoxTemplateModel[] = [];
+  templates: BoxTemplate[] = [];
   usersWithBoxes: any[] = [];
 
   loadingTemplates = false;
@@ -46,8 +48,9 @@ export class SuscriptionPageComponent implements OnInit {
   showAddForm = false;
   showActiveTemplate = false;
   showRenovateModal = false;
+  showRespuestasBox = false;
 
-  selectedTemplate: BoxTemplateModel | null = null;
+  selectedTemplate: BoxTemplate | null = null;
   selectedUser: any = null;
 
   // ===================== ICONS (Lucide) =====================
@@ -132,17 +135,22 @@ export class SuscriptionPageComponent implements OnInit {
 
   // ===================== TEMPLATE FORM =====================
 
+  openRespuestasBox(template: BoxTemplate) {
+    this.selectedTemplate = template;
+    this.showRespuestasBox = true;
+  }
+
   openCreateTemplate() {
     this.selectedTemplate = null;
     this.showAddForm = true;
   }
 
-  openEditTemplate(template: BoxTemplateModel) {
+  openEditTemplate(template: BoxTemplate) {
     this.selectedTemplate = template;
     this.showTemplateForm = true;
   }
 
-  openDeleteTemplate(template: BoxTemplateModel) {
+  openDeleteTemplate(template: BoxTemplate) {
     this.uiService.confirm({
       title: 'Confirmar eliminación',
       message: `¿Estás seguro de que deseas eliminar el template "${template.nombre}"? Esta acción no se puede deshacer.`,

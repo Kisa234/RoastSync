@@ -14,7 +14,7 @@ interface LoginResp {
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/user`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login(email: string, password: string): Observable<LoginResp> {
     return this.http
@@ -23,9 +23,21 @@ export class AuthService {
         tap(resp => {
           localStorage.setItem('access_token', resp.accessToken);
           localStorage.setItem('refresh_token', resp.refreshToken);
+
         })
       );
   }
+
+  logout() {
+    return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
+      .pipe(
+        tap(() => {
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        })
+      );
+  }
+
 
   refreshAccessToken() {
     const refreshToken = localStorage.getItem('refresh_token');
@@ -38,10 +50,6 @@ export class AuthService {
       );
   }
 
-  logout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-  }
 
   getToken(): string | null {
     return localStorage.getItem('access_token');

@@ -1,0 +1,101 @@
+<div class="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-7xl overflow-hidden">
+
+        <!-- HEADER -->
+        <div class="flex justify-between items-center border-b border-[#E5E5E5] px-6 py-4">
+            <h2 class="text-xl font-semibold text-[#1F1F1F]">
+                Respuestas del {{ box?.nombre }}
+            </h2>
+            <button (click)="close()" class="text-gray-500 hover:text-gray-700 text-xl font-semibold">✕</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="p-6 space-y-8 max-h-[75vh] overflow-y-auto">
+
+            <!-- ==========================
+                 RESUMEN ESTADÍSTICO
+            =========================== -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Total respuestas -->
+                <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#FAFAFA]">
+                    <p class="text-sm text-gray-500">Total respuestas</p>
+                    <p class="text-2xl font-semibold">{{ respuestas.length }}</p>
+                </div>
+            </div>
+
+
+            <!-- ==========================
+                 LISTA DE RESPUESTAS
+            =========================== -->
+            <div class="space-y-4">
+
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-[#333]">Listado de respuestas</h3>
+
+                    <button (click)="nuevaRespuesta()"
+                        class="bg-[#B8672E] text-white px-4 py-2 rounded-lg hover:bg-[#A05622] transition">
+                        + Agregar respuesta
+                    </button>
+                </div>
+
+                <table class="w-full border-collapse">
+                    <thead class="text-xs text-gray-600 bg-[#FAFAFA]">
+                        <tr>
+                            <th class="p-3 text-left">Usuario</th>
+                            <th class="p-3 text-left">Cafe Fijo 1</th>
+                            <th class="p-3 text-left">Tueste</th>
+                            <th class="p-3 text-left">Molienda</th>
+                            <th class="p-3 text-left">Cafe Fijo 2</th>
+                            <th class="p-3 text-left">Tueste</th>
+                            <th class="p-3 text-left">Molienda</th>
+                            <th class="p-3 text-left">Café Elegido</th>
+                            <th class="p-3 text-left">Tueste</th>
+                            <th class="p-3 text-left">Molienda</th>
+                            <th class="p-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let r of respuestas" class="border-b border-[#E5E5E5]">
+                            <td class="p-3 capitalize">{{ r.id_user | userName }}</td>
+                            <td class="p-3 capitalize">{{ box?.cafe_fijo_1 }}</td>
+                            <td class="p-3 capitalize">{{ r.tueste_1 | titlecaseSmart }}</td>
+                            <td class="p-3 capitalize">{{ r.molienda_1 |titlecaseSmart }}</td>
+                            <td class="p-3 capitalize">{{ box?.cafe_fijo_2 }}</td>
+                            <td class="p-3 capitalize">{{ r.tueste_2 | titlecaseSmart }}</td>
+                            <td class="p-3 capitalize">{{ r.molienda_2 | titlecaseSmart }}</td>
+                            <td class="p-3 capitalize">{{ r.id_cafe_elegido }}</td>
+                            <td class="p-3 capitalize">{{ r.tueste_3 | titlecaseSmart }}</td>
+                            <td class="p-3 capitalize">{{ r.molienda_3 | titlecaseSmart }}</td>
+
+                            <td class="p-3 flex items-center justify-center gap-3">
+
+                                <!-- Editar -->
+                                <button (click)="editarRespuesta(r)" class="text-gray-600 hover:text-gray-800 ">
+                                    <lucide-angular [img]="Edit"></lucide-angular>
+                                </button>
+
+                                <!-- Eliminar -->
+                                <button (click)="eliminarRespuesta(r)" class="text-red-600 hover:text-red-800">
+
+                                    <lucide-angular [img]="Trash2"></lucide-angular>
+                                </button>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="flex justify-end gap-3 px-6 py-4 border-t border-[#E5E5E5]">
+            <button (click)="close()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                Cerrar
+            </button>
+        </div>
+
+    </div>
+</div>

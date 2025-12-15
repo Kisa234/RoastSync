@@ -1,16 +1,32 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router, UrlTree } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../features/auth/service/auth.service';
+import { catchError, map, of } from 'rxjs';
 
 export const smartRedirectGuard: CanActivateFn = () => {
-  const auth   = inject(AuthService);
+  const auth = inject(AuthService);
   const router = inject(Router);
 
+  // Si no hay token → permitir ver login
   const token = auth.getToken();
-  if (token) {
-    // si hay token, directo al dashboard
-    return router.parseUrl('/dashboard');
-  }
-  // si no, muestro el login
-  return true;
+  if (!token) return true;
+
+  // Si hay token → verificar sesión en backend
+  return auth.checkSession().pipe(
+    map(user => {
+      // Si el backend devuelve usuario válido:
+      if (user.rol === 'cliente') {
+        return router.parseUrl('/client/box-form');
+      }
+
+      // Admin u otros roles:
+      return router.parseUrl('/dashboard');
+    }),
+
+    catchError(() => {
+      // Si /me falla (token inválido / expirado)
+      auth.logout();
+      return of(true);  // permitir ver login
+    })
+  );
 };
