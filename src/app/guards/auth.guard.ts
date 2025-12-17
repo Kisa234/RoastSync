@@ -7,10 +7,17 @@ export const authGuard: CanActivateFn = async (route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
+  // 🔑 1. NO hay token → login
+  const token = auth.getToken();
+  if (!token || auth.isTokenExpired(token)) {
+    auth.logout();
+    return router.parseUrl('/login');
+  }
+
   try {
+    // 🔑 2. Token válido → recién llamamos backend
     const user = await firstValueFrom(auth.checkSession());
 
-    // Cliente solo puede acceder a /client/*
     if (user.rol === 'cliente') {
       if (state.url.startsWith('/client')) {
         return true;
@@ -18,10 +25,10 @@ export const authGuard: CanActivateFn = async (route, state) => {
       return router.parseUrl('/client/box-form');
     }
 
-    // Admin -> rutas normales
     return true;
 
   } catch {
+    auth.logout();
     return router.parseUrl('/login');
   }
 };
