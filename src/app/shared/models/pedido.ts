@@ -5,6 +5,7 @@ export interface Pedido {
   fecha_registro: Date;
   tipo_pedido: string;
   cantidad: number;
+  facturado?: boolean;
   estado_pedido: string;
   id_user: string;
   id_lote?: string;

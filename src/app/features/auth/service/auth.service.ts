@@ -59,6 +59,15 @@ export class AuthService {
     return localStorage.getItem('refresh_token');
   }
 
+  isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp * 1000 < Date.now();
+    } catch {
+      return true;
+    }
+  }
+
   // PARA TUS GUARDS: comprueba sesión llamando /me
   checkSession() {
     return this.http.get<{ id: string; email: string; rol: string }>(

@@ -15,7 +15,8 @@ import {
   FlaskConical,
   Truck,
   PackageSearch,
-  Gift
+  Gift,
+  Calculator 
   
 } from 'lucide-angular';
 
@@ -35,6 +36,7 @@ export class SidebarComponent {
   links = [
     { label: 'Dashboard',    path: '/dashboard', icon: House },
     { label: 'Inventario',   path: '/inventory', icon: Box },
+    // { label: 'Costeo',path: '/costing',  icon: Calculator },
     { label: 'Pedidos',      path: '/orders',    icon: ShoppingCart },
     { label: 'Productos',      path: '/products',    icon: PackageSearch  },
     { label: 'Envios',      path: '/envio',    icon: Truck },

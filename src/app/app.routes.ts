@@ -24,6 +24,7 @@ import { authGuard } from './guards/auth.guard';
 import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { ClientFormComponent } from './features/client-form/pages/client-form.component';
+import { CostingComponent } from './features/costing/pages/costing.component';
 
 export const appRoutes: Routes = [
 
@@ -65,6 +66,7 @@ export const appRoutes: Routes = [
       { path: 'settings', component: SettingsPageComponent },
       { path: 'products', component: ProductPageComponent },
       { path: 'suscriptions', component: SuscriptionPageComponent },
+      { path: 'costing', component: CostingComponent },
       
       {
         path: 'pdf/:type/:id',

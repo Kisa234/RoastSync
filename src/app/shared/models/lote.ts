@@ -11,6 +11,8 @@ export interface Lote {
   fecha_registro: Date;
   eliminado: boolean;
   clasificacion?:string;
+  costo?: number;
+  altura?: number;
   id_user?: string;
   id_analisis?: string;
   peso_tostado?: number;
