@@ -28,15 +28,11 @@ export class AuthService {
       );
   }
 
-  logout() {
-    return this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true })
-      .pipe(
-        tap(() => {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-        })
-      );
+  logout(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
   }
+
 
 
   refreshAccessToken() {

@@ -179,13 +179,7 @@ export class ClientFormComponent implements OnInit {
       cancelText: 'No'
     }).then(confirmed => {
       if (confirmed) {
-        this.authService.logout().subscribe({
-          next: () => {
-            window.location.reload();
-          },
-          error: (err) => {
-          }
-        });
+        this.authService.logout()
       }
     });
   }

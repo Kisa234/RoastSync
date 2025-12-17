@@ -9,12 +9,13 @@ export const smartRedirectGuard: CanActivateFn = () => {
 
   const token = auth.getToken();
 
-  // 🔑 NO token o token vencido → mostrar login
+  // 🔑 SIN token o token vencido → dejar ver login SIN backend
   if (!token || auth.isTokenExpired(token)) {
-    auth.logout();
+    auth.logout(); // limpia refreshToken viejo
     return true;
   }
 
+  // 🔑 SOLO aquí se llama al backend
   return auth.checkSession().pipe(
     map(user => {
       if (user.rol === 'cliente') {
