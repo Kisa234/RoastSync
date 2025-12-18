@@ -51,7 +51,7 @@
             Distrito
           </label>
           <select-search name="distrito" [items]="distritos" displayField="nombre" valueField="nombre"
-            placeholder="Distrito" [(ngModel)]="model.distrito"  [multiple]="true" [multipleAsString]="true" >
+            placeholder="Distrito" [(ngModel)]="model.distrito" [multiple]="true" [multipleAsString]="true">
           </select-search>
         </div>
 
@@ -71,6 +71,13 @@
           </label>
           <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
             valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+        </div>
+
+        <!-- Costo -->
+        <div class="col-span-1 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Costo (PEN)</label>
+          <input type="number" min="1" [(ngModel)]="model.costo" name="costo"
+            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
         </div>
 
         <!-- Variedades -->

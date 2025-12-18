@@ -61,6 +61,7 @@ export class EditLoteComponent implements OnInit {
     tipo_lote: 'Lote Verde',
     id_user: '',
     clasificacion: '',
+    costo: 0,
     id_lote: '',
     fecha_registro: new Date(),
     eliminado: false

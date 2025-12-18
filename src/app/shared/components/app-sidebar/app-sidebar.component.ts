@@ -16,8 +16,8 @@ import {
   Truck,
   PackageSearch,
   Gift,
-  Calculator 
-  
+  Calculator
+
 } from 'lucide-angular';
 
 @Component({
@@ -34,17 +34,17 @@ import {
 export class SidebarComponent {
   readonly Coffee = Coffee;
   links = [
-    { label: 'Dashboard',    path: '/dashboard', icon: House },
-    { label: 'Inventario',   path: '/inventory', icon: Box },
-    // { label: 'Costeo',path: '/costing',  icon: Calculator },
-    { label: 'Pedidos',      path: '/orders',    icon: ShoppingCart },
-    { label: 'Productos',      path: '/products',    icon: PackageSearch  },
-    { label: 'Envios',      path: '/envio',    icon: Truck },
-    { label: 'Tostado',      path: '/roasts',    icon: Flame },
-    { label: 'Analisis',         path: '/analisis',    icon: FlaskConical  },
-    { label: 'Usuarios',     path: '/clients',   icon: Users },
-    { label: 'Suscripcion',path: '/suscriptions',  icon: Gift },
-    { label: 'Configuración',path: '/settings',  icon: Settings },
+    { label: 'Dashboard', path: '/dashboard', icon: House },
+    { label: 'Inventario', path: '/inventory', icon: Box },
+    { label: 'Costeo', path: '/costing', icon: Calculator },
+    { label: 'Pedidos', path: '/orders', icon: ShoppingCart },
+    { label: 'Productos', path: '/products', icon: PackageSearch },
+    { label: 'Envios', path: '/envio', icon: Truck },
+    { label: 'Tostado', path: '/roasts', icon: Flame },
+    { label: 'Analisis', path: '/analisis', icon: FlaskConical },
+    { label: 'Usuarios', path: '/clients', icon: Users },
+    { label: 'Suscripcion', path: '/suscriptions', icon: Gift },
+    { label: 'Configuración', path: '/settings', icon: Settings },
     // { label: 'Reportes',     path: '/reports',   icon: ChartColumn },
   ];
 }

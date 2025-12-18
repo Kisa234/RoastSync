@@ -3,8 +3,11 @@ import { User } from './../../../shared/models/user';
 import { Component } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Plus } from 'lucide-angular';
+import { LucideAngularModule, Plus, Sheet } from 'lucide-angular';
 import { X, Check, Eye, Edit, Trash } from 'lucide-angular';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 import { AddRoasterComponent } from '../components/add-order-roast/add-order-roast.component';
 import { Pedido } from '../../../shared/models/pedido';
@@ -21,6 +24,8 @@ import { RoastsService } from '../service/roasts.service';
 import { Tueste } from '../../../shared/models/tueste';
 import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../shared/pipes/time.pipe";
+
+
 
 interface ExtendedPedido extends Pedido {
   userName?: string;
@@ -41,7 +46,7 @@ interface ExtendedPedido extends Pedido {
     FichaTuesteComponent,
     UserNamePipe,
     MinSecPipe
-],
+  ],
   templateUrl: './roast-page.component.html',
 })
 export class RoastsPage {
@@ -51,11 +56,14 @@ export class RoastsPage {
   readonly Eye = Eye;
   readonly Edit = Edit;
   readonly Trash = Trash;
+  readonly Sheet = Sheet;
 
   pendingOrders: ExtendedPedido[] = [];
   allHistoryRoasts: ExtendedPedido[] = [];
   filteredHistoryRoasts: ExtendedPedido[] = [];
   allRoasts: Tueste[] = [];
+  filteredAllRoasts: Tueste[] = [];
+
 
   startDate = '';
   endDate = '';
@@ -70,6 +78,17 @@ export class RoastsPage {
   selectedTuesteId = '';
   showFichaTueste = false;
 
+  // paginator 
+  page = 1;
+  pageSize = 5;
+  totalPages = 1;
+  pagedHistoryRoasts: ExtendedPedido[] = [];
+
+  // filter client 
+
+  clients: User[] = [];
+  selectedClientId = '';
+
 
   constructor(
     private pedidoSvc: PedidoService,
@@ -81,7 +100,16 @@ export class RoastsPage {
   ngOnInit() {
     this.loadPending();
     this.loadHistory();
+    this.loadClients();
+    this.loadAllRoasts();
   }
+
+  loadClients() {
+    this.userSvc.getUsers().subscribe(list => {
+      this.clients = list;
+    });
+  }
+
 
   private loadPending() {
     this.pedidoSvc.getPedidosByEstado('Pendiente')
@@ -119,24 +147,46 @@ export class RoastsPage {
     });
   }
 
-  toggleAllRoasts() {
-    this.showAllRoasts = !this.showAllRoasts;
-    if (this.showAllRoasts) {
-      this.loadAllRoasts();
-    }
-  }
-
-
   loadAllRoasts() {
     this.roastsSvc.getAllTuestes().subscribe(list => {
       this.allRoasts = list;
-      console.log(list);
+      this.filteredAllRoasts = list;
     });
   }
 
+
+  toggleAllRoasts() {
+    this.showAllRoasts = !this.showAllRoasts;
+  }
+
+
+  applyAllRoastsFilter() {
+
+    const desde = this.startDate ? new Date(this.startDate) : null;
+    const hasta = this.endDate ? new Date(this.endDate + 'T23:59:59') : null;
+    const cliente = this.selectedClientId;
+
+    this.filteredAllRoasts = this.allRoasts.filter(t => {
+      const fecha = new Date(t.fecha_tueste!);
+
+      const inRange =
+        (!desde || fecha >= desde) &&
+        (!hasta || fecha <= hasta);
+
+      const clientMatch =
+        !cliente || t.id_cliente === cliente;
+
+      return inRange && clientMatch;
+    });
+  }
+
+
+
   onFilterChange() {
     this.applyFilter();
+    this.applyAllRoastsFilter();
   }
+
 
   private applyFilter() {
     const desde = this.startDate ? new Date(this.startDate) : null;
@@ -155,8 +205,15 @@ export class RoastsPage {
         !nivel ||
         h.comentario === `Tueste ${nivel}`;
 
-      return inRange && nivelMatch;
+      const clientMatch =
+        !this.selectedClientId || h.id_user === this.selectedClientId;
+
+      return inRange && nivelMatch && clientMatch;
     });
+
+    this.totalPages = Math.ceil(this.filteredHistoryRoasts.length / this.pageSize) || 1;
+    this.page = 1;
+    this.updatePagedHistory();
   }
 
   openAddRoaster() {
@@ -201,5 +258,113 @@ export class RoastsPage {
     this.selectedTuesteId = t;
     this.showFichaTueste = true;
   }
+
+  updatePagedHistory() {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.pagedHistoryRoasts = this.filteredHistoryRoasts.slice(start, end);
+  }
+
+  changePage(delta: number) {
+    const next = this.page + delta;
+    if (next < 1 || next > this.totalPages) return;
+    this.page = next;
+    this.updatePagedHistory();
+  }
+
+  exportHistoryToExcel() {
+
+    /* ===============================
+     * HOJA 1 – HISTORIAL DE PEDIDOS
+     * =============================== */
+    const pedidosSheet = this.filteredHistoryRoasts.map(h => ({
+      id_pedido: h.id_pedido,
+      Lote: h.id_lote,
+      Fecha: h.fecha_tueste,
+      Cliente: h.userName ?? h.id_user,
+      Cantidad: h.cantidad,
+      'Tipo de Tueste': h.comentario,
+      Facturado: h.facturado ? 'Sí' : 'No',
+    }));
+
+    const wsPedidos = XLSX.utils.json_to_sheet(pedidosSheet);
+
+
+    /* ===============================
+     * HOJA 2 – TUESTES (DETALLE)
+     * =============================== */
+    const tuestesSheet = this.filteredAllRoasts.map(t => ({
+      id_pedido: t.id_pedido,
+      Lote: t.id_lote,
+      Fecha: t.fecha_tueste,
+      Tostadora: t.tostadora,
+      Densidad: t.densidad,
+      Humedad: t.humedad,
+      'Peso de Entrada': t.peso_entrada,
+      'Temperatura de Entrada': t.temperatura_entrada,
+      'Llama Inicial': t.llama_inicial,
+      'Aire Inicial': t.aire_inicial,
+      'Punto De No Retorno': t.punto_no_retorno,
+      'Temperatura de Salida': t.temperatura_salida,
+      'Tiempo Total': t.tiempo_total,
+      '%Caramelizacion': t.porcentaje_caramelizacion,
+      Desarrollo: t.desarrollo,
+      'Grados de Desarrollo': t.grados_desarrollo,
+      'Peso de Salida ': t.peso_salida,
+      Merma: t.merma,
+      'Agtron Comercial': t.agtrom_comercial,
+      'Agtron Gourmet': t.agtrom_gourmet,
+    }));
+
+    const wsTuestes = XLSX.utils.json_to_sheet(tuestesSheet);
+
+
+    /* ===============================
+     * WORKBOOK
+     * =============================== */
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, wsPedidos, 'Historial Pedidos Tueste');
+    XLSX.utils.book_append_sheet(wb, wsTuestes, 'Detalle Tuestes');
+
+    const buffer = XLSX.write(wb, {
+      bookType: 'xlsx',
+      type: 'array'
+    });
+
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+
+    const fileName = this.buildExportFileName();
+    saveAs(blob, fileName);
+
+  }
+
+  private buildExportFileName(): string {
+    const parts: string[] = ['tuestes'];
+
+    // fechas
+    if (this.startDate && this.endDate) {
+      parts.push(`${this.startDate}_a_${this.endDate}`);
+    } else if (this.startDate) {
+      parts.push(this.startDate);
+    } else if (this.endDate) {
+      parts.push(this.endDate);
+    }
+
+    // cliente
+    if (this.selectedClientId) {
+      const client = this.clients.find(c => c.id_user === this.selectedClientId);
+      if (client?.nombre) {
+        const safeName = client.nombre.replace(/\s+/g, '-').toUpperCase();
+        parts.push(safeName);
+      }
+    }
+
+    return parts.join('_') + '.xlsx';
+  }
+
+
+
+
 
 }

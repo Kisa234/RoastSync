@@ -84,6 +84,13 @@
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
           </div>
 
+          <!-- Costo -->
+          <div class="col-span-1 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1">Costo (PEN)</label>
+            <input type="number" min="1" [(ngModel)]="model.costo" name="costo"
+              class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+          </div>
+
 
           <div class="col-span-2 sm:col-span-1">
             <label for="cliente" class="block text-gray-700 text-sm mb-1">Cliente *</label>
@@ -196,6 +203,13 @@
             valueField="id_user" placeholder="Seleccionar cliente"></select-search>
         </div>
 
+        <!-- Costo -->
+        <div class="col-span-1 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Costo (PEN)</label>
+          <input type="number" min="1" [(ngModel)]="model.costo" name="costo"
+            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+        </div>
+
 
         <!-- Variedades -->
         <div class="col-span-2">
@@ -204,7 +218,6 @@
             displayField="nombre" valueField="nombre" placeholder="Seleccionar variedades"
             [multiple]="true"></select-search>
         </div>
-
 
 
         <!-- Proceso -->
@@ -236,6 +249,8 @@
             </div>
           </div>
         </div>
+
+
 
       </form>
 
