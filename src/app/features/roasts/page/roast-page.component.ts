@@ -5,6 +5,8 @@ import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus, Sheet } from 'lucide-angular';
 import { X, Check, Eye, Edit, Trash } from 'lucide-angular';
+import * as XLSX from 'xlsx';
+import { saveAs } from  'file-saver';
 
 
 import { AddRoasterComponent } from '../components/add-order-roast/add-order-roast.component';
@@ -22,7 +24,6 @@ import { RoastsService } from '../service/roasts.service';
 import { Tueste } from '../../../shared/models/tueste';
 import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../shared/pipes/time.pipe";
-
 
 
 interface ExtendedPedido extends Pedido {
@@ -270,10 +271,9 @@ export class RoastsPage {
     this.updatePagedHistory();
   }
 
-  async exportHistoryToExcel() {
+   exportHistoryToExcel() {
 
-    const XLSX = await import('xlsx');
-    const { saveAs } = await import('file-saver');
+    
 
     /* ===============================
      * HOJA 1 – HISTORIAL DE PEDIDOS
