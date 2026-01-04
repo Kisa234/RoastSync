@@ -4,9 +4,9 @@ import { Component } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Plus, Sheet } from 'lucide-angular';
-import { X, Check, Eye, Edit, Trash } from 'lucide-angular';
+import { X, Check, Eye, Edit, Trash, ReceiptText } from 'lucide-angular';
 import * as XLSX from 'xlsx';
-import { saveAs } from  'file-saver';
+import { saveAs } from 'file-saver';
 
 
 import { AddRoasterComponent } from '../components/add-order-roast/add-order-roast.component';
@@ -24,6 +24,7 @@ import { RoastsService } from '../service/roasts.service';
 import { Tueste } from '../../../shared/models/tueste';
 import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../shared/pipes/time.pipe";
+import { LoteService } from '../../inventory/service/lote.service';
 
 
 interface ExtendedPedido extends Pedido {
@@ -56,6 +57,7 @@ export class RoastsPage {
   readonly Edit = Edit;
   readonly Trash = Trash;
   readonly Sheet = Sheet;
+  readonly ReceiptText = ReceiptText;
 
   pendingOrders: ExtendedPedido[] = [];
   allHistoryRoasts: ExtendedPedido[] = [];
@@ -90,6 +92,7 @@ export class RoastsPage {
 
 
   constructor(
+    private loteSvc: LoteService,
     private pedidoSvc: PedidoService,
     private roastsSvc: RoastsService,
     private userSvc: UserService,
@@ -153,11 +156,54 @@ export class RoastsPage {
     });
   }
 
+  facturarPedido(o: ExtendedPedido) {
+
+    if (o.facturado) {
+      this.uiSvc.alert(
+        'info',
+        'Pedido ya facturado',
+        `El pedido de tueste del lote ${o.id_lote} ya está marcado como facturado.`,
+        1500
+      );
+      return;
+    }
+
+    if (o.estadoFacturacion === "ES_NUESTRO") {
+      this.uiSvc.alert(
+        'info',
+        'Pedido de tueste interno',
+        `El pedido de tueste del lote ${o.id_lote} es un pedido interno de la empresa y no se puede facturar.`,
+        1500
+      );
+      return;
+    }
+
+
+    this.uiSvc.confirm({
+      title: 'Facturar pedido',
+      message: `¿Confirma que desea marcar el pedido de tueste del lote ${o.id_lote} como facturado?`,
+      confirmText: 'Sí',
+      cancelText: 'No'
+    }).then(
+      confirmed => {
+        if (confirmed) {
+          this.pedidoSvc.setFacturado(o.id_pedido).subscribe(updated => {
+            this.allHistoryRoasts = this.allHistoryRoasts.map(p =>
+              p.id_pedido === updated.id_pedido ? { ...p, estadoFacturacion: "FACTURADO" } : p
+            );
+
+            this.applyFilter();
+          });
+
+        }
+      }
+    )
+
+  }
 
   toggleAllRoasts() {
     this.showAllRoasts = !this.showAllRoasts;
   }
-
 
   applyAllRoastsFilter() {
 
@@ -179,13 +225,10 @@ export class RoastsPage {
     });
   }
 
-
-
   onFilterChange() {
     this.applyFilter();
     this.applyAllRoastsFilter();
   }
-
 
   private applyFilter() {
     const desde = this.startDate ? new Date(this.startDate) : null;
@@ -271,9 +314,7 @@ export class RoastsPage {
     this.updatePagedHistory();
   }
 
-   exportHistoryToExcel() {
-
-    
+  exportHistoryToExcel() {
 
     /* ===============================
      * HOJA 1 – HISTORIAL DE PEDIDOS

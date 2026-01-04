@@ -68,4 +68,8 @@ export class PedidoService {
   getPedidosByLote(idLote:string):Observable<Pedido[]>{
     return this.http.get<Pedido[]>(`${this.base}/lote/${idLote}`);
   }
+
+  setFacturado(id:string):Observable<Pedido>{
+    return this.http.put<Pedido>(`${this.base}/facturar/${id}`, {});
+  }
 }

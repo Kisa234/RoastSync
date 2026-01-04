@@ -9,6 +9,8 @@ import { Pedido } from '../../../../shared/models/pedido';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
 import { ProductoService } from '../../../products/service/producto.service';
 import { LoteTostadoService } from '../../../inventory/service/lote-tostado.service';
+import { Producto } from '../../../../shared/models/producto';
+import { User } from '../../../../shared/models/user';
 
 @Component({
   selector: 'add-maquila',
@@ -42,8 +44,10 @@ export class AddMaquilaOrderComponent {
   availableQty: number | null = null;
   clientesOriginal: any[] = [];
   userLote: any = null;
-  clientes: any[] = [];
-  productos: any[] = [];
+  clientes: User[] = [];
+  productos: Producto[] = [];
+  productosFiltrados: Producto[] = [];
+
   lotesTostados: any[] = [];
   loading = false;
 
@@ -69,15 +73,21 @@ export class AddMaquilaOrderComponent {
       error: (err) => console.error('Error cargando usuarios:', err)
     });
 
-    // Productos (solo categoría CAT001 y activos)
+    // Productos 
     this.productoSvc.getProductos().subscribe({
       next: (res) => {
-        this.productos = res.filter(
-          (p: any) => p.id_categoria === 'CAT001' && p.activo === true
-        );
+        this.productos = res.filter((p: any) => {
+          const numeroCategoria = Number(p.id_categoria.replace('CAT', ''));
+          return (
+            numeroCategoria >= 1 &&
+            numeroCategoria <= 10 &&
+            p.activo === true
+          );
+        });
       },
       error: (err) => console.error('Error cargando productos:', err)
     });
+
 
     // Lotes tostados con peso >= 0
     this.loteTostadoSvc.getAll().subscribe({
@@ -94,6 +104,12 @@ export class AddMaquilaOrderComponent {
     if (!lote) return;
 
     this.availableQty = lote.peso; // ← Guardamos el peso disponible del lote
+
+    const clasificacion = lote.clasificacion.toUpperCase();
+
+    this.productosFiltrados = this.productos.filter(p =>
+      p.nombre.toUpperCase().includes(clasificacion)
+    );
 
     // Obtenemos el usuario dueño del lote
     this.userSvc.getUserById(lote.id_user).subscribe({

@@ -25,7 +25,7 @@ import { LucideAngularModule, ChevronDown } from 'lucide-angular';
 })
 export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnChanges {
   @HostListener('document:click', ['$event.target'])
-
+  
 
   @Input() items: any[] = [];
   @Input() displayField = '';
@@ -215,6 +215,10 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
         : this.placeholder;
     }
     return this.selected ? this.getLabel(this.selected) : this.placeholder;
+  }
+
+  onDocumentClick(target: HTMLElement) {
+    this.onClickOutside(target);
   }
 
   onClickOutside(target: HTMLElement) {

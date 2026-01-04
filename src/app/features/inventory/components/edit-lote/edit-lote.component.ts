@@ -11,6 +11,10 @@ import { UbigeoService } from '../../../../shared/services/ubigeo.service';
 import { Lote } from '../../../../shared/models/lote';
 import { Variedad } from '../../../../shared/models/variedad';
 import { Departamento, Distrito } from '../../../../shared/models/ubigeo';
+import { Cambio } from '../../../../shared/models/cambio';
+import { Historial } from '../../../../shared/models/historial';
+import { UiService } from '../../../../shared/services/ui.service';
+import { HistorialService } from '../../../../shared/services/historial.service';
 
 @Component({
   selector: 'edit-lote',
@@ -30,7 +34,9 @@ export class EditLoteComponent implements OnInit {
     private muestraSvc: MuestraService,
     private userSvc: UserService,
     private variedadSvc: VariedadService,
-    private ubigeoSvc: UbigeoService
+    private ubigeoSvc: UbigeoService,
+    private uiSvc: UiService,
+    private historialService: HistorialService
   ) { }
 
   // icons
@@ -66,6 +72,16 @@ export class EditLoteComponent implements OnInit {
     fecha_registro: new Date(),
     eliminado: false
   };
+
+  historial: Partial<Historial> = {
+    entidad: 'Lote',
+    id_entidad: this.loteId,
+    accion: 'Editar',
+    comentario: '',
+    fecha_registro: new Date(),
+    objeto_antes: null
+  }
+
 
   clientes: any[] = [];
 
@@ -107,6 +123,9 @@ export class EditLoteComponent implements OnInit {
         }
       });
     });
+
+    // Guardar el estado inicial para el historial
+    this.historial.objeto_antes = { ...this.model };
   }
 
 
@@ -123,7 +142,28 @@ export class EditLoteComponent implements OnInit {
   }
 
   saveManual() {
-    this.loteSvc.update(this.model.id_lote,this.model).subscribe(l => {
+    //this.uiSvc.prompt({
+    //  title: 'Confirmar edición',
+    //  message: 'Por favor, ingrese un comentario para el historial de cambios:',
+    //  placeholder: 'Comentario',
+    //  confirmText: 'Confirmar',
+    //  cancelText: 'Cancelar'
+    //}).then(res => {
+    //  if (!res.confirmed) return;
+    //
+    //  this.loteSvc.update(this.model.id_lote, this.model).subscribe({
+    //    next: () => {
+    //      this.historial.comentario = res.value ?? '';
+    //
+    //      this.historialService.create(this.historial).subscribe(() => {
+    //        this.create.emit();
+    //        this.close.emit();
+    //      });
+    //    }
+    //  });
+    //});
+
+    this.loteSvc.update(this.model.id_lote, this.model).subscribe(l => {
       this.create.emit();
       this.close.emit();
     });

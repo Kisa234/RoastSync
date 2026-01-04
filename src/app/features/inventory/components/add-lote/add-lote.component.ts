@@ -14,6 +14,8 @@ import { VariedadService } from '../../../../shared/services/variedad.service';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
 import { Departamento, Distrito, Provincia } from '../../../../shared/models/ubigeo';
 import { UbigeoService } from '../../../../shared/services/ubigeo.service';
+import { UiService } from '../../../../shared/services/ui.service';
+import { IngresoCafeService } from '../../service/ingreso-cafe.service';
 
 @Component({
   selector: 'add-lote',
@@ -33,7 +35,9 @@ export class AddLoteComponent implements OnInit {
     private muestraSvc: MuestraService,
     private userSvc: UserService,
     private variedadSvc: VariedadService,
-    private ubigeoSvc: UbigeoService
+    private ubigeoSvc: UbigeoService,
+    private uiSvc: UiService,
+    private ingresoCafeSvc: IngresoCafeService
   ) { }
 
   // icons
@@ -97,14 +101,14 @@ export class AddLoteComponent implements OnInit {
     this.cleanModel();
     this.muestraSvc.getById(muestraId).subscribe(muestra => {
       this.model.productor = muestra.productor,
-      this.model.finca = muestra.finca,
-      this.model.distrito = muestra.distrito,
-      this.model.departamento = muestra.departamento,
-      this.model.variedades = muestra.variedades,
-      this.model.proceso = muestra.proceso,
-      this.model.id_user = muestra.id_user,
+        this.model.finca = muestra.finca,
+        this.model.distrito = muestra.distrito,
+        this.model.departamento = muestra.departamento,
+        this.model.variedades = muestra.variedades,
+        this.model.proceso = muestra.proceso,
+        this.model.id_user = muestra.id_user,
 
-      this.model.peso = 0;
+        this.model.peso = 0;
     })
   }
 
@@ -142,19 +146,12 @@ export class AddLoteComponent implements OnInit {
     this.close.emit();
   }
 
-  saveManual() {
-    this.loteSvc.create(this.model).subscribe(l => {
-      this.create.emit();
-      this.close.emit();
-    });
-  }
-
   // ubigeo 
   departamentos: Departamento[] = [];
-  distritos: Distrito[]= []
+  distritos: Distrito[] = []
 
   selectedDeptoId?: string;
-  selecterDistId?:string
+  selecterDistId?: string
 
   @Output() selection = new EventEmitter<{ depto: Departamento; distrito: Distrito }>();
 
@@ -170,6 +167,25 @@ export class AddLoteComponent implements OnInit {
       .subscribe(provs => this.distritos = provs);
   }
 
+  addIngreso(lote: Lote) {
+    this.uiSvc.confirm({
+      title: 'Registrar ingreso de café',
+      message: `¿Deseas registrar ${lote.peso} g como ingreso inicial para este lote?`,
+      confirmText: 'Sí, registrar',
+      cancelText: 'No'
+    }).then(confirmed => {
+      if (!confirmed) { return }
+      
+      this.ingresoCafeSvc.createIngreso({
+        id_lote: lote.id_lote,
+        cantidad_kg: lote.peso,
+        costo_unitario: lote.costo ?? 0,
+        proveedor: lote.productor,
+        id_user: lote.id_user
+      }).subscribe(() => { });
+
+    });
+  }
 
   onSave() {
     if (this.activeTab === 'manual') {
@@ -179,10 +195,19 @@ export class AddLoteComponent implements OnInit {
     }
   }
 
+  saveManual() {
+    this.loteSvc.create(this.model).subscribe(l => {
+      this.addIngreso(l);
+      this.create.emit();
+      this.close.emit();
+    });
+  }
+
   saveFromMuestra() {
     console.log(this.selectedMuestraId);
     console.log(this.model);
     this.loteSvc.createByMuestra(this.selectedMuestraId, this.model).subscribe(l => {
+      this.addIngreso(l);
       this.create.emit();
       this.close.emit();
     });

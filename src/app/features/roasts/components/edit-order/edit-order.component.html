@@ -81,6 +81,20 @@
           </select>
         </div>
 
+        <!-- Facturado -->
+        <div>
+          <label class="block text-gray-700 text-sm mb-1">Facturado</label>
+
+          <select [(ngModel)]="orden.facturado" name="facturado" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E]
+           focus:outline-none transition">
+            <option [ngValue]="true">Sí</option>
+            <option [ngValue]="false">No</option>
+            <option [ngValue]="false">Es nuestro</option>
+          </select>
+        </div>
+
+
         <!-- Cantidad para nuevo batch -->
         <div class="col-span-2 grid grid-cols-2 gap-x-6">
           <div>

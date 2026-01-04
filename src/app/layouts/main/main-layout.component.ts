@@ -3,6 +3,7 @@ import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../../shared/components/app-sidebar/app-sidebar.component';
 import { AlertComponent } from '../../shared/components/alert/alert.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { PromptDialogComponent } from '../../shared/components/prompt-dialog/prompt-dialog.component';
 import { AuthService } from '../../features/auth/service/auth.service';
 import { NgIf } from '@angular/common';
 
@@ -14,6 +15,7 @@ import { NgIf } from '@angular/common';
     RouterModule,
     AlertComponent,
     ConfirmDialogComponent,
+    PromptDialogComponent,
     NgIf
   ],
   templateUrl: './main-layout.component.html',

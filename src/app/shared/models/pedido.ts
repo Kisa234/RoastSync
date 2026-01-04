@@ -6,6 +6,7 @@ export interface Pedido {
   tipo_pedido: string;
   cantidad: number;
   facturado?: boolean;
+  estadoFacturacion?: 'ES_NUESTRO' | 'FACTURADO' | 'NO_FACTURADO';
   estado_pedido: string;
   id_user: string;
   id_lote?: string;
@@ -27,5 +28,4 @@ export interface Pedido {
   creado_por_id?: string;
   completado_por_id?: string;
   fecha_completado?: Date;
-
 }
