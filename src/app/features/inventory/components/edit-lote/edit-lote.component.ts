@@ -54,7 +54,7 @@ export class EditLoteComponent implements OnInit {
 
   variedades: Variedad[] = [];
   procesos = ['LAVADO', 'NATURAL', 'HONEY'];
-  clasificaciones = ['SELECTO', 'CLASICO', 'EXCLUSIVO', 'ESPECIAL'];
+  clasificaciones = ['SELECTO', 'CLASICO', 'EXCLUSIVO', 'ESPECIAL', 'GOURMET'];
 
   model: Lote = {
     productor: '',

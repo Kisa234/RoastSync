@@ -76,7 +76,8 @@ export class AddLoteComponent implements OnInit {
 
   variedades: Variedad[] = [];
   procesos = ['Lavado', 'Natural', 'Honey'];
-  clasificaciones = ['Selecto', 'Clasico', 'Exclusivo', 'Especial'];
+  clasificaciones = ['SELECTO', 'CLASICO', 'EXCLUSIVO', 'ESPECIAL', 'GOURMET'];
+  
 
 
   // datos de muestras
