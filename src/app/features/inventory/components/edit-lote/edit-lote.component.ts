@@ -73,14 +73,6 @@ export class EditLoteComponent implements OnInit {
     eliminado: false
   };
 
-  historial: Partial<Historial> = {
-    entidad: 'Lote',
-    id_entidad: this.loteId,
-    accion: 'Editar',
-    comentario: '',
-    fecha_registro: new Date(),
-    objeto_antes: null
-  }
 
 
   clientes: any[] = [];
@@ -123,9 +115,6 @@ export class EditLoteComponent implements OnInit {
         }
       });
     });
-
-    // Guardar el estado inicial para el historial
-    this.historial.objeto_antes = { ...this.model };
   }
 
 
@@ -142,31 +131,37 @@ export class EditLoteComponent implements OnInit {
   }
 
   saveManual() {
-    //this.uiSvc.prompt({
-    //  title: 'Confirmar edición',
-    //  message: 'Por favor, ingrese un comentario para el historial de cambios:',
-    //  placeholder: 'Comentario',
-    //  confirmText: 'Confirmar',
-    //  cancelText: 'Cancelar'
-    //}).then(res => {
-    //  if (!res.confirmed) return;
-    //
-    //  this.loteSvc.update(this.model.id_lote, this.model).subscribe({
-    //    next: () => {
-    //      this.historial.comentario = res.value ?? '';
-    //
-    //      this.historialService.create(this.historial).subscribe(() => {
-    //        this.create.emit();
-    //        this.close.emit();
-    //      });
-    //    }
-    //  });
-    //});
+    if (this.model.peso <= 0) {
+      this.uiSvc.alert('error', 'error','El peso del lote debe ser mayor a cero.', 5000);
+      return;
+    }
 
-    this.loteSvc.update(this.model.id_lote, this.model).subscribe(l => {
-      this.create.emit();
-      this.close.emit();
+    this.uiSvc.prompt({
+      title: 'Confirmar edición',
+      message: 'Por favor, ingrese un comentario para el historial de cambios:',
+      placeholder: 'Comentario',
+      confirmText: 'Confirmar',
+      cancelText: 'Cancelar'
+    }).then(res => {
+      if (!res.confirmed) return;
+      
+      const payload = {
+        ...this.model,
+         hcomentario: res.value ?? ''
+      };
+
+      this.loteSvc.update(this.model.id_lote, payload).subscribe(l => {
+        this.create.emit();
+
+        if (this.model.peso == 0) {
+          this.loteSvc.delete(this.model.id_lote).subscribe();
+        }
+
+        this.close.emit();
+      });
     });
+
+
   }
 
 

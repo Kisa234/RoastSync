@@ -1,21 +1,81 @@
-<nav class="bg-[#30251D] text-white h-screen flex flex-col justify-between">
-  <!-- Logo -->
-  <div class="px-6 py-4 flex items-center space-x-2">
-    <lucide-icon [img]="Coffee"></lucide-icon>
-    <span class="text-xl font-semibold">RoastSync</span>
+<nav class="h-screen bg-[#30251D] text-white transition-all duration-300" [ngClass]="{
+    'w-64': !collapsed,
+    'w-20': collapsed
+  }">
+
+  <!-- LOGO -->
+  <div class="px-4 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-2 overflow-hidden">
+      <lucide-icon [img]="Flame"></lucide-icon>
+
+      <span class="text-xl font-semibold transition-all duration-300" [ngClass]="{
+          'opacity-100 w-auto': !collapsed,
+          'opacity-0 w-0 overflow-hidden': collapsed
+        }">
+        ORIGO
+      </span>
+    </div>
+
+    <!-- TOGGLE SIDEBAR -->
+    <button type="button" (click)="toggleSidebar()" class="p-1 rounded hover:bg-white/10 transition">
+      <lucide-icon [img]="ChevronLeft" class="transition-transform duration-300"
+        [class.rotate-180]="collapsed"></lucide-icon>
+    </button>
   </div>
 
-  <!-- Menú -->
+  <!-- MENU -->
   <ul class="flex-1 px-2 space-y-1">
-    <li *ngFor="let link of links">
-      <a
-        [routerLink]="link.path"
-        routerLinkActive="bg-[#B8672E]/20"
-        class="flex items-center px-4 py-3 rounded hover:bg-[#B8672E]/20"
-      >
-        <lucide-icon [img]="link.icon"></lucide-icon>
-        <span class="ml-3">{{ link.label }}</span>
-      </a>
+    <li *ngFor="let item of items">
+
+      <!-- ========= LINK SIMPLE ========= -->
+      <ng-container *ngIf="item.type === 'link'">
+        <a [routerLink]="item.path" routerLinkActive="bg-[#B8672E]/20"
+          class="flex items-center px-4 py-3 rounded hover:bg-[#B8672E]/20 transition-all">
+          <lucide-icon [img]="item.icon"></lucide-icon>
+
+          <span class="ml-3 whitespace-nowrap transition-all duration-300" [ngClass]="{
+              'opacity-100 w-auto': !collapsed,
+              'opacity-0 w-0 overflow-hidden': collapsed
+            }">
+            {{ item.label }}
+          </span>
+        </a>
+      </ng-container>
+
+      <!-- ========= GRUPO ========= -->
+      <ng-container *ngIf="item.type === 'group'">
+        <button type="button" (click)="toggleGroup(item.key)"
+          class="w-full flex items-center justify-between px-4 py-3 rounded hover:bg-[#B8672E]/20 transition-all"
+          [ngClass]="{
+            'bg-[#B8672E]/20': isGroupActive(item)
+          }">
+          <div class="flex items-center">
+            <lucide-icon [img]="item.icon"></lucide-icon>
+
+            <span class="ml-3 whitespace-nowrap transition-all duration-300" [ngClass]="{
+                'opacity-100 w-auto': !collapsed,
+                'opacity-0 w-0 overflow-hidden': collapsed
+              }">
+              {{ item.label }}
+            </span>
+          </div>
+
+          <lucide-icon *ngIf="!collapsed" [img]="ChevronDown" class="transition-transform duration-300"
+            [class.rotate-180]="openGroups[item.key]"></lucide-icon>
+        </button>
+
+        <!-- SUBMENU -->
+        <ul *ngIf="openGroups[item.key] && !collapsed" class="mt-1 ml-3 pl-3 border-l border-white/10 space-y-1">
+          <li *ngFor="let child of item.children">
+            <a [routerLink]="child.path" routerLinkActive="bg-[#B8672E]/20"
+              class="flex items-center px-4 py-2 rounded hover:bg-[#B8672E]/20 text-sm transition">
+              <lucide-icon [img]="child.icon"></lucide-icon>
+              <span class="ml-3">{{ child.label }}</span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
+
     </li>
   </ul>
 </nav>

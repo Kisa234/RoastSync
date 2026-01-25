@@ -1,0 +1,143 @@
+<div class="h-screen p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Muestras</h1>
+      <p class="text-gray-600">Gestión de muestras de café</p>
+    </div>
+
+    <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+      (click)="showAddMuestra = true">
+      <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
+      Agregar Muestra
+    </button>
+  </div>
+
+  <!-- Contenedor -->
+  <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
+
+    <!-- Filtros y búsqueda -->
+    <div class="flex gap-2.5 mb-4">
+
+      <!-- Buscador -->
+      <div class="relative w-full max-w-lg">
+        <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400">
+        </lucide-icon>
+
+        <input type="text" [(ngModel)]="filterTextMuestras" (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por cliente, productor, finca o provincia..." class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2
+                 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+      </div>
+
+      <!-- Botones de filtro -->
+      <div class="flex gap-x-2.5">
+        <button *ngFor="let f of filtersMuestras" (click)="aplicarFiltro(f.key)" [ngClass]="
+            filterMuestra === f.key
+              ? 'bg-[#B8672E] text-white'
+              : 'bg-gray-700 text-white hover:bg-[#B8672E]'
+          " class="transition rounded-lg px-4 py-2 text-sm">
+          {{ f.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="rounded-lg shadow-sm overflow-x-auto">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">ID</th>
+            <th class="py-3 text-left text-xs font-medium text-gray-600 uppercase">Nombre Muestra</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Productor</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Finca</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Provincia</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso (kg)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Variedades</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Proceso</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let m of muestras$ | async">
+
+            <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">
+              {{ m.id_muestra }}
+            </td>
+
+            <td class="py-4 font-semibold text-sm text-gray-700">
+              {{ m.nombre_muestra || 'N/A' }}
+            </td>
+
+            <td class="px-6 py-4 text-sm text-gray-700">
+              {{ m.id_user! | userName }}
+            </td>
+
+            <td class="px-6 py-4 text-sm text-gray-700">
+              {{ m.productor }}
+            </td>
+
+            <td class="px-6 py-4 text-sm text-gray-700">
+              {{ m.finca }}
+            </td>
+
+            <td class="px-6 py-4 text-sm text-gray-700">
+              {{ m.distrito }}
+            </td>
+
+            <td class="px-6 py-4 text-sm text-gray-700">
+              {{ m.peso.toLocaleString('en-US') }}
+            </td>
+
+            <td class="px-6 py-4">
+              <span *ngFor="let v of m.variedades" class="inline-block bg-[#E5E5E5] text-gray-700 text-xs
+                       px-2 py-0.5 rounded-full mr-1">
+                {{ v }}
+              </span>
+            </td>
+
+            <td class="px-6 py-4">
+              <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
+                  'bg-blue-100 text-blue-800': m.proceso === 'Lavado',
+                  'bg-green-100 text-green-800': m.proceso === 'Natural',
+                  'bg-yellow-100 text-yellow-800': m.proceso === 'Honey'
+                }">
+                {{ m.proceso }}
+              </span>
+            </td>
+
+            <td class="px-6 py-4 text-sm text-gray-700">
+              {{ m.fecha_registro | date:'dd/MM/yyyy' }}
+            </td>
+
+            <td class="px-6 py-4 text-right text-sm space-x-2">
+
+              <button (click)="onReport(m)" class="text-gray-500 hover:text-gray-700" title="Ver reporte">
+                <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+              </button>
+
+              <button *ngIf="!m.completado" (click)="onComplete(m)" class="text-gray-500 hover:text-green-600"
+                title="Marcar como completa">
+                <lucide-icon [img]="CheckCircle" class="w-5 h-5"></lucide-icon>
+              </button>
+
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modales -->
+
+<add-muestra *ngIf="showAddMuestra" (close)="showAddMuestra = false" (create)="onCreated()">
+</add-muestra>
+
+<report-lote *ngIf="showReport" [MuestraId]="selectedMuestraId" (close)="showReport = false">
+</report-lote>

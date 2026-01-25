@@ -7,7 +7,6 @@ import { ClientLayoutComponent } from './layouts/client/client-layout.component'
 
 // Pages
 import { OverviewComponent } from './features/dashboard/page/overview/overview.component';
-import { UsersPageComponent } from './features/users/page/users-page.component';
 import { OrdersPage } from './features/orders/page/orders-page.component';
 import { RoastsPage } from './features/roasts/page/roast-page.component';
 import { AnalisisPage } from './features/analysis/page/analisis.component';
@@ -25,6 +24,11 @@ import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { ClientFormComponent } from './features/client-form/pages/client-form.component';
 import { CostingComponent } from './features/costing/pages/costing.component';
+import { LoteVerdeComponent } from './features/inventory/pages/inventory/lote-verde/lote-verde.component';
+import { LoteTostadoComponent } from './features/inventory/pages/inventory/lote-tostado/lote-tostado.component';
+import { MuestrasComponent } from './features/inventory/pages/inventory/muestras/muestras.component';
+import { InternsComponent } from './features/users/page/interns/interns.component';
+import { ClientsComponent } from './features/users/page/clients/clients.component';
 
 export const appRoutes: Routes = [
 
@@ -57,12 +61,23 @@ export const appRoutes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: OverviewComponent },
-      { path: 'inventory', component: InventoryPage },
+      { 
+        path: 'inventory', 
+        component: InventoryPage, 
+        children: [
+          { path: 'muestras', component: MuestrasComponent },
+          { path: 'lotes-verdes', component: LoteVerdeComponent },
+          { path: 'lotes-tostados', component: LoteTostadoComponent }
+        ]
+      },
       { path: 'orders', component: OrdersPage },
       { path: 'envio', component: EnvioPageComponent },
       { path: 'roasts', component: RoastsPage },
       { path: 'analisis', component: AnalisisPage },
-      { path: 'clients', component: UsersPageComponent },
+      { path: 'users', children:[
+        { path: '', component: ClientsComponent },
+        { path: 'interns', component: InternsComponent}
+      ]},
       { path: 'settings', component: SettingsPageComponent },
       { path: 'products', component: ProductPageComponent },
       { path: 'suscriptions', component: SuscriptionPageComponent },

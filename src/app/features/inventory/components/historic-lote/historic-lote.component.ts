@@ -6,11 +6,12 @@ import { Lote } from '../../../../shared/models/lote';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { UserNamePipe } from "../../../../shared/pipes/user-name-pipe.pipe";
 import { LucideAngularModule, X } from 'lucide-angular';
+import { HistorialService } from './../../../../shared/services/historial.service';
 
 @Component({
   selector: 'historic-lote',
   imports: [
-    DatePipe,
+  DatePipe,
     DecimalPipe,
     CommonModule,
     UserNamePipe,
@@ -22,6 +23,7 @@ import { LucideAngularModule, X } from 'lucide-angular';
 export class HistoricLoteComponent implements OnInit {
   readonly X = X;
   
+
   @Output() close = new EventEmitter<void>();
   @Input() loteId: string = '';
 
@@ -38,7 +40,8 @@ export class HistoricLoteComponent implements OnInit {
 
   constructor(
     private readonly loteSvc:LoteService,
-    private readonly pedidoSvc:PedidoService
+    private readonly pedidoSvc:PedidoService,
+    private readonly historialService: HistorialService
   ){}
 
   ngOnInit(): void {

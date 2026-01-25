@@ -1,0 +1,200 @@
+<div
+  class="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-4"
+>
+  <div
+    class="bg-white rounded-lg shadow-lg w-full max-w-4xl overflow-hidden"
+  >
+
+    <!-- ================= HEADER ================= -->
+    <div class="flex justify-between items-center px-6 pt-4">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">
+          Configurar accesos
+        </h2>
+        <p class="text-gray-600 text-sm">
+          Asignar rol y permisos a usuarios
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="cancel()"
+        class="text-gray-400 hover:text-gray-600"
+      >
+        <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- ================= BODY ================= -->
+    <div class="px-6 py-5 space-y-5">
+
+      <!-- ===== Usuario ===== -->
+      <div>
+        <label class="block text-gray-700 text-sm mb-1">
+          Usuario
+        </label>
+        <select
+          class="w-full border border-[#E5E5E5] rounded px-3 py-2"
+          [(ngModel)]="selectedUserId"
+          (ngModelChange)="onUserChange($event)"
+        >
+          <option [ngValue]="null" disabled>
+            Seleccionar usuario
+          </option>
+          <option
+            *ngFor="let u of users"
+            [value]="u.id_user"
+          >
+            {{ u.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <!-- ===== Rol ===== -->
+      <div class="flex items-end gap-3">
+        <div class="flex-1">
+          <label class="block text-gray-700 text-sm mb-1">
+            Rol
+          </label>
+          <select
+            class="w-full border border-[#E5E5E5] rounded px-3 py-2"
+            [(ngModel)]="selectedRoleId"
+            (ngModelChange)="onRoleChange($event)"
+            [disabled]="!selectedUserId"
+          >
+            <option [ngValue]="null" disabled>
+              Seleccionar rol
+            </option>
+            <option
+              *ngFor="let rol of roles"
+              [value]="rol.id_rol"
+            >
+              {{ rol.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Crear rol -->
+        <button
+          type="button"
+          class="text-sm text-[#B8672E] hover:underline whitespace-nowrap"
+          (click)="openCreateRole()"
+        >
+          + Crear rol
+        </button>
+      </div>
+
+      <!-- ===== Acciones accordion ===== -->
+      <div class="flex justify-end gap-4 text-sm">
+        <button
+          type="button"
+          class="text-[#B8672E] hover:underline"
+          (click)="abrirTodosLosModulos()"
+        >
+          Abrir todos
+        </button>
+        <button
+          type="button"
+          class="text-gray-500 hover:underline"
+          (click)="cerrarTodosLosModulos()"
+        >
+          Cerrar todos
+        </button>
+      </div>
+
+      <!-- ===== PERMISOS (SCROLL + ACCORDION) ===== -->
+      <div
+        class="border border-[#E5E5E5] rounded overflow-hidden max-h-[420px] overflow-y-auto"
+      >
+
+        <!-- MODULO -->
+        <div
+          *ngFor="let modulo of permisosPorModulo | keyvalue"
+          class="border-b"
+        >
+
+          <!-- HEADER MODULO -->
+          <button
+            type="button"
+            class="w-full flex justify-between items-center px-4 py-3 bg-gray-100 hover:bg-gray-200 transition"
+            (click)="toggleModulo(modulo.key)"
+          >
+            <span class="font-medium text-gray-800">
+              {{ modulo.key }}
+            </span>
+
+            <span class="text-sm text-gray-500">
+              {{ modulo.value.length }} permisos
+            </span>
+          </button>
+
+          <!-- CONTENIDO MODULO -->
+          <div *ngIf="isModuloAbierto(modulo.key)">
+            <table class="w-full text-sm">
+              <tbody>
+
+                <tr
+                  *ngFor="let permiso of modulo.value"
+                  class="border-t hover:bg-gray-50 transition"
+                >
+                  <td class="p-3">
+                    <div class="font-medium text-gray-800">
+                      {{ permiso.descripcion || permiso.codigo }}
+                    </div>
+                  </td>
+
+                  <td class="p-3 text-center w-24">
+                    <input
+                      type="checkbox"
+                      [disabled]="!selectedRoleId"
+                      [checked]="permisosSeleccionados.includes(permiso.id_permiso)"
+                      (change)="togglePermiso(
+                        permiso.id_permiso,
+                        $any($event.target).checked
+                      )"
+                    />
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div
+          *ngIf="!loadingPermisos && permisos.length === 0"
+          class="p-6 text-center text-gray-400 text-sm"
+        >
+          No hay permisos registrados
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <div
+      class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5] space-x-2"
+    >
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-4 py-2 rounded border border-[#A67C52] hover:bg-[#F3F2F1]"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        (click)="save()"
+        [disabled]="!selectedUserId || !selectedRoleId"
+        class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] flex items-center disabled:opacity-50"
+      >
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2"></lucide-icon>
+        Guardar
+      </button>
+    </div>
+
+  </div>
+</div>

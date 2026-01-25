@@ -10,6 +10,7 @@ export interface User {
   direccion?: string;
   numero_telefono: number;
   rol: string;
+  id_rol?: string;
   tuestes? : number,
   suscripcion?: boolean,
   cant_suscripciones?: number,

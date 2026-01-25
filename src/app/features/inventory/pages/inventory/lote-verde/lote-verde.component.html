@@ -1,0 +1,204 @@
+<div class="h-screen p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Lotes Café Verde</h1>
+      <p class="text-gray-600">Gestión de lotes de café verde</p>
+    </div>
+
+    <div class="flex gap-2.5">
+      <div class="text-lg font-semibold text-[#1F1F1F] self-center">
+        Costo Total Inventario:
+        <span class="text-[#B8672E]">
+          {{ costoInventarioVerde | currency:'PEN':'symbol':'1.2-2' }}
+        </span>
+      </div>
+
+      <button
+        class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="showAddLote = true">
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
+        Agregar Lote
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenedor -->
+  <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
+
+    <!-- Buscador -->
+    <div class="mb-4 relative w-full max-w-lg">
+      <lucide-icon
+        [img]="Search"
+        class="absolute left-2 top-2 w-5 h-5 text-gray-400">
+      </lucide-icon>
+
+      <input
+        type="text"
+        [(ngModel)]="filterTextVerde"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Buscar por cliente, productor, finca o provincia..."
+        class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2
+               focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+    </div>
+
+    <!-- Tabla -->
+    <div class="rounded-lg shadow-sm overflow-x-auto">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Productor</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Distrito</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso (gr)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Variedades</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Proceso</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Clasificación</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+
+          <!-- ADMIN -->
+          <tr class="bg-[#F3F3F3]">
+            <td colspan="10" class="text-left text-xs uppercase text-gray-500 py-2 px-6">
+              Lotes de Fortunato
+            </td>
+          </tr>
+
+          <ng-container *ngFor="let l of getLotesAdmin()">
+            <tr>
+              <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | userName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.distrito }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.peso.toLocaleString('en-US') }}</td>
+              <td class="px-6 py-4">
+                <span class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                  {{ l.variedades }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <span
+                  class="inline-block text-xs px-2 py-0.5 rounded-full"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': l.proceso?.toLowerCase() === 'natural',
+                    'bg-blue-100 text-blue-800': l.proceso?.toLowerCase() === 'lavado',
+                    'bg-yellow-100 text-yellow-800': l.proceso?.toLowerCase() === 'honey'
+                  }">
+                  {{ l.proceso }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                {{ l.clasificacion || 'N/A' }}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                {{ l.fecha_registro | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 text-right text-sm space-x-2">
+                <button (click)="onReport(l)" class="text-gray-500 hover:text-gray-700">
+                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                </button>
+                <button (click)="openHistoric(l)" class="text-gray-500 hover:text-gray-700">
+                  <lucide-icon [img]="History" class="w-5 h-5"></lucide-icon>
+                </button>
+                <button (click)="openEdit(l)" class="text-gray-500 hover:text-gray-700">
+                  <lucide-icon [img]="Edit2" class="w-5 h-5"></lucide-icon>
+                </button>
+                <button (click)="delete(l)" class="text-gray-500 hover:text-red-600">
+                  <lucide-icon [img]="Trash2" class="w-5 h-5"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- CLIENTE -->
+          <tr class="bg-[#F3F3F3]">
+            <td colspan="10" class="text-left text-xs uppercase text-gray-500 py-2 px-6">
+              Lotes de Cliente
+            </td>
+          </tr>
+
+          <ng-container *ngFor="let l of getLotesCliente()">
+            <tr>
+              <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | userName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.distrito }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.peso.toLocaleString('en-US') }}</td>
+              <td class="px-6 py-4">
+                <span class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                  {{ l.variedades }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <span
+                  class="inline-block text-xs px-2 py-0.5 rounded-full"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': l.proceso?.toLowerCase() === 'natural',
+                    'bg-blue-100 text-blue-800': l.proceso?.toLowerCase() === 'lavado',
+                    'bg-yellow-100 text-yellow-800': l.proceso?.toLowerCase() === 'honey'
+                  }">
+                  {{ l.proceso }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                {{ l.clasificacion || 'N/A' }}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                {{ l.fecha_registro | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 text-right text-sm space-x-2">
+                <button (click)="onReport(l)" class="text-gray-500 hover:text-gray-700">
+                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                </button>
+                <button (click)="openHistoric(l)" class="text-gray-500 hover:text-gray-700">
+                  <lucide-icon [img]="History" class="w-5 h-5"></lucide-icon>
+                </button>
+                <button (click)="openEdit(l)" class="text-gray-500 hover:text-gray-700">
+                  <lucide-icon [img]="Edit2" class="w-5 h-5"></lucide-icon>
+                </button>
+                <button (click)="delete(l)" class="text-gray-500 hover:text-red-600">
+                  <lucide-icon [img]="Trash2" class="w-5 h-5"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+          </ng-container>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODALES -->
+
+<add-lote
+  *ngIf="showAddLote"
+  (close)="showAddLote = false"
+  (create)="onCreated()">
+</add-lote>
+
+<edit-lote
+  *ngIf="showEditLote"
+  [loteId]="selectedLoteId"
+  (close)="showEditLote = false"
+  (create)="onUpdated()">
+</edit-lote>
+
+<historic-lote
+  *ngIf="showHistoricLote"
+  [loteId]="selectedLoteId"
+  (close)="showHistoricLote = false">
+</historic-lote>
+
+<report-lote
+  *ngIf="showReportLote"
+  [loteId]="selectedLoteId"
+  (close)="showReportLote = false">
+</report-lote>
