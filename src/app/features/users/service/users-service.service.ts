@@ -1,4 +1,3 @@
-// src/app/features/users/service/user.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -12,7 +11,7 @@ import { User } from '../../../shared/models/user';
 export class UserService {
   private baseUrl = `${environment.apiUrl}/user`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** Obtiene todos los usuarios, opcionalmente filtrando por texto (nombre o email) */
   getUsers(): Observable<User[]> {
@@ -27,6 +26,10 @@ export class UserService {
   /** Obtiene usuarios según su rol */
   getUsersByRole(role: string): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseUrl}/role/${role}`);
+  }
+
+  assignRoleToUser(idUser: string, idRol: string): Observable<User> {
+    return this.http.put<User>( `${environment.apiUrl}/user/${idUser}/role/${idRol}`, {});
   }
 
   /** Crea un nuevo usuario */
