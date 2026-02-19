@@ -29,6 +29,7 @@ import { LoteTostadoComponent } from './features/inventory/pages/inventory/lote-
 import { MuestrasComponent } from './features/inventory/pages/inventory/muestras/muestras.component';
 import { InternsComponent } from './features/users/page/interns/interns.component';
 import { ClientsComponent } from './features/users/page/clients/clients.component';
+import { AlmacenComponent } from './features/inventory/pages/inventory/almacen/almacen.component';
 
 export const appRoutes: Routes = [
 
@@ -67,17 +68,18 @@ export const appRoutes: Routes = [
         children: [
           { path: 'muestras', component: MuestrasComponent },
           { path: 'lotes-verdes', component: LoteVerdeComponent },
-          { path: 'lotes-tostados', component: LoteTostadoComponent }
+          { path: 'lotes-tostados', component: LoteTostadoComponent },
+          { path: 'almacen', component: AlmacenComponent }
         ]
       },
       { path: 'orders', component: OrdersPage },
-      { path: 'envio', component: EnvioPageComponent },
       { path: 'roasts', component: RoastsPage },
       { path: 'analisis', component: AnalisisPage },
       { path: 'users', children:[
         { path: '', component: ClientsComponent },
         { path: 'interns', component: InternsComponent}
       ]},
+      { path: 'envio', component: EnvioPageComponent },
       { path: 'settings', component: SettingsPageComponent },
       { path: 'products', component: ProductPageComponent },
       { path: 'suscriptions', component: SuscriptionPageComponent },
