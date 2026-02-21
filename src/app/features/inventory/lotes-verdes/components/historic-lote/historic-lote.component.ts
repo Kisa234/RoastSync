@@ -7,29 +7,32 @@ import { Lote } from '../../../../../shared/models/lote';
 import { LoteService } from '../../service/lote.service';
 import { PedidoService } from '../../../../orders/service/orders.service';
 import { HistorialService } from '../../../../../shared/services/historial.service';
+import { Historial } from '../../../../../shared/models/historial';
 
 
 @Component({
   selector: 'historic-lote',
   imports: [
-  DatePipe,
+    DatePipe,
     DecimalPipe,
     CommonModule,
     UserNamePipe,
     LucideAngularModule
-],
+  ],
   templateUrl: './historic-lote.component.html',
   styles: ``
 })
 export class HistoricLoteComponent implements OnInit {
   readonly X = X;
-  
+
 
   @Output() close = new EventEmitter<void>();
   @Input() loteId: string = '';
 
   pedidos: Pedido[] = []
-  lote: Lote ={
+  historial: Historial[] = [];
+
+  lote: Lote = {
     id_lote: '',
     peso: 0,
     variedades: [],
@@ -40,22 +43,27 @@ export class HistoricLoteComponent implements OnInit {
   }
 
   constructor(
-    private readonly loteSvc:LoteService,
-    private readonly pedidoSvc:PedidoService,
+    private readonly loteSvc: LoteService,
+    private readonly pedidoSvc: PedidoService,
     private readonly historialService: HistorialService
-  ){}
+  ) { }
 
   ngOnInit(): void {
-    this.loteSvc.getById(this.loteId).subscribe(lote=>{
+    this.loteSvc.getById(this.loteId).subscribe(lote => {
       this.lote = lote;
-      this.pedidoSvc.getPedidosByLote(this.loteId).subscribe(pedidos =>{
+
+      this.pedidoSvc.getPedidosByLote(this.loteId).subscribe(pedidos => {
         this.pedidos = pedidos;
-      })    
-    })
+      });
+
+      this.historialService.getByEntidad(this.loteId).subscribe(historial => {
+        this.historial = historial;
+      });
+    });
   }
 
   onCancel() {
     this.close.emit();
   }
-  
+
 }
