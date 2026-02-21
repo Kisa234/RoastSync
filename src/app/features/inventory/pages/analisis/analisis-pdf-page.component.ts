@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { AnalisisPdfComponent } from '../../components/analisis-pdf/analisis-pdf.component';
+import { AnalisisPdfComponent } from '../analisis-pdf/analisis-pdf.component';
 import { ActivatedRoute } from '@angular/router';
 import { LucideAngularModule, Download } from 'lucide-angular';
 

@@ -5,7 +5,7 @@ import { BoxRespuestaService } from '../../suscriptions/service/box-respuesta.se
 import { BoxTemplateService } from '../../suscriptions/service/box-template.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { LoteService } from '../../inventory/service/lote.service';
+import { LoteService } from '../../inventory/lotes-verdes/service/lote.service';
 import { Lote } from '../../../shared/models/lote';
 import { AnalisisService } from '../../analysis/service/analisis.service';
 import { AnalisisSensorialService } from './../../analysis/service/analisis-sensorial.service';
@@ -15,7 +15,7 @@ import { UserService } from '../../users/service/users-service.service';
 import { AuthService } from '../../auth/service/auth.service';
 import { User } from '../../../shared/models/user';
 import { ReplacePipe } from '../../../shared/pipes/replace.pipe';
-import { SpiderGraphComponent } from '../../inventory/components/spider-graph/spider-graph.component';
+import { SpiderGraphComponent } from '../../../shared/components/spider-graph/spider-graph.component';
 import { MultiPieChartComponent } from '../../../shared/components/multi-pie-chart/multi-pie-chart.component';
 import { forkJoin } from 'rxjs';
 import { UiService } from '../../../shared/services/ui.service';

@@ -8,7 +8,7 @@ import { Pedido }          from '../../../../shared/models/pedido';
 import { Lote }            from '../../../../shared/models/lote';
 import { User }            from '../../../../shared/models/user';
 import { PedidoService } from '../../service/orders.service';
-import { LoteService } from '../../../inventory/service/lote.service';
+import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { SelectSearchComponent } from "../../../../shared/components/select-search/select-search.component";
 

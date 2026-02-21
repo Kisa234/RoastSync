@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { LucideAngularModule, FileSpreadsheet, Download, TestTube } from 'lucide-angular';
 import { RoastsService } from '../../../features/roasts/service/roasts.service';
-import { LoteTostadoService } from '../../../features/inventory/service/lote-tostado.service';
+import { LoteTostadoService } from '../../../features/inventory/lotes-tostados/service/lote-tostado.service';
 import { Tueste } from '../../models/tueste';
 import { FichaTueste } from '../../models/ficha-tueste';
 import { MinSecPipe } from "../../pipes/time.pipe";

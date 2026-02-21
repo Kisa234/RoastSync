@@ -5,7 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { X, Check } from 'lucide-angular';
 
 import { PedidoService } from '../../../orders/service/orders.service';
-import { LoteService } from '../../../inventory/service/lote.service';
+import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { Pedido } from '../../../../shared/models/pedido';
 import { UiService } from '../../../../shared/services/ui.service';

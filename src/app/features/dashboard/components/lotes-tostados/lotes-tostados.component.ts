@@ -4,7 +4,7 @@ import { UserService } from '../../../users/service/users-service.service';
 import { LoteTostado } from '../../../../shared/models/lote-tostado';
 import { User } from '../../../../shared/models/user';
 import { formatDate } from '@angular/common';
-import { LoteTostadoService } from '../../../inventory/service/lote-tostado.service';
+import { LoteTostadoService } from '../../../inventory/lotes-tostados/service/lote-tostado.service';
 
 @Component({
   selector: 'lotes-tostados',

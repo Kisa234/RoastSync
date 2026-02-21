@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PedidoService } from '../../service/orders.service';
-import { LoteService } from '../../../inventory/service/lote.service';
+import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { User } from '../../../../shared/models/user';
 import { Lote } from '../../../../shared/models/lote';

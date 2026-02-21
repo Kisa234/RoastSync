@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { LoteService } from './../../inventory/service/lote.service';
+import { LoteService } from '../../inventory/lotes-verdes/service/lote.service';
 import { UserService } from '../../users/service/users-service.service';
 import { Lote } from '../../../shared/models/lote';
 

@@ -24,12 +24,13 @@ import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { ClientFormComponent } from './features/client-form/pages/client-form.component';
 import { CostingComponent } from './features/costing/pages/costing.component';
-import { LoteVerdeComponent } from './features/inventory/pages/inventory/lote-verde/lote-verde.component';
-import { LoteTostadoComponent } from './features/inventory/pages/inventory/lote-tostado/lote-tostado.component';
-import { MuestrasComponent } from './features/inventory/pages/inventory/muestras/muestras.component';
+import { LoteTostadoComponent } from './features/inventory/lotes-tostados/page/lote-tostado.component';
 import { InternsComponent } from './features/users/page/interns/interns.component';
 import { ClientsComponent } from './features/users/page/clients/clients.component';
-import { AlmacenComponent } from './features/inventory/pages/inventory/almacen/almacen.component';
+import { AlmacenComponent } from './features/inventory/almacenes/page/almacen.component';
+import { MuestrasComponent } from './features/inventory/muestras/page/muestras.component';
+import { LoteVerdeComponent } from './features/inventory/lotes-verdes/page/lote-verde.component';
+import { InsumoComponent } from './features/inventory/insumo/page/insumo.component';
 
 export const appRoutes: Routes = [
 
@@ -69,7 +70,8 @@ export const appRoutes: Routes = [
           { path: 'muestras', component: MuestrasComponent },
           { path: 'lotes-verdes', component: LoteVerdeComponent },
           { path: 'lotes-tostados', component: LoteTostadoComponent },
-          { path: 'almacen', component: AlmacenComponent }
+          { path: 'almacen', component: AlmacenComponent },
+          { path: 'insumos',  component: InsumoComponent }
         ]
       },
       { path: 'orders', component: OrdersPage },

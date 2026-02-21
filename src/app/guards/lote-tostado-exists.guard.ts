@@ -8,7 +8,7 @@ import {
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { LoteTostadoService } from '../features/inventory/service/lote-tostado.service';
+import { LoteTostadoService } from '../features/inventory/lotes-tostados/service/lote-tostado.service';
 import { LoteTostado } from '../shared/models/lote-tostado';
 
 @Injectable({ providedIn: 'root' })
