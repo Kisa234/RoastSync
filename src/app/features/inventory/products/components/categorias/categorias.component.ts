@@ -1,12 +1,12 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Plus, Edit, Trash2, LucideAngularModule } from 'lucide-angular';
 import { CategoriaService } from '../../service/categoria.service';
-import { Categoria } from '../../../../shared/models/categoria';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AddCategoriaComponent } from '../add-categoria/add-categoria.component';
 import { EditCategoriaComponent } from '../edit-categoria/edit-categoria.component';
-import { UiService } from '../../../../shared/services/ui.service';
+import { Categoria } from '../../../../../shared/models/categoria';
+import { UiService } from '../../../../../shared/services/ui.service';
 
 @Component({
   selector: 'categorias',

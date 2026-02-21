@@ -1,10 +1,10 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ProductoService } from '../../service/producto.service';
-import { Producto } from '../../../../shared/models/producto';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CategoriaService } from '../../service/categoria.service';
-import { Categoria } from '../../../../shared/models/categoria';
+import { Producto } from '../../../../../shared/models/producto';
+import { Categoria } from '../../../../../shared/models/categoria';
 
 @Component({
   selector: 'add-product',

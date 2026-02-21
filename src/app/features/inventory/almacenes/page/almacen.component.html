@@ -8,14 +8,6 @@
     </div>
 
     <div class="flex gap-2.5 items-center">
-      <div class="text-lg font-semibold text-[#1F1F1F]">
-        Activos:
-        <span class="text-[#B8672E]">{{ totalActivos }}</span>
-        <span class="text-gray-400 mx-1">/</span>
-        Total:
-        <span class="text-[#B8672E]">{{ totalAlmacenes }}</span>
-      </div>
-
       <button
         class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
         (click)="showAddAlmacen = true">
@@ -89,13 +81,13 @@
           </ng-container>
 
           <!-- INACTIVOS -->
-          <tr class="bg-[#F3F3F3]">
+          <tr class="bg-[#F3F3F3]" *ngIf="getInactivos().length > 0">
             <td colspan="5" class="text-left text-xs uppercase text-gray-500 py-2 px-6">
               Almacenes Inactivos
             </td>
           </tr>
 
-          <ng-container *ngFor="let a of getInactivos()">
+          <ng-container *ngFor="let a of getInactivos()" ngIf="getInactivos().length > 0">
             <tr>
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ a.id_almacen }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ a.nombre }}</td>

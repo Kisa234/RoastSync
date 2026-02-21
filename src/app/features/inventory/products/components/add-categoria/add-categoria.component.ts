@@ -1,8 +1,8 @@
 import { Component, EventEmitter, NgModule, Output } from '@angular/core';
 import { CategoriaService } from '../../service/categoria.service';
-import { Categoria } from '../../../../shared/models/categoria';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Categoria } from '../../../../../shared/models/categoria';
 
 @Component({
   selector: 'add-categoria',

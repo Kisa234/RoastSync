@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ProductoService } from '../../service/producto.service';
-import { Producto } from '../../../../shared/models/producto';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Producto } from '../../../../../shared/models/producto';
 
 @Component({
   selector: 'edit-product',

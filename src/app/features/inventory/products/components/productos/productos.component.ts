@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { Edit, LucideAngularModule, Plus, Trash2 } from 'lucide-angular';
-import { Producto } from '../../../../shared/models/producto';
 import { ProductoService } from '../../service/producto.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { CategoriaNombrePipe } from "../../../../shared/pipes/categoria-nombre.pipe";
 import { AddProductComponent } from '../add-product/add-product.component';
 import { EditProductComponent } from '../edit-product/edit-product.component';
-import { UiService } from '../../../../shared/services/ui.service';
+import { Producto } from '../../../../../shared/models/producto';
+import { UiService } from '../../../../../shared/services/ui.service';
+import { CategoriaNombrePipe } from '../../../../../shared/pipes/categoria-nombre.pipe';
 
 @Component({
   selector: 'productos',

@@ -71,10 +71,10 @@
 
             <div class="flex flex-col items-center p-1">
               <h1 class="text-3xl font-semibold text-[#6B3B2A] leading-snug">
-                {{ steps[stepCafe]?.lote?.productor }}
+                {{ steps[stepCafe].lote?.productor }}
               </h1>
               <sub class="text-xl font-semibold text-[#6B3B2A] leading-snug">
-                {{ steps[stepCafe]?.lote?.finca }}
+                {{ steps[stepCafe].lote?.finca }}
               </sub>
             </div>
 
@@ -90,21 +90,21 @@
             <div>
               <p class="uppercase text-xs text-gray-400">Origen</p>
               <p class="font-medium text-[#6B3B2A]">
-                {{ steps[stepCafe]?.lote?.distrito }}, {{ steps[stepCafe]?.lote?.departamento }}
+                {{ steps[stepCafe].lote?.distrito }}, {{ steps[stepCafe].lote?.departamento }}
               </p>
             </div>
 
             <div>
               <p class="uppercase text-xs text-gray-400">Variedad</p>
               <p class="font-medium text-[#6B3B2A]">
-                {{ steps[stepCafe]?.lote?.variedades | replace: ',': ', ' }}
+                {{ steps[stepCafe].lote?.variedades | replace: ',': ', ' }}
               </p>
             </div>
 
             <div>
               <p class="uppercase text-xs text-gray-400">Proceso</p>
               <p class="font-medium text-[#6B3B2A]">
-                {{ steps[stepCafe]?.lote?.proceso }}
+                {{ steps[stepCafe].lote?.proceso }}
               </p>
             </div>
 
@@ -155,7 +155,7 @@
               <button *ngFor="let t of steps[stepCafe]?.tuestes" class="px-6 py-3 rounded-lg border text-sm
                              hover:bg-[#FFF6F1] hover:border-[#D8A47F] transition"
                 [ngClass]="boxRespuesta[steps[stepCafe].tuesteField] === t ? 'border-[#B8672E] bg-[#FFF0E6]' : ''"
-                (click)="steps[stepCafe]?.tuesteField && (boxRespuesta[steps[stepCafe].tuesteField] = t)">
+                (click)="steps[stepCafe].tuesteField && (boxRespuesta[steps[stepCafe].tuesteField] = t)">
                 {{ t }}
               </button>
             </div>
@@ -379,8 +379,8 @@
 
     <button *ngIf="stepVisual > 0 && stepVisual < 5" [disabled]="
     !lotesLoaded ||
-    !steps[stepCafe]?.moliendaField ||
-    !steps[stepCafe]?.tuesteField ||
+    !steps[stepCafe].moliendaField ||
+    !steps[stepCafe].tuesteField ||
     !boxRespuesta[steps[stepCafe].moliendaField] ||
     !boxRespuesta[steps[stepCafe].tuesteField]
   " (click)="nextStep()" class="

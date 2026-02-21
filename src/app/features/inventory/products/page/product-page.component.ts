@@ -2,27 +2,29 @@ import { Component, OnInit } from '@angular/core';
 import { Producto } from '../../../../shared/models/producto';
 import { Categoria } from '../../../../shared/models/categoria';
 import { Inventario } from '../../../../shared/models/inventario';
-import { ProductoService } from '../../service/producto.service';
-import { CategoriaService } from '../../service/categoria.service';
-import { InventarioService } from '../../service/inventario.service';
+import { ProductoService } from '../service/producto.service';
+import { CategoriaService } from '../service/categoria.service';
+import { InventarioService } from '../service/inventario.service';
 
 import { Plus, FolderPlus, Eye, Edit2, LucideAngularModule } from 'lucide-angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProductoNombrePipe } from "../../../../shared/pipes/product-name.pipe";
-import { ProductosComponent } from "../../components/productos/productos.component";
-import { CategoriasComponent } from "../../components/categorias/categorias.component";
+import { ProductoNombrePipe } from '../../../../shared/pipes/product-name.pipe';
+import { CategoriasComponent } from '../components/categorias/categorias.component';
+import { ProductosComponent } from '../components/productos/productos.component';
+
 
 @Component({
   selector: 'app-product-page',
+  standalone: true,
   templateUrl: './product-page.component.html',
   imports: [
     LucideAngularModule,
     CommonModule,
     FormsModule,
     ProductoNombrePipe,
+    CategoriasComponent,
     ProductosComponent,
-    CategoriasComponent
   ]
 })
 export class ProductPageComponent implements OnInit {
