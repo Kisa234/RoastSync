@@ -42,6 +42,8 @@ export class HistoricLoteComponent implements OnInit {
     eliminado: false
   }
 
+  
+
   constructor(
     private readonly loteSvc: LoteService,
     private readonly pedidoSvc: PedidoService,

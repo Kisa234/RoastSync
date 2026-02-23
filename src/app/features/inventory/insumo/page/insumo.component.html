@@ -7,18 +7,23 @@
       <p class="text-gray-600">Gestión de insumos y catálogo</p>
     </div>
 
-    <div class="flex items-center gap-2.5">
-      <button class="flex items-center bg-gray-700 text-white px-4 py-2 rounded shadow hover:bg-[#B8672E] transition"
-        (click)="toggleActivos()">
-        <!-- Si no usas iconos, puedes borrar este lucide-icon -->
-        <lucide-icon [img]="Filter" class="w-5 h-5 mr-2"></lucide-icon>
-        {{ onlyActivos ? 'Ver todos' : 'Ver activos' }}
-      </button>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2.5">
+        <!-- Ver Insumos -->
+        <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+          (click)="openListInsumos()">
+          <lucide-icon [img]="Eye" class="w-5 h-5 mr-2"></lucide-icon>
+          Ver Insumos
+        </button>
 
-      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition">
-        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
-        Nuevo Insumo
-      </button>
+        <!-- Ver Categorías -->
+        <button
+          class="flex items-center bg-white border border-[#E5E5E5] text-[#1F1F1F] px-4 py-2 rounded shadow hover:bg-[#F9F9F9] transition"
+          (click)="openListCategorias()">
+          <lucide-icon [img]="Eye" class="w-5 h-5 mr-2"></lucide-icon>
+          Ver Categorías
+        </button>
+      </div>
     </div>
   </div>
 
@@ -51,7 +56,6 @@
 
         <thead class="bg-[#F9F9F9]">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">ID</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Nombre</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Categoría</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Unidad</th>
@@ -63,16 +67,12 @@
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
           <tr *ngFor="let i of insumos">
 
-            <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">
-              {{ i.id_insumo }}
-            </td>
-
             <td class="px-6 py-4 text-sm text-gray-700">
               {{ i.nombre }}
             </td>
 
             <td class="px-6 py-4 text-sm text-gray-700">
-              {{ i.categoria }}
+              {{ i.id_categoria | categoriaInsumo: categorias }}
             </td>
 
             <td class="px-6 py-4 text-sm text-gray-700">
@@ -129,3 +129,13 @@
     </div>
   </div>
 </div>
+
+<app-insumos
+  *ngIf="showListInsumos"
+  (close)="closeModals()">
+</app-insumos>
+
+<app-categorias
+  *ngIf="showListCategorias"
+  (close)="closeModals()">
+</app-categorias>
