@@ -174,23 +174,6 @@
             />
           </div>
 
-          <div class="flex items-center gap-6 pt-1">
-            <label class="flex items-center gap-2 text-sm text-gray-700">
-              <input type="checkbox" [(ngModel)]="form.es_combo" name="es_combo" />
-              Es combo
-            </label>
-
-            <label class="flex items-center gap-2 text-sm text-gray-700">
-              <input type="checkbox" [(ngModel)]="form.activo" name="activo" />
-              Activo
-            </label>
-
-            <label class="flex items-center gap-2 text-sm text-gray-700">
-              <input type="checkbox" [(ngModel)]="form.fragil" name="fragil" />
-              Frágil
-            </label>
-          </div>
-
         </div>
       </div>
 
@@ -217,4 +200,4 @@
 </div>
 
 <!--MODAL-->
-<create-marca></create-marca>
+<create-marca *ngIf="showAddMarca" (close)="closeModal()"></create-marca>

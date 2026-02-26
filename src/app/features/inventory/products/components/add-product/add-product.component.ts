@@ -9,12 +9,13 @@ import { MarcaService } from '../../service/marca.service';
 import { Producto } from '../../../../../shared/models/producto';
 import { Categoria } from '../../../../../shared/models/categoria';
 import { Marca } from '../../../../../shared/models/marca';
+import { CreateMarcaComponent } from "../create-marca/create-marca.component";
 
 @Component({
   selector: 'add-product',
   templateUrl: './add-product.component.html',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CreateMarcaComponent],
 })
 export class AddProductComponent implements OnInit {
   @Output() closes = new EventEmitter<void>();
@@ -49,7 +50,6 @@ export class AddProductComponent implements OnInit {
 
   // modal marca
   showAddMarca = false;
-  savingMarca = false;
   marcaForm: { nombre: string; descripcion?: string | null } = {
     nombre: '',
     descripcion: null,
@@ -86,14 +86,9 @@ export class AddProductComponent implements OnInit {
     this.showAddMarca = true;
   }
 
-  cancelAddMarca() {
-    this.showAddMarca = false;
-  }
 
   saveMarca() {
     if (!this.marcaForm.nombre?.trim()) return;
-
-    this.savingMarca = true;
 
     this.marcaSvc.create({
       nombre: this.marcaForm.nombre.trim(),
@@ -107,9 +102,7 @@ export class AddProductComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al crear marca:', err);
-        this.savingMarca = false;
       },
-      complete: () => (this.savingMarca = false),
     });
   }
 
@@ -137,6 +130,11 @@ export class AddProductComponent implements OnInit {
       },
       complete: () => (this.loading = false),
     });
+  }
+
+  closeModal() {
+    this.showAddMarca = false;
+    this.loadMarcas(); // recarga marcas para mostrar la nueva
   }
 
   close() {

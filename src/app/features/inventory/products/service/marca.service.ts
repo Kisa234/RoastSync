@@ -17,7 +17,7 @@ export interface UpdateMarcaDto {
 
 @Injectable({ providedIn: 'root' })
 export class MarcaService {
-  private baseUrl = `${environment.apiUrl}/marcas`;
+  private baseUrl = `${environment.apiUrl}/marca`;
 
   constructor(private http: HttpClient) {}
 
