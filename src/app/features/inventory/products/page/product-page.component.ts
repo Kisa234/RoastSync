@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { ProductoNombrePipe } from '../../../../shared/pipes/product-name.pipe';
 import { CategoriasComponent } from '../components/categorias/categorias.component';
 import { ProductosComponent } from '../components/productos/productos.component';
+import { IngresoProductComponent } from "../components/ingreso-product/ingreso-product.component";
 
 
 @Component({
@@ -25,7 +26,8 @@ import { ProductosComponent } from '../components/productos/productos.component'
     ProductoNombrePipe,
     CategoriasComponent,
     ProductosComponent,
-  ]
+    IngresoProductComponent
+]
 })
 export class ProductPageComponent implements OnInit {
   productos: Producto[] = [];
@@ -42,6 +44,7 @@ export class ProductPageComponent implements OnInit {
 
   showProductos = false;
   showCategorias = false;
+  showIngresoProducto = false;
 
   constructor(
     private productoService: ProductoService,
@@ -111,17 +114,14 @@ export class ProductPageComponent implements OnInit {
     this.showProductos = true;
   }
 
-  closeProductos() {
-    this.showProductos = false;
-  }
-
   openCategorias() {
     this.showCategorias = true;
   }
 
-  closeCategorias() {
-    this.showCategorias = false;
+  openIngresoProducto() {
+    this.showIngresoProducto = true;
   }
+
 
   // 🔹 Eventos de Productos
   onEditProducto(producto: Producto) {

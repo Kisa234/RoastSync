@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Edit2, Trash2, Plus } from 'lucide-angular';
+import { LucideAngularModule, Search, Edit2, Trash2, Plus, Eye } from 'lucide-angular';
 
 
 import { Almacen } from '../../../../shared/models/almacen';
@@ -9,6 +9,7 @@ import { AlmacenService } from '../service/almacen.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { AddAlmacenComponent } from '../components/add-almacen/add-almacen.component';
 import { EditAlmacenComponent } from '../components/edit-almacen/edit-almacen.component';
+import { VerMovimientosComponent } from "../components/ver-movimientos/ver-movimientos.component";
 
 @Component({
   selector: 'app-almacen',
@@ -21,7 +22,8 @@ import { EditAlmacenComponent } from '../components/edit-almacen/edit-almacen.co
     LucideAngularModule,
     AddAlmacenComponent,
     EditAlmacenComponent,
-  ],
+    VerMovimientosComponent
+],
   templateUrl: './almacen.component.html',
   styles: []
 })
@@ -32,6 +34,7 @@ export class AlmacenComponent {
   readonly Edit2 = Edit2;
   readonly Trash2 = Trash2;
   readonly Plus = Plus;
+  readonly Eye = Eye;
 
   // DATA
   almacenes: Almacen[] = [];
@@ -50,6 +53,7 @@ export class AlmacenComponent {
 
   showAddAlmacen = false;
   showEditAlmacen = false;
+  showMovimientos = false;
 
   selectedAlmacenId = '';
 
@@ -121,6 +125,11 @@ export class AlmacenComponent {
   openEdit(a: Almacen) {
     this.selectedAlmacenId = a.id_almacen;
     this.showEditAlmacen = true;
+  }
+
+  openMovimientos(a: Almacen) {
+    this.selectedAlmacenId = a.id_almacen;
+    this.showMovimientos = true;
   }
 
   delete(a: Almacen) {

@@ -25,6 +25,15 @@
         <lucide-icon [img]="Eye" class="w-5 h-5 mr-2" />
         Ver Categorías
       </button>
+
+      <!-- Boton Ingreso Productos -->
+       <button
+        class="flex items-center bg-[#4CAF50] text-white px-4 py-2 rounded shadow hover:bg-[#45A049] transition"
+        (click)="openIngresoProducto()"
+        >
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+        Ingreso de Productos
+      </button>
     </div>
   </div>
 
@@ -81,10 +90,15 @@
 <!-- Modales -->
 <productos
   *ngIf="showProductos"
-  (closes)="closeProductos()"
+  (closes)="showProductos = false"
 ></productos>
 
 <categorias
   *ngIf="showCategorias"
-  (closes)="closeCategorias()"
+  (closes)="showCategorias = false"
 ></categorias>
+
+<ingreso-product
+  *ngIf="showIngresoProducto"
+  (close)="showIngresoProducto = false"
+></ingreso-product>

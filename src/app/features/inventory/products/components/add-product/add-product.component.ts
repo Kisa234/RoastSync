@@ -80,30 +80,8 @@ export class AddProductComponent implements OnInit {
     });
   }
 
-  // Marca modal
   openAddMarca() {
-    this.marcaForm = { nombre: '', descripcion: null };
     this.showAddMarca = true;
-  }
-
-
-  saveMarca() {
-    if (!this.marcaForm.nombre?.trim()) return;
-
-    this.marcaSvc.create({
-      nombre: this.marcaForm.nombre.trim(),
-      descripcion: this.marcaForm.descripcion ?? null,
-    }).subscribe({
-      next: (created) => {
-        // agrega a la lista y selecciona
-        this.marcas = [created, ...this.marcas];
-        this.form.id_marca = created.id_marca;
-        this.showAddMarca = false;
-      },
-      error: (err) => {
-        console.error('Error al crear marca:', err);
-      },
-    });
   }
 
   // Producto
@@ -134,7 +112,7 @@ export class AddProductComponent implements OnInit {
 
   closeModal() {
     this.showAddMarca = false;
-    this.loadMarcas(); // recarga marcas para mostrar la nueva
+    this.loadMarcas(); 
   }
 
   close() {
