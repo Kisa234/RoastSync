@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { AlmacenService } from '../../features/inventory/almacenes/service/almacen.service';
 
 @Pipe({
-  name: 'almacenNombre',
+  name: 'almacenName',
   standalone: true,
   pure: true,
 })

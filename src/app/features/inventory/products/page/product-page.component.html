@@ -9,10 +9,8 @@
 
     <div class="flex space-x-3">
       <!-- Botón Productos -->
-      <button
-        class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
-        (click)="openProductos()"
-      >
+      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openProductos()">
         <lucide-icon [img]="Eye" class="w-5 h-5 mr-2" />
         Ver Productos
       </button>
@@ -20,17 +18,14 @@
       <!-- Botón Categorías -->
       <button
         class="flex items-center bg-[#F4F4F4] text-[#1F1F1F] px-4 py-2 rounded shadow hover:bg-[#E5E5E5] transition"
-        (click)="openCategorias()"
-      >
+        (click)="openCategorias()">
         <lucide-icon [img]="Eye" class="w-5 h-5 mr-2" />
         Ver Categorías
       </button>
 
-      <!-- Boton Ingreso Productos -->
-       <button
-        class="flex items-center bg-[#4CAF50] text-white px-4 py-2 rounded shadow hover:bg-[#45A049] transition"
-        (click)="openIngresoProducto()"
-        >
+      <!-- Botón Ingreso Productos -->
+      <button class="flex items-center bg-[#4CAF50] text-white px-4 py-2 rounded shadow hover:bg-[#45A049] transition"
+        (click)="openIngresoProducto()">
         <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
         Ingreso de Productos
       </button>
@@ -44,11 +39,8 @@
     <div class="flex justify-between items-center mb-3">
       <h2 class="text-xl font-semibold text-[#1F1F1F]">Resumen de Inventario</h2>
 
-      <select
-        [(ngModel)]="selectedCategoria"
-        (change)="filterByCategoria()"
-        class="border border-[#E5E5E5] rounded px-3 py-2 text-sm text-gray-700 focus:outline-none"
-      >
+      <select [(ngModel)]="selectedCategoria" (change)="onCategoriaChange()"
+        class="border border-[#E5E5E5] rounded px-3 py-2 text-sm text-gray-700 focus:outline-none">
         <option value="">Todas las categorías</option>
         <option *ngFor="let c of categorias" [value]="c.id_categoria">
           {{ c.nombre }}
@@ -56,49 +48,54 @@
       </select>
     </div>
 
-    <!-- Tabla de Inventario -->
+    <!-- Tabla de Productos con Stock -->
     <div class="overflow-x-auto m-1 rounded-lg shadow-sm">
       <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
         <thead class="bg-[#F9F9F9]">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Producto</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote Tostado</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Molienda</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Gramaje</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Stock Total</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acciones</th>
           </tr>
         </thead>
+
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
-          <tr *ngFor="let i of inventarios" class="hover:bg-[#F9F9F9]">
-            <td class="px-6 py-4 text-sm text-gray-700">{{ i.id_producto | productoNombre}}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ i.cantidad }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ i.id_lote_tostado }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ i.molienda }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ i.gramaje }} Gr.</td>
+          <tr *ngFor="let p of productosConStock" class="hover:bg-[#F9F9F9]">
+            <td class="px-6 py-4 text-sm text-gray-700">
+              {{ p.nombre }}
+            </td>
+
+            <td class="px-6 py-4 text-sm text-gray-700 font-semibold">
+              {{ p.totalStock }}
+            </td>
+
+
+            <td class="px-6 py-4 text-sm text-gray-700">
+              <button (click)="openMovimientos(p)" class="text-gray-500 hover:text-blue-600">
+                <lucide-icon class="w-5 h-5" [img]="Eye"></lucide-icon>
+              </button>
+            </td>
           </tr>
-          <tr *ngIf="inventarios.length === 0">
-            <td colspan="6" class="px-6 py-6 text-center text-gray-500">
-              No hay inventarios registrados.
+
+          <tr *ngIf="productosConStock.length === 0">
+            <td colspan="4" class="px-6 py-6 text-center text-gray-500">
+              No hay productos con inventario.
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
   </div>
 </div>
 
 <!-- Modales -->
-<productos
-  *ngIf="showProductos"
-  (closes)="showProductos = false"
-></productos>
+<productos *ngIf="showProductos" (closes)="showProductos = false"></productos>
 
-<categorias
-  *ngIf="showCategorias"
-  (closes)="showCategorias = false"
-></categorias>
+<categorias *ngIf="showCategorias" (closes)="showCategorias = false"></categorias>
 
-<ingreso-product
-  *ngIf="showIngresoProducto"
-  (close)="showIngresoProducto = false"
-></ingreso-product>
+<ingreso-product *ngIf="showIngresoProducto" (close)="showIngresoProducto = false"></ingreso-product>
+
+<!-- ✅ Modal Movimientos -->
+<movimientos-inventario *ngIf="showMovimientos && selectedProducto" [producto]="selectedProducto"
+  (close)="closeMovimientos()"></movimientos-inventario>

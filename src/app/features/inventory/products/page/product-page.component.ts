@@ -1,19 +1,23 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import { Plus, FolderPlus, Eye, Edit2, LucideAngularModule } from 'lucide-angular';
+
 import { Producto } from '../../../../shared/models/producto';
 import { Categoria } from '../../../../shared/models/categoria';
 import { Inventario } from '../../../../shared/models/inventario';
+
 import { ProductoService } from '../service/producto.service';
 import { CategoriaService } from '../service/categoria.service';
 import { InventarioService } from '../service/inventario.service';
 
-import { Plus, FolderPlus, Eye, Edit2, LucideAngularModule } from 'lucide-angular';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ProductoNombrePipe } from '../../../../shared/pipes/product-name.pipe';
 import { CategoriasComponent } from '../components/categorias/categorias.component';
 import { ProductosComponent } from '../components/productos/productos.component';
-import { IngresoProductComponent } from "../components/ingreso-product/ingreso-product.component";
+import { IngresoProductComponent } from '../components/ingreso-product/ingreso-product.component';
+import { MovimientosInventarioComponent } from '../components/movimientos-inventario/movimientos-inventario.component';
 
+type ProductoConStock = Producto & { inventarios: Inventario[]; totalStock: number };
 
 @Component({
   selector: 'app-product-page',
@@ -23,17 +27,20 @@ import { IngresoProductComponent } from "../components/ingreso-product/ingreso-p
     LucideAngularModule,
     CommonModule,
     FormsModule,
-    ProductoNombrePipe,
     CategoriasComponent,
     ProductosComponent,
-    IngresoProductComponent
-]
+    IngresoProductComponent,
+    MovimientosInventarioComponent,
+  ],
 })
 export class ProductPageComponent implements OnInit {
   productos: Producto[] = [];
-  productosConStock: (Producto & { totalStock: number })[] = [];
   categorias: Categoria[] = [];
   inventarios: Inventario[] = [];
+
+  // ✅ lista base y lista filtrada
+  productosConStockAll: ProductoConStock[] = [];
+  productosConStock: ProductoConStock[] = [];
 
   selectedCategoria: string = '';
 
@@ -46,11 +53,15 @@ export class ProductPageComponent implements OnInit {
   showCategorias = false;
   showIngresoProducto = false;
 
+  // ✅ Modal movimientos
+  showMovimientos = false;
+  selectedProducto: ProductoConStock | null = null;
+
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
     private inventarioService: InventarioService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadCategorias();
@@ -60,7 +71,7 @@ export class ProductPageComponent implements OnInit {
 
   loadCategorias(): void {
     this.categoriaService.getCategorias().subscribe({
-      next: (data) => (this.categorias = data.filter(c => c.eliminado === false)),
+      next: (data) => (this.categorias = data.filter((c) => c.eliminado === false)),
       error: (err) => console.error('Error cargando categorías', err),
     });
   }
@@ -85,28 +96,35 @@ export class ProductPageComponent implements OnInit {
     });
   }
 
-  /** Combina productos con su stock total */
+  /** ✅ Combina productos con sus inventarios + stock total */
   actualizarStock(): void {
     if (!this.productos.length || !this.inventarios.length) return;
 
-    this.productosConStock = this.productos.map((p) => {
-      const invs = this.inventarios.filter((i) => i.id_producto === p.id_producto);
-      const total = invs.reduce((sum, i) => sum + (i.cantidad || 0), 0);
-      return { ...p, inventarios: invs, totalStock: total };
-    });
+    this.productosConStockAll = this.productos
+      .map((p) => {
+        const invs = this.inventarios.filter((i) => i.id_producto === p.id_producto);
+        const total = invs.reduce((sum, i) => sum + (i.cantidad || 0), 0);
 
-    this.filterByCategoria();
+        return { ...p, inventarios: invs, totalStock: total };
+      })
+      // ✅ IMPORTANTE: solo muestra productos que realmente tienen inventarios
+      .filter((p) => p.inventarios.length > 0);
+
+    this.applyCategoriaFilter();
   }
 
-  /** Filtra productos por categoría */
-  filterByCategoria(): void {
-    if (this.selectedCategoria) {
-      this.productosConStock = this.productosConStock.filter(
-        (p) => p.id_categoria === this.selectedCategoria
-      );
-    } else {
-      this.actualizarStock();
-    }
+  /** ✅ Filtra sin modificar la lista base */
+  applyCategoriaFilter(): void {
+    const list = [...this.productosConStockAll];
+
+    this.productosConStock = this.selectedCategoria
+      ? list.filter((p) => p.id_categoria === this.selectedCategoria)
+      : list;
+  }
+
+  /** handler para (change) del select */
+  onCategoriaChange(): void {
+    this.applyCategoriaFilter();
   }
 
   // 🔹 Abrir / Cerrar modales
@@ -122,6 +140,16 @@ export class ProductPageComponent implements OnInit {
     this.showIngresoProducto = true;
   }
 
+  // ✅ Movimientos
+  openMovimientos(p: ProductoConStock) {
+    this.selectedProducto = p;
+    this.showMovimientos = true;
+  }
+
+  closeMovimientos() {
+    this.showMovimientos = false;
+    this.selectedProducto = null;
+  }
 
   // 🔹 Eventos de Productos
   onEditProducto(producto: Producto) {

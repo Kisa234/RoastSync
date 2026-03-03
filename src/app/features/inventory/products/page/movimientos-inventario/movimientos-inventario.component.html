@@ -9,12 +9,13 @@
           Volver
         </a>
 
-        <h2 class="mt-2 text-lg font-semibold text-zinc-900">Movimientos del Almacén</h2>
+        <h2 class="mt-2 text-lg font-semibold text-zinc-900">Movimientos del Producto</h2>
         <p class="text-sm text-zinc-500">
-          <span>{{ almacen?.nombre }}</span>
+          <span class="font-mono">{{ id_producto }}</span>
+          <!-- si cargas producto, puedes mostrar nombre aquí -->
+          <!-- · <span>{{ producto?.nombre }}</span> -->
         </p>
       </div>
-
     </div>
 
     <!-- filtros -->
@@ -42,9 +43,9 @@
           class="w-full px-3 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-200">
           <option value="ALL">Todos</option>
           <option value="INGRESO">INGRESO</option>
-          <option value="SALIDA">SALIDA</option>
-          <option value="TRASLADO">TRASLADO</option>
-          <option value="AJUSTE">AJUSTE</option>
+          <option value="SALIDA" disabled>SALIDA</option>
+          <option value="TRASLADO" disabled>TRASLADO</option>
+          <option value="AJUSTE" disabled>AJUSTE</option>
         </select>
       </div>
     </div>
@@ -71,7 +72,7 @@
             <th class="py-3.5 pr-5 font-medium">Tipo</th>
             <th class="py-3.5 pr-5 font-medium">Entidad</th>
             <th class="py-3.5 pr-5 font-medium">ID Entidad</th>
-            <th class="py-3.5 pr-5 f|ont-medium">Cantidad</th>
+            <th class="py-3.5 pr-5 font-medium">Cantidad</th>
             <th class="py-3.5 pr-5 font-medium">Comentario</th>
             <th class="py-3.5 pr-5 font-medium">Usuario</th>
             <th class="py-3.5 font-medium">Fecha</th>
@@ -103,7 +104,7 @@
             </td>
 
             <td class="py-3.5 pr-5 text-zinc-700 leading-7 whitespace-nowrap">
-              {{ (getUsuario(m) | userName) || '—' }}
+              {{ getUsuario(m) || '—' }}
             </td>
 
             <td class="py-3.5 text-zinc-700 leading-7 whitespace-nowrap">
@@ -119,7 +120,7 @@
 
           <tr *ngIf="!loading && !pageRows.length">
             <td class="py-9 text-center text-zinc-500" colspan="7">
-              No hay movimientos para este almacén.
+              No hay movimientos para este producto.
             </td>
           </tr>
         </tbody>

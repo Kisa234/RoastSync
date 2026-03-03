@@ -9,13 +9,14 @@ import { MovimientoAlmacenService } from '../../service/movimiento-almacen.servi
 import { MovimientoAlmacen } from '../../../../../shared/models/movimiento-almacen';
 import { Almacen } from '../../../../../shared/models/almacen';
 import { AlmacenService } from '../../service/almacen.service';
+import { UserNamePipe } from "../../../../../shared/pipes/user-name-pipe.pipe";
 
 type TipoMovimientoUI = 'ALL' | 'INGRESO' | 'SALIDA' | 'TRASLADO' | 'AJUSTE';
 
 @Component({
   selector: 'app-movimientos-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, RouterModule, FormsModule, LucideAngularModule, UserNamePipe],
   templateUrl: './ver-movimientos.component.html',
 })
 export class VerMovimientosPage implements OnInit {

@@ -8,7 +8,7 @@ import { Inventario } from '../../../../shared/models/inventario';
   providedIn: 'root'
 })
 export class InventarioService {
-  private base = `${environment.apiUrl}/inventario`;
+  private base = `${environment.apiUrl}/inventario-producto`;
 
   constructor(private http: HttpClient) {}
 
