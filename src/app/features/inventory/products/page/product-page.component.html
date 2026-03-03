@@ -95,7 +95,3 @@
 <categorias *ngIf="showCategorias" (closes)="showCategorias = false"></categorias>
 
 <ingreso-product *ngIf="showIngresoProducto" (close)="showIngresoProducto = false"></ingreso-product>
-
-<!-- ✅ Modal Movimientos -->
-<movimientos-inventario *ngIf="showMovimientos && selectedProducto" [producto]="selectedProducto"
-  (close)="closeMovimientos()"></movimientos-inventario>

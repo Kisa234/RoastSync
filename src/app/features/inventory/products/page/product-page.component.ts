@@ -15,7 +15,6 @@ import { InventarioService } from '../service/inventario.service';
 import { CategoriasComponent } from '../components/categorias/categorias.component';
 import { ProductosComponent } from '../components/productos/productos.component';
 import { IngresoProductComponent } from '../components/ingreso-product/ingreso-product.component';
-import { MovimientosInventarioComponent } from './movimientos-inventario/movimientos-inventario.component';
 
 type ProductoConStock = Producto & { inventarios: Inventario[]; totalStock: number };
 
@@ -30,7 +29,6 @@ type ProductoConStock = Producto & { inventarios: Inventario[]; totalStock: numb
     CategoriasComponent,
     ProductosComponent,
     IngresoProductComponent,
-    MovimientosInventarioComponent,
   ],
 })
 export class ProductPageComponent implements OnInit {
