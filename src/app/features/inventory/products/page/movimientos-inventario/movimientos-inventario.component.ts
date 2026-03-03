@@ -6,14 +6,8 @@ import { LucideAngularModule, ArrowLeft, Search } from 'lucide-angular';
 import { IngresoProductoService } from '../../service/ingreso-producto.service';
 import { IngresoProducto } from '../../../../../shared/models/ingreso-producto';
 
-
-// Si quieres mostrar el nombre del producto, puedes cargarlo por ProductoService con id_producto
-// import { ProductoService } from '../service/producto.service';
-// import { Producto } from '../../../../shared/models/producto';
-
 type TipoFiltro = 'ALL' | 'INGRESO' | 'SALIDA' | 'TRASLADO' | 'AJUSTE';
 
-// Para que el HTML sea igual al ejemplo (helpers getTipo/getEntidad/etc.)
 type MovimientoRow = {
   tipo: 'INGRESO';
   entidad: 'PRODUCTO';
