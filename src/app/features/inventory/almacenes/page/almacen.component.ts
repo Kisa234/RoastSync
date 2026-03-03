@@ -9,7 +9,8 @@ import { AlmacenService } from '../service/almacen.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { AddAlmacenComponent } from '../components/add-almacen/add-almacen.component';
 import { EditAlmacenComponent } from '../components/edit-almacen/edit-almacen.component';
-import { VerMovimientosComponent } from "../components/ver-movimientos/ver-movimientos.component";
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-almacen',
@@ -22,8 +23,8 @@ import { VerMovimientosComponent } from "../components/ver-movimientos/ver-movim
     LucideAngularModule,
     AddAlmacenComponent,
     EditAlmacenComponent,
-    VerMovimientosComponent
-],
+    RouterOutlet
+  ],
   templateUrl: './almacen.component.html',
   styles: []
 })
@@ -56,14 +57,24 @@ export class AlmacenComponent {
   showMovimientos = false;
 
   selectedAlmacenId = '';
+  isChildRoute = false;
 
   constructor(
     private almacenService: AlmacenService,
-    private uiService: UiService
-  ) {}
+    private uiService: UiService,
+    private router: Router
+  ) { }
+
 
   ngOnInit() {
     this.loadAlmacenes();
+
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => this.isChildRoute = this.router.url.includes('/inventory/almacen/movimientos/'));
+
+    // inicial
+    this.isChildRoute = this.router.url.includes('/inventory/almacen/movimientos/');
   }
 
   /* =========================
@@ -127,11 +138,6 @@ export class AlmacenComponent {
     this.showEditAlmacen = true;
   }
 
-  openMovimientos(a: Almacen) {
-    this.selectedAlmacenId = a.id_almacen;
-    this.showMovimientos = true;
-  }
-
   delete(a: Almacen) {
     this.uiService.confirm({
       title: 'Eliminar almacén',
@@ -165,5 +171,9 @@ export class AlmacenComponent {
   onUpdated() {
     this.showEditAlmacen = false;
     this.loadAlmacenes();
+  }
+
+  openMovimientos(a: any) {
+    this.router.navigate(['/inventory/almacen/movimientos', a.id_almacen]);
   }
 }

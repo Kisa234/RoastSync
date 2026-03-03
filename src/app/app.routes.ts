@@ -31,6 +31,7 @@ import { MuestrasComponent } from './features/inventory/muestras/page/muestras.c
 import { LoteVerdeComponent } from './features/inventory/lotes-verdes/page/lote-verde.component';
 import { InsumoComponent } from './features/inventory/insumo/page/insumo.component';
 import { ProductPageComponent } from './features/inventory/products/page/product-page.component';
+import { VerMovimientosPage } from './features/inventory/almacenes/page/ver-movimientos/ver-movimientos.component';
 
 export const appRoutes: Routes = [
 
@@ -70,7 +71,12 @@ export const appRoutes: Routes = [
           { path: 'muestras', component: MuestrasComponent },
           { path: 'lotes-verdes', component: LoteVerdeComponent },
           { path: 'lotes-tostados', component: LoteTostadoComponent },
-          { path: 'almacen', component: AlmacenComponent },
+          { path: 'almacen', 
+            component: AlmacenComponent,
+            children: [
+              { path: 'movimientos/:id', component: VerMovimientosPage },
+            ]
+          },
           { path: 'insumos',  component: InsumoComponent },
           { path: 'productos', component: ProductPageComponent },
         ]

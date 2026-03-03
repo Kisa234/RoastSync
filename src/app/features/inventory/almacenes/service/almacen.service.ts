@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { Almacen, CreateAlmacenDto, UpdateAlmacenDto } from '../../../../shared/models/almacen';
 
@@ -9,7 +10,7 @@ import { Almacen, CreateAlmacenDto, UpdateAlmacenDto } from '../../../../shared/
 export class AlmacenService {
   private baseUrl = `${environment.apiUrl}/almacen`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // GET /almacen/activos
   getAlmacenesActivos(): Observable<Almacen[]> {
@@ -40,4 +41,31 @@ export class AlmacenService {
   deleteAlmacen(idAlmacen: string): Observable<{ ok: boolean; message?: string }> {
     return this.http.delete<{ ok: boolean; message?: string }>(`${this.baseUrl}/${idAlmacen}`);
   }
+
+
+
+  //FUNCIONES CON CACHE 
+
+  // FUNCIONES CON CACHE 
+  private cache = new Map<string, Observable<string>>();
+
+  getNombre(idAlmacen: string | null | undefined): Observable<string> {
+    if (!idAlmacen) return of('N/A');
+
+    const hit = this.cache.get(idAlmacen);
+    if (hit) return hit;
+
+    const req$ = this.getAlmacenById(idAlmacen).pipe(
+      map(a => {
+        if (!a || !a.nombre) return 'N/A';
+        return a.nombre;
+      }),
+      catchError(() => of('N/A')),
+      shareReplay({ bufferSize: 1, refCount: false })
+    );
+
+    this.cache.set(idAlmacen, req$);
+    return req$;
+  }
+
 }

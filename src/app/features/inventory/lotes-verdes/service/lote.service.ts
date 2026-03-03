@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Lote } from '../../../../shared/models/lote';
+import { Lote, LoteVerdeConInventario } from '../../../../shared/models/lote';
 import { environment } from '../../../../../environments/environment';
 import { BlendLotes } from '../../../../shared/models/blend-lotes';
 import { FusionarLotes } from '../../../../shared/models/fusionar-lote';
@@ -11,7 +11,7 @@ import { FusionarLotes } from '../../../../shared/models/fusionar-lote';
 export class LoteService {
   private baseUrl = `${environment.apiUrl}/lote`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<Lote[]> {
     return this.http.get<Lote[]>(this.baseUrl);
@@ -41,16 +41,22 @@ export class LoteService {
     return this.http.delete<Lote>(`${this.baseUrl}/${id}`);
   }
 
-  createByMuestra(id:string,data: Partial<Lote>): Observable<Lote> {
+  createByMuestra(id: string, data: Partial<Lote>): Observable<Lote> {
     return this.http.post<Lote>(`${this.baseUrl}/muestra/${id}`, data);
   }
 
-  blendlote(data:BlendLotes): Observable<BlendLotes> {
+  blendlote(data: BlendLotes): Observable<BlendLotes> {
     return this.http.post<BlendLotes>(`${this.baseUrl}/blend`, data);
   }
-  
+
   fusionarLotes(data: FusionarLotes): Observable<FusionarLotes> {
     return this.http.post<FusionarLotes>(`${this.baseUrl}/fusionar`, data);
   }
-  
+
+  getLotesVerdesConInventario(): Observable<LoteVerdeConInventario[]> {
+    return this.http.get<LoteVerdeConInventario[]>(
+      `${this.baseUrl}/inventario`
+    );
+  }
+
 }

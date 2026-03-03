@@ -1,4 +1,6 @@
-<div class="h-screen p-6 bg-[#F9F9F9] overflow-auto">
+<router-outlet></router-outlet>
+
+<div *ngIf="!isChildRoute" class="h-screen p-6 bg-[#F9F9F9] overflow-auto">
 
   <!-- Header -->
   <div class="flex justify-between items-center mb-5">
@@ -81,7 +83,7 @@
             </td>
           </tr>
 
-          <ng-container *ngFor="let a of getInactivos()" ngIf="getInactivos().length > 0">
+          <ng-container *ngFor="let a of getInactivos()">
             <tr>
               <td class="px-6 py-4 text-sm text-gray-700">{{ a.nombre }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ a.descripcion || '—' }}</td>
@@ -110,23 +112,16 @@
   </div>
 </div>
 
-<!-- MODALES -->
+<!-- ✅ MODALES: solo cuando estás en la lista -->
 <add-almacen
-  *ngIf="showAddAlmacen"
+  *ngIf="!isChildRoute && showAddAlmacen"
   (close)="showAddAlmacen = false"
   (create)="onCreated()">
 </add-almacen>
 
 <edit-almacen
-  *ngIf="showEditAlmacen"
+  *ngIf="!isChildRoute && showEditAlmacen"
   [almacenId]="selectedAlmacenId"
   (close)="showEditAlmacen = false"
   (create)="onUpdated()">
 </edit-almacen>
-
-<ver-movimientos
-  *ngIf="showMovimientos"
-  [almacenId]="selectedAlmacenId"
-  (close)="showMovimientos = false"
-  (create)="onUpdated()">
-</ver-movimientos>

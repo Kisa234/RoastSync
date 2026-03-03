@@ -6,7 +6,7 @@ import { LucideAngularModule, Search, Eye, Edit2, Trash2, History, Plus } from '
 import { AddLoteComponent } from '../components/add-lote/add-lote.component';
 import { ReportLoteComponent } from '../../../../shared/components/report-lote/report-lote.component';
 import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
-import { Lote } from '../../../../shared/models/lote';
+import { Lote, LoteVerdeConInventario } from '../../../../shared/models/lote';
 import { User } from '../../../../shared/models/user';
 import { LoteService } from '../service/lote.service';
 import { UserService } from '../../../users/service/users-service.service';
@@ -46,14 +46,17 @@ export class LoteVerdeComponent {
   readonly Plus = Plus;
 
   // DATA
-  lotes: Lote[] = [];
-  private _lotesFiltrados: Lote[] = [];
-  public get lotesFiltrados(): Lote[] {
+  lotes: LoteVerdeConInventario[] = [];
+  private _lotesFiltrados: LoteVerdeConInventario[] = [];
+  public get lotesFiltrados(): LoteVerdeConInventario[] {
     return this._lotesFiltrados;
   }
-  public set lotesFiltrados(value: Lote[]) {
+  public set lotesFiltrados(value: LoteVerdeConInventario[]) {
     this._lotesFiltrados = value;
   }
+
+
+
   usuarios: User[] = [];
 
   // UI STATE
@@ -71,7 +74,7 @@ export class LoteVerdeComponent {
     private loteService: LoteService,
     private userService: UserService,
     private uiService: UiService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadUsuarios();
@@ -89,8 +92,8 @@ export class LoteVerdeComponent {
   }
 
   loadLotes() {
-    this.loteService.getAll().subscribe(lotes => {
-      this.lotes = lotes;
+    this.loteService.getLotesVerdesConInventario().subscribe(lotes => {
+      this.lotes = lotes ?? [];
       this.aplicarFiltro();
     });
   }
@@ -205,5 +208,9 @@ export class LoteVerdeComponent {
   onUpdated() {
     this.showEditLote = false;
     this.loadLotes();
+  }
+
+  openAsignar(lote: Lote) {
+    this.selectedLoteId = lote.id_lote;
   }
 }
