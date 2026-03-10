@@ -13,6 +13,7 @@ import { UserService } from '../../../users/service/users-service.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { HistoricLoteComponent } from '../components/historic-lote/historic-lote.component';
 import { EditLoteComponent } from '../components/edit-lote/edit-lote.component';
+import { AddInventoryComponent } from '../components/add-inventory/add-inventory.component';
 
 
 
@@ -27,6 +28,7 @@ import { EditLoteComponent } from '../components/edit-lote/edit-lote.component';
     NgFor,
     LucideAngularModule,
     AddLoteComponent,
+    AddInventoryComponent,
     EditLoteComponent,
     HistoricLoteComponent,
     ReportLoteComponent,
@@ -67,6 +69,7 @@ export class LoteVerdeComponent {
   showEditLote = false;
   showHistoricLote = false;
   showReportLote = false;
+  showAddInventory = false;
 
   selectedLoteId = '';
 
@@ -96,6 +99,10 @@ export class LoteVerdeComponent {
       this.lotes = lotes ?? [];
       this.aplicarFiltro();
     });
+  }
+
+  getPesoInventario(l: LoteVerdeConInventario): number {
+    return (l.inventarioLotes || []).reduce((total, inv) => total + (inv.cantidad_kg || 0), 0);
   }
 
   /* =========================
@@ -212,5 +219,11 @@ export class LoteVerdeComponent {
 
   openAsignar(lote: Lote) {
     this.selectedLoteId = lote.id_lote;
+    this.showAddInventory = true;
+  }
+
+  onInventoryCreated() {
+    this.showAddInventory = false;
+    this.loadLotes();
   }
 }

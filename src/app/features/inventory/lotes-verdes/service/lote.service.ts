@@ -59,4 +59,10 @@ export class LoteService {
     );
   }
 
+  getLoteVerdeConInventarioById(id: string): Observable<LoteVerdeConInventario> {
+    return this.http.get<LoteVerdeConInventario>(
+      `${this.baseUrl}/inventario/${id}`
+    );
+  }
+
 }
