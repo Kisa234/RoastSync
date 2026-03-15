@@ -3,17 +3,17 @@ import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, Eye, Edit2, Trash2, History, Plus } from 'lucide-angular';
 
-import { AddLoteComponent } from '../components/add-lote/add-lote.component';
-import { ReportLoteComponent } from '../../../../shared/components/report-lote/report-lote.component';
-import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
-import { Lote, LoteVerdeConInventario } from '../../../../shared/models/lote';
-import { User } from '../../../../shared/models/user';
-import { LoteService } from '../service/lote.service';
-import { UserService } from '../../../users/service/users-service.service';
-import { UiService } from '../../../../shared/services/ui.service';
-import { HistoricLoteComponent } from '../components/historic-lote/historic-lote.component';
-import { EditLoteComponent } from '../components/edit-lote/edit-lote.component';
-import { AddInventoryComponent } from '../components/add-inventory/add-inventory.component';
+import { AddLoteComponent } from '../../components/add-lote/add-lote.component';
+import { ReportLoteComponent } from '../../../../../shared/components/report-lote/report-lote.component';
+import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
+import { Lote, LoteVerdeConInventario } from '../../../../../shared/models/lote';
+import { User } from '../../../../../shared/models/user';
+import { LoteService } from '../../service/lote.service';
+import { UserService } from '../../../../users/service/users-service.service';
+import { UiService } from '../../../../../shared/services/ui.service';
+import { EditLoteComponent } from '../../components/edit-lote/edit-lote.component';
+import { AddInventoryComponent } from '../../components/add-inventory/add-inventory.component';
+import { Router, RouterOutlet } from '@angular/router';
 
 
 
@@ -30,10 +30,10 @@ import { AddInventoryComponent } from '../components/add-inventory/add-inventory
     AddLoteComponent,
     AddInventoryComponent,
     EditLoteComponent,
-    HistoricLoteComponent,
     ReportLoteComponent,
-    UserNamePipe
-  ],
+    UserNamePipe,
+    RouterOutlet
+],
   templateUrl: './lote-verde.component.html',
   styles: []
 })
@@ -67,7 +67,6 @@ export class LoteVerdeComponent {
 
   showAddLote = false;
   showEditLote = false;
-  showHistoricLote = false;
   showReportLote = false;
   showAddInventory = false;
 
@@ -76,7 +75,8 @@ export class LoteVerdeComponent {
   constructor(
     private loteService: LoteService,
     private userService: UserService,
-    private uiService: UiService
+    private uiService: UiService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -173,9 +173,9 @@ export class LoteVerdeComponent {
   }
 
   openHistoric(l: Lote) {
-    this.selectedLoteId = l.id_lote;
-    this.showHistoricLote = true;
+    this.router.navigate(['/inventory/lotes-verdes/historico', l.id_lote]);
   }
+
 
   openEdit(l: Lote) {
     this.selectedLoteId = l.id_lote;

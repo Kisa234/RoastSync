@@ -1,33 +1,34 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
-import { LucideAngularModule, X } from 'lucide-angular';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule, DatePipe, DecimalPipe, Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
+
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { Pedido } from '../../../../../shared/models/pedido';
 import { LoteVerdeConInventario } from '../../../../../shared/models/lote';
+import { Historial } from '../../../../../shared/models/historial';
+
 import { LoteService } from '../../service/lote.service';
 import { PedidoService } from '../../../../orders/service/orders.service';
 import { HistorialService } from '../../../../../shared/services/historial.service';
-import { Historial } from '../../../../../shared/models/historial';
 
 @Component({
   selector: 'historic-lote',
   standalone: true,
   imports: [
+    CommonModule,
     DatePipe,
     DecimalPipe,
-    CommonModule,
     UserNamePipe,
     LucideAngularModule
   ],
   templateUrl: './historic-lote.component.html',
   styles: ``
 })
-export class HistoricLoteComponent implements OnInit {
-  readonly X = X;
+export class HistoricLote implements OnInit {
+  readonly ArrowLeft = ArrowLeft;
 
-  @Output() close = new EventEmitter<void>();
-  @Input() loteId: string = '';
-
+  loteId: string = '';
   pedidos: Pedido[] = [];
   historial: Historial[] = [];
 
@@ -54,12 +55,21 @@ export class HistoricLoteComponent implements OnInit {
   };
 
   constructor(
+    private readonly route: ActivatedRoute,
+    private readonly location: Location,
     private readonly loteSvc: LoteService,
     private readonly pedidoSvc: PedidoService,
     private readonly historialService: HistorialService
   ) {}
 
   ngOnInit(): void {
+    this.loteId = this.route.snapshot.paramMap.get('id') || '';
+
+    if (!this.loteId) {
+      console.error('No se recibió el id del lote');
+      return;
+    }
+
     this.loadLote();
     this.loadPedidos();
     this.loadHistorial();
@@ -109,7 +119,7 @@ export class HistoricLoteComponent implements OnInit {
     );
   }
 
-  onCancel(): void {
-    this.close.emit();
+  goBack(): void {
+    this.location.back();
   }
 }

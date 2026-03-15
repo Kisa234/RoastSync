@@ -1,17 +1,17 @@
-import { UserService } from './../../../features/users/service/users-service.service';
-import { UserNamePipe } from './../../pipes/user-name-pipe.pipe';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { LucideAngularModule, FileSpreadsheet, Download, TestTube } from 'lucide-angular';
-import { RoastsService } from '../../../features/roasts/service/roasts.service';
-import { LoteTostadoService } from '../../../features/inventory/lotes-tostados/service/lote-tostado.service';
-import { Tueste } from '../../models/tueste';
-import { FichaTueste } from '../../models/ficha-tueste';
-import { MinSecPipe } from "../../pipes/time.pipe";
+import { LucideAngularModule, FileSpreadsheet, Download, TestTube, ArrowLeft } from 'lucide-angular';
 import { firstValueFrom } from 'rxjs';
 import { formatDate } from '@angular/common';
+import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
+import { MinSecPipe } from '../../../../../shared/pipes/time.pipe';
+import { FichaTueste } from '../../../../../shared/models/ficha-tueste';
+import { Tueste } from '../../../../../shared/models/tueste';
+import { RoastsService } from '../../../../roasts/service/roasts.service';
+import { LoteTostadoService } from '../../service/lote-tostado.service';
+import { UserService } from '../../../../users/service/users-service.service';
 
 @Component({
   selector: 'report-lote-tostado',
@@ -33,6 +33,7 @@ export class ReportLoteTostadoComponent implements OnInit {
   readonly Download = Download;
   readonly FileSpreadsheet = FileSpreadsheet;
   readonly TestTube = TestTube;
+  readonly ArrowLeft = ArrowLeft;
 
   currentDate: Date = new Date();
   ficha: FichaTueste = {
@@ -46,8 +47,14 @@ export class ReportLoteTostadoComponent implements OnInit {
     private route: ActivatedRoute,
     private roastSvc: RoastsService,
     private loteTostadoSvc: LoteTostadoService,
-    private userService: UserService
+    private userService: UserService,
+    private location: Location
   ) { }
+
+
+  goBack(): void {
+    this.location.back();
+  }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id') || this.id;

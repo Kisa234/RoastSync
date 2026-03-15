@@ -1,4 +1,4 @@
-<!-- src/app/features/inventory/pages/inventory/lote-tostado/lote-tostado.component.html -->
+<router-outlet></router-outlet>
 
 <div class="h-screen p-6 bg-[#F9F9F9] overflow-auto">
 
@@ -96,7 +96,7 @@
             </td>
 
             <td class="px-6 py-4 text-sm text-gray-700">
-              {{ t.productor }}
+              {{ t.lote.productor }}
             </td>
 
             <td class="px-6 py-4 text-sm text-gray-700">
@@ -167,19 +167,6 @@
   </div>
 </div>
 
-<!-- MODALES -->
-
-<historic-lote-tostado
-  *ngIf="showHistoric"
-  [loteId]="selectedTuesteId"
-  (close)="showHistoric = false">
-</historic-lote-tostado>
-
-<report-lote-tostado
-  *ngIf="showReport"
-  [loteId]="selectedTuesteId"
-  (close)="showReport = false">
-</report-lote-tostado>
 
 <ficha-tueste
   *ngIf="showFicha"

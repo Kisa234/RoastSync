@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
+import {
   LucideAngularModule,
   Search,
   Eye,
@@ -10,21 +10,19 @@ import {
   TestTube,
   Tag
 } from 'lucide-angular';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { formatDate } from '@angular/common';
 
-import { LoteTostado } from '../../../../shared/models/lote-tostado';
-import { Lote } from '../../../../shared/models/lote';
-import { User } from '../../../../shared/models/user';
-import { LoteTostadoService } from '../service/lote-tostado.service';
-import { LoteService } from '../../lotes-verdes/service/lote.service';
-import { UserService } from '../../../users/service/users-service.service';
-import { UiService } from '../../../../shared/services/ui.service';
-import { FichaTuesteComponent } from '../../../../shared/components/ficha-tueste/ficha-tueste.component';
-import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
-import { HistoricLoteTostadoComponent } from '../components/historic-lote-tostado/historic-lote-tostado.component';
-import { ReportLoteTostadoComponent } from '../components/report-lote-tostado/report-lote-tostado.component';
+import { LoteTostadoConLote } from '../../../../../shared/models/lote-tostado';
+import { User } from '../../../../../shared/models/user';
+import { LoteTostadoService } from '../../service/lote-tostado.service';
+import { UserService } from '../../../../users/service/users-service.service';
+import { UiService } from '../../../../../shared/services/ui.service';
+import { FichaTuesteComponent } from '../../../../../shared/components/ficha-tueste/ficha-tueste.component';
+import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
+import { HistoricLoteTostadoComponent } from '../historic-lote-tostado/historic-lote-tostado.component';
+import { ReportLoteTostadoComponent } from '../../components/report-lote-tostado/report-lote-tostado.component';
 
 type FilterKey = 'todos' | 'enviados' | 'no-enviados';
 
@@ -37,17 +35,15 @@ type FilterKey = 'todos' | 'enviados' | 'no-enviados';
     NgIf,
     NgFor,
     LucideAngularModule,
-    HistoricLoteTostadoComponent,
-    ReportLoteTostadoComponent,
     FichaTuesteComponent,
-    UserNamePipe
+    UserNamePipe,
+    RouterOutlet
   ],
   templateUrl: './lote-tostado.component.html',
   styles: []
 })
 export class LoteTostadoComponent {
 
-  /* ===== ICONOS ===== */
   readonly Search = Search;
   readonly Eye = Eye;
   readonly Clipboard = Clipboard;
@@ -55,13 +51,10 @@ export class LoteTostadoComponent {
   readonly TestTube = TestTube;
   readonly Tag = Tag;
 
-  /* ===== DATA ===== */
-  tostados: LoteTostado[] = [];
-  tostadosFiltrados: LoteTostado[] = [];
-  lotesVerdeMap = new Map<string, Lote>();
+  tostados: LoteTostadoConLote[] = [];
+  tostadosFiltrados: LoteTostadoConLote[] = [];
   usuarios: User[] = [];
 
-  /* ===== UI STATE ===== */
   filterTextTostado = '';
   filterTostado: FilterKey = 'no-enviados';
 
@@ -82,7 +75,6 @@ export class LoteTostadoComponent {
 
   constructor(
     private loteTostadoService: LoteTostadoService,
-    private loteService: LoteService,
     private userService: UserService,
     private uiService: UiService,
     private router: Router
@@ -90,12 +82,8 @@ export class LoteTostadoComponent {
 
   ngOnInit() {
     this.loadUsuarios();
-    this.loadLotesVerde();
+    this.loadTostados();
   }
-
-  /* =========================
-     CARGA DE DATA
-     ========================= */
 
   loadUsuarios() {
     this.userService.getUsers().subscribe(users => {
@@ -103,35 +91,16 @@ export class LoteTostadoComponent {
     });
   }
 
-  loadLotesVerde() {
-    this.loteService.getAll().subscribe(lotes => {
-      this.lotesVerdeMap = new Map(lotes.map(l => [l.id_lote, l]));
-      this.loadTostados();
-    });
-  }
-
   loadTostados() {
-    this.loteTostadoService.getAll().subscribe(tostados => {
-      this.tostados = tostados.map(t => {
-        const loteVerde = this.lotesVerdeMap.get(t.id_lote);
-        return {
-          ...t,
-          productor: loteVerde?.productor ?? ''
-        };
-      });
-
+    this.loteTostadoService.getloteconlote().subscribe(tostados => {
+      this.tostados = tostados;
       this.aplicarFiltro();
     });
   }
 
-  /* =========================
-     FILTROS
-     ========================= */
-
   aplicarFiltro() {
     let result = [...this.tostados];
 
-    // filtro por estado
     switch (this.filterTostado) {
       case 'enviados':
         result = result.filter(t => !!t.entregado && t.peso === 0);
@@ -141,26 +110,34 @@ export class LoteTostadoComponent {
         break;
     }
 
-    // filtro por texto
     if (this.filterTextTostado.trim()) {
       const term = this.filterTextTostado.toLowerCase();
 
       result = result.filter(t => {
         const user = this.usuarios.find(u => u.id_user === t.id_user);
         const cliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
-        const loteVerde = this.lotesVerdeMap.get(t.id_lote);
 
         return (
           t.id_lote_tostado?.toLowerCase().includes(term) ||
           t.perfil_tostado?.toLowerCase().includes(term) ||
           cliente.includes(term) ||
-          loteVerde?.productor?.toLowerCase().includes(term) ||
-          loteVerde?.distrito?.toLowerCase().includes(term) ||
-          loteVerde?.variedades.join(' ').toLowerCase().includes(term) ||
-          loteVerde?.clasificacion?.toLowerCase().includes(term) ||
-          loteVerde?.proceso?.toLowerCase().includes(term) ||
-          loteVerde?.id_lote.toLowerCase().includes(term)
+          t.lote?.productor?.toLowerCase().includes(term) ||
+          t.lote?.distrito?.toLowerCase().includes(term) ||
+          t.lote?.variedades?.join(' ')?.toLowerCase().includes(term) ||
+          t.lote?.clasificacion?.toLowerCase().includes(term) ||
+          t.lote?.proceso?.toLowerCase().includes(term) ||
+          t.lote?.id_lote?.toLowerCase().includes(term)
         );
+      });
+    }
+
+    if (this.startDate || this.endDate) {
+      const desde = this.startDate ? new Date(this.startDate) : null;
+      const hasta = this.endDate ? new Date(this.endDate) : null;
+
+      result = result.filter(t => {
+        const fecha = new Date(t.fecha_tostado);
+        return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
       });
     }
 
@@ -177,47 +154,36 @@ export class LoteTostadoComponent {
   }
 
   onDateChange() {
-    const desde = this.startDate ? new Date(this.startDate) : null;
-    const hasta = this.endDate ? new Date(this.endDate) : null;
-
-    this.tostadosFiltrados = this.tostadosFiltrados.filter(t => {
-      const fecha = new Date(t.fecha_tostado);
-      return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
-    });
+    this.aplicarFiltro();
   }
 
-  /* =========================
-     ACCIONES
-     ========================= */
-
-  onReportTueste(t: LoteTostado) {
-    this.router.navigate(['/report-lote-tostado', t.id_lote_tostado]);
+  onReportTueste(t: LoteTostadoConLote) {
+    this.router.navigate(
+      ['/inventory/lotes-tostados/reporte', t.id_lote_tostado]
+    );
+  }
+  openHistoric(t: LoteTostadoConLote) {
+    this.router.navigate(
+      ['/inventory/lotes-tostados/historico', t.id_lote_tostado]
+    );
   }
 
-  openHistoric(t: LoteTostado) {
-    this.selectedTuesteId = t.id_lote_tostado;
-    this.showHistoric = true;
-  }
-
-  openFicha(t: LoteTostado) {
+  openFicha(t: LoteTostadoConLote) {
     this.selectedTuesteId = t.id_lote_tostado;
     this.showFicha = true;
   }
 
-  openReportAnalisis(t: LoteTostado) {
+  openReportAnalisis(t: LoteTostadoConLote) {
     if (!t.id_analisis_rapido) {
       this.uiService.alert('error', 'Error', 'El lote no tiene análisis asociado');
       return;
     }
+
     this.selectedTuesteId = t.id_lote_tostado;
     this.showReport = true;
   }
 
-  /* =========================
-     EXPORT STICKER
-     ========================= */
-
-  async exportStickerTostado(t: LoteTostado) {
+  async exportStickerTostado(t: LoteTostadoConLote) {
     const lote = t.id_lote ?? '';
     const fecha = t.fecha_tostado
       ? formatDate(new Date(t.fecha_tostado), 'dd/MM/yyyy', 'es-PE')
@@ -274,7 +240,6 @@ export class LoteTostadoComponent {
 
     drawFit(String(lote), x[0], cols[0] - 30);
     drawFit(String(cliente), x[1], cols[1] - 30);
-
     ctx.fillText(String(fecha), x[2], yValue);
 
     const a = document.createElement('a');

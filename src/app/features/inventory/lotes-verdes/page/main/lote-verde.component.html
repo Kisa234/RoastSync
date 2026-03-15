@@ -1,3 +1,5 @@
+<router-outlet></router-outlet>
+
 <div class="min-h-screen p-6 bg-[#F9F9F9]">
   <!-- Header -->
   <div class="flex justify-between items-center mb-5">
@@ -273,8 +275,6 @@
 <edit-lote *ngIf="showEditLote" [loteId]="selectedLoteId" (close)="showEditLote = false" (create)="onUpdated()">
 </edit-lote>
 
-<historic-lote *ngIf="showHistoricLote" [loteId]="selectedLoteId" (close)="showHistoricLote = false">
-</historic-lote>
 
 <report-lote *ngIf="showReportLote" [loteId]="selectedLoteId" (close)="showReportLote = false">
 </report-lote>

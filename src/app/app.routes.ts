@@ -23,15 +23,16 @@ import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { ClientFormComponent } from './features/client-form/pages/client-form.component';
 import { CostingComponent } from './features/costing/pages/costing.component';
-import { LoteTostadoComponent } from './features/inventory/lotes-tostados/page/lote-tostado.component';
+import { LoteTostadoComponent } from './features/inventory/lotes-tostados/page/main/lote-tostado.component';
 import { InternsComponent } from './features/users/page/interns/interns.component';
 import { ClientsComponent } from './features/users/page/clients/clients.component';
 import { AlmacenComponent } from './features/inventory/almacenes/page/almacen.component';
 import { MuestrasComponent } from './features/inventory/muestras/page/muestras.component';
-import { LoteVerdeComponent } from './features/inventory/lotes-verdes/page/lote-verde.component';
+import { LoteVerdeComponent } from './features/inventory/lotes-verdes/page/main/lote-verde.component';
 import { InsumoComponent } from './features/inventory/insumo/page/insumo.component';
 import { ProductPageComponent } from './features/inventory/products/page/product-page.component';
 import { VerMovimientosPage } from './features/inventory/almacenes/page/ver-movimientos/ver-movimientos.component';
+import { HistoricLote } from './features/inventory/lotes-verdes/page/historic-lote/historic-lote.component';
 
 export const appRoutes: Routes = [
 
@@ -55,7 +56,7 @@ export const appRoutes: Routes = [
       { path: '**', redirectTo: 'box-form' }
     ]
   },
-  
+
   // 3) ADMIN (todo lo demás)
   {
     path: '',
@@ -64,35 +65,59 @@ export const appRoutes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: OverviewComponent },
-      { 
-        path: 'inventory', 
-        component: InventoryPage, 
+      {
+        path: 'inventory',
+        component: InventoryPage,
         children: [
           { path: 'muestras', component: MuestrasComponent },
           { path: 'lotes-verdes', component: LoteVerdeComponent },
+          {
+            path: 'lotes-verdes/historico/:id',
+            loadComponent: () =>
+              import('./features/inventory/lotes-verdes/page/historic-lote/historic-lote.component')
+                .then(m => m.HistoricLote)
+          },
           { path: 'lotes-tostados', component: LoteTostadoComponent },
-          { path: 'almacen', 
+          {
+            path: 'lotes-tostados/reporte/:id',
+            loadComponent: () =>
+              import('./features/inventory/lotes-tostados/page/report-lote-tostado/report-lote-tostado.component')
+                .then(m => m.ReportLoteTostadoComponent),
+            canActivate: [LoteTostadoExistsGuard]
+          },
+          {
+            path: 'lotes-tostados/historico/:id',
+            loadComponent: () =>
+              import('./features/inventory/lotes-tostados/page/historic-lote-tostado/historic-lote-tostado.component')
+                .then(m => m.HistoricLoteTostadoComponent),
+            canActivate: [LoteTostadoExistsGuard]
+          },
+          {
+            path: 'almacen',
             component: AlmacenComponent,
             children: [
               { path: 'movimientos/:id', component: VerMovimientosPage },
             ]
           },
-          { path: 'insumos',  component: InsumoComponent },
+          { path: 'insumos', component: InsumoComponent },
           { path: 'productos', component: ProductPageComponent },
         ]
       },
+
       { path: 'orders', component: OrdersPage },
       { path: 'roasts', component: RoastsPage },
       { path: 'analisis', component: AnalisisPage },
-      { path: 'users', children:[
-        { path: '', component: ClientsComponent },
-        { path: 'interns', component: InternsComponent}
-      ]},
+      {
+        path: 'users', children: [
+          { path: '', component: ClientsComponent },
+          { path: 'interns', component: InternsComponent }
+        ]
+      },
       { path: 'envio', component: EnvioPageComponent },
       { path: 'settings', component: SettingsPageComponent },
       { path: 'suscriptions', component: SuscriptionPageComponent },
       { path: 'costing', component: CostingComponent },
-      
+
       {
         path: 'pdf/:type/:id',
         loadComponent: () =>
@@ -101,13 +126,8 @@ export const appRoutes: Routes = [
         canActivate: [AnalysisCompleteGuard]
       },
 
-      {
-        path: 'report-lote-tostado/:id',
-        loadComponent: () =>
-          import('./shared/components/report-lote-tostado/report-lote-tostado.component')
-            .then(m => m.ReportLoteTostadoComponent),
-        canActivate: [LoteTostadoExistsGuard]
-      },
+
+
 
       { path: '**', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
