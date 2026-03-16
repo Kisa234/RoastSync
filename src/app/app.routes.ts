@@ -7,7 +7,6 @@ import { ClientLayoutComponent } from './layouts/client/client-layout.component'
 
 // Pages
 import { OverviewComponent } from './features/dashboard/page/overview/overview.component';
-import { OrdersPage } from './features/orders/page/orders-page.component';
 import { RoastsPage } from './features/roasts/page/roast-page.component';
 import { AnalisisPage } from './features/analysis/page/analisis.component';
 import { InventoryPage } from './features/inventory/pages/inventory/inventory-page.component';
@@ -33,6 +32,7 @@ import { ProductPageComponent } from './features/inventory/products/page/product
 import { VerMovimientosPage } from './features/inventory/almacenes/page/ver-movimientos/ver-movimientos.component';
 import { HistoricLote } from './features/inventory/lotes-verdes/page/historic-lote/historic-lote.component';
 import { AlmacenComponent } from './features/inventory/almacenes/page/main/almacen.component';
+import { OrdersPage } from './features/orders/page/main/orders-page.component';
 
 export const appRoutes: Routes = [
 

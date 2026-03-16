@@ -24,27 +24,18 @@
       <div class="relative w-full max-w-lg">
         <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400"></lucide-icon>
 
-        <input
-          type="text"
-          [(ngModel)]="filterTextMuestras"
-          (ngModelChange)="onSearchChange()"
+        <input type="text" [(ngModel)]="filterTextMuestras" (ngModelChange)="onSearchChange()"
           placeholder="Buscar por cliente, productor, finca o provincia..."
-          class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm"
-        />
+          class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
       </div>
 
       <!-- Botones de filtro -->
       <div class="flex gap-x-2.5">
-        <button
-          *ngFor="let f of filtersMuestras"
-          (click)="aplicarFiltro(f.key)"
-          [ngClass]="
+        <button *ngFor="let f of filtersMuestras" (click)="aplicarFiltro(f.key)" [ngClass]="
             filterMuestra === f.key
               ? 'bg-[#B8672E] text-white'
               : 'bg-gray-700 text-white hover:bg-[#B8672E]'
-          "
-          class="transition rounded-lg px-4 py-2 text-sm"
-        >
+          " class="transition rounded-lg px-4 py-2 text-sm">
           {{ f.label }}
         </button>
       </div>
@@ -63,7 +54,7 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Finca</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Provincia</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Almacén</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso (kg)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso (Gr)</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Variedades</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Proceso</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
@@ -110,17 +101,17 @@
                 <!-- Más de un inventario -->
                 <ng-template #multiple>
                   <div class="relative inline-block group">
-
                     <span class="cursor-pointer font-medium text-[#1F1F1F]">
                       {{ m.inventarioMuestras[0].almacen?.nombre }}
                       +{{ m.inventarioMuestras.length - 1 }}
                     </span>
 
                     <div class="absolute left-0 top-full mt-2 w-64 bg-white border border-[#E5E5E5] rounded-lg shadow-lg
-                                opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                                transition-all duration-200 z-30">
+                    opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                    transition-all duration-200 z-30">
                       <div class="p-3 space-y-1">
-                        <div *ngFor="let inv of m.inventarioMuestras" class="flex justify-between text-xs text-gray-700">
+                        <div *ngFor="let inv of m.inventarioMuestras"
+                          class="flex justify-between text-xs text-gray-700">
                           <span class="font-medium">
                             {{ inv.almacen?.nombre || 'N/A' }}
                           </span>
@@ -137,7 +128,8 @@
               </ng-container>
 
               <ng-template #sinAlmacen>
-                <span class="text-gray-400 font-medium">
+                <span (click)="openAsignarInventarioMuestra(m)"
+                  class="text-gray-400 hover:text-[#B8672E] cursor-pointer transition font-medium">
                   Sin almacén
                 </span>
               </ng-template>
@@ -148,23 +140,18 @@
             </td>
 
             <td class="px-6 py-4">
-              <span
-                *ngFor="let v of getVariedadesArray(m.variedades)"
-                class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full mr-1"
-              >
+              <span *ngFor="let v of getVariedadesArray(m.variedades)"
+                class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full mr-1">
                 {{ v }}
               </span>
             </td>
 
             <td class="px-6 py-4">
-              <span
-                class="inline-block text-xs px-2 py-0.5 rounded-full"
-                [ngClass]="{
+              <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
                   'bg-blue-100 text-blue-800': m.proceso === 'Lavado',
                   'bg-green-100 text-green-800': m.proceso === 'Natural',
                   'bg-yellow-100 text-yellow-800': m.proceso === 'Honey'
-                }"
-              >
+                }">
                 {{ m.proceso }}
               </span>
             </td>
@@ -179,12 +166,8 @@
                 <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
               </button>
 
-              <button
-                *ngIf="!m.completado"
-                (click)="onComplete(m)"
-                class="text-gray-500 hover:text-green-600"
-                title="Marcar como completa"
-              >
+              <button *ngIf="!m.completado" (click)="onComplete(m)" class="text-gray-500 hover:text-green-600"
+                title="Marcar como completa">
                 <lucide-icon [img]="CheckCircle" class="w-5 h-5"></lucide-icon>
               </button>
 
@@ -204,3 +187,7 @@
 
 <report-lote *ngIf="showReport" [MuestraId]="selectedMuestraId" (close)="showReport = false">
 </report-lote>
+
+<add-inventory-muestra *ngIf="showAsignarInventarioModal && selectedMuestra" [muestraId]="selectedMuestra.id_muestra"
+  (close)="closeAsignarInventarioMuestra()" (create)="onInventarioMuestraCreated()">
+</add-inventory-muestra>

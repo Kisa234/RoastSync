@@ -33,7 +33,7 @@ import { Router, RouterOutlet } from '@angular/router';
     ReportLoteComponent,
     UserNamePipe,
     RouterOutlet
-],
+  ],
   templateUrl: './lote-verde.component.html',
   styles: []
 })
@@ -157,6 +157,15 @@ export class LoteVerdeComponent {
     });
   }
 
+  getVariedadesArray(variedades: string | string[]): string[] {
+    if (Array.isArray(variedades)) return variedades;
+    if (!variedades) return [];
+
+    return variedades
+      .split(',')
+      .map(v => v.trim())
+      .filter(Boolean);
+  }
   /* =========================
      ACCIONES
      ========================= */

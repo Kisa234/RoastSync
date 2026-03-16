@@ -21,6 +21,7 @@ import { UiService } from '../../../../../shared/services/ui.service';
 import { FichaTuesteComponent } from '../../../../../shared/components/ficha-tueste/ficha-tueste.component';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { LoteTostadoConInventario } from '../../../../../shared/models/lote-tostado';
+import { AddInventoryLoteTostadoComponent } from "../../components/add-inventory-lote-tostado/add-inventory-lote-tostado.component";
 
 type FilterKey = 'todos' | 'enviados' | 'no-enviados';
 
@@ -35,8 +36,9 @@ type FilterKey = 'todos' | 'enviados' | 'no-enviados';
     LucideAngularModule,
     FichaTuesteComponent,
     UserNamePipe,
-    RouterOutlet
-  ],
+    RouterOutlet,
+    AddInventoryLoteTostadoComponent
+],
   templateUrl: './lote-tostado.component.html',
   styles: []
 })
@@ -70,6 +72,9 @@ export class LoteTostadoComponent {
   showFicha = false;
 
   selectedTuesteId = '';
+  selectedLoteTostado: LoteTostadoConInventario | null = null;
+  showAsignarInventarioModal = false;
+
 
   constructor(
     private loteTostadoService: LoteTostadoService,
@@ -149,8 +154,8 @@ export class LoteTostadoComponent {
         return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
       });
     }
-
-    this.tostadosFiltrados = result;
+    console.log(result);
+        this.tostadosFiltrados = result;
   }
 
   onSearchChange() {
@@ -164,6 +169,21 @@ export class LoteTostadoComponent {
 
   onDateChange() {
     this.aplicarFiltro();
+  }
+
+  openAsignarInventarioLoteTostado(lote: LoteTostadoConInventario): void {
+    this.selectedLoteTostado = lote;
+    this.showAsignarInventarioModal = true;
+  }
+
+  closeAsignarInventarioLoteTostado(): void {
+    this.selectedLoteTostado = null;
+    this.showAsignarInventarioModal = false;
+  }
+
+  onInventarioLoteTostadoCreated(): void {
+    this.closeAsignarInventarioLoteTostado();
+    this.loadTostados(); 
   }
 
   onReportTueste(t: LoteTostadoConInventario) {

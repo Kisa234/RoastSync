@@ -124,8 +124,9 @@
                 {{ getPesoInventario(l) | number:'1.0-2' }} kg
               </td>
               <td class="px-6 py-4">
-                <span class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full">
-                  {{ l.variedades }}
+                <span *ngFor="let v of getVariedadesArray(l.variedades)"
+                  class="inline-block text-center bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full mr-1">
+                  {{ v }}
                 </span>
               </td>
               <td class="px-6 py-4">
@@ -225,8 +226,9 @@
                 {{ getPesoInventario(l) | number:'1.0-2' }} kg
               </td>
               <td class="px-6 py-4">
-                <span class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full">
-                  {{ l.variedades }}
+                <span *ngFor="let v of getVariedadesArray(l.variedades)"
+                  class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full mr-1">
+                  {{ v }}
                 </span>
               </td>
               <td class="px-6 py-4">

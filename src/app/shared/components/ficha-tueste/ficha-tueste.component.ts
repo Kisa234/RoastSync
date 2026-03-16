@@ -55,6 +55,9 @@ export class FichaTuesteComponent implements OnInit {
     eliminado: false
   }
 
+  agtromGour = 0;
+
+
   constructor(
     readonly loteTostadoSvc: LoteTostadoService,
     readonly userService: UserService,
@@ -65,7 +68,7 @@ export class FichaTuesteComponent implements OnInit {
     this.loadData();
   }
 
-  private loadData() {
+  private async loadData() {
     this.loteTostadoSvc.getFichaTueste(this.id).subscribe(loteTostado => {
       this.data = loteTostado;
       this.loteService.getById(loteTostado.id_lote).subscribe(lote => {
@@ -75,6 +78,10 @@ export class FichaTuesteComponent implements OnInit {
         })
       })
     });
+  }
+
+  calcAgtrom(){
+    this.agtromGour = parseFloat(((this.data.agtrom! + 1.528 ) * 0.74294).toFixed(1));
   }
 
   formatTiempoSegundos(segundos: number): string {

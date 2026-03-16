@@ -11,6 +11,7 @@ import { UserService } from '../../../users/service/users-service.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { MuestraService } from '../service/muestra.service';
 import { MuestraConInventario } from '../../../../shared/models/muestra';
+import { AddInventoryMuestraComponent } from "../components/add-inventory-muestra/add-inventory-muestra.component";
 
 type FilterKey = 'todas' | 'sin-completar' | 'completadas';
 
@@ -26,8 +27,9 @@ type FilterKey = 'todas' | 'sin-completar' | 'completadas';
     LucideAngularModule,
     AddMuestraComponent,
     ReportLoteComponent,
-    UserNamePipe
-  ],
+    UserNamePipe,
+    AddInventoryMuestraComponent
+],
   templateUrl: './muestras.component.html'
 })
 export class MuestrasComponent {
@@ -51,6 +53,9 @@ export class MuestrasComponent {
   showAddMuestra = false;
   showReport = false;
   selectedMuestraId = '';
+  selectedMuestra: MuestraConInventario | null = null;
+  showAsignarInventarioModal = false;
+
 
   usuarios: User[] = [];
 
@@ -58,7 +63,7 @@ export class MuestrasComponent {
     private muestraService: MuestraService,
     private userService: UserService,
     private uiService: UiService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadUsuarios();
@@ -118,6 +123,21 @@ export class MuestrasComponent {
   }
 
   onSearchChange() {
+    this.loadMuestras();
+  }
+
+  openAsignarInventarioMuestra(muestra: MuestraConInventario): void {
+    this.selectedMuestra = muestra;
+    this.showAsignarInventarioModal = true;
+  }
+
+  closeAsignarInventarioMuestra(): void {
+    this.selectedMuestra = null;
+    this.showAsignarInventarioModal = false;
+  }
+
+  onInventarioMuestraCreated(): void {
+    this.closeAsignarInventarioMuestra();
     this.loadMuestras();
   }
 

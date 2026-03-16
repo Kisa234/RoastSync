@@ -8,7 +8,10 @@ export interface Pedido {
   facturado?: boolean;
   estadoFacturacion?: 'ES_NUESTRO' | 'FACTURADO' | 'NO_FACTURADO';
   estado_pedido: string;
+
   id_user: string;
+  usuario_nombre?: string;
+
   id_lote?: string;
   eliminado: boolean;
 
@@ -17,7 +20,7 @@ export interface Pedido {
   comentario?: string;
   pesos?: number[];
 
-  fecha_tueste?: Date|string;
+  fecha_tueste?: Date | string;
   tostadora?: string;
 
   id_lote_tostado?: string;

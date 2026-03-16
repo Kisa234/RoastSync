@@ -67,9 +67,9 @@
 
             <!-- Agtrom Comercial -->
             <div>
-                <div class="text-gray-600">Agtrom Comercial</div>
+                <div class="text-gray-600">Agt Com / Gour</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.agtrom | number:'1.2-2' }}
+                    {{ data.agtrom | number:'1.2-2' }} / {{this.agtromGour}}
                 </div>
             </div>
 
@@ -93,7 +93,7 @@
             <div>
                 <div class="text-gray-600">Peso Total</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.peso_total }}
+                    {{ data.peso_total }} gr | (MERMA) gr
                 </div>
             </div>
 
@@ -101,7 +101,7 @@
             <div>
                 <div class="text-gray-600">Lote</div>
                 <div class="border-b border-gray-400 pb-1 font-medium">
-                    {{ data.id_lote_tostado }}
+                    {{ data.id_lote_tostado }} 
                 </div>
             </div>
         </div>
