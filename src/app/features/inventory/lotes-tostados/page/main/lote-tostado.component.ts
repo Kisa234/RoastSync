@@ -14,15 +14,13 @@ import { Router, RouterOutlet } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { formatDate } from '@angular/common';
 
-import { LoteTostadoConLote } from '../../../../../shared/models/lote-tostado';
 import { User } from '../../../../../shared/models/user';
 import { LoteTostadoService } from '../../service/lote-tostado.service';
 import { UserService } from '../../../../users/service/users-service.service';
 import { UiService } from '../../../../../shared/services/ui.service';
 import { FichaTuesteComponent } from '../../../../../shared/components/ficha-tueste/ficha-tueste.component';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
-import { HistoricLoteTostadoComponent } from '../historic-lote-tostado/historic-lote-tostado.component';
-import { ReportLoteTostadoComponent } from '../../components/report-lote-tostado/report-lote-tostado.component';
+import { LoteTostadoConInventario } from '../../../../../shared/models/lote-tostado';
 
 type FilterKey = 'todos' | 'enviados' | 'no-enviados';
 
@@ -51,8 +49,8 @@ export class LoteTostadoComponent {
   readonly TestTube = TestTube;
   readonly Tag = Tag;
 
-  tostados: LoteTostadoConLote[] = [];
-  tostadosFiltrados: LoteTostadoConLote[] = [];
+  tostados: LoteTostadoConInventario[] = [];
+  tostadosFiltrados: LoteTostadoConInventario[] = [];
   usuarios: User[] = [];
 
   filterTextTostado = '';
@@ -92,7 +90,7 @@ export class LoteTostadoComponent {
   }
 
   loadTostados() {
-    this.loteTostadoService.getloteconlote().subscribe(tostados => {
+    this.loteTostadoService.getLotesTostadosConInventario().subscribe(tostados => {
       this.tostados = tostados;
       this.aplicarFiltro();
     });
@@ -117,16 +115,23 @@ export class LoteTostadoComponent {
         const user = this.usuarios.find(u => u.id_user === t.id_user);
         const cliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
 
+        const almacenes = (t.inventarioLotesTostados || [])
+          .map(inv => inv.almacen?.nombre?.toLowerCase() || '')
+          .join(' ');
+
+        const variedadesTexto = (t.lote?.variedades || []).join(' ').toLowerCase();
+
         return (
           t.id_lote_tostado?.toLowerCase().includes(term) ||
           t.perfil_tostado?.toLowerCase().includes(term) ||
           cliente.includes(term) ||
           t.lote?.productor?.toLowerCase().includes(term) ||
           t.lote?.distrito?.toLowerCase().includes(term) ||
-          t.lote?.variedades?.join(' ')?.toLowerCase().includes(term) ||
-          t.lote?.clasificacion?.toLowerCase().includes(term) ||
-          t.lote?.proceso?.toLowerCase().includes(term) ||
-          t.lote?.id_lote?.toLowerCase().includes(term)
+          variedadesTexto.includes(term) ||
+          (t.lote?.clasificacion || '').toLowerCase().includes(term) ||
+          (t.lote?.proceso || '').toLowerCase().includes(term) ||
+          (t.lote?.id_lote || '').toLowerCase().includes(term) ||
+          almacenes.includes(term)
         );
       });
     }
@@ -134,6 +139,10 @@ export class LoteTostadoComponent {
     if (this.startDate || this.endDate) {
       const desde = this.startDate ? new Date(this.startDate) : null;
       const hasta = this.endDate ? new Date(this.endDate) : null;
+
+      if (hasta) {
+        hasta.setHours(23, 59, 59, 999);
+      }
 
       result = result.filter(t => {
         const fecha = new Date(t.fecha_tostado);
@@ -157,23 +166,24 @@ export class LoteTostadoComponent {
     this.aplicarFiltro();
   }
 
-  onReportTueste(t: LoteTostadoConLote) {
+  onReportTueste(t: LoteTostadoConInventario) {
     this.router.navigate(
       ['/inventory/lotes-tostados/reporte', t.id_lote_tostado]
     );
   }
-  openHistoric(t: LoteTostadoConLote) {
+
+  openHistoric(t: LoteTostadoConInventario) {
     this.router.navigate(
       ['/inventory/lotes-tostados/historico', t.id_lote_tostado]
     );
   }
 
-  openFicha(t: LoteTostadoConLote) {
+  openFicha(t: LoteTostadoConInventario) {
     this.selectedTuesteId = t.id_lote_tostado;
     this.showFicha = true;
   }
 
-  openReportAnalisis(t: LoteTostadoConLote) {
+  openReportAnalisis(t: LoteTostadoConInventario) {
     if (!t.id_analisis_rapido) {
       this.uiService.alert('error', 'Error', 'El lote no tiene análisis asociado');
       return;
@@ -183,7 +193,7 @@ export class LoteTostadoComponent {
     this.showReport = true;
   }
 
-  async exportStickerTostado(t: LoteTostadoConLote) {
+  async exportStickerTostado(t: LoteTostadoConInventario) {
     const lote = t.id_lote ?? '';
     const fecha = t.fecha_tostado
       ? formatDate(new Date(t.fecha_tostado), 'dd/MM/yyyy', 'es-PE')

@@ -91,6 +91,15 @@
               class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
           </div>
 
+          <!-- Almacen -->
+          <div class="col-span-1 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1">Almacen*</label>
+            <select [(ngModel)]="model.almacen" name="clasificacion" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+              <option value="" disabled selected>Selecciona Almacen</option>
+              <option *ngFor="let a of almacenes" [value]="a.id_almacen">{{ a.nombre }}</option>
+            </select>
+          </div>
 
           <div class="col-span-2 sm:col-span-1">
             <label for="cliente" class="block text-gray-700 text-sm mb-1">Cliente *</label>
@@ -208,6 +217,16 @@
           <label class="block text-gray-700 text-sm mb-1">Costo (PEN)</label>
           <input type="number" min="1" [(ngModel)]="model.costo" name="costo"
             class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+        </div>
+
+        <!-- Almacen -->
+        <div class="col-span-1 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Almacen*</label>
+          <select [(ngModel)]="model.almacen" name="clasificacion" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="" disabled selected>Selecciona Almacen</option>
+            <option *ngFor="let a of almacenes" [value]="a.id_almacen">{{ a.nombre }}</option>
+          </select>
         </div>
 
 

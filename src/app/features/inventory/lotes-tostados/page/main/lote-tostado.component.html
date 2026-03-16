@@ -82,6 +82,7 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Productor</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Perfil</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Almacén</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso (gr)</th>
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
@@ -105,6 +106,48 @@
 
             <td class="px-6 py-4 text-sm text-gray-700">
               {{ t.perfil_tostado }}
+            </td>
+
+            <!-- ALMACÉN -->
+            <td class="px-6 py-4 text-sm text-gray-700">
+              <ng-container *ngIf="t.inventarioLotesTostados.length; else sinAlmacen">
+
+                <ng-container *ngIf="t.inventarioLotesTostados.length === 1; else multiple">
+                  {{ t.inventarioLotesTostados[0].almacen?.nombre || 'N/A' }}
+                </ng-container>
+
+                <ng-template #multiple>
+                  <div class="relative inline-block group">
+                    <span class="cursor-pointer font-medium text-[#1F1F1F]">
+                      {{ t.inventarioLotesTostados[0].almacen?.nombre }}
+                      +{{ t.inventarioLotesTostados.length - 1 }}
+                    </span>
+
+                    <div class="absolute left-0 top-full mt-2 w-64 bg-white border border-[#E5E5E5] rounded-lg shadow-lg
+                                opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                                transition-all duration-200 z-30">
+                      <div class="p-3 space-y-1">
+                        <div *ngFor="let inv of t.inventarioLotesTostados" class="flex justify-between text-xs text-gray-700">
+                          <span class="font-medium">
+                            {{ inv.almacen?.nombre || 'N/A' }}
+                          </span>
+
+                          <span class="text-gray-500">
+                            {{ inv.cantidad_kg| number:'1.0-2' }} gr
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+
+              </ng-container>
+
+              <ng-template #sinAlmacen>
+                <span class="text-gray-400 font-medium">
+                  Sin almacén
+                </span>
+              </ng-template>
             </td>
 
             <td class="px-6 py-4 text-sm text-gray-700">
@@ -166,7 +209,6 @@
     </div>
   </div>
 </div>
-
 
 <ficha-tueste
   *ngIf="showFicha"

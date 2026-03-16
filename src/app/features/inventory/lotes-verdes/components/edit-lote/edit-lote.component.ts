@@ -99,7 +99,7 @@ export class EditLoteComponent implements OnInit {
       // 3. Ahora que tenemos departamentos, cargar el lote
       this.loteSvc.getById(this.loteId).subscribe(lote => {
         this.model = { ...lote };
-
+        this.model.proceso = this.model.proceso.toUpperCase();
         // 4. Si el lote tiene departamento, cargar sus distritos
         if (this.model.departamento) {
           const dept = this.departamentos.find(d => d.nombre === this.model.departamento);

@@ -26,13 +26,13 @@ import { CostingComponent } from './features/costing/pages/costing.component';
 import { LoteTostadoComponent } from './features/inventory/lotes-tostados/page/main/lote-tostado.component';
 import { InternsComponent } from './features/users/page/interns/interns.component';
 import { ClientsComponent } from './features/users/page/clients/clients.component';
-import { AlmacenComponent } from './features/inventory/almacenes/page/almacen.component';
 import { MuestrasComponent } from './features/inventory/muestras/page/muestras.component';
 import { LoteVerdeComponent } from './features/inventory/lotes-verdes/page/main/lote-verde.component';
 import { InsumoComponent } from './features/inventory/insumo/page/insumo.component';
 import { ProductPageComponent } from './features/inventory/products/page/product-page.component';
 import { VerMovimientosPage } from './features/inventory/almacenes/page/ver-movimientos/ver-movimientos.component';
 import { HistoricLote } from './features/inventory/lotes-verdes/page/historic-lote/historic-lote.component';
+import { AlmacenComponent } from './features/inventory/almacenes/page/main/almacen.component';
 
 export const appRoutes: Routes = [
 
@@ -72,31 +72,57 @@ export const appRoutes: Routes = [
           { path: 'muestras', component: MuestrasComponent },
           { path: 'lotes-verdes', component: LoteVerdeComponent },
           {
-            path: 'lotes-verdes/historico/:id',
-            loadComponent: () =>
-              import('./features/inventory/lotes-verdes/page/historic-lote/historic-lote.component')
-                .then(m => m.HistoricLote)
-          },
-          { path: 'lotes-tostados', component: LoteTostadoComponent },
-          {
-            path: 'lotes-tostados/reporte/:id',
-            loadComponent: () =>
-              import('./features/inventory/lotes-tostados/page/report-lote-tostado/report-lote-tostado.component')
-                .then(m => m.ReportLoteTostadoComponent),
-            canActivate: [LoteTostadoExistsGuard]
+            path: 'lotes-verdes',
+            children: [
+              { path: '', component: LoteVerdeComponent },
+              {
+                path: 'historico/:id',
+                loadComponent: () =>
+                  import('./features/inventory/lotes-verdes/page/historic-lote/historic-lote.component')
+                    .then(m => m.HistoricLote)
+              }
+            ]
           },
           {
-            path: 'lotes-tostados/historico/:id',
-            loadComponent: () =>
-              import('./features/inventory/lotes-tostados/page/historic-lote-tostado/historic-lote-tostado.component')
-                .then(m => m.HistoricLoteTostadoComponent),
-            canActivate: [LoteTostadoExistsGuard]
+            path: 'lotes-tostados',
+            children: [
+
+              { path: '', component: LoteTostadoComponent },
+
+              {
+                path: 'reporte/:id',
+                loadComponent: () =>
+                  import('./features/inventory/lotes-tostados/page/report-lote-tostado/report-lote-tostado.component')
+                    .then(m => m.ReportLoteTostadoComponent),
+                canActivate: [LoteTostadoExistsGuard]
+              },
+
+              {
+                path: 'historico/:id',
+                loadComponent: () =>
+                  import('./features/inventory/lotes-tostados/page/historic-lote-tostado/historic-lote-tostado.component')
+                    .then(m => m.HistoricLoteTostadoComponent),
+                canActivate: [LoteTostadoExistsGuard]
+              }
+
+            ]
           },
           {
             path: 'almacen',
             component: AlmacenComponent,
             children: [
+
+              { path: '', component: AlmacenComponent },
+
               { path: 'movimientos/:id', component: VerMovimientosPage },
+
+              {
+                path: 'inventario-general/:id',
+                loadComponent: () =>
+                  import('./features/inventory/almacenes/page/inventario-general/inventario-general.component')
+                    .then(m => m.InventarioGeneralComponent)
+              }
+
             ]
           },
           { path: 'insumos', component: InsumoComponent },

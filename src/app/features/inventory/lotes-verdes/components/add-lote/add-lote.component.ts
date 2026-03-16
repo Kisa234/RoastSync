@@ -16,6 +16,8 @@ import { Departamento, Distrito, Provincia } from '../../../../../shared/models/
 import { UbigeoService } from '../../../../../shared/services/ubigeo.service';
 import { UiService } from '../../../../../shared/services/ui.service';
 import { IngresoCafeService } from '../../service/ingreso-cafe.service';
+import { AlmacenService } from '../../../almacenes/service/almacen.service';
+import { Almacen } from '../../../../../shared/models/almacen';
 
 @Component({
   selector: 'add-lote',
@@ -37,7 +39,8 @@ export class AddLoteComponent implements OnInit {
     private variedadSvc: VariedadService,
     private ubigeoSvc: UbigeoService,
     private uiSvc: UiService,
-    private ingresoCafeSvc: IngresoCafeService
+    private ingresoCafeSvc: IngresoCafeService,
+    private almacenService:  AlmacenService
   ) { }
 
   // icons
@@ -71,12 +74,14 @@ export class AddLoteComponent implements OnInit {
     costo: 0,
     id_lote: '',
     fecha_registro: new Date(),
-    eliminado: false
+    eliminado: false,
+    almacen: ''
   };
 
   variedades: Variedad[] = [];
-  procesos = ['Lavado', 'Natural', 'Honey'];
+  procesos = ['LAVADO', 'NATURAL', 'HONEY'];
   clasificaciones = ['SELECTO', 'CLASICO', 'EXCLUSIVO', 'ESPECIAL', 'GOURMET'];
+  almacenes: Almacen[] = [];
   
 
 
@@ -95,6 +100,7 @@ export class AddLoteComponent implements OnInit {
     this.ubigeoSvc.getDepartamentos().subscribe(deps => {
       this.departamentos = deps;
     });
+    this.almacenService.getAlmacenesActivos().subscribe(a => this.almacenes = a);
   }
 
   onMuestraChange(muestraId: string) {
@@ -106,7 +112,7 @@ export class AddLoteComponent implements OnInit {
         this.model.distrito = muestra.distrito,
         this.model.departamento = muestra.departamento,
         this.model.variedades = muestra.variedades,
-        this.model.proceso = muestra.proceso,
+        this.model.proceso = muestra.proceso.toUpperCase(),
         this.model.id_user = muestra.id_user,
 
         this.model.peso = 0;

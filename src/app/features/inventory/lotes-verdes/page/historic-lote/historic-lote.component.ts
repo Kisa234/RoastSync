@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, GitCompare } from 'lucide-angular';
 
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { Pedido } from '../../../../../shared/models/pedido';
@@ -11,6 +11,7 @@ import { Historial } from '../../../../../shared/models/historial';
 import { LoteService } from '../../service/lote.service';
 import { PedidoService } from '../../../../orders/service/orders.service';
 import { HistorialService } from '../../../../../shared/services/historial.service';
+import { VerCambiosComponent } from "../../components/ver-cambios/ver-cambios.component";
 
 @Component({
   selector: 'historic-lote',
@@ -20,17 +21,25 @@ import { HistorialService } from '../../../../../shared/services/historial.servi
     DatePipe,
     DecimalPipe,
     UserNamePipe,
-    LucideAngularModule
+    LucideAngularModule,
+    VerCambiosComponent
   ],
   templateUrl: './historic-lote.component.html',
   styles: ``
 })
 export class HistoricLote implements OnInit {
   readonly ArrowLeft = ArrowLeft;
+  readonly GitCompare = GitCompare;
 
   loteId: string = '';
   pedidos: Pedido[] = [];
   historial: Historial[] = [];
+
+  selectedHistorial?: Historial
+  showHistorial = false
+
+
+
 
   lote: LoteVerdeConInventario = {
     id_lote: '',
@@ -60,7 +69,7 @@ export class HistoricLote implements OnInit {
     private readonly loteSvc: LoteService,
     private readonly pedidoSvc: PedidoService,
     private readonly historialService: HistorialService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loteId = this.route.snapshot.paramMap.get('id') || '';
@@ -117,6 +126,11 @@ export class HistoricLote implements OnInit {
       (total, inv) => total + (inv.cantidad_kg || 0),
       0
     );
+  }
+
+  openHistorial(h: Historial) {
+    this.selectedHistorial = h
+    this.showHistorial = true
   }
 
   goBack(): void {

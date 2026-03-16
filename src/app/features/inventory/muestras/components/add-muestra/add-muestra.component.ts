@@ -1,3 +1,4 @@
+import { AlmacenService } from './../../../almacenes/service/almacen.service';
 import { Component, EventEmitter, Output, ViewChild, ElementRef, HostListener, OnInit } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +13,7 @@ import { Muestra } from '../../../../../shared/models/muestra';
 import { Variedad } from '../../../../../shared/models/variedad';
 import { User } from '../../../../../shared/models/user';
 import { Departamento, Distrito, Provincia } from '../../../../../shared/models/ubigeo';
+import { Almacen } from '../../../../../shared/models/almacen';
 
 
 @Component({
@@ -31,7 +33,8 @@ export class AddMuestraComponent implements OnInit {
     private MuestraSvc: MuestraService,
     private VariedadSvc: VariedadService,
     private userSvc: UserService,
-    private ubigeoSvc: UbigeoService
+    private ubigeoSvc: UbigeoService,
+    private almacenService: AlmacenService
   ) { }
 
   ngOnInit() {
@@ -40,6 +43,7 @@ export class AddMuestraComponent implements OnInit {
     });
     this.userSvc.getUsers().subscribe(u => this.clientes = u);
     this.ubigeoSvc.getDepartamentos().subscribe(deps => this.departamentos = deps);
+    this.almacenService.getAlmacenesActivos().subscribe(a => this.almacenes = a);
 
   }
 
@@ -61,12 +65,15 @@ export class AddMuestraComponent implements OnInit {
     variedades: [],
     proceso: '',
     nombre_muestra: '',
+    almacen:'',
   };
 
   // Listas de opciones
   variedades: Variedad[] = [];
   clientes: User[] = [];
-  procesos = ['Lavado', 'Natural', 'Honey'];
+  procesos = ['LAVADO', 'NATURAL', 'HONEY'];
+  almacenes: Almacen[] = [];
+
 
   // Dropdown Propio
   showVarDropdown = false;
@@ -84,7 +91,7 @@ export class AddMuestraComponent implements OnInit {
 
   onDeptoChange(deptoNombre: string) {
     this.model.distrito = '';
-    this.distritos   = [];
+    this.distritos = [];
 
     // buscamos el código interno a partir del nombre
     const dept = this.departamentos.find(d => d.nombre === deptoNombre);
@@ -92,6 +99,8 @@ export class AddMuestraComponent implements OnInit {
 
     this.ubigeoSvc.getDistritoByDepartamento(dept.codigo)
       .subscribe(provs => this.distritos = provs);
+
+    
   }
 
   onCancel() {

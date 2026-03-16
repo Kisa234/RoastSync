@@ -6,17 +6,17 @@ import { Plus, FolderPlus, Eye, Edit2, LucideAngularModule } from 'lucide-angula
 
 import { Producto } from '../../../../shared/models/producto';
 import { Categoria } from '../../../../shared/models/categoria';
-import { Inventario } from '../../../../shared/models/inventario';
+import { InventarioProducto  } from '../../../../shared/models/inventario-producto';
 
 import { ProductoService } from '../service/producto.service';
 import { CategoriaService } from '../service/categoria.service';
-import { InventarioService } from '../service/inventario.service';
+import { InventarioProductoService } from '../service/inventario-producto.service';
 
 import { CategoriasComponent } from '../components/categorias/categorias.component';
 import { ProductosComponent } from '../components/productos/productos.component';
 import { IngresoProductComponent } from '../components/ingreso-product/ingreso-product.component';
 
-type ProductoConStock = Producto & { inventarios: Inventario[]; totalStock: number };
+type ProductoConStock = Producto & { inventarios: InventarioProducto []; totalStock: number };
 
 @Component({
   selector: 'app-product-page',
@@ -34,7 +34,7 @@ type ProductoConStock = Producto & { inventarios: Inventario[]; totalStock: numb
 export class ProductPageComponent implements OnInit {
   productos: Producto[] = [];
   categorias: Categoria[] = [];
-  inventarios: Inventario[] = [];
+  inventarios: InventarioProducto [] = [];
 
   // ✅ lista base y lista filtrada
   productosConStockAll: ProductoConStock[] = [];
@@ -58,7 +58,7 @@ export class ProductPageComponent implements OnInit {
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
-    private inventarioService: InventarioService
+    private inventarioService: InventarioProductoService
   ) {}
 
   ngOnInit(): void {

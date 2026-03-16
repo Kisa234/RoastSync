@@ -10,8 +10,7 @@
     </div>
 
     <div class="flex gap-2.5 items-center">
-      <button
-        class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
         (click)="showAddAlmacen = true">
         <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
         Agregar Almacén
@@ -24,17 +23,11 @@
 
     <!-- Buscador -->
     <div class="mb-4 relative w-full max-w-lg">
-      <lucide-icon
-        [img]="Search"
-        class="absolute left-2 top-2 w-5 h-5 text-gray-400">
+      <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400">
       </lucide-icon>
 
-      <input
-        type="text"
-        [(ngModel)]="filterText"
-        (ngModelChange)="onSearchChange()"
-        placeholder="Buscar por ID, nombre o descripción..."
-        class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2
+      <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+        placeholder="Buscar por ID, nombre o descripción..." class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2
                focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
     </div>
 
@@ -71,6 +64,10 @@
                 </button>
                 <button (click)="openMovimientos(a)" class="text-gray-500 hover:text-blue-600">
                   <lucide-icon class="w-5 h-5" [img]="Eye"></lucide-icon>
+                </button>
+                <button (click)="openInventario(a)" class="text-gray-500 hover:text-[#B8672E]"
+                  title="Ver inventario del almacén">
+                  <lucide-icon class="w-5 h-5" [img]="ClipboardList"></lucide-icon>
                 </button>
               </td>
             </tr>
@@ -113,15 +110,9 @@
 </div>
 
 <!-- ✅ MODALES: solo cuando estás en la lista -->
-<add-almacen
-  *ngIf="!isChildRoute && showAddAlmacen"
-  (close)="showAddAlmacen = false"
-  (create)="onCreated()">
+<add-almacen *ngIf="!isChildRoute && showAddAlmacen" (close)="showAddAlmacen = false" (create)="onCreated()">
 </add-almacen>
 
-<edit-almacen
-  *ngIf="!isChildRoute && showEditAlmacen"
-  [almacenId]="selectedAlmacenId"
-  (close)="showEditAlmacen = false"
+<edit-almacen *ngIf="!isChildRoute && showEditAlmacen" [almacenId]="selectedAlmacenId" (close)="showEditAlmacen = false"
   (create)="onUpdated()">
 </edit-almacen>

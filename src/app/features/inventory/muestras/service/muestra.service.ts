@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Muestra } from '../../../../shared/models/muestra';
+import { Muestra, MuestraConInventario } from '../../../../shared/models/muestra';
 import { environment } from '../../../../../environments/environment';
 
 
@@ -35,5 +35,9 @@ export class MuestraService {
 
   complete(id: string): Observable<Muestra> {
     return this.http.patch<Muestra>(`${this.baseUrl}/complete/${id}`, {});
+  }
+
+  getMuestrasConInventario(): Observable<MuestraConInventario[]>{
+    return this.http.get<MuestraConInventario[]>(`${this.baseUrl}/inventario`);
   }
 }

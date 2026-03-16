@@ -6,5 +6,6 @@ export interface Historial {
   accion: string,
   comentario: string | null,
   objeto_antes: any | null,
+  objeto_despues: any|null,
   fecha_registro: Date
 }

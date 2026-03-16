@@ -1,16 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Edit2, Trash2, Plus, Eye } from 'lucide-angular';
-
-
-import { Almacen } from '../../../../shared/models/almacen';
-import { AlmacenService } from '../service/almacen.service';
-import { UiService } from '../../../../shared/services/ui.service';
-import { AddAlmacenComponent } from '../components/add-almacen/add-almacen.component';
-import { EditAlmacenComponent } from '../components/edit-almacen/edit-almacen.component';
+import { LucideAngularModule, Search, Edit2, Trash2, Plus, Eye, ClipboardList } from 'lucide-angular';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AddAlmacenComponent } from '../../components/add-almacen/add-almacen.component';
+import { EditAlmacenComponent } from '../../components/edit-almacen/edit-almacen.component';
+import { Almacen } from '../../../../../shared/models/almacen';
+import { AlmacenService } from '../../service/almacen.service';
+import { UiService } from '../../../../../shared/services/ui.service';
 
 @Component({
   selector: 'app-almacen',
@@ -36,6 +34,7 @@ export class AlmacenComponent {
   readonly Trash2 = Trash2;
   readonly Plus = Plus;
   readonly Eye = Eye;
+  readonly ClipboardList = ClipboardList;
 
   // DATA
   almacenes: Almacen[] = [];
@@ -172,6 +171,14 @@ export class AlmacenComponent {
     this.showEditAlmacen = false;
     this.loadAlmacenes();
   }
+
+  openInventario(a: Almacen) {
+    this.router.navigate([
+      '/inventory/almacen/inventario-general',
+      a.id_almacen
+    ]);
+  }
+
 
   openMovimientos(a: any) {
     this.router.navigate(['/inventory/almacen/movimientos', a.id_almacen]);

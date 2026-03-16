@@ -16,6 +16,7 @@ export interface Lote {
   id_user?: string;
   id_analisis?: string;
   peso_tostado?: number;
+  almacen? :string;
 }
 
 

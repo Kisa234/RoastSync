@@ -6,13 +6,11 @@ import { Observable, map } from 'rxjs';
 import { AddMuestraComponent } from '../components/add-muestra/add-muestra.component';
 import { ReportLoteComponent } from '../../../../shared/components/report-lote/report-lote.component';
 import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
-import { Muestra } from '../../../../shared/models/muestra';
 import { User } from '../../../../shared/models/user';
-import { MuestraService } from '../service/muestra.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { UiService } from '../../../../shared/services/ui.service';
-
-
+import { MuestraService } from '../service/muestra.service';
+import { MuestraConInventario } from '../../../../shared/models/muestra';
 
 type FilterKey = 'todas' | 'sin-completar' | 'completadas';
 
@@ -30,18 +28,16 @@ type FilterKey = 'todas' | 'sin-completar' | 'completadas';
     ReportLoteComponent,
     UserNamePipe
   ],
-
   templateUrl: './muestras.component.html'
 })
 export class MuestrasComponent {
 
-  // icons
   readonly Search = Search;
   readonly Eye = Eye;
   readonly CheckCircle = CheckCircle;
   readonly Plus = Plus;
 
-  muestras$!: Observable<Muestra[]>;
+  muestras$!: Observable<MuestraConInventario[]>;
 
   filterTextMuestras = '';
   filterMuestra: FilterKey = 'sin-completar';
@@ -62,7 +58,7 @@ export class MuestrasComponent {
     private muestraService: MuestraService,
     private userService: UserService,
     private uiService: UiService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.loadUsuarios();
@@ -76,7 +72,7 @@ export class MuestrasComponent {
   }
 
   loadMuestras() {
-    this.muestras$ = this.muestraService.getAll().pipe(
+    this.muestras$ = this.muestraService.getMuestrasConInventario().pipe(
       map(muestras => {
         let filtradas = muestras;
 
@@ -91,20 +87,26 @@ export class MuestrasComponent {
 
         if (this.filterTextMuestras.trim()) {
           const term = this.filterTextMuestras.toLowerCase();
+
           filtradas = filtradas.filter(m => {
             const user = this.usuarios.find(u => u.id_user === m.id_user);
             const cliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
+
+            const almacenes = (m.inventarioMuestras || [])
+              .map(inv => inv.almacen?.nombre?.toLowerCase() || '')
+              .join(' ');
 
             return (
               m.nombre_muestra?.toLowerCase().includes(term) ||
               m.productor?.toLowerCase().includes(term) ||
               m.finca?.toLowerCase().includes(term) ||
               m.distrito?.toLowerCase().includes(term) ||
-              cliente.includes(term)
+              cliente.includes(term) ||
+              almacenes.includes(term)
             );
           });
         }
-
+        console.log(filtradas);
         return filtradas;
       })
     );
@@ -115,24 +117,24 @@ export class MuestrasComponent {
     this.loadMuestras();
   }
 
-
   onSearchChange() {
     this.loadMuestras();
   }
 
-  onComplete(m: Muestra) {
+  onComplete(m: MuestraConInventario) {
     this.muestraService.complete(m.id_muestra).subscribe(() => {
       this.uiService.alert('success', 'Éxito', 'Muestra marcada como completa');
       this.loadMuestras();
     });
   }
 
-  onReport(m: Muestra) {
+  onReport(m: MuestraConInventario) {
     this.muestraService.getById(m.id_muestra).subscribe(muestra => {
       if (!muestra?.id_analisis) {
         this.uiService.alert('error', 'Error', 'La muestra no tiene análisis asociado');
         return;
       }
+
       this.selectedMuestraId = m.id_muestra;
       this.showReport = true;
     });
@@ -141,5 +143,15 @@ export class MuestrasComponent {
   onCreated() {
     this.showAddMuestra = false;
     this.loadMuestras();
+  }
+
+  getVariedadesArray(variedades: string | string[]): string[] {
+    if (Array.isArray(variedades)) return variedades;
+    if (!variedades) return [];
+
+    return variedades
+      .split(',')
+      .map(v => v.trim())
+      .filter(Boolean);
   }
 }

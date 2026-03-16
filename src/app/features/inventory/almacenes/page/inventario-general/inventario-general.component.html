@@ -1,0 +1,156 @@
+<div class="min-h-screen bg-[#F9F9F9] p-6">
+  <div class="w-full space-y-6">
+
+    <!-- Header -->
+    <div class="bg-white border border-[#E7E7E7] rounded-2xl shadow-sm p-6">
+      <button
+        (click)="volver()"
+        class="text-sm text-gray-500 hover:text-[#B8672E] transition mb-4"
+      >
+        ← Volver
+      </button>
+
+      <div class="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-5">
+        <div>
+          <h1 class="text-3xl font-bold text-[#1F1F1F]">Inventario General</h1>
+          <p class="text-gray-500 mt-1">{{ nombreAlmacen }}</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 w-full xl:w-auto">
+          <div class="bg-[#F9F9F9] border border-[#ECECEC] rounded-xl px-4 py-3 min-w-[120px]">
+            <p class="text-xs text-gray-500">Productos</p>
+            <p class="text-lg font-semibold text-[#1F1F1F]">{{ totalProductos() }}</p>
+          </div>
+
+          <div class="bg-[#F9F9F9] border border-[#ECECEC] rounded-xl px-4 py-3 min-w-[120px]">
+            <p class="text-xs text-gray-500">Insumos</p>
+            <p class="text-lg font-semibold text-[#1F1F1F]">{{ totalInsumos() }}</p>
+          </div>
+
+          <div class="bg-[#F9F9F9] border border-[#ECECEC] rounded-xl px-4 py-3 min-w-[120px]">
+            <p class="text-xs text-gray-500">Muestras</p>
+            <p class="text-lg font-semibold text-[#1F1F1F]">{{ totalMuestras() }}</p>
+          </div>
+
+          <div class="bg-[#F9F9F9] border border-[#ECECEC] rounded-xl px-4 py-3 min-w-[120px]">
+            <p class="text-xs text-gray-500">Lotes Verdes</p>
+            <p class="text-lg font-semibold text-[#1F1F1F]">{{ totalLotesVerdes() }}</p>
+          </div>
+
+          <div class="bg-[#F9F9F9] border border-[#ECECEC] rounded-xl px-4 py-3 min-w-[120px]">
+            <p class="text-xs text-gray-500">Lotes Tostados</p>
+            <p class="text-lg font-semibold text-[#1F1F1F]">{{ totalLotesTostados() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <div>
+          <label class="block text-sm text-gray-500 mb-1">Buscar</label>
+          <input
+            [ngModel]="busqueda()"
+            (ngModelChange)="busqueda.set($event)"
+            type="text"
+            placeholder="Entidad, código, nombre, presentación..."
+            class="w-full rounded-xl border border-[#DDDDDD] bg-white px-4 py-3 outline-none focus:border-[#B8672E]"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm text-gray-500 mb-1">Entidad</label>
+          <select
+            [ngModel]="filtroEntidad()"
+            (ngModelChange)="filtroEntidad.set($event)"
+            class="w-full rounded-xl border border-[#DDDDDD] bg-white px-4 py-3 outline-none focus:border-[#B8672E]"
+          >
+            <option value="TODOS">Todos</option>
+            <option value="PRODUCTO">Productos</option>
+            <option value="INSUMO">Insumos</option>
+            <option value="MUESTRA">Muestras</option>
+            <option value="LOTE_VERDE">Lotes Verdes</option>
+            <option value="LOTE_TOSTADO">Lotes Tostados</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-white border border-[#E7E7E7] rounded-2xl shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-[#1F1F1F]">Detalle del inventario</h2>
+        <span class="text-sm text-gray-500">{{ filteredRows().length }} registros</span>
+      </div>
+
+      <div *ngIf="loading" class="py-10 text-center text-gray-500">
+        Cargando inventario...
+      </div>
+
+      <div *ngIf="!loading && error" class="py-6 text-center text-red-500">
+        {{ error }}
+      </div>
+
+      <div *ngIf="!loading && !error" class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="border-b border-[#ECECEC] text-left text-gray-500">
+              <th class="px-4 py-3 font-medium">Tipo</th>
+              <th class="px-4 py-3 font-medium">ID Entidad</th>
+              <th class="px-4 py-3 font-medium">Nombre</th>
+              <th class="px-4 py-3 font-medium">Presentación</th>
+              <th class="px-4 py-3 font-medium">Cantidad</th>
+              <th class="px-4 py-3 font-medium">Unidad</th>
+              <th class="px-4 py-3 font-medium">Almacén</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              *ngFor="let row of filteredRows()"
+              class="border-b border-[#F1F1F1] hover:bg-[#FCFCFC] transition"
+            >
+              <td class="px-4 py-4">
+                <span
+                  class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getBadgeClass(row.tipoEntidad)"
+                >
+                  {{ row.tipoEntidad.replace('_', ' ') }}
+                </span>
+              </td>
+
+              <td class="px-4 py-4 font-medium text-[#1F1F1F]">
+                {{ row.idEntidad }}
+              </td>
+
+              <td class="px-4 py-4 text-gray-700">
+                {{ row.nombre }}
+              </td>
+
+              <td class="px-4 py-4 text-gray-600">
+                {{ row.presentacion || '—' }}
+              </td>
+
+              <td class="px-4 py-4 font-semibold text-[#1F1F1F]">
+                {{ row.cantidad }}
+              </td>
+
+              <td class="px-4 py-4 text-gray-600">
+                {{ row.unidad || '—' }}
+              </td>
+
+              <td class="px-4 py-4 text-gray-600">
+                {{ row.almacen || '—' }}
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredRows().length === 0">
+              <td colspan="7" class="px-4 py-10 text-center text-gray-400">
+                No se encontraron registros para este almacén.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

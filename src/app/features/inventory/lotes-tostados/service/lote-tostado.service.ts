@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { LoteTostado, LoteTostadoConLote } from '../../../../shared/models/lote-tostado';
+import { LoteTostado, LoteTostadoConInventario, LoteTostadoConLote } from '../../../../shared/models/lote-tostado';
 import { environment } from '../../../../../environments/environment';
 import { FichaTueste } from '../../../../shared/models/ficha-tueste';
 
@@ -39,5 +39,9 @@ export class LoteTostadoService {
 
   getloteconlote(): Observable<LoteTostadoConLote[]>{
     return this.http.get<LoteTostadoConLote[]>(`${this.baseUrl}/lote-con-lote/`);
+  }
+  
+  getLotesTostadosConInventario(): Observable<LoteTostadoConInventario[]>{
+    return this.http.get<LoteTostadoConInventario[]>(`${this.baseUrl}/inventario`);
   }
 }
