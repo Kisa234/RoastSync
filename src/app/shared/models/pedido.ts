@@ -20,6 +20,8 @@ export interface Pedido {
   comentario?: string;
   pesos?: number[];
 
+  id_almacen:string;
+
   fecha_tueste?: Date | string;
   tostadora?: string;
 
