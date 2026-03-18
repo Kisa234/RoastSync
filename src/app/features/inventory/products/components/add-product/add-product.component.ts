@@ -3,7 +3,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ProductoService } from '../../service/producto.service';
-import { CategoriaService } from '../../service/categoria.service';
+import { CategoriaProductoService } from '../../service/categoria-producto.service';
 import { MarcaService } from '../../service/marca.service';
 
 import { Producto } from '../../../../../shared/models/producto';
@@ -57,7 +57,7 @@ export class AddProductComponent implements OnInit {
 
   constructor(
     private productoSvc: ProductoService,
-    private catSvc: CategoriaService,
+    private catSvc: CategoriaProductoService,
     private marcaSvc: MarcaService
   ) {}
 

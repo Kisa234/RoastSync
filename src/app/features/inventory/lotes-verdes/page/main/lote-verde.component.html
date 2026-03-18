@@ -69,7 +69,7 @@
           <ng-container *ngFor="let l of getLotesAdmin()">
             <tr>
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | userName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | UserNamePipe |  async }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.distrito }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">
@@ -171,7 +171,7 @@
           <ng-container *ngFor="let l of getLotesCliente()">
             <tr>
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | userName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | UserNamePipe | async }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.distrito }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">

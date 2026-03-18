@@ -9,7 +9,7 @@ import { Categoria } from '../../../../shared/models/categoria';
 import { InventarioProducto  } from '../../../../shared/models/inventario-producto';
 
 import { ProductoService } from '../service/producto.service';
-import { CategoriaService } from '../service/categoria.service';
+import { CategoriaProductoService } from '../service/categoria-producto.service';
 import { InventarioProductoService } from '../service/inventario-producto.service';
 
 import { CategoriasComponent } from '../components/categorias/categorias.component';
@@ -57,7 +57,7 @@ export class ProductPageComponent implements OnInit {
 
   constructor(
     private productoService: ProductoService,
-    private categoriaService: CategoriaService,
+    private categoriaService: CategoriaProductoService,
     private inventarioService: InventarioProductoService
   ) {}
 

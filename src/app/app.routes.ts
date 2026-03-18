@@ -33,6 +33,7 @@ import { VerMovimientosPage } from './features/inventory/almacenes/page/ver-movi
 import { HistoricLote } from './features/inventory/lotes-verdes/page/historic-lote/historic-lote.component';
 import { AlmacenComponent } from './features/inventory/almacenes/page/main/almacen.component';
 import { OrdersPage } from './features/orders/page/main/orders-page.component';
+import { UpdateInventoryComponent } from './features/inventory/update-inventory/update-inventory.component';
 
 export const appRoutes: Routes = [
 
@@ -71,8 +72,7 @@ export const appRoutes: Routes = [
         children: [
           { path: 'muestras', component: MuestrasComponent },
           { path: 'lotes-verdes', component: LoteVerdeComponent },
-          {
-            path: 'lotes-verdes',
+          {path: 'lotes-verdes',
             children: [
               { path: '', component: LoteVerdeComponent },
               {
@@ -83,8 +83,7 @@ export const appRoutes: Routes = [
               }
             ]
           },
-          {
-            path: 'lotes-tostados',
+          {path: 'lotes-tostados',
             children: [
 
               { path: '', component: LoteTostadoComponent },
@@ -107,8 +106,7 @@ export const appRoutes: Routes = [
 
             ]
           },
-          {
-            path: 'almacen',
+          {path: 'almacen',
             component: AlmacenComponent,
             children: [
 
@@ -127,6 +125,7 @@ export const appRoutes: Routes = [
           },
           { path: 'insumos', component: InsumoComponent },
           { path: 'productos', component: ProductPageComponent },
+          { path: 'actualizar', component: UpdateInventoryComponent}
         ]
       },
 

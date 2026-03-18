@@ -77,7 +77,7 @@ export class SidebarComponent {
         { type: 'link', label: 'Lotes Tostados', path: '/inventory/lotes-tostados', icon: Box },
         { type: 'link', label: 'Productos', path: '/inventory/productos', icon: Box },
         { type: 'link', label: 'Insumos', path: '/inventory/insumos', icon: Box },
-        { type: 'link', label: 'Actualizar Inventario', path: '/inventory/insumos', icon: FilePenLine  },
+        { type: 'link', label: 'Actualizar Inventario', path: '/inventory/actualizar', icon: FilePenLine  },
 
       ]
     },

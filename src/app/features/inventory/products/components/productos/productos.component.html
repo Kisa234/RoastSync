@@ -39,7 +39,7 @@
             <tr *ngFor="let p of productos" class="hover:bg-[#F9F9F9] transition">
               <td class="px-6 py-4 text-sm text-gray-700 font-medium">{{ p.id_producto }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ p.nombre }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_categoria | categoriaNombre }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_categoria | CategoriaProductoNamePipe | async }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ p.descripcion || '-' }}</td>
 
               <td class="px-6 py-4 text-center">

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, NgModule, Output } from '@angular/core';
-import { CategoriaService } from '../../service/categoria.service';
+import { CategoriaProductoService } from '../../service/categoria-producto.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Categoria } from '../../../../../shared/models/categoria';
@@ -23,7 +23,7 @@ export class AddCategoriaComponent {
 
   loading = false;
 
-  constructor(private categoriaSvc: CategoriaService) {}
+  constructor(private categoriaSvc: CategoriaProductoService) {}
 
   save() {
     if (!this.form.nombre?.trim()) return;

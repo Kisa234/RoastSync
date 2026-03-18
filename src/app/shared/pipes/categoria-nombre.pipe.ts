@@ -1,33 +1,22 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Categoria } from '../models/categoria';
-import { CategoriaService } from '../../features/inventory/products/service/categoria.service';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { CategoriaProductoService } from '../../features/inventory/products/service/categoria-producto.service';
 
 @Pipe({
-  name: 'categoriaNombre',
-  pure: false
+  name: 'CategoriaProductoNamePipe',
+  standalone: true,
+  pure: true
 })
 export class CategoriaNombrePipe implements PipeTransform {
-  private cache = new Map<string, Categoria | null>();
+  constructor(private categoriaSvc: CategoriaProductoService) {}
 
-  constructor(private categoriaSvc: CategoriaService) {}
+  transform(id: string | null | undefined): Observable<string> {
+    if (!id) return of('');
 
-  transform(id: string): string {
-    if (!id) return '';
-
-    // Si no está cacheada, la cargamos
-    if (!this.cache.has(id)) {
-      this.cache.set(id, null);
-      this.categoriaSvc.getCategoriaById(id).subscribe({
-        next: (res) => this.cache.set(id, res),
-        error: () => this.cache.delete(id)
-      });
-      return id; // Mientras carga, mostramos el id
-    }
-
-    const categoria = this.cache.get(id);
-    if (!categoria) return id;
-
-    return this.capitalizeWords(categoria.nombre);
+    return this.categoriaSvc.getCategoriaById(id).pipe(
+      map(categoria => this.capitalizeWords(categoria?.nombre ?? id))
+    );
   }
 
   private capitalizeWords(text: string): string {

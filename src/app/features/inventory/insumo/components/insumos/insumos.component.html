@@ -43,7 +43,7 @@
           <tbody class="bg-white divide-y divide-[#E5E5E5]">
             <tr *ngFor="let i of insumos" class="hover:bg-[#F9F9F9] transition">
               <td class="px-6 py-4 text-sm text-gray-700">{{ i.nombre }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ i.id_categoria | categoriaInsumo: categorias }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ i.id_categoria | CategoriaInsumoNamePipe | async }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ i.unidad_medida }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ i.descripcion }}</td>
 

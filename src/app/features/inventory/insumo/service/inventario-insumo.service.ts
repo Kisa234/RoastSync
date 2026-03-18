@@ -10,7 +10,12 @@ import { InventarioInsumo } from '../../../../shared/models/inventario-insumo';
 export class InventarioInsumoService {
   private baseUrl = `${environment.apiUrl}/inventario-insumo`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
+
+  /** Obtener todo el inventario */
+  getInventarios(): Observable<InventarioInsumo[]> {
+    return this.http.get<InventarioInsumo[]>(this.baseUrl);
+  }
 
   create(data: Partial<InventarioInsumo>): Observable<InventarioInsumo> {
     return this.http.post<InventarioInsumo>(this.baseUrl, data);

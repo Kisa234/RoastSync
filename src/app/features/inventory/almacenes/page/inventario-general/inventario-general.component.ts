@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -82,7 +82,13 @@ export class InventarioGeneralComponent implements OnInit {
     private readonly inventarioInsumoService: InventarioInsumoService,
     private readonly inventarioMuestraService: InventarioMuestraService,
     private readonly inventarioLoteTostadoService: InventarioLoteTostadoService,
-  ) {}
+  ) {
+    effect(() => {
+      this.busqueda();
+      this.filtroEntidad();
+      this.currentPage.set(1);
+    });
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -258,5 +264,58 @@ export class InventarioGeneralComponent implements OnInit {
       default:
         return 'bg-gray-100 text-gray-700';
     }
+  }
+
+  currentPage = signal(1);
+  pageSize = signal(10);
+
+  totalPages = computed(() => {
+    const total = this.filteredRows().length;
+    return Math.max(1, Math.ceil(total / this.pageSize()));
+  });
+
+  paginatedRows = computed(() => {
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    const end = start + size;
+
+    return this.filteredRows().slice(start, end);
+  });
+
+  pageNumbers = computed(() => {
+    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
+  });
+
+  emptyRows = computed(() => {
+    const faltantes = this.pageSize() - this.paginatedRows().length;
+    return Array.from({ length: Math.max(0, faltantes) });
+  });
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages()) return;
+    this.currentPage.set(page);
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((p) => p + 1);
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update((p) => p - 1);
+    }
+  }
+
+  get pageStart(): number {
+    return this.filteredRows().length === 0
+      ? 0
+      : (this.currentPage() - 1) * this.pageSize() + 1;
+  }
+
+  get pageEnd(): number {
+    return Math.min(this.currentPage() * this.pageSize(), this.filteredRows().length);
   }
 }

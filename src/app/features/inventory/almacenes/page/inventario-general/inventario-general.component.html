@@ -3,10 +3,7 @@
 
     <!-- Header -->
     <div class="bg-white border border-[#E7E7E7] rounded-2xl shadow-sm p-6">
-      <button
-        (click)="volver()"
-        class="text-sm text-gray-500 hover:text-[#B8672E] transition mb-4"
-      >
+      <button (click)="volver()" class="text-sm text-gray-500 hover:text-[#B8672E] transition mb-4">
         ← Volver
       </button>
 
@@ -48,22 +45,15 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         <div>
           <label class="block text-sm text-gray-500 mb-1">Buscar</label>
-          <input
-            [ngModel]="busqueda()"
-            (ngModelChange)="busqueda.set($event)"
-            type="text"
+          <input [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" type="text"
             placeholder="Entidad, código, nombre, presentación..."
-            class="w-full rounded-xl border border-[#DDDDDD] bg-white px-4 py-3 outline-none focus:border-[#B8672E]"
-          />
+            class="w-full rounded-xl border border-[#DDDDDD] bg-white px-4 py-3 outline-none focus:border-[#B8672E]" />
         </div>
 
         <div>
           <label class="block text-sm text-gray-500 mb-1">Entidad</label>
-          <select
-            [ngModel]="filtroEntidad()"
-            (ngModelChange)="filtroEntidad.set($event)"
-            class="w-full rounded-xl border border-[#DDDDDD] bg-white px-4 py-3 outline-none focus:border-[#B8672E]"
-          >
+          <select [ngModel]="filtroEntidad()" (ngModelChange)="filtroEntidad.set($event)"
+            class="w-full rounded-xl border border-[#DDDDDD] bg-white px-4 py-3 outline-none focus:border-[#B8672E]">
             <option value="TODOS">Todos</option>
             <option value="PRODUCTO">Productos</option>
             <option value="INSUMO">Insumos</option>
@@ -105,15 +95,11 @@
           </thead>
 
           <tbody>
-            <tr
-              *ngFor="let row of filteredRows()"
-              class="border-b border-[#F1F1F1] hover:bg-[#FCFCFC] transition"
-            >
+            <tr *ngFor="let row of paginatedRows()" class="border-b border-[#F1F1F1] hover:bg-[#FCFCFC] transition">
+
               <td class="px-4 py-4">
-                <span
-                  class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-                  [ngClass]="getBadgeClass(row.tipoEntidad)"
-                >
+                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getBadgeClass(row.tipoEntidad)">
                   {{ row.tipoEntidad.replace('_', ' ') }}
                 </span>
               </td>
@@ -148,8 +134,65 @@
                 No se encontraron registros para este almacén.
               </td>
             </tr>
+
+            <tr *ngFor="let _ of emptyRows()" class="border-b border-[#F1F1F1]">
+              <td class="px-4 py-4">&nbsp;</td>
+              <td class="px-4 py-4">&nbsp;</td>
+              <td class="px-4 py-4">&nbsp;</td>
+              <td class="px-4 py-4">&nbsp;</td>
+              <td class="px-4 py-4">&nbsp;</td>
+              <td class="px-4 py-4">&nbsp;</td>
+              <td class="px-4 py-4">&nbsp;</td>
+            </tr>
+
+
+
           </tbody>
         </table>
+
+          <div *ngIf="!loading && !error && filteredRows().length > 0"
+            class="mt-5 w-full flex flex-col lg:flex-row lg:items-center gap-4">
+            <!-- IZQUIERDA -->
+            <div class="lg:w-[240px] text-sm text-gray-500 shrink-0">
+              Mostrando {{ pageStart }} - {{ pageEnd }} de {{ filteredRows().length }} registros
+            </div>
+
+            <!-- CENTRO -->
+            <div class="flex-1 flex justify-center">
+              <div class="flex items-center gap-2 flex-wrap">
+                <button (click)="prevPage()" [disabled]="currentPage() === 1"
+                  class="px-3 py-2 rounded-lg border border-[#DDDDDD] bg-white text-sm text-gray-600 hover:border-[#B8672E] hover:text-[#B8672E] disabled:opacity-50 disabled:cursor-not-allowed">
+                  Anterior
+                </button>
+
+                <button *ngFor="let page of pageNumbers()" (click)="goToPage(page)"
+                  class="px-3 py-2 rounded-lg border text-sm transition" [ngClass]="
+          currentPage() === page
+            ? 'border-[#B8672E] bg-[#B8672E] text-white'
+            : 'border-[#DDDDDD] bg-white text-gray-600 hover:border-[#B8672E] hover:text-[#B8672E]'
+        ">
+                  {{ page }}
+                </button>
+
+                <button (click)="nextPage()" [disabled]="currentPage() === totalPages()"
+                  class="px-3 py-2 rounded-lg border border-[#DDDDDD] bg-white text-sm text-gray-600 hover:border-[#B8672E] hover:text-[#B8672E] disabled:opacity-50 disabled:cursor-not-allowed">
+                  Siguiente
+                </button>
+              </div>
+            </div>
+
+            <!-- DERECHA -->
+            <div class="lg:w-[220px] flex items-center justify-start lg:justify-end gap-2 shrink-0">
+              <label class="text-sm text-gray-500 whitespace-nowrap">Filas por página</label>
+              <select [ngModel]="pageSize()" (ngModelChange)="pageSize.set(+$event); currentPage.set(1)"
+                class="rounded-lg border border-[#DDDDDD] bg-white px-3 py-2 text-sm outline-none focus:border-[#B8672E]">
+                <option [ngValue]="5">5</option>
+                <option [ngValue]="10">10</option>
+                <option [ngValue]="20">20</option>
+                <option [ngValue]="50">50</option>
+              </select>
+            </div>
+          </div>
       </div>
     </div>
   </div>

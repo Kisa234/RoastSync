@@ -21,7 +21,7 @@
       <div class="text-sm text-zinc-600 space-y-1 md:min-w-[260px]">
         <p>
           Cliente:
-          <span class="font-medium text-zinc-900">{{ LoteTostado.id_user! | userName }}</span>
+          <span class="font-medium text-zinc-900">{{ LoteTostado.id_user! | UserNamePipe | async }}</span>
         </p>
         <p>
           Lote:
@@ -96,7 +96,7 @@
               </td>
 
               <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">
-                {{ p.id_cliente | userName }}
+                {{ p.id_cliente | UserNamePipe | async }}
               </td>
 
               <td class="px-6 py-4 text-sm text-zinc-700">

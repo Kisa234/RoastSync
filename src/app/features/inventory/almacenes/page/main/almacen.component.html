@@ -1,114 +1,116 @@
-<router-outlet></router-outlet>
+<ng-container *ngIf="isChildRoute; else listaAlmacenes">
+  <router-outlet></router-outlet>
+</ng-container>
+<ng-template #listaAlmacenes>
+  <div class="h-screen p-6 bg-[#F9F9F9] overflow-auto">
 
-<div *ngIf="!isChildRoute" class="h-screen p-6 bg-[#F9F9F9] overflow-auto">
-  
-  <!-- Header -->
-  <div class="flex justify-between items-center mb-5">
-    <div>
-      <h1 class="text-2xl font-bold text-[#1F1F1F]">Almacenes</h1>
-      <p class="text-gray-600">Gestión de almacenes y estados</p>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-5">
+      <div>
+        <h1 class="text-2xl font-bold text-[#1F1F1F]">Almacenes</h1>
+        <p class="text-gray-600">Gestión de almacenes y estados</p>
+      </div>
+
+      <div class="flex gap-2.5 items-center">
+        <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+          (click)="showAddAlmacen = true">
+          <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
+          Agregar Almacén
+        </button>
+      </div>
     </div>
 
-    <div class="flex gap-2.5 items-center">
-      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
-        (click)="showAddAlmacen = true">
-        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
-        Agregar Almacén
-      </button>
-    </div>
-  </div>
+    <!-- Contenedor -->
+    <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
 
-  <!-- Contenedor -->
-  <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
+      <!-- Buscador -->
+      <div class="mb-4 relative w-full max-w-lg">
+        <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400">
+        </lucide-icon>
 
-    <!-- Buscador -->
-    <div class="mb-4 relative w-full max-w-lg">
-      <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400">
-      </lucide-icon>
-
-      <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
-        placeholder="Buscar por ID, nombre o descripción..." class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2
+        <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por ID, nombre o descripción..." class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2
                focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
-    </div>
+      </div>
 
-    <!-- Tabla -->
-    <div class="rounded-lg shadow-sm overflow-x-auto">
-      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+      <!-- Tabla -->
+      <div class="rounded-lg shadow-sm overflow-x-auto">
+        <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
 
-        <thead class="bg-[#F9F9F9]">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Nombre</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Descripción</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
-          </tr>
-        </thead>
-
-        <tbody class="bg-white divide-y divide-[#E5E5E5]">
-
-          <ng-container *ngFor="let a of getActivos()">
+          <thead class="bg-[#F9F9F9]">
             <tr>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ a.nombre }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ a.descripcion || '—' }}</td>
-              <td class="px-6 py-4">
-                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
-                  Activo
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right text-sm space-x-2">
-                <button (click)="openEdit(a)" class="text-gray-500 hover:text-gray-700">
-                  <lucide-icon class="w-5 h-5" [img]="Edit2"></lucide-icon>
-                </button>
-                <button (click)="delete(a)" class="text-gray-500 hover:text-red-600">
-                  <lucide-icon class="w-5 h-5" [img]="Trash2"></lucide-icon>
-                </button>
-                <button (click)="openMovimientos(a)" class="text-gray-500 hover:text-blue-600">
-                  <lucide-icon class="w-5 h-5" [img]="Eye"></lucide-icon>
-                </button>
-                <button (click)="openInventario(a)" class="text-gray-500 hover:text-[#B8672E]"
-                  title="Ver inventario del almacén">
-                  <lucide-icon class="w-5 h-5" [img]="ClipboardList"></lucide-icon>
-                </button>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Nombre</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Descripción</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody class="bg-white divide-y divide-[#E5E5E5]">
+
+            <ng-container *ngFor="let a of getActivos()">
+              <tr>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ a.nombre }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ a.descripcion || '—' }}</td>
+                <td class="px-6 py-4">
+                  <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
+                    Activo
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-right text-sm space-x-2">
+                  <button (click)="openEdit(a)" class="text-gray-500 hover:text-gray-700">
+                    <lucide-icon class="w-5 h-5" [img]="Edit2"></lucide-icon>
+                  </button>
+                  <button (click)="delete(a)" class="text-gray-500 hover:text-red-600">
+                    <lucide-icon class="w-5 h-5" [img]="Trash2"></lucide-icon>
+                  </button>
+                  <button (click)="openMovimientos(a)" class="text-gray-500 hover:text-blue-600">
+                    <lucide-icon class="w-5 h-5" [img]="Eye"></lucide-icon>
+                  </button>
+                  <button (click)="openInventario(a)" class="text-gray-500 hover:text-[#B8672E]"
+                    title="Ver inventario del almacén">
+                    <lucide-icon class="w-5 h-5" [img]="ClipboardList"></lucide-icon>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- INACTIVOS -->
+            <tr class="bg-[#F3F3F3]" *ngIf="getInactivos().length > 0">
+              <td colspan="5" class="text-left text-xs uppercase text-gray-500 py-2 px-6">
+                Almacenes Inactivos
               </td>
             </tr>
-          </ng-container>
 
-          <!-- INACTIVOS -->
-          <tr class="bg-[#F3F3F3]" *ngIf="getInactivos().length > 0">
-            <td colspan="5" class="text-left text-xs uppercase text-gray-500 py-2 px-6">
-              Almacenes Inactivos
-            </td>
-          </tr>
+            <ng-container *ngFor="let a of getInactivos()">
+              <tr>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ a.nombre }}</td>
+                <td class="px-6 py-4 text-sm text-gray-700">{{ a.descripcion || '—' }}</td>
+                <td class="px-6 py-4">
+                  <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                    Inactivo
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-right text-sm space-x-2">
+                  <button (click)="openEdit(a)" class="text-gray-500 hover:text-gray-700">
+                    <lucide-icon class="w-5 h-5" [img]="Edit2"></lucide-icon>
+                  </button>
+                  <button (click)="delete(a)" class="text-gray-500 hover:text-red-600">
+                    <lucide-icon class="w-5 h-5" [img]="Trash2"></lucide-icon>
+                  </button>
+                  <button (click)="openMovimientos(a)" class="text-gray-500 hover:text-blue-600">
+                    <lucide-icon class="w-5 h-5" [img]="Eye"></lucide-icon>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
 
-          <ng-container *ngFor="let a of getInactivos()">
-            <tr>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ a.nombre }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ a.descripcion || '—' }}</td>
-              <td class="px-6 py-4">
-                <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
-                  Inactivo
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right text-sm space-x-2">
-                <button (click)="openEdit(a)" class="text-gray-500 hover:text-gray-700">
-                  <lucide-icon class="w-5 h-5" [img]="Edit2"></lucide-icon>
-                </button>
-                <button (click)="delete(a)" class="text-gray-500 hover:text-red-600">
-                  <lucide-icon class="w-5 h-5" [img]="Trash2"></lucide-icon>
-                </button>
-                <button (click)="openMovimientos(a)" class="text-gray-500 hover:text-blue-600">
-                  <lucide-icon class="w-5 h-5" [img]="Eye"></lucide-icon>
-                </button>
-              </td>
-            </tr>
-          </ng-container>
-
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
-
+</ng-template>
 <!-- ✅ MODALES: solo cuando estás en la lista -->
 <add-almacen *ngIf="!isChildRoute && showAddAlmacen" (close)="showAddAlmacen = false" (create)="onCreated()">
 </add-almacen>

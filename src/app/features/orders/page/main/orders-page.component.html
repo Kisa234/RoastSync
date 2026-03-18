@@ -50,7 +50,7 @@
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
           <tr *ngFor="let p of pedidos" class="hover:bg-[#F9F9F9]">
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.tipo_pedido }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_user | userName }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_user | UserNamePipe | async }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.cantidad | number }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.gramaje ? p.gramaje : 'N/A' }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_lote_tostado || p.id_lote || 'N/A' }}</td>
@@ -139,7 +139,7 @@
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
           <tr *ngFor="let p of paginatedPedidos" class="hover:bg-[#FCFCFC] transition">
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.tipo_pedido }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_user | userName }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_user | UserNamePipe | async }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.cantidad | number }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_lote_tostado || p.id_lote || 'N/A' }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ p.fecha_registro | date:'dd/MM/yyyy' }}</td>

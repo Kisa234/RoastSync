@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, Edit2, Trash2, Plus, Eye, ClipboardList } from 'lucide-angular';
@@ -26,9 +26,8 @@ import { UiService } from '../../../../../shared/services/ui.service';
   templateUrl: './almacen.component.html',
   styles: []
 })
-export class AlmacenComponent {
+export class AlmacenComponent implements OnInit {
 
-  // ICONOS
   readonly Search = Search;
   readonly Edit2 = Edit2;
   readonly Trash2 = Trash2;
@@ -36,17 +35,17 @@ export class AlmacenComponent {
   readonly Eye = Eye;
   readonly ClipboardList = ClipboardList;
 
-  // DATA
   almacenes: Almacen[] = [];
   private _almacenesFiltrados: Almacen[] = [];
-  public get almacenesFiltrados(): Almacen[] {
+
+  get almacenesFiltrados(): Almacen[] {
     return this._almacenesFiltrados;
   }
-  public set almacenesFiltrados(value: Almacen[]) {
+
+  set almacenesFiltrados(value: Almacen[]) {
     this._almacenesFiltrados = value;
   }
 
-  // UI STATE
   filterText = '';
   totalAlmacenes = 0;
   totalActivos = 0;
@@ -62,23 +61,25 @@ export class AlmacenComponent {
     private almacenService: AlmacenService,
     private uiService: UiService,
     private router: Router
-  ) { }
+  ) {}
 
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadAlmacenes();
+    this.updateChildRouteState();
 
     this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(() => this.isChildRoute = this.router.url.includes('/inventory/almacen/movimientos/'));
-
-    // inicial
-    this.isChildRoute = this.router.url.includes('/inventory/almacen/movimientos/');
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.updateChildRouteState();
+      });
   }
 
-  /* =========================
-     DATA LOAD
-     ========================= */
+  private updateChildRouteState(): void {
+    const url = this.router.url;
+    this.isChildRoute =
+      url.includes('/inventory/almacen/movimientos/') ||
+      url.includes('/inventory/almacen/inventario-general/');
+  }
 
   loadAlmacenes() {
     this.almacenService.getAllAlmacenes().subscribe({
@@ -92,10 +93,6 @@ export class AlmacenComponent {
     });
   }
 
-  /* =========================
-     FILTROS
-     ========================= */
-
   aplicarFiltro() {
     const term = (this.filterText || '').toLowerCase().trim();
 
@@ -106,19 +103,13 @@ export class AlmacenComponent {
     });
 
     this.almacenesFiltrados = filtrados;
-
-    // KPIs
     this.totalAlmacenes = filtrados.length;
-    this.totalActivos = filtrados.filter(a => a.activo !== false).length; // por defecto true si no viene
+    this.totalActivos = filtrados.filter(a => a.activo !== false).length;
   }
 
   onSearchChange() {
     this.aplicarFiltro();
   }
-
-  /* =========================
-     HELPERS (ACTIVOS / INACTIVOS)
-     ========================= */
 
   getActivos() {
     return this.almacenesFiltrados.filter(a => a.activo !== false);
@@ -127,10 +118,6 @@ export class AlmacenComponent {
   getInactivos() {
     return this.almacenesFiltrados.filter(a => a.activo === false);
   }
-
-  /* =========================
-     ACCIONES
-     ========================= */
 
   openEdit(a: Almacen) {
     this.selectedAlmacenId = a.id_almacen;
@@ -158,10 +145,6 @@ export class AlmacenComponent {
     });
   }
 
-  /* =========================
-     MODALES
-     ========================= */
-
   onCreated() {
     this.showAddAlmacen = false;
     this.loadAlmacenes();
@@ -173,14 +156,10 @@ export class AlmacenComponent {
   }
 
   openInventario(a: Almacen) {
-    this.router.navigate([
-      '/inventory/almacen/inventario-general',
-      a.id_almacen
-    ]);
+    this.router.navigate(['/inventory/almacen/inventario-general', a.id_almacen]);
   }
 
-
-  openMovimientos(a: any) {
+  openMovimientos(a: Almacen) {
     this.router.navigate(['/inventory/almacen/movimientos', a.id_almacen]);
   }
 }

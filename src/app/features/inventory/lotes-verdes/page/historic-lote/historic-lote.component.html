@@ -16,7 +16,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm min-w-fit">
         <div>
           <p class="text-zinc-500">Cliente</p>
-          <p class="font-semibold text-zinc-900">{{ lote.id_user! | userName }}</p>
+          <p class="font-semibold text-zinc-900">{{ lote.id_user! | UserNamePipe | async }}</p>
         </div>
         <div>
           <p class="text-zinc-500">Lote</p>
@@ -174,7 +174,7 @@
               </td>
 
               <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">
-                {{ r.usuario | userName }}
+                {{ r.usuario | UserNamePipe | async }}
               </td>
 
               <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">

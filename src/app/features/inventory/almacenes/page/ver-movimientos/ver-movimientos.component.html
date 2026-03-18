@@ -103,7 +103,7 @@
             </td>
 
             <td class="py-3.5 pr-5 text-zinc-700 leading-7 whitespace-nowrap">
-              {{ (getUsuario(m) | userName) || '—' }}
+              {{ (getUsuario(m) | UserNamePipe | async) || '—' }}
             </td>
 
             <td class="py-3.5 text-zinc-700 leading-7 whitespace-nowrap">

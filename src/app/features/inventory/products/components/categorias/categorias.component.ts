@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Plus, Edit, Trash2, LucideAngularModule } from 'lucide-angular';
-import { CategoriaService } from '../../service/categoria.service';
+import { CategoriaProductoService } from '../../service/categoria-producto.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AddCategoriaComponent } from '../add-categoria/add-categoria.component';
@@ -34,7 +34,7 @@ export class CategoriasComponent implements OnInit {
   Trash2 = Trash2;
 
   constructor(
-    private categoriaSvc: CategoriaService,
+    private categoriaSvc: CategoriaProductoService,
     private uiSvc: UiService
   ) { }
 

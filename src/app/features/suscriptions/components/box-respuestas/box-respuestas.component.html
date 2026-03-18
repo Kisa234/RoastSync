@@ -58,7 +58,7 @@
 
                     <tbody>
                         <tr *ngFor="let r of respuestas" class="border-b border-[#E5E5E5]">
-                            <td class="p-3 capitalize">{{ r.id_user | userName }}</td>
+                            <td class="p-3 capitalize">{{ r.id_user | UserNamePipe | async }}</td>
                             <td class="p-3 capitalize">{{ box?.cafe_fijo_1 }}</td>
                             <td class="p-3 capitalize">{{ r.tueste_1 | titlecaseSmart }}</td>
                             <td class="p-3 capitalize">{{ r.molienda_1 |titlecaseSmart }}</td>

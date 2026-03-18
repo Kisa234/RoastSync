@@ -74,7 +74,7 @@
             </td>
 
             <td class="px-6 py-4 text-sm text-gray-700">
-              {{ m.id_user! | userName }}
+              {{ m.id_user! | UserNamePipe | async }}
             </td>
 
             <td class="px-6 py-4 text-sm text-gray-700">

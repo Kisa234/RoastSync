@@ -1,19 +1,24 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { CategoriaInsumo } from '../models/categoria-insumo';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { CategoriaInsumoService } from '../../features/inventory/insumo/service/categoria-insumo.service';
 
 @Pipe({
-  name: 'categoriaInsumo',
-  standalone: true
+  name: 'CategoriaInsumoNamePipe',
+  standalone: true,
+  pure: true
 })
 export class CategoriaInsumoPipe implements PipeTransform {
+  constructor(private categoriaInsumoService: CategoriaInsumoService) {}
 
-  transform(idCategoria: string, categorias: CategoriaInsumo[]): string {
-    if (!idCategoria || !categorias || categorias.length === 0) {
-      return '';
+  transform(idCategoria: string | null | undefined): Observable<string> {
+    if (!idCategoria) {
+      return of('');
     }
 
-    const categoria = categorias.find(c => c.id_categoria === idCategoria);
-    return categoria ? categoria.nombre : 'Sin categoría';
+    return this.categoriaInsumoService.getById(idCategoria).pipe(
+      map(categoria => categoria?.nombre ?? 'Sin categoría'),
+      catchError(() => of('Sin categoría'))
+    );
   }
-
 }

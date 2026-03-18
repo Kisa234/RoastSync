@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CategoriaService } from '../../service/categoria.service';
+import { CategoriaProductoService } from '../../service/categoria-producto.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -23,7 +23,7 @@ export class EditCategoriaComponent {
   form: Partial<Categoria> = {};
   loading = false;
 
-  constructor(private categoriaSvc: CategoriaService) { }
+  constructor(private categoriaSvc: CategoriaProductoService) { }
 
   ngOnInit() {
     this.form = { ...this.categoria };

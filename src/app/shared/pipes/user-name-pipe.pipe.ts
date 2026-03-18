@@ -1,46 +1,29 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { UserService } from '../../features/users/service/users-service.service';
-import { User } from '../models/user';
 
 @Pipe({
-  name: 'userName',
-  pure: false
+  name: 'UserNamePipe',
+  standalone: true,
+  pure: true
 })
 export class UserNamePipe implements PipeTransform {
-  private userCache = new Map<string, User | null>();
-
   constructor(private userSvc: UserService) {}
 
-  transform(id: string): string {
-    if (!id) {
-      return '';
-    }
+  transform(id: string | null | undefined): Observable<string> {
+    if (!id) return of('');
 
-    // Si aún no hemos intentado cargar este ID, lo iniciamos
-    if (!this.userCache.has(id)) {
-      // Marcamos como “cargando”
-      this.userCache.set(id, null);
-      this.userSvc.getUserById(id).subscribe(u => {
-        this.userCache.set(id, u);
-      });
-      // Devolvemos el ID (o cadena vacía) mientras llega la respuesta
-      return id;
-    }
-
-    const user = this.userCache.get(id)!;
-    // Si sigue siendo null significa que aún no llegó la respuesta
-    if (!user) {
-      return id;
-    }
-
-    // Ya tenemos el user, capitalizamos su nombre
-    return this.capitalizeWords(user.nombre_comercial? user.nombre_comercial : user.nombre );
+    return this.userSvc.getUserById(id).pipe(
+      map(user => {
+        const nombre = user?.nombre_comercial || user?.nombre || id;
+        return this.capitalizeWords(nombre);
+      })
+    );
   }
 
   private capitalizeWords(sentence: string): string {
-    if (!sentence) {
-      return '';
-    }
+    if (!sentence) return '';
     return sentence
       .split(' ')
       .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())

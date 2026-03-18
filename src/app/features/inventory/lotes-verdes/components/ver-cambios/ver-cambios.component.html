@@ -105,7 +105,7 @@
               </label>
               <input
                 type="text"
-                [value]="(antes.id_user! | userName) || ''"
+                [value]="(antes.id_user! | UserNamePipe | async) || ''"
                 name="antes_cliente"
                 disabled
                 [ngClass]="getInputClass('id_user', 'before')"
@@ -285,7 +285,7 @@
               </label>
               <input
                 type="text"
-                [value]="(despues.id_user! | userName) || ''"
+                [value]="(despues.id_user! | UserNamePipe | async) || ''"
                 name="despues_cliente"
                 disabled
                 [ngClass]="getInputClass('id_user', 'after')"

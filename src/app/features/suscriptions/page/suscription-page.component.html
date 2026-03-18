@@ -147,7 +147,7 @@
           <tbody class="bg-white divide-y divide-[#E5E5E5]">
 
             <tr *ngFor="let u of usersWithBoxes" class="hover:bg-[#F9F9F9]">
-              <td class="px-6 py-4 text-sm text-gray-700">{{ u.id_user | userName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ u.id_user | UserNamePipe | async }}</td>
               <td class="px-6 py-4 text-sm text-gray-800">{{ u.cant_suscripcion }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ u.lastDate | date:'dd/MM/yyyy' }}</td>
             </tr>
