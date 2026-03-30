@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, DatePipe, DecimalPipe, Location } from '@angular/common';
+import { CommonModule, DatePipe, DecimalPipe, JsonPipe, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, ArrowLeft, GitCompare } from 'lucide-angular';
@@ -108,6 +108,7 @@ export class HistoricLote implements OnInit {
           inventarioLotes: lote.inventarioLotes ?? [],
           variedades: lote.variedades ?? []
         };
+        console.log('Lote cargado:', JsonPipe.prototype.transform(this.lote));
       },
       error: (err) => {
         console.error('Error al cargar lote con inventario:', err);

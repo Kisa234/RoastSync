@@ -94,7 +94,8 @@ export class VerMovimientosPage implements OnInit {
   // helpers flexibles (ajusta a tu modelo real)
   getTipo(m: any): string { return m?.tipo || m?.tipo_movimiento || '—'; }
   getEntidad(m: any): string { return m?.entidad || m?.entidad_inventario || '—'; }
-  getIdEntidad(m: any): string { return m?.id_entidad || m?.idEntidad || '—'; }
+  getIdEntidadPrimario(m: any): string { return m?.id_entidad_primario || m?.idEntidad || '—'; }
+  getIdEntidadSecundario(m: any): string { return m?.id_entidad_secundario || m?.idEntidad || '—'; }
   getCantidad(m: any): number | null {
     const v = m?.cantidad ?? m?.cantidad_kg ?? m?.cantidad_unidades ?? null;
     return typeof v === 'number' ? v : (v ? Number(v) : null);
@@ -113,7 +114,8 @@ export class VerMovimientosPage implements OnInit {
     return (this.movimientos || []).filter((m: any) => {
       const tipo = this.getTipo(m);
       const entidad = this.getEntidad(m);
-      const idEntidad = this.getIdEntidad(m);
+      const idEntidadPrimario = this.getIdEntidadPrimario(m);
+      const idEntidadSecundario = this.getIdEntidadSecundario(m);
       const comentario = this.getComentario(m);
       const usuario = this.getUsuario(m);
 
@@ -125,7 +127,8 @@ export class VerMovimientosPage implements OnInit {
       return (
         String(tipo).toLowerCase().includes(qq) ||
         String(entidad).toLowerCase().includes(qq) ||
-        String(idEntidad).toLowerCase().includes(qq) ||
+        String(idEntidadPrimario).toLowerCase().includes(qq) ||
+        String(idEntidadSecundario).toLowerCase().includes(qq) ||
         String(comentario).toLowerCase().includes(qq) ||
         String(usuario).toLowerCase().includes(qq)
       );

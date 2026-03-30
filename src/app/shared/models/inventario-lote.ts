@@ -15,9 +15,9 @@ export interface InventarioLote {
   id_lote: string;
   id_almacen: string;
   cantidad_kg: number;
+  cantidad_tostado_kg: number;
   fecha_registro: string;
   fecha_editado?: string | null;
-
   lote?: LoteInventarioRef;
   almacen?: AlmacenInventarioRef;
 }

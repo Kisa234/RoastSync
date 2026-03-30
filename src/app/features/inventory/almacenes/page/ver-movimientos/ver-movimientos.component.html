@@ -70,8 +70,9 @@
           <tr class="text-nowrap">
             <th class="py-3.5 pr-5 font-medium">Tipo</th>
             <th class="py-3.5 pr-5 font-medium">Entidad</th>
-            <th class="py-3.5 pr-5 font-medium">ID Entidad</th>
-            <th class="py-3.5 pr-5 f|ont-medium">Cantidad</th>
+            <th class="py-3.5 pr-5 font-medium">ID Entidad Primario</th>
+            <th class="py-3.5 pr-5 font-medium">ID Entidad Secundario</th>
+            <th class="py-3.5 pr-5 font-medium">Cantidad</th>
             <th class="py-3.5 pr-5 font-medium">Comentario</th>
             <th class="py-3.5 pr-5 font-medium">Usuario</th>
             <th class="py-3.5 font-medium">Fecha</th>
@@ -91,7 +92,11 @@
             </td>
 
             <td class="py-3.5 pr-5 text-zinc-700 leading-7 whitespace-nowrap font-mono">
-              {{ getIdEntidad(m) }}
+              {{ getIdEntidadPrimario(m) }}
+            </td>
+
+            <td class="py-3.5 pr-5 text-zinc-700 leading-7 whitespace-nowrap font-mono">
+              {{ getIdEntidadSecundario(m) }}
             </td>
 
             <td class="py-3.5 pr-5 text-zinc-700 leading-7 whitespace-nowrap">

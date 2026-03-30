@@ -2,6 +2,7 @@ import { CommonModule, DatePipe, NgClass, NgFor } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Check, Edit2, Eye, Factory, LucideAngularModule, Plus, Trash2 } from 'lucide-angular';
+import { forkJoin } from 'rxjs';
 import { AddOrderComponent } from '../../components/add-order/add-order.component';
 import { AddMaquilaOrderComponent } from '../../components/add-maquila/add-maquila.component';
 import { EditOrderComponent } from '../../components/edit-order/edit-order.component';
@@ -61,24 +62,27 @@ export class OrdersPage {
   constructor(
     private pedidoSvc: PedidoService,
     private uiSvc: UiService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.getData();
   }
 
   getData() {
-    this.pedidoSvc.getPedidos().subscribe({
-      next: (list) => {
-        const filtrados = list.filter(p => p.tipo_pedido !== 'Orden Tueste');
-
-        this.pedidos = filtrados.filter(
-          p => (p.estado_pedido || '').toLowerCase() === 'pendiente'
+    forkJoin({
+      pendientes: this.pedidoSvc.getPedidosByEstado('Pendiente'),
+      completados: this.pedidoSvc.getPedidosByEstado('Completado')
+    }).subscribe({
+      next: ({ pendientes, completados }) => {
+        this.pedidos = pendientes.filter(
+          p => (p.tipo_pedido || '').toLowerCase() !== 'orden tueste'
         );
 
-        this.pedidosCompletados = filtrados.filter(
-          p => (p.estado_pedido || '').toLowerCase() === 'completado'
-        );
+        this.pedidosCompletados = completados
+          .filter(p => (p.tipo_pedido || '').toLowerCase() !== 'orden tueste')
+          .sort((a, b) =>
+            new Date(b.fecha_registro).getTime() - new Date(a.fecha_registro).getTime()
+          );
 
         this.applyFilters();
       },
@@ -156,26 +160,30 @@ export class OrdersPage {
     const selectedDate = this.selectedDate;
     const selectedTipo = this.selectedTipoPedido.trim().toLowerCase();
 
-    this.filteredPedidosCompletados = this.pedidosCompletados.filter((p) => {
-      const lote = `${p.id_lote ?? ''} ${p.id_lote_tostado ?? ''}`.toLowerCase();
-      const usuario = `${p.usuario_nombre ?? p.id_user ?? ''}`.toLowerCase();
-      const tipoPedido = `${p.tipo_pedido ?? ''}`.toLowerCase();
+    this.filteredPedidosCompletados = this.pedidosCompletados
+      .filter((p) => {
+        const lote = `${p.id_lote ?? ''} ${p.id_lote_tostado ?? ''}`.toLowerCase();
+        const usuario = `${p.usuario_nombre ?? p.id_user ?? ''}`.toLowerCase();
+        const tipoPedido = `${p.tipo_pedido ?? ''}`.toLowerCase();
 
-      const matchesSearch =
-        !term ||
-        lote.includes(term) ||
-        usuario.includes(term);
+        const matchesSearch =
+          !term ||
+          lote.includes(term) ||
+          usuario.includes(term);
 
-      const matchesDate =
-        !selectedDate ||
-        this.formatDateOnly(p.fecha_registro) === selectedDate;
+        const matchesDate =
+          !selectedDate ||
+          this.formatDateOnly(p.fecha_registro) === selectedDate;
 
-      const matchesTipo =
-        !selectedTipo ||
-        tipoPedido === selectedTipo;
+        const matchesTipo =
+          !selectedTipo ||
+          tipoPedido === selectedTipo;
 
-      return matchesSearch && matchesDate && matchesTipo;
-    });
+        return matchesSearch && matchesDate && matchesTipo;
+      })
+      .sort((a, b) =>
+        new Date(b.fecha_registro).getTime() - new Date(a.fecha_registro).getTime()
+      );
 
     this.currentPage = 1;
     this.adjustCurrentPage();
