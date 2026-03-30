@@ -25,6 +25,7 @@ export interface InventarioLoteMini {
   id_lote: string;
   id_almacen: string;
   cantidad_kg: number;
+  cantidad_tostado_kg: number;
   fecha_registro: Date;
   fecha_editado?: Date | null;
 

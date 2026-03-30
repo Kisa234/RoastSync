@@ -27,8 +27,11 @@ export interface CreateInventarioLote {
   id_lote: string;
   id_almacen: string;
   cantidad_kg: number;
+
 }
 
 export interface UpdateInventarioLote {
   cantidad_kg: number;
+  cantidad_tostado_kg?: number;
+
 }

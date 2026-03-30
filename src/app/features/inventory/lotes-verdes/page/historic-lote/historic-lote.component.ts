@@ -189,6 +189,13 @@ export class HistoricLote implements OnInit {
       0
     );
   }
+  
+  get pesoTotalTostadoInventarios(): number {
+    return (this.lote.inventarioLotes || []).reduce(
+      (total, inv) => total + (inv.cantidad_tostado_kg || 0),
+      0
+    );
+  }
 
   getHistorialFromRegistro(r: RegistroVista): Historial | null {
     return r.tipo === 'HISTORIAL' ? (r.raw as Historial) : null;

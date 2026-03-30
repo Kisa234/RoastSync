@@ -1,3 +1,4 @@
+import { Almacen } from './../../../../shared/models/almacen';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +13,8 @@ import { UiService } from '../../../../shared/services/ui.service';
 import { AnalisisService } from '../../../analysis/service/analisis.service';
 import { AvgTueste } from '../../../../shared/models/avg-tueste';
 import { RoastsService } from '../../service/roasts.service';
+import { LoteVerdeConInventario } from '../../../../shared/models/lote';
+import { AlmacenService } from '../../../inventory/almacenes/service/almacen.service';
 
 
 interface Batch {
@@ -35,8 +38,9 @@ export class AddRoasterComponent implements OnInit {
 
   // Listas para selects
   clientes: any[] = [];
-  lotes: any[] = [];
-  lotesAll: any[] = [];
+  lotes: LoteVerdeConInventario[] = [];
+  lotesAll: LoteVerdeConInventario[] = [];
+  Almacenes: Almacen[] = [];
 
   // Modelo principal
   orden: Partial<Pedido> = {
@@ -81,16 +85,20 @@ export class AddRoasterComponent implements OnInit {
     private userSvc: UserService,
     private roastSvc: RoastsService,
     private uiSvc: UiService,
-    private analisisSvc: AnalisisService
+    private analisisSvc: AnalisisService,
+    private almacenSvc: AlmacenService
   ) { }
 
   ngOnInit() {
     this.userSvc.getUsers().subscribe(usuarios => {
-      this.loteSvc.getAll().subscribe(lotes => {
+      this.loteSvc.getLotesVerdesConInventario().subscribe(lotes => {
         this.lotesAll = lotes;
         this.clientes = usuarios.filter(u =>
           lotes.some(l => l.id_user === u.id_user)
         );
+        this.almacenSvc.getAlmacenesActivos().subscribe(almacenes => {
+          this.Almacenes = almacenes;
+        });
       });
     });
 
@@ -115,10 +123,12 @@ export class AddRoasterComponent implements OnInit {
 
   onLoteChange() {
     const sel = this.lotes.find(l => l.id_lote === this.orden.id_lote);
-    this.pesoVerdeDisp = sel?.peso || 0;
-    this.pesoTostadoDisp = sel?.peso_tostado || 0;
+    this.pesoVerdeDisp = sel?.inventarioLotes.reduce((total, inv) => total + (inv.cantidad_kg || 0), 0) || 0;
+    this.pesoTostadoDisp = sel?.inventarioLotes.reduce((total, inv) => total + (inv.cantidad_tostado_kg || 0), 0) || 0;
+    this.Almacenes = sel?.inventarioLotes?.map(inv => inv.id_almacen).flatMap(id => this.Almacenes.filter(a => a.id_almacen === id)) || [];
   }
 
+  
 
 
   agregarBatch() {
