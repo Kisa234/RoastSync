@@ -9,8 +9,7 @@
 
     <div class="flex space-x-3">
       <!-- Botón Ver Insumos -->
-      <button
-        class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
         (click)="openListInsumos()">
         <lucide-icon [img]="Eye" class="w-5 h-5 mr-2"></lucide-icon>
         Ver Insumos
@@ -25,8 +24,7 @@
       </button>
 
       <!-- Botón Ingreso de Insumos -->
-      <button
-        class="flex items-center bg-[#4CAF50] text-white px-4 py-2 rounded shadow hover:bg-[#45A049] transition"
+      <button class="flex items-center bg-[#4CAF50] text-white px-4 py-2 rounded shadow hover:bg-[#45A049] transition"
         (click)="openIngresoInsumo()">
         <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
         Ingreso de Insumos
@@ -44,23 +42,16 @@
       <div class="flex gap-3 items-center">
         <!-- Buscador -->
         <div class="relative w-full md:w-80">
-          <lucide-icon
-            [img]="Search"
-            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400">
+          <lucide-icon [img]="Search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400">
           </lucide-icon>
 
-          <input
-            type="text"
-            [(ngModel)]="filterText"
-            (ngModelChange)="onSearchChange()"
+          <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
             placeholder="Buscar por nombre o unidad..."
             class="w-full border border-[#E5E5E5] rounded px-10 py-2 text-sm text-gray-700 focus:outline-none" />
         </div>
 
         <!-- Select Categoría -->
-        <select
-          [(ngModel)]="selectedCategoria"
-          (change)="onCategoriaChange()"
+        <select [(ngModel)]="selectedCategoria" (change)="onCategoriaChange()"
           class="border border-[#E5E5E5] rounded px-3 py-2 text-sm text-gray-700 focus:outline-none">
           <option value="">Todas las categorías</option>
           <option *ngFor="let c of categorias" [value]="c.id_categoria">
@@ -108,11 +99,8 @@
 
             <td class="px-6 py-4 text-sm text-gray-700">
               <div class="flex items-center gap-2">
-                <button
-                  (click)="openMovimientos(i)"
-                  class="text-gray-500 hover:text-blue-600"
-                  title="Ver movimientos">
-                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                <button (click)="goToMovimientos(i.id_insumo)" class="text-gray-500 hover:text-blue-600">
+                  <lucide-icon class="w-5 h-5" [img]="Eye"></lucide-icon>
                 </button>
               </div>
             </td>
@@ -131,20 +119,13 @@
 </div>
 
 <!-- Modales -->
-<app-insumos
-  *ngIf="showListInsumos"
-  (close)="closeModals()">
+<app-insumos *ngIf="showListInsumos" (close)="closeModals()">
 </app-insumos>
 
-<app-categorias
-  *ngIf="showListCategorias"
-  (close)="closeModals()">
+<app-categorias *ngIf="showListCategorias" (close)="closeModals()">
 </app-categorias>
 
-<app-ingreso-insumo
-  *ngIf="showIngresoInsumo"
-  (close)="closeModals()"
-  (saved)="loadInventarios()">
+<app-ingreso-insumo *ngIf="showIngresoInsumo" (close)="closeModals()" (saved)="loadInventarios()">
 </app-ingreso-insumo>
 
 <!-- <app-movimientos-insumo

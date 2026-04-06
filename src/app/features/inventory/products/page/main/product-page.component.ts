@@ -3,20 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { Plus, FolderPlus, Eye, Edit2, LucideAngularModule } from 'lucide-angular';
+import { CategoriasComponent } from '../../components/categorias/categorias.component';
+import { ProductosComponent } from '../../components/productos/productos.component';
+import { IngresoProductComponent } from '../../components/ingreso-product/ingreso-product.component';
+import { Producto } from '../../../../../shared/models/producto';
+import { Categoria } from '../../../../../shared/models/categoria';
+import { InventarioProducto } from '../../../../../shared/models/inventario-producto';
+import { ProductoService } from '../../service/producto.service';
+import { CategoriaProductoService } from '../../service/categoria-producto.service';
+import { InventarioProductoService } from '../../service/inventario-producto.service';
+import { Router } from '@angular/router';
 
-import { Producto } from '../../../../shared/models/producto';
-import { Categoria } from '../../../../shared/models/categoria';
-import { InventarioProducto  } from '../../../../shared/models/inventario-producto';
 
-import { ProductoService } from '../service/producto.service';
-import { CategoriaProductoService } from '../service/categoria-producto.service';
-import { InventarioProductoService } from '../service/inventario-producto.service';
-
-import { CategoriasComponent } from '../components/categorias/categorias.component';
-import { ProductosComponent } from '../components/productos/productos.component';
-import { IngresoProductComponent } from '../components/ingreso-product/ingreso-product.component';
-
-type ProductoConStock = Producto & { inventarios: InventarioProducto []; totalStock: number };
+type ProductoConStock = Producto & { inventarios: InventarioProducto[]; totalStock: number };
 
 @Component({
   selector: 'app-product-page',
@@ -34,7 +33,7 @@ type ProductoConStock = Producto & { inventarios: InventarioProducto []; totalSt
 export class ProductPageComponent implements OnInit {
   productos: Producto[] = [];
   categorias: Categoria[] = [];
-  inventarios: InventarioProducto [] = [];
+  inventarios: InventarioProducto[] = [];
 
   // ✅ lista base y lista filtrada
   productosConStockAll: ProductoConStock[] = [];
@@ -51,20 +50,19 @@ export class ProductPageComponent implements OnInit {
   showCategorias = false;
   showIngresoProducto = false;
 
-  // ✅ Modal movimientos
-  showMovimientos = false;
-  selectedProducto: ProductoConStock | null = null;
 
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaProductoService,
-    private inventarioService: InventarioProductoService
-  ) {}
+    private inventarioService: InventarioProductoService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.loadCategorias();
     this.loadProductos();
     this.loadInventarios();
+
   }
 
   loadCategorias(): void {
@@ -139,14 +137,8 @@ export class ProductPageComponent implements OnInit {
   }
 
   // ✅ Movimientos
-  openMovimientos(p: ProductoConStock) {
-    this.selectedProducto = p;
-    this.showMovimientos = true;
-  }
-
-  closeMovimientos() {
-    this.showMovimientos = false;
-    this.selectedProducto = null;
+  goToMovimientos(idProducto: string): void {
+    this.router.navigate(['/inventory/productos/movimientos', idProducto]);
   }
 
   // 🔹 Eventos de Productos

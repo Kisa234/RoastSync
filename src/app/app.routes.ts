@@ -27,13 +27,13 @@ import { InternsComponent } from './features/users/page/interns/interns.componen
 import { ClientsComponent } from './features/users/page/clients/clients.component';
 import { MuestrasComponent } from './features/inventory/muestras/page/muestras.component';
 import { LoteVerdeComponent } from './features/inventory/lotes-verdes/page/main/lote-verde.component';
-import { InsumoComponent } from './features/inventory/insumo/page/insumo.component';
-import { ProductPageComponent } from './features/inventory/products/page/product-page.component';
 import { VerMovimientosPage } from './features/inventory/almacenes/page/ver-movimientos/ver-movimientos.component';
 import { HistoricLote } from './features/inventory/lotes-verdes/page/historic-lote/historic-lote.component';
 import { AlmacenComponent } from './features/inventory/almacenes/page/main/almacen.component';
 import { OrdersPage } from './features/orders/page/main/orders-page.component';
 import { UpdateInventoryComponent } from './features/inventory/update-inventory/update-inventory.component';
+import { ProductPageComponent } from './features/inventory/products/page/main/product-page.component';
+import { InsumoComponent } from './features/inventory/insumo/page/main/insumo.component';
 
 export const appRoutes: Routes = [
 
@@ -72,7 +72,8 @@ export const appRoutes: Routes = [
         children: [
           { path: 'muestras', component: MuestrasComponent },
           { path: 'lotes-verdes', component: LoteVerdeComponent },
-          {path: 'lotes-verdes',
+          {
+            path: 'lotes-verdes',
             children: [
               { path: '', component: LoteVerdeComponent },
               {
@@ -83,7 +84,8 @@ export const appRoutes: Routes = [
               }
             ]
           },
-          {path: 'lotes-tostados',
+          {
+            path: 'lotes-tostados',
             children: [
 
               { path: '', component: LoteTostadoComponent },
@@ -106,7 +108,8 @@ export const appRoutes: Routes = [
 
             ]
           },
-          {path: 'almacen',
+          {
+            path: 'almacen',
             component: AlmacenComponent,
             children: [
 
@@ -123,9 +126,37 @@ export const appRoutes: Routes = [
 
             ]
           },
-          { path: 'insumos', component: InsumoComponent },
-          { path: 'productos', component: ProductPageComponent },
-          { path: 'actualizar', component: UpdateInventoryComponent}
+          {
+            path: 'insumos',
+            children: [
+              {
+                path: '',
+                loadComponent: () =>
+                  import('./features/inventory/insumo/page/main/insumo.component').then(m => m.InsumoComponent)
+              },
+              {
+                path: 'movimientos/:id',
+                loadComponent: () =>
+                  import('./features/inventory/insumo/page/movimientos-insumo/movimientos-insumo.component').then(m => m.MovimientosInsumoPageComponent)
+              }
+            ]
+          },
+          {
+            path: 'productos',
+            children: [
+              {
+                path: '',
+                loadComponent: () =>
+                  import('./features/inventory/products/page/main/product-page.component').then(m => m.ProductPageComponent)
+              },
+              {
+                path: 'movimientos/:id',
+                loadComponent: () =>
+                  import('./features/inventory/products/page/movimientos-producto/movimientos-producto.component').then(m => m.MovimientosProductoPageComponent)
+              }
+            ]
+          },
+          { path: 'actualizar', component: UpdateInventoryComponent }
         ]
       },
 

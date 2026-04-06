@@ -1,5 +1,6 @@
+import { UserService } from './../../users/service/users-service.service';
 import { AlmacenService } from './../almacenes/service/almacen.service';
-import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
+import { CommonModule, NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
@@ -11,18 +12,26 @@ import {
   Pencil,
   RefreshCcw,
   Filter,
-  Boxes
+  Boxes,
+  User
 } from 'lucide-angular';
+
 import { ProductoService } from '../products/service/producto.service';
-import { InventarioProductoService } from '../products/service/inventario-producto.service';
-
 import { InsumoService } from '../insumo/service/insumo.service';
-import { InventarioInsumoService } from '../insumo/service/inventario-insumo.service';
-
 import { LoteService } from '../lotes-verdes/service/lote.service';
 import { LoteTostadoService } from '../lotes-tostados/service/lote-tostado.service';
-
 import { MuestraService } from '../muestras/service/muestra.service';
+
+import { LoteVerdeConInventario } from '../../../shared/models/lote';
+import { LoteTostadoConInventario } from '../../../shared/models/lote-tostado';
+import { MuestraConInventario } from '../../../shared/models/muestra';
+import { CategoriaNombrePipe } from "../../../shared/pipes/categoria-nombre.pipe";
+import { UserNamePipe } from '../../../shared/pipes/user-name-pipe.pipe';
+import { CategoriaInsumoPipe } from '../../../shared/pipes/categoria-insumo.pipe';
+import { ProductoConInventarios } from '../../../shared/models/producto';
+import { InsumoConInventarios } from '../../../shared/models/insumo';
+import { User as UserEntity } from '../../../shared/models/user';
+import { SelectSearchComponent } from "../../../shared/components/select-search/select-search.component";
 
 type InventoryEntityType =
   | 'TODOS'
@@ -38,15 +47,30 @@ interface InventoryByAlmacen {
   cantidad: number;
 }
 
+type InventoryRaw =
+  | ProductoConInventarios
+  | InsumoConInventarios
+  | LoteVerdeConInventario
+  | LoteTostadoConInventario
+  | MuestraConInventario;
+
 interface InventorySearchRow {
   id: string;
-  nombre: string;
+  displayName: string;
+  reference: string;
   tipo: Exclude<InventoryEntityType, 'TODOS'>;
-  subtitulo?: string;
-  categoria?: string;
+  userId?: string;
   stockTotal: number;
   almacenes: InventoryByAlmacen[];
-  raw: any;
+  raw: InventoryRaw;
+}
+
+interface UpdateInventoryResponse {
+  productos: ProductoConInventarios[] | null;
+  insumos: InsumoConInventarios[] | null;
+  lotesVerdes: LoteVerdeConInventario[] | null;
+  lotesTostados: LoteTostadoConInventario[] | null;
+  muestras: MuestraConInventario[] | null;
 }
 
 @Component({
@@ -58,7 +82,14 @@ interface InventorySearchRow {
     NgIf,
     NgFor,
     NgClass,
-    LucideAngularModule
+    NgSwitch,
+    NgSwitchCase,
+    NgSwitchDefault,
+    LucideAngularModule,
+    CategoriaNombrePipe,
+    CategoriaInsumoPipe,
+    UserNamePipe,
+    SelectSearchComponent
   ],
   templateUrl: './update-inventory.component.html',
   styles: []
@@ -71,14 +102,16 @@ export class UpdateInventoryComponent implements OnInit {
   readonly RefreshCcw = RefreshCcw;
   readonly Filter = Filter;
   readonly Boxes = Boxes;
+  readonly User = User;
 
   loading = signal(true);
   error = signal('');
   selectedRow = signal<InventorySearchRow | null>(null);
 
+  clientes: UserEntity[] = [];
+
   search = signal('');
-  searchId = signal('');
-  searchName = signal('');
+  searchUser = signal('');
   selectedType = signal<InventoryEntityType>('TODOS');
   onlyWithStock = signal(false);
   onlyMultiWarehouse = signal(false);
@@ -89,110 +122,100 @@ export class UpdateInventoryComponent implements OnInit {
     let data = this.rows();
 
     const general = this.search().trim().toLowerCase();
-    const id = this.searchId().trim().toLowerCase();
-    const name = this.searchName().trim().toLowerCase();
+    const user = this.searchUser().trim().toLowerCase();
     const type = this.selectedType();
     const withStock = this.onlyWithStock();
     const multi = this.onlyMultiWarehouse();
 
     if (type !== 'TODOS') {
-      data = data.filter(r => r.tipo === type);
+      data = data.filter(row => row.tipo === type);
     }
 
     if (general) {
-      data = data.filter(r =>
-        r.id.toLowerCase().includes(general) ||
-        r.nombre.toLowerCase().includes(general) ||
-        (r.subtitulo || '').toLowerCase().includes(general) ||
-        (r.categoria || '').toLowerCase().includes(general)
+      data = data.filter(row =>
+        row.id.toLowerCase().includes(general) ||
+        row.displayName.toLowerCase().includes(general) ||
+        row.reference.toLowerCase().includes(general)
       );
     }
 
-    if (id) {
-      data = data.filter(r => r.id.toLowerCase().includes(id));
-    }
-
-    if (name) {
-      data = data.filter(r =>
-        r.nombre.toLowerCase().includes(name) ||
-        (r.subtitulo || '').toLowerCase().includes(name)
+    if (user) {
+      data = data.filter(row =>
+        (row.userId ?? '').toLowerCase().includes(user)
       );
     }
 
     if (withStock) {
-      data = data.filter(r => r.stockTotal > 0);
+      data = data.filter(row => row.stockTotal > 0);
     }
 
     if (multi) {
-      data = data.filter(r => r.almacenes.filter(a => a.cantidad > 0).length > 1);
+      data = data.filter(
+        row => row.almacenes.filter(almacen => almacen.cantidad > 0).length > 1
+      );
     }
 
-    return [...data].sort((a, b) => a.nombre.localeCompare(b.nombre));
+    return [...data].sort((a, b) => a.displayName.localeCompare(b.displayName));
   });
 
   constructor(
     private productoService: ProductoService,
-    private inventarioProductoService: InventarioProductoService,
-
     private insumoService: InsumoService,
-    private inventarioInsumoService: InventarioInsumoService,
-
     private loteService: LoteService,
     private loteTostadoService: LoteTostadoService,
-
     private muestraService: MuestraService,
-
-    private almacenService: AlmacenService
-  ) {}
+    private almacenService: AlmacenService,
+    private userService: UserService
+  ) { }
 
   ngOnInit(): void {
     this.loadData();
   }
 
-  loadData() {
+  loadData(): void {
     this.loading.set(true);
     this.error.set('');
 
-    forkJoin({
-      productos: this.productoService.getProductos(),
-      inventarioProductos: this.inventarioProductoService.getInventarios(),
+    this.userService.getUsers().subscribe(
+      users => {
+        this.clientes = users;
+      }),
 
-      insumos: this.insumoService.getAll(),
-      inventarioInsumos: this.inventarioInsumoService.getInventarios(),
+      forkJoin({
+        productos: this.productoService.getProductosConInventarios(),
+        insumos: this.insumoService.getInsumosConInventarios(),
+        lotesVerdes: this.loteService.getLotesVerdesConInventario(),
+        lotesTostados: this.loteTostadoService.getLotesTostadosConInventario(),
+        muestras: this.muestraService.getMuestrasConInventario(),
+      }).subscribe({
+        next: (resp: UpdateInventoryResponse) => {
+          const rows: InventorySearchRow[] = [
+            ...this.mapProductos(resp.productos ?? []),
+            ...this.mapInsumos(resp.insumos ?? []),
+            ...this.mapLotesVerdes(resp.lotesVerdes ?? []),
+            ...this.mapLotesTostados(resp.lotesTostados ?? []),
+            ...this.mapMuestras(resp.muestras ?? [])
+          ];
 
-      lotesVerdes: this.loteService.getLotesVerdesConInventario(),
-      lotesTostados: this.loteTostadoService.getLotesTostadosConInventario(),
-      muestras: this.muestraService.getMuestrasConInventario(),
-    }).subscribe({
-      next: (resp: any) => {
-        const rows: InventorySearchRow[] = [
-          ...this.mapProductos(resp.productos, resp.inventarioProductos),
-          ...this.mapInsumos(resp.insumos, resp.inventarioInsumos),
-          ...this.mapLotesVerdes(resp.lotesVerdes),
-          ...this.mapLotesTostados(resp.lotesTostados),
-          ...this.mapMuestras(resp.muestras)
-        ];
-
-        this.rows.set(rows);
-        this.selectedRow.set(rows.length ? rows[0] : null);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error(err);
-        this.error.set('No se pudo cargar la información del inventario.');
-        this.loading.set(false);
-      }
-    });
+          this.rows.set(rows);
+          this.selectedRow.set(rows.length > 0 ? rows[0] : null);
+          this.loading.set(false);
+        },
+        error: (err: unknown) => {
+          console.error(err);
+          this.error.set('No se pudo cargar la información del inventario.');
+          this.loading.set(false);
+        }
+      });
   }
 
-  selectRow(row: InventorySearchRow) {
+  selectRow(row: InventorySearchRow): void {
     this.selectedRow.set(row);
   }
 
-  clearFilters() {
+  clearFilters(): void {
     this.search.set('');
-    this.searchId.set('');
-    this.searchName.set('');
+    this.searchUser.set('');
     this.selectedType.set('TODOS');
     this.onlyWithStock.set(false);
     this.onlyMultiWarehouse.set(false);
@@ -200,127 +223,131 @@ export class UpdateInventoryComponent implements OnInit {
 
   getTypeLabel(tipo: InventorySearchRow['tipo']): string {
     switch (tipo) {
-      case 'INSUMO': return 'Insumo';
-      case 'LOTE_VERDE': return 'Lote Verde';
-      case 'LOTE_TOSTADO': return 'Lote Tostado';
-      case 'MUESTRA': return 'Muestra';
-      case 'PRODUCTO': return 'Producto';
-      default: return tipo;
+      case 'INSUMO':
+        return 'Insumo';
+      case 'LOTE_VERDE':
+        return 'Lote Verde';
+      case 'LOTE_TOSTADO':
+        return 'Lote Tostado';
+      case 'MUESTRA':
+        return 'Muestra';
+      case 'PRODUCTO':
+        return 'Producto';
+      default:
+        return tipo;
     }
   }
 
-  private buildAlmacenes(inventarios: any[], entityKey: string, entityId: string): InventoryByAlmacen[] {
-    return (inventarios || [])
-      .filter(inv => inv[entityKey] === entityId)
-      .map(inv => ({
-        id_almacen: inv.id_almacen,
-        nombre: inv.almacen?.nombre || 'Almacén',
-        cantidad: Number(inv.peso ?? inv.cantidad ?? 0)
+  private totalAlmacenes(items: InventoryByAlmacen[] = []): number {
+    return items.reduce((sum, item) => sum + item.cantidad, 0);
+  }
+
+  private mapProductos(productos: ProductoConInventarios[] = []): InventorySearchRow[] {
+    return productos.map((producto) => {
+      const almacenes: InventoryByAlmacen[] = (producto?.inventarios ?? []).map((inv) => ({
+        id_almacen: inv?.almacen?.id_almacen ?? '',
+        nombre: inv?.almacen?.nombre ?? 'Almacén',
+        cantidad: Number(inv?.cantidad ?? 0)
       }));
-  }
 
-  private buildAlmacenesFromEmbedded(inventarios: any[] = []): InventoryByAlmacen[] {
-    return (inventarios || []).map(inv => ({
-      id_almacen: inv.id_almacen,
-      nombre: inv.almacen?.nombre || 'Almacén',
-      cantidad: Number(inv.peso ?? inv.cantidad ?? 0)
-    }));
-  }
-
-  private totalAlmacenes(items: InventoryByAlmacen[]): number {
-    return items.reduce((sum, item) => sum + Number(item.cantidad || 0), 0);
-  }
-
-  private mapProductos(productos: any[], inventarios: any[]): InventorySearchRow[] {
-    return productos.map(p => {
-      const almacenes = this.buildAlmacenes(inventarios, 'id_producto', p.id_producto);
       return {
-        id: p.id_producto,
-        nombre: p.nombre,
+        id: producto.id_producto,
+        displayName: producto.nombre,
+        reference: producto.id_categoria ?? '',
         tipo: 'PRODUCTO',
-        subtitulo: p.marca?.nombre || '',
-        categoria: p.categoria?.nombre || '',
+        userId: undefined,
         stockTotal: this.totalAlmacenes(almacenes),
         almacenes,
-        raw: p
+        raw: producto
       };
     });
   }
 
-  private mapInsumos(insumos: any[], inventarios: any[]): InventorySearchRow[] {
-    return insumos.map(i => {
-      const almacenes = this.buildAlmacenes(inventarios, 'id_insumo', i.id_insumo);
+  private mapInsumos(insumos: InsumoConInventarios[] = []): InventorySearchRow[] {
+    return insumos.map((insumo) => {
+      const almacenes: InventoryByAlmacen[] = (insumo?.inventarios ?? []).map((inv) => ({
+        id_almacen: inv?.id_almacen ?? '',
+        nombre: inv?.almacen?.nombre ?? 'Almacén',
+        cantidad: Number(inv?.cantidad ?? 0)
+      }));
+
       return {
-        id: i.id_insumo,
-        nombre: i.nombre,
+        id: insumo.id_insumo,
+        displayName: insumo.nombre,
+        reference: insumo.id_categoria ?? '',
         tipo: 'INSUMO',
-        subtitulo: i.marca?.nombre || '',
-        categoria: i.categoria?.nombre || '',
+        userId: undefined,
         stockTotal: this.totalAlmacenes(almacenes),
         almacenes,
-        raw: i
+        raw: insumo
       };
     });
   }
 
-  private mapLotesVerdes(lotes: any[]): InventorySearchRow[] {
-    return lotes.map(l => {
-      const almacenes = this.buildAlmacenesFromEmbedded(
-        l.inventarios || l.inventario || l.inventarioLote || []
-      );
+  private mapLotesVerdes(lotes: LoteVerdeConInventario[] = []): InventorySearchRow[] {
+    return lotes.map((lote) => {
+      const almacenes: InventoryByAlmacen[] = (lote?.inventarioLotes ?? []).map((inv) => ({
+        id_almacen: inv?.id_almacen ?? '',
+        nombre: inv?.almacen?.nombre ?? 'Almacén',
+        cantidad: Number(inv?.cantidad_kg ?? 0)
+      }));
 
       return {
-        id: l.id_lote,
-        nombre: l.productor || l.proveedor || l.id_lote,
+        id: lote.id_lote,
+        displayName: lote.id_lote,
+        reference: lote.productor ?? '',
         tipo: 'LOTE_VERDE',
-        subtitulo: `${l.finca || ''}${l.proceso ? ' - ' + l.proceso : ''}`.trim(),
-        categoria: l.departamento || '',
+        userId: lote.id_user,
         stockTotal: this.totalAlmacenes(almacenes),
         almacenes,
-        raw: l
+        raw: lote
       };
     });
   }
 
-  private mapLotesTostados(lotes: any[]): InventorySearchRow[] {
-    return lotes.map(l => {
-      const almacenes = this.buildAlmacenesFromEmbedded(
-        l.inventarios || l.inventario || l.inventarioLoteTostado || []
-      );
+  private mapLotesTostados(lotes: LoteTostadoConInventario[] = []): InventorySearchRow[] {
+    return lotes.map((lote) => {
+      const almacenes: InventoryByAlmacen[] = (lote?.inventarioLotesTostados ?? []).map((inv) => ({
+        id_almacen: inv?.id_almacen ?? '',
+        nombre: inv?.almacen?.nombre ?? 'Almacén',
+        cantidad: Number(inv?.cantidad_kg ?? 0)
+      }));
 
       return {
-        id: l.id_lote_tostado,
-        nombre: l.id_lote_tostado,
+        id: lote.id_lote_tostado,
+        displayName: lote.id_lote_tostado,
+        reference: lote.lote?.productor ?? '',
         tipo: 'LOTE_TOSTADO',
-        subtitulo: l.perfil_tostado || '',
-        categoria: l.id_lote || '',
+        userId: lote.id_user,
         stockTotal: this.totalAlmacenes(almacenes),
         almacenes,
-        raw: l
+        raw: lote
       };
     });
   }
 
-  private mapMuestras(muestras: any[]): InventorySearchRow[] {
-    return muestras.map(m => {
-      const almacenes = this.buildAlmacenesFromEmbedded(
-        m.inventarios || m.inventario || m.inventarioMuestra || []
-      );
+  private mapMuestras(muestras: MuestraConInventario[] = []): InventorySearchRow[] {
+    return muestras.map((muestra) => {
+      const almacenes: InventoryByAlmacen[] = (muestra?.inventarioMuestras ?? []).map((inv) => ({
+        id_almacen: inv?.id_almacen ?? '',
+        nombre: inv?.almacen?.nombre ?? 'Almacén',
+        cantidad: Number(inv?.peso ?? 0)
+      }));
 
       return {
-        id: m.id_muestra,
-        nombre: m.nombre_muestra || m.id_muestra,
+        id: muestra.id_muestra,
+        displayName: muestra.nombre_muestra || muestra.id_muestra,
+        reference: muestra.productor ?? '',
         tipo: 'MUESTRA',
-        subtitulo: m.productor || m.proveedor || '',
-        categoria: m.proceso || '',
+        userId: muestra.id_user,
         stockTotal: this.totalAlmacenes(almacenes),
         almacenes,
-        raw: m
+        raw: muestra
       };
     });
   }
 
-  onUpdateSelected() {
+  onUpdateSelected(): void {
     const row = this.selectedRow();
     if (!row) return;
 

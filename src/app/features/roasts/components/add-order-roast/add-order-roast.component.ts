@@ -128,7 +128,7 @@ export class AddRoasterComponent implements OnInit {
     this.Almacenes = sel?.inventarioLotes?.map(inv => inv.id_almacen).flatMap(id => this.Almacenes.filter(a => a.id_almacen === id)) || [];
   }
 
-  
+
 
 
   agregarBatch() {
@@ -192,16 +192,96 @@ export class AddRoasterComponent implements OnInit {
     return true;
   }
 
+  validarFormulario(): boolean {
+    if (!this.orden.id_user) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar un cliente.', 4000);
+      return false;
+    }
+
+    if (!this.orden.id_lote) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar un lote.', 4000);
+      return false;
+    }
+
+    if (!this.orden.id_almacen) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar un almacén.', 4000);
+      return false;
+    }
+
+    if (!this.orden.fecha_tueste) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar la fecha de tueste.', 4000);
+      return false;
+    }
+
+    if (!this.orden.comentario || !String(this.orden.comentario).trim()) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar el tipo de tueste.', 4000);
+      return false;
+    }
+
+    if (!this.orden.tostadora || !String(this.orden.tostadora).trim()) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar la tostadora.', 4000);
+      return false;
+    }
+
+    if (this.orden.facturado === undefined || this.orden.facturado === null) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes indicar si es facturado o no.', 4000);
+      return false;
+    }
+
+    if (!this.orden.cantidad || this.orden.cantidad <= 0) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes ingresar una cantidad válida para el batch verde.', 4000);
+      return false;
+    }
+
+    if (!this.batchTostado || this.batchTostado <= 0) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes ingresar una cantidad válida para el batch tostado.', 4000);
+      return false;
+    }
+
+    if (!this.batches.length) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes agregar al menos un batch.', 4000);
+      return false;
+    }
+
+    const batchInvalido = this.batches.some(
+      b => !b.pesoVerde || b.pesoVerde <= 0 || !b.pesoTostado || b.pesoTostado <= 0
+    );
+
+    if (batchInvalido) {
+      this.uiSvc.alert('warning', 'Batches incompletos', 'Todos los batches deben tener pesos válidos.', 4000);
+      return false;
+    }
+
+    if (this.totalVerde > this.pesoVerdeDisp) {
+      this.uiSvc.alert('warning', 'Stock insuficiente', 'El peso verde total de los batches supera el verde disponible.', 5000);
+      return false;
+    }
+
+    if (!this.validarPesos()) {
+      return false;
+    }
+
+    return true;
+  }
+
   guardar() {
-    console.log('Guardar orden de tueste', this.orden);
-    if (!this.validarPesos()) return;
-    if (!this.batches.length) return;
+
+    if (!this.validarFormulario()) return;
+
     this.orden.pesos = this.batches.map(b => b.pesoVerde);
-    // construir payload
+
     const payload = { ...this.orden };
-    this.pedidoSvc.createPedido(payload).subscribe(res => {
-      this.create.emit(res);
-      this.close.emit();
+
+    this.pedidoSvc.createPedido(payload).subscribe({
+      next: (res) => {
+        this.uiSvc.alert('success', 'Orden creada', 'La orden de tueste fue creada correctamente.', 3000);
+        this.create.emit(res);
+        this.close.emit();
+      },
+      error: (err) => {
+        console.error(err);
+        this.uiSvc.alert('error', 'Error', 'No se pudo guardar la orden de tueste.', 5000);
+      }
     });
   }
 }

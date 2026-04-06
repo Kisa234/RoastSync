@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
-import { Producto } from '../../../../shared/models/producto';
+import { Producto, ProductoConInventarios } from '../../../../shared/models/producto';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ import { Producto } from '../../../../shared/models/producto';
 export class ProductoService {
   private base = `${environment.apiUrl}/producto`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** Obtener todos los productos */
   getProductos(): Observable<Producto[]> {
@@ -35,5 +35,13 @@ export class ProductoService {
   /** Eliminar un producto */
   deleteProducto(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${id}`);
+  }
+
+  getProductosConInventarios(): Observable<ProductoConInventarios[]> {
+    return this.http.get<ProductoConInventarios[]>(`${this.base}/con-inventarios`);
+  }
+
+  getProductoConInventariosById(id: string): Observable<ProductoConInventarios> {
+    return this.http.get<ProductoConInventarios>(`${this.base}/con-inventarios/${id}`);
   }
 }

@@ -1,3 +1,5 @@
+import { InventarioProducto } from "./inventario-producto";
+
 export interface Producto {
   id_producto: string;
   nombre: string;
@@ -23,4 +25,12 @@ export interface Producto {
 
   fecha_registro: Date;
   fecha_editado?: Date | null;
+}
+
+export interface ProductoConInventarios extends Producto {
+  inventarios: InventarioProducto[];
+  stock_total: number;
+  cantidad_almacenes: number;
+  stock_inicial_referencial: number;
+  fecha_primer_registro?: string | Date | null;
 }

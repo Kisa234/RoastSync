@@ -10,19 +10,19 @@ import {
   CheckCircle,
   Search
 } from 'lucide-angular';
+import { Insumo } from '../../../../../shared/models/insumo';
+import { InventarioInsumo } from '../../../../../shared/models/inventario-insumo';
+import { CategoriaInsumoPipe } from '../../../../../shared/pipes/categoria-insumo.pipe';
+import { InsumosComponent } from '../../components/insumos/insumos.component';
+import { CategoriasComponent } from '../../components/categorias/categorias.component';
+import { IngresoInsumoComponent } from '../../components/ingreso-insumo/ingreso-insumo.component';
+import { CategoriaInsumo } from '../../../../../shared/models/categoria-insumo';
+import { InsumoService } from '../../service/insumo.service';
+import { CategoriaInsumoService } from '../../service/categoria-insumo.service';
+import { InventarioInsumoService } from '../../service/inventario-insumo.service';
+import { Router } from '@angular/router';
 
-import { Insumo } from '../../../../shared/models/insumo';
-import { CategoriaInsumo } from '../../../../shared/models/categoria-insumo';
-import { InventarioInsumo } from '../../../../shared/models/inventario-insumo';
 
-import { InsumoService } from '../service/insumo.service';
-import { CategoriaInsumoService } from '../service/categoria-insumo.service';
-import { InventarioInsumoService } from '../service/inventario-insumo.service';
-
-import { CategoriaInsumoPipe } from '../../../../shared/pipes/categoria-insumo.pipe';
-import { CategoriasComponent } from '../components/categorias/categorias.component';
-import { InsumosComponent } from '../components/insumos/insumos.component';
-import { IngresoInsumoComponent } from "../components/ingreso-insumo/ingreso-insumo.component";
 
 type InsumoConStock = Insumo & {
   inventarios: InventarioInsumo[];
@@ -77,7 +77,8 @@ export class InsumoComponent implements OnInit {
   constructor(
     private insumoService: InsumoService,
     private categoriaService: CategoriaInsumoService,
-    private inventarioInsumoService: InventarioInsumoService
+    private inventarioInsumoService: InventarioInsumoService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -201,13 +202,8 @@ export class InsumoComponent implements OnInit {
     this.loadInventarios();
   }
 
-  openMovimientos(insumo: InsumoConStock): void {
-    this.selectedInsumo = insumo;
-    this.showMovimientos = true;
+  goToMovimientos(idInsumo: string): void {
+    this.router.navigate(['/inventory/insumos/movimientos', idInsumo]);
   }
 
-  closeMovimientos(): void {
-    this.selectedInsumo = null;
-    this.showMovimientos = false;
-  }
 }
