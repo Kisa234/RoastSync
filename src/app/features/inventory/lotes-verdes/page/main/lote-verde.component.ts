@@ -3,20 +3,17 @@ import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, Eye, Edit2, Trash2, History, Plus } from 'lucide-angular';
 
-import { AddLoteComponent } from '../../components/add-lote/add-lote.component';
 import { ReportLoteComponent } from '../../../../../shared/components/report-lote/report-lote.component';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { Lote, LoteVerdeConInventario } from '../../../../../shared/models/lote';
 import { User } from '../../../../../shared/models/user';
-import { LoteService } from '../../service/lote.service';
 import { UserService } from '../../../../users/service/users-service.service';
 import { UiService } from '../../../../../shared/services/ui.service';
-import { EditLoteComponent } from '../../components/edit-lote/edit-lote.component';
-import { AddInventoryComponent } from '../../components/add-inventory/add-inventory.component';
 import { Router, RouterOutlet } from '@angular/router';
-
-
-
+import { AddLoteComponent } from '../../../lotes-verdes/components/add-lote/add-lote.component';
+import { AddInventoryComponent } from '../../../lotes-verdes/components/add-inventory/add-inventory.component';
+import { EditLoteComponent } from '../../../lotes-verdes/components/edit-lote/edit-lote.component';
+import { LoteService } from '../../../lotes-verdes/service/lote.service';
 
 @Component({
   selector: 'app-lote-verde',
@@ -39,7 +36,6 @@ import { Router, RouterOutlet } from '@angular/router';
 })
 export class LoteVerdeComponent {
 
-  // ICONOS
   readonly Search = Search;
   readonly Eye = Eye;
   readonly Edit2 = Edit2;
@@ -47,21 +43,19 @@ export class LoteVerdeComponent {
   readonly History = History;
   readonly Plus = Plus;
 
-  // DATA
   lotes: LoteVerdeConInventario[] = [];
   private _lotesFiltrados: LoteVerdeConInventario[] = [];
+
   public get lotesFiltrados(): LoteVerdeConInventario[] {
     return this._lotesFiltrados;
   }
+
   public set lotesFiltrados(value: LoteVerdeConInventario[]) {
     this._lotesFiltrados = value;
   }
 
-
-
   usuarios: User[] = [];
 
-  // UI STATE
   filterTextVerde = '';
   costoInventarioVerde = 0;
 
@@ -84,13 +78,10 @@ export class LoteVerdeComponent {
     this.loadLotes();
   }
 
-  /* =========================
-     DATA LOAD
-     ========================= */
-
   loadUsuarios() {
     this.userService.getUsers().subscribe(users => {
-      this.usuarios = users;
+      this.usuarios = users ?? [];
+      this.aplicarFiltro();
     });
   }
 
@@ -102,15 +93,14 @@ export class LoteVerdeComponent {
   }
 
   getPesoInventario(l: LoteVerdeConInventario): number {
-    return (l.inventarioLotes || []).reduce((total, inv) => total + (inv.cantidad_kg || 0), 0);
+    return (l.inventarioLotes || []).reduce(
+      (total, inv) => total + Number(inv.cantidad_kg || 0),
+      0
+    );
   }
 
-  /* =========================
-     FILTROS
-     ========================= */
-
   aplicarFiltro() {
-    const term = this.filterTextVerde.toLowerCase();
+    const term = this.filterTextVerde.trim().toLowerCase();
     this.costoInventarioVerde = 0;
 
     this.lotesFiltrados = this.lotes.filter(l => {
@@ -119,7 +109,7 @@ export class LoteVerdeComponent {
 
       const match =
         !term ||
-        l.id_lote.toLowerCase().includes(term) ||
+        l.id_lote?.toLowerCase().includes(term) ||
         l.productor?.toLowerCase().includes(term) ||
         l.distrito?.toLowerCase().includes(term) ||
         l.variedades?.join(' ').toLowerCase().includes(term) ||
@@ -128,7 +118,8 @@ export class LoteVerdeComponent {
         cliente.includes(term);
 
       if (match && user?.rol === 'admin') {
-        this.costoInventarioVerde += (l.costo ?? 0) * l.peso;
+        const pesoInventario = this.getPesoInventario(l);
+        this.costoInventarioVerde += Number(l.costo ?? 0) * pesoInventario;
       }
 
       return match;
@@ -138,10 +129,6 @@ export class LoteVerdeComponent {
   onSearchChange() {
     this.aplicarFiltro();
   }
-
-  /* =========================
-     HELPERS (ADMIN / CLIENTE)
-     ========================= */
 
   getLotesAdmin() {
     return this.lotesFiltrados.filter(l => {
@@ -166,9 +153,6 @@ export class LoteVerdeComponent {
       .map(v => v.trim())
       .filter(Boolean);
   }
-  /* =========================
-     ACCIONES
-     ========================= */
 
   onReport(l: Lote) {
     this.loteService.getById(l.id_lote).subscribe(lote => {
@@ -184,7 +168,6 @@ export class LoteVerdeComponent {
   openHistoric(l: Lote) {
     this.router.navigate(['/inventory/lotes-verdes/historico', l.id_lote]);
   }
-
 
   openEdit(l: Lote) {
     this.selectedLoteId = l.id_lote;
@@ -211,10 +194,6 @@ export class LoteVerdeComponent {
       });
     });
   }
-
-  /* =========================
-     MODALES
-     ========================= */
 
   onCreated() {
     this.showAddLote = false;

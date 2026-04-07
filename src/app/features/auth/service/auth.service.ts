@@ -7,14 +7,19 @@ import { Observable } from 'rxjs';
 interface LoginResp {
   accessToken: string;
   refreshToken: string;
-  user: { id_user: string; email: string; rol: string };
+  user: {
+    id_user: string;
+    email: string;
+    rol: string;
+    id_rol: string;
+  };
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/user`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   login(email: string, password: string): Observable<LoginResp> {
     return this.http
@@ -23,7 +28,6 @@ export class AuthService {
         tap(resp => {
           localStorage.setItem('access_token', resp.accessToken);
           localStorage.setItem('refresh_token', resp.refreshToken);
-
         })
       );
   }
@@ -32,8 +36,6 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
   }
-
-
 
   refreshAccessToken() {
     const refreshToken = localStorage.getItem('refresh_token');
@@ -45,7 +47,6 @@ export class AuthService {
         })
       );
   }
-
 
   getToken(): string | null {
     return localStorage.getItem('access_token');
@@ -64,10 +65,12 @@ export class AuthService {
     }
   }
 
-  // PARA TUS GUARDS: comprueba sesión llamando /me
   checkSession() {
-    return this.http.get<{ id: string; email: string; rol: string }>(
-      `${this.apiUrl}/me`
-    );
+    return this.http.get<{
+      id_user: string;
+      email: string;
+      rol: string;
+      id_rol: string;
+    }>(`${this.apiUrl}/me`);
   }
 }

@@ -111,7 +111,6 @@ export class MuestrasComponent {
             );
           });
         }
-        console.log(filtradas);
         return filtradas;
       })
     );

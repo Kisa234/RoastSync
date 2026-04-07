@@ -38,7 +38,7 @@ type FilterKey = 'todos' | 'enviados' | 'no-enviados';
     UserNamePipe,
     RouterOutlet,
     AddInventoryLoteTostadoComponent
-],
+  ],
   templateUrl: './lote-tostado.component.html',
   styles: []
 })
@@ -54,6 +54,7 @@ export class LoteTostadoComponent {
   tostados: LoteTostadoConInventario[] = [];
   tostadosFiltrados: LoteTostadoConInventario[] = [];
   usuarios: User[] = [];
+  costoInventario = 0;
 
   filterTextTostado = '';
   filterTostado: FilterKey = 'no-enviados';
@@ -74,7 +75,6 @@ export class LoteTostadoComponent {
   selectedTuesteId = '';
   selectedLoteTostado: LoteTostadoConInventario | null = null;
   showAsignarInventarioModal = false;
-
 
   constructor(
     private loteTostadoService: LoteTostadoService,
@@ -154,8 +154,19 @@ export class LoteTostadoComponent {
         return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
       });
     }
-    console.log(result);
-        this.tostadosFiltrados = result;
+
+    this.tostadosFiltrados = result;
+
+    this.costoInventario = result
+      .filter(t => {
+        const user = this.usuarios.find(u => u.id_user === t.id_user);
+        return user?.rol === 'admin';
+      })
+      .reduce((total, t) => {
+        const pesoInventario = this.getPesoInventarioTostado(t);
+        const costo = Number(t.lote?.costo || 0);
+        return total + costo * pesoInventario;
+      }, 0);
   }
 
   onSearchChange() {
@@ -171,6 +182,13 @@ export class LoteTostadoComponent {
     this.aplicarFiltro();
   }
 
+  getPesoInventarioTostado(t: LoteTostadoConInventario): number {
+    return (t.inventarioLotesTostados || []).reduce(
+      (total, inv) => total + Number(inv.cantidad_kg || 0),
+      0
+    );
+  }
+
   openAsignarInventarioLoteTostado(lote: LoteTostadoConInventario): void {
     this.selectedLoteTostado = lote;
     this.showAsignarInventarioModal = true;
@@ -183,7 +201,7 @@ export class LoteTostadoComponent {
 
   onInventarioLoteTostadoCreated(): void {
     this.closeAsignarInventarioLoteTostado();
-    this.loadTostados(); 
+    this.loadTostados();
   }
 
   onReportTueste(t: LoteTostadoConInventario) {

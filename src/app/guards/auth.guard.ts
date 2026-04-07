@@ -2,33 +2,40 @@ import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../features/auth/service/auth.service';
+import { RolPermisoService } from '../features/roles/service/rol-permiso-service.service';
+import { PermissionAccessService } from '../shared/services/permission-access.service';
 
-export const authGuard: CanActivateFn = async (route, state) => {
+export const authGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);
+  const rolPermisoService = inject(RolPermisoService);
+  const permissionAccessService = inject(PermissionAccessService);
 
-  // 🔑 1. NO hay token → login
   const token = auth.getToken();
+
   if (!token || auth.isTokenExpired(token)) {
     auth.logout();
+    permissionAccessService.clearPermissions();
     return router.parseUrl('/login');
   }
 
   try {
-    // 🔑 2. Token válido → recién llamamos backend
     const user = await firstValueFrom(auth.checkSession());
 
-    if (user.rol === 'cliente') {
-      if (state.url.startsWith('/client')) {
-        return true;
-      }
-      return router.parseUrl('/client/box-form');
+    if (user.id_rol) {
+      const permisos = await firstValueFrom(
+        rolPermisoService.getPermisosByRol(user.id_rol)
+      );
+
+      permissionAccessService.setPermissions(permisos);
+    } else {
+      permissionAccessService.clearPermissions();
     }
 
     return true;
-
   } catch {
     auth.logout();
+    permissionAccessService.clearPermissions();
     return router.parseUrl('/login');
   }
 };

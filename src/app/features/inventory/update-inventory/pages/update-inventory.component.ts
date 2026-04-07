@@ -1,5 +1,6 @@
-import { UserService } from './../../users/service/users-service.service';
-import { AlmacenService } from './../almacenes/service/almacen.service';
+import { UiService } from './../../../../shared/services/ui.service';
+import { UserService } from './../../../users/service/users-service.service';
+import { AlmacenService } from './../../almacenes/service/almacen.service';
 import { CommonModule, NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -16,22 +17,24 @@ import {
   User
 } from 'lucide-angular';
 
-import { ProductoService } from '../products/service/producto.service';
-import { InsumoService } from '../insumo/service/insumo.service';
-import { LoteService } from '../lotes-verdes/service/lote.service';
-import { LoteTostadoService } from '../lotes-tostados/service/lote-tostado.service';
-import { MuestraService } from '../muestras/service/muestra.service';
+import { ProductoService } from '../../products/service/producto.service';
+import { InsumoService } from '../../insumo/service/insumo.service';
+import { LoteService } from '../../lotes-verdes/service/lote.service';
+import { LoteTostadoService } from '../../lotes-tostados/service/lote-tostado.service';
+import { MuestraService } from '../../muestras/service/muestra.service';
 
-import { LoteVerdeConInventario } from '../../../shared/models/lote';
-import { LoteTostadoConInventario } from '../../../shared/models/lote-tostado';
-import { MuestraConInventario } from '../../../shared/models/muestra';
-import { CategoriaNombrePipe } from "../../../shared/pipes/categoria-nombre.pipe";
-import { UserNamePipe } from '../../../shared/pipes/user-name-pipe.pipe';
-import { CategoriaInsumoPipe } from '../../../shared/pipes/categoria-insumo.pipe';
-import { ProductoConInventarios } from '../../../shared/models/producto';
-import { InsumoConInventarios } from '../../../shared/models/insumo';
-import { User as UserEntity } from '../../../shared/models/user';
-import { SelectSearchComponent } from "../../../shared/components/select-search/select-search.component";
+import { LoteVerdeConInventario } from '../../../../shared/models/lote';
+import { LoteTostadoConInventario } from '../../../../shared/models/lote-tostado';
+import { MuestraConInventario } from '../../../../shared/models/muestra';
+import { CategoriaNombrePipe } from "../../../../shared/pipes/categoria-nombre.pipe";
+import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
+import { CategoriaInsumoPipe } from '../../../../shared/pipes/categoria-insumo.pipe';
+import { ProductoConInventarios } from '../../../../shared/models/producto';
+import { InsumoConInventarios } from '../../../../shared/models/insumo';
+import { User as UserEntity } from '../../../../shared/models/user';
+import { SelectSearchComponent } from "../../../../shared/components/select-search/select-search.component";
+import { TransferStockComponent } from '.././components/transfer-stock/transfer-stock.component';
+import { AdjustStockComponent } from '.././components/adjust-stock/adjust-stock.component';
 
 type InventoryEntityType =
   | 'TODOS'
@@ -89,7 +92,9 @@ interface UpdateInventoryResponse {
     CategoriaNombrePipe,
     CategoriaInsumoPipe,
     UserNamePipe,
-    SelectSearchComponent
+    SelectSearchComponent,
+    TransferStockComponent,
+    AdjustStockComponent
   ],
   templateUrl: './update-inventory.component.html',
   styles: []
@@ -115,6 +120,8 @@ export class UpdateInventoryComponent implements OnInit {
   selectedType = signal<InventoryEntityType>('TODOS');
   onlyWithStock = signal(false);
   onlyMultiWarehouse = signal(false);
+  showAdjustModal = signal(false);
+  showTransferModal = signal(false);
 
   rows = signal<InventorySearchRow[]>([]);
 
@@ -165,7 +172,8 @@ export class UpdateInventoryComponent implements OnInit {
     private loteTostadoService: LoteTostadoService,
     private muestraService: MuestraService,
     private almacenService: AlmacenService,
-    private userService: UserService
+    private userService: UserService,
+    private uiService: UiService
   ) { }
 
   ngOnInit(): void {
@@ -348,9 +356,46 @@ export class UpdateInventoryComponent implements OnInit {
   }
 
   onUpdateSelected(): void {
-    const row = this.selectedRow();
-    if (!row) return;
+    this.openAdjustModal();
+  }
 
-    console.log('Actualizar inventario de:', row);
+
+  openAdjustModal(): void {
+    if (!this.selectedRow()) {
+      this.uiService.alert('warning', 'Atención', 'Selecciona un registro');
+      return;
+    }
+
+    this.showAdjustModal.set(true);
+  }
+
+  closeAdjustModal(): void {
+    this.showAdjustModal.set(false);
+  }
+
+  openTransferModal(): void {
+    const row = this.selectedRow();
+
+    if (!row) {
+      this.uiService.alert('warning', 'Atención', 'Selecciona un registro');
+      return;
+    }
+
+    if (!row.almacenes?.length) {
+      this.uiService.alert('warning', 'Atención', 'La entidad no tiene almacenes registrados');
+      return;
+    }
+
+    this.showTransferModal.set(true);
+  }
+
+  closeTransferModal(): void {
+    this.showTransferModal.set(false);
+  }
+
+  handleInventoryUpdated(): void {
+    this.closeAdjustModal();
+    this.closeTransferModal();
+    this.loadData();
   }
 }

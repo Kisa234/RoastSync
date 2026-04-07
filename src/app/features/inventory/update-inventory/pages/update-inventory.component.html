@@ -41,12 +41,13 @@
         </select>
       </div>
 
-    
+
 
       <div class="col-span-2 sm:col-span-1">
         <label for="cliente" class="block text-gray-700 text-sm mb-1">Buscar por usuario</label>
-        <select-search name="cliente" [items]="clientes" displayField="nombre"
-          valueField="id_user" placeholder="Seleccionar cliente"  [ngModel]="searchUser()" (ngModelChange)="searchUser.set($event)" ></select-search>
+        <select-search name="cliente" [items]="clientes" displayField="nombre" valueField="id_user"
+          placeholder="Seleccionar cliente" [ngModel]="searchUser()"
+          (ngModelChange)="searchUser.set($event)"></select-search>
       </div>
     </div>
 
@@ -170,11 +171,19 @@
           <h2 class="font-semibold text-[#1F1F1F]">Verificación</h2>
         </div>
 
-        <button *ngIf="selectedRow()" (click)="onUpdateSelected()"
-          class="flex items-center gap-2 bg-[#B8672E] text-white px-4 py-2 rounded-lg shadow hover:bg-[#A65A27] transition">
-          <lucide-icon [img]="Pencil" class="w-4 h-4"></lucide-icon>
-          Actualizar
-        </button>
+        <div *ngIf="selectedRow()" class="flex items-center gap-2">
+          <button (click)="openAdjustModal()"
+            class="flex items-center gap-2 bg-[#B8672E] text-white px-4 py-2 rounded-lg shadow hover:bg-[#A65A27] transition">
+            <lucide-icon [img]="Pencil" class="w-4 h-4"></lucide-icon>
+            Ajustar stock
+          </button>
+
+          <button (click)="openTransferModal()"
+            class="flex items-center gap-2 border border-[#B8672E] text-[#B8672E] px-4 py-2 rounded-lg hover:bg-[#FCF8F5] transition">
+            <lucide-icon [img]="RefreshCcw" class="w-4 h-4"></lucide-icon>
+            Trasladar stock
+          </button>
+        </div>
       </div>
 
       <div class="p-5" *ngIf="selectedRow() as selected; else noSelected">
@@ -291,3 +300,17 @@
     </div>
   </div>
 </div>
+
+<adjust-stock-modal
+  *ngIf="showAdjustModal() && selectedRow()"
+  [row]="selectedRow()!"
+  (close)="closeAdjustModal()"
+  (saved)="handleInventoryUpdated()">
+</adjust-stock-modal>
+
+<transfer-stock-modal
+  *ngIf="showTransferModal() && selectedRow()"
+  [row]="selectedRow()!"
+  (close)="closeTransferModal()"
+  (saved)="handleInventoryUpdated()">
+</transfer-stock-modal>

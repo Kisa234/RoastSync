@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { LoteService } from '../../inventory/lotes-verdes/service/lote.service';
 import { Lote } from '../../../shared/models/lote';
 import { AnalisisService } from '../../analysis/service/analisis.service';
-import { AnalisisSensorialService } from './../../analysis/service/analisis-sensorial.service';
+import { AnalisisSensorialService } from '../../analysis/service/analisis-sensorial.service';
 import { AnalisisSensorial } from '../../../shared/models/analisis-sensorial';
 import { Analisis } from '../../../shared/models/analisis';
 import { UserService } from '../../users/service/users-service.service';
@@ -20,61 +20,72 @@ import { MultiPieChartComponent } from '../../../shared/components/multi-pie-cha
 import { forkJoin } from 'rxjs';
 import { UiService } from '../../../shared/services/ui.service';
 
+type SessionInfo = {
+  id_user: string;
+  email: string;
+  rol: string;
+  id_rol?: string;
+};
+
 @Component({
   selector: 'app-client-form',
-  imports: [FormsModule, CommonModule, ReplacePipe, SpiderGraphComponent, MultiPieChartComponent],
+  standalone: true,
+  imports: [
+    FormsModule,
+    CommonModule,
+    ReplacePipe,
+    SpiderGraphComponent,
+    MultiPieChartComponent
+  ],
   templateUrl: './client-form.component.html',
   styles: ``
 })
 export class ClientFormComponent implements OnInit {
-
   template: any;
   selectedOption: any = null;
 
-  stepVisual = 0; // controla pantallas
-  stepCafe = 0;   // controla steps[] (fijo1, fijo2, libre)
+  stepVisual = 0;
+  stepCafe = 0;
 
   lotesLoaded = false;
 
   MOLIENDA_MAP: Record<string, string> = {
-    "Fina": "MOLIENDA_FINA",
-    "Media": "MOLIENDA_MEDIA",
-    "Gruesa": "MOLIENDA_GRUESA",
-    "Grano Entero": "ENTERO",
-    "Ninguno": "NINGUNO"
+    Fina: 'MOLIENDA_FINA',
+    Media: 'MOLIENDA_MEDIA',
+    Gruesa: 'MOLIENDA_GRUESA',
+    'Grano Entero': 'ENTERO',
+    Ninguno: 'NINGUNO'
   };
-
 
   Moliendas: string[] = ['Grano Entero', 'Fina', 'Media', 'Gruesa'];
 
   steps = [
     {
-      titulo: "Café Fijo 1",
+      titulo: 'Café Fijo 1',
       lote: null as Lote | null,
-      moliendaField: "molienda_1",
-      tuesteField: "tueste_1",
+      moliendaField: 'molienda_1',
+      tuesteField: 'tueste_1',
       tuestes: [] as string[],
       notas: [] as string[]
     },
     {
-      titulo: "Café Fijo 2",
+      titulo: 'Café Fijo 2',
       lote: null as Lote | null,
-      moliendaField: "molienda_2",
-      tuesteField: "tueste_2",
+      moliendaField: 'molienda_2',
+      tuesteField: 'tueste_2',
       tuestes: [] as string[],
       notas: [] as string[]
     },
     {
-      titulo: "Elige tu tercer café",
+      titulo: 'Elige tu tercer café',
       lote: null as Lote | null,
-      moliendaField: "molienda_3",
-      tuesteField: "tueste_3",
+      moliendaField: 'molienda_3',
+      tuesteField: 'tueste_3',
       tuestes: [] as string[],
       notas: [] as string[],
       esLibre: true
     }
   ];
-
 
   boxRespuesta: BoxRespuesta & { [key: string]: any } = {
     id_respuesta: '',
@@ -106,12 +117,17 @@ export class ClientFormComponent implements OnInit {
     tazas_defecto_rechazo: 0,
     puntaje_taza: 0,
     comentario: '',
-    fecha_registro: new Date(),
+    fecha_registro: new Date()
   };
 
   parsedNotas = { notas: [] as string[] };
 
-  sessioninfo = { id: '', email: '', rol: '' };
+  sessioninfo: SessionInfo = {
+    id_user: '',
+    email: '',
+    rol: '',
+    id_rol: ''
+  };
 
   user: User = {
     id_user: '',
@@ -122,7 +138,7 @@ export class ClientFormComponent implements OnInit {
     password: '',
     eliminado: false,
     fecha_registro: new Date()
-  }
+  };
 
   constructor(
     private readonly boxOpcionService: BoxOpcionService,
@@ -134,67 +150,73 @@ export class ClientFormComponent implements OnInit {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly uiService: UiService
-  ) { }
+  ) {}
 
-  ngOnInit() {
-
+  ngOnInit(): void {
     this.authService.checkSession().subscribe({
-      next: info => {
+      next: (info: SessionInfo) => {
         this.sessioninfo = info;
 
-        // 🔥 1. Verificar si ya tiene box este mes
-        this.boxRespuestaService.getByUser(info.id).subscribe({
+        this.boxRespuestaService.getByUser(info.id_user).subscribe({
           next: (respuestas) => {
-
             const hoy = new Date();
             const mesActual = hoy.getMonth();
             const anioActual = hoy.getFullYear();
 
-            const yaRespondiste = respuestas.some(r => {
+            const yaRespondiste = respuestas.some((r: BoxRespuesta) => {
               const fecha = new Date(r.fecha_registro);
-              return fecha.getMonth() === mesActual && fecha.getFullYear() === anioActual;
+              return (
+                fecha.getMonth() === mesActual &&
+                fecha.getFullYear() === anioActual
+              );
             });
 
             if (yaRespondiste) {
-              console.log("El usuario ya tiene un box este mes");
-              this.stepVisual = 6;   // 🔥 mostrar pantalla de box ya enviado
-              return;                // ❗ NO CONTINUAR CARGANDO WIZARD
+              console.log('El usuario ya tiene un box este mes');
+              this.stepVisual = 6;
+              return;
             }
 
-            // Si no respondió → cargar usuario y template normal
-            this.cargarUsuario(info.id);
+            this.cargarUsuario(info.id_user);
             this.cargarTemplate();
+          },
+          error: (err) => {
+            console.error('Error obteniendo respuestas del usuario:', err);
           }
         });
+      },
+      error: (err) => {
+        console.error('Error obteniendo sesión:', err);
       }
     });
-
   }
 
-  logout() {
+  logout(): void {
     this.uiService.confirm({
       title: 'Salir de la sesión',
-      message: `¿Estás seguro de que deseas salir de tu sesión?`,
+      message: '¿Estás seguro de que deseas salir de tu sesión?',
       confirmText: 'Sí',
       cancelText: 'No'
-    }).then(confirmed => {
+    }).then((confirmed) => {
       if (confirmed) {
-        this.authService.logout()
+        this.authService.logout();
       }
     });
   }
 
-
-  cargarUsuario(id: string) {
+  cargarUsuario(id: string): void {
     this.userService.getUserById(id).subscribe({
-      next: user => {
+      next: (user) => {
         this.user = user;
         this.boxRespuesta.id_user = user.id_user;
+      },
+      error: (err) => {
+        console.error('Error cargando usuario:', err);
       }
     });
   }
 
-  cargarTemplate() {
+  cargarTemplate(): void {
     this.boxTemplateService.getActiveTemplate().subscribe({
       next: (res: any) => {
         this.template = res;
@@ -206,29 +228,35 @@ export class ClientFormComponent implements OnInit {
         forkJoin([
           this.loteService.getById(fijo1),
           this.loteService.getById(fijo2)
-        ]).subscribe(([l1, l2]) => {
+        ]).subscribe({
+          next: ([l1, l2]) => {
+            this.steps[0].lote = l1;
+            this.steps[1].lote = l2;
+            this.steps[0].tuestes = res.tueste_fijo_1 ?? [];
+            this.steps[1].tuestes = res.tueste_fijo_2 ?? [];
 
-          this.steps[0].lote = l1;
-          this.steps[1].lote = l2;
-          this.steps[0].tuestes = res.tueste_fijo_1 ?? [];
-          this.steps[1].tuestes = res.tueste_fijo_2 ?? [];
-
-          this.lotesLoaded = true;
-          this.loadAnalysisForCurrentStep();
+            this.lotesLoaded = true;
+            this.loadAnalysisForCurrentStep();
+          },
+          error: (err) => {
+            console.error('Error cargando lotes fijos:', err);
+          }
         });
 
         this.loadOpciones(res.id_box_template);
+      },
+      error: (err) => {
+        console.error('Error cargando template:', err);
       }
     });
   }
 
-
-  setMolienda(m: string) {
+  setMolienda(m: string): void {
     const field = this.steps[this.stepCafe].moliendaField;
     this.boxRespuesta[field] = this.MOLIENDA_MAP[m];
   }
 
-  editarCafe(indice: number) {
+  editarCafe(indice: number): void {
     this.stepCafe = indice;
 
     if (indice === 0) this.stepVisual = 1;
@@ -238,50 +266,61 @@ export class ClientFormComponent implements OnInit {
     this.loadAnalysisForCurrentStep();
   }
 
-
-  loadOpciones(idBoxTemplate: string) {
+  loadOpciones(idBoxTemplate: string): void {
     this.boxOpcionService.getByTemplate(idBoxTemplate).subscribe({
-      next: opciones => {
-
-        opciones.forEach(op => {
+      next: (opciones: any[]) => {
+        opciones.forEach((op: any) => {
           if (!op.id_cafe) return;
 
-          this.loteService.getById(op.id_cafe.trim()).subscribe(lote => {
-            op.lote = lote;
+          this.loteService.getById(op.id_cafe.trim()).subscribe({
+            next: (lote) => {
+              op.lote = lote;
 
-            // ============================
-            // 🔥 CARGAR NOTAS SENSORIALES
-            // ============================
-            this.analisisService.getAnalisisByLoteId(lote.id_lote).subscribe({
-              next: (analisis: Analisis) => {
-                if (!analisis?.analisisSensorial_id) {
-                  op.notas = [];
-                  return;
-                }
+              this.analisisService.getAnalisisByLoteId(lote.id_lote).subscribe({
+                next: (analisis: Analisis) => {
+                  if (!analisis?.analisisSensorial_id) {
+                    op.notas = [];
+                    return;
+                  }
 
-                this.analisisSensorialService.getAnalisisById(analisis.analisisSensorial_id)
-                  .subscribe({
-                    next: (analisisSensorial) => {
-                      try {
-                        const parsed = JSON.parse(analisisSensorial.comentario || "{}");
-                        op.notas = parsed.notas ?? [];
-                      } catch {
+                  this.analisisSensorialService
+                    .getAnalisisById(analisis.analisisSensorial_id)
+                    .subscribe({
+                      next: (analisisSensorial) => {
+                        try {
+                          const parsed = JSON.parse(
+                            analisisSensorial.comentario || '{}'
+                          );
+                          op.notas = parsed.notas ?? [];
+                        } catch {
+                          op.notas = [];
+                        }
+                      },
+                      error: () => {
                         op.notas = [];
                       }
-                    }
-                  });
-              }
-            });
+                    });
+                },
+                error: () => {
+                  op.notas = [];
+                }
+              });
+            },
+            error: (err) => {
+              console.error('Error cargando lote de opción:', err);
+            }
           });
         });
 
         this.template.opciones = opciones;
+      },
+      error: (err) => {
+        console.error('Error cargando opciones:', err);
       }
     });
   }
 
-
-  selectOption(op: any) {
+  selectOption(op: any): void {
     this.selectedOption = op;
 
     this.steps[2].lote = op.lote;
@@ -297,43 +336,47 @@ export class ClientFormComponent implements OnInit {
     this.getanalisisSensorial(op.lote.id_lote);
   }
 
-  loadAnalysisForCurrentStep() {
+  loadAnalysisForCurrentStep(): void {
     const lote = this.steps[this.stepCafe]?.lote;
     if (lote?.id_lote) {
       this.getanalisisSensorial(lote.id_lote);
     }
   }
 
-  getanalisisSensorial(idLote: string) {
+  getanalisisSensorial(idLote: string): void {
     this.analisisService.getAnalisisByLoteId(idLote).subscribe({
       next: (analisis: Analisis) => {
         if (!analisis?.analisisSensorial_id) return;
 
-        this.analisisSensorialService.getAnalisisById(analisis.analisisSensorial_id)
+        this.analisisSensorialService
+          .getAnalisisById(analisis.analisisSensorial_id)
           .subscribe({
             next: (analisisSensorial) => {
-
               this.analisisSensorial = analisisSensorial;
 
-              let notas = [];
+              let notas: string[] = [];
 
               try {
-                const parsed = JSON.parse(analisisSensorial.comentario || "{}");
+                const parsed = JSON.parse(analisisSensorial.comentario || '{}');
                 notas = parsed.notas ?? [];
               } catch {
                 notas = [];
               }
 
-              // 🔥 GUARDAR LAS NOTAS EN SU STEP CORRECTO
               this.steps[this.stepCafe].notas = notas;
+            },
+            error: (err) => {
+              console.error('Error cargando análisis sensorial:', err);
             }
           });
+      },
+      error: (err) => {
+        console.error('Error cargando análisis:', err);
       }
     });
   }
 
-
-  nextStep() {
+  nextStep(): void {
     this.stepVisual++;
 
     if (this.stepVisual === 1) this.stepCafe = 0;
@@ -343,7 +386,7 @@ export class ClientFormComponent implements OnInit {
     this.loadAnalysisForCurrentStep();
   }
 
-  prevStep() {
+  prevStep(): void {
     this.stepVisual--;
 
     if (this.stepVisual === 1) this.stepCafe = 0;
@@ -353,13 +396,14 @@ export class ClientFormComponent implements OnInit {
     this.loadAnalysisForCurrentStep();
   }
 
-  submit() {
+  submit(): void {
     console.log('Guardando respuesta del box:', this.boxRespuesta);
+
     this.boxRespuestaService.create(this.boxRespuesta).subscribe({
-      next: res => {
+      next: () => {
         this.stepVisual = 6;
       },
-      error: err => {
+      error: (err) => {
         console.error('Error al guardar la respuesta:', err);
       }
     });

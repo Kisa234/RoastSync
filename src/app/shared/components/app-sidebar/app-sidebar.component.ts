@@ -1,19 +1,15 @@
-// src/app/shared/components/app-sidebar/app-sidebar.component.ts
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { NgFor, NgIf, NgClass } from '@angular/common';
-import { FilePenLine, LucideAngularModule, Store, User, Warehouse } from 'lucide-angular';
+import { FilePenLine, LucideAngularModule, Users, Flame } from 'lucide-angular';
+import { PermissionAccessService } from '../../services/permission-access.service';
 import {
-  Coffee,
   House,
   ShoppingCart,
   Box,
-  Users,
-  Flame,
   Settings,
   FlaskConical,
   Truck,
-  PackageSearch,
   Gift,
   Calculator,
   ChevronDown,
@@ -26,6 +22,7 @@ type SidebarLink = {
   label: string;
   path: string;
   icon: any;
+  permissions?: string | string[];
 };
 
 type SidebarGroup = {
@@ -33,7 +30,8 @@ type SidebarGroup = {
   label: string;
   icon: any;
   key: string;
-  children: SidebarLink[]; // ✅ SOLO LINKS
+  permissions?: string | string[];
+  children: SidebarLink[];
 };
 
 type SidebarItem = SidebarLink | SidebarGroup;
@@ -53,66 +51,206 @@ type SidebarItem = SidebarLink | SidebarGroup;
 export class SidebarComponent {
   @Input() collapsed = false;
   @Output() collapsedChange = new EventEmitter<boolean>();
+
   readonly Flame = Flame;
   readonly ChevronDown = ChevronDown;
   readonly ChevronLeft = ChevronLeft;
 
-
-  /** estado de submenús */
   openGroups: Record<string, boolean> = {
-    inventory: true
+    inventory: true,
+    users: false
   };
 
-  items: SidebarItem[] = [
-    { type: 'link', label: 'Dashboard', path: '/dashboard', icon: House },
+  private allItems: SidebarItem[] = [
+    {
+      type: 'link',
+      label: 'Dashboard',
+      path: '/dashboard',
+      icon: House,
+      permissions: 'dashboard.read'
+    },
     {
       type: 'group',
       label: 'Inventario',
       icon: Box,
       key: 'inventory',
       children: [
-        { type: 'link', label: 'Almacenes', path: '/inventory/almacen', icon: Box },
-        { type: 'link', label: 'Muestras', path: '/inventory/muestras', icon: Box },
-        { type: 'link', label: 'Lotes Verdes', path: '/inventory/lotes-verdes', icon: Box },
-        { type: 'link', label: 'Lotes Tostados', path: '/inventory/lotes-tostados', icon: Box },
-        { type: 'link', label: 'Productos', path: '/inventory/productos', icon: Box },
-        { type: 'link', label: 'Insumos', path: '/inventory/insumos', icon: Box },
-        { type: 'link', label: 'Actualizar Inventario', path: '/inventory/actualizar', icon: FilePenLine  },
-
+        {
+          type: 'link',
+          label: 'Almacenes',
+          path: '/inventory/almacen',
+          icon: Box,
+          permissions: 'inventario.almacenes.read'
+        },
+        {
+          type: 'link',
+          label: 'Muestras',
+          path: '/inventory/muestras',
+          icon: Box,
+          permissions: 'inventario.muestras.read'
+        },
+        {
+          type: 'link',
+          label: 'Lotes Verdes',
+          path: '/inventory/lotes-verdes',
+          icon: Box,
+          permissions: 'inventario.lotes-verdes.read'
+        },
+        {
+          type: 'link',
+          label: 'Lotes Tostados',
+          path: '/inventory/lotes-tostados',
+          icon: Box,
+          permissions: 'inventario.lotes-tostados.read'
+        },
+        {
+          type: 'link',
+          label: 'Productos',
+          path: '/inventory/productos',
+          icon: Box,
+          permissions: 'inventario.productos.read'
+        },
+        {
+          type: 'link',
+          label: 'Insumos',
+          path: '/inventory/insumos',
+          icon: Box,
+          permissions: 'inventario.insumos.read'
+        },
+        {
+          type: 'link',
+          label: 'Actualizar Inventario',
+          path: '/inventory/actualizar',
+          icon: FilePenLine,
+          permissions: 'inventario.stock.read'
+        }
       ]
     },
-    { type: 'link', label: 'Pedidos', path: '/orders', icon: ShoppingCart },
-    { type: 'link', label: 'Tostado', path: '/roasts', icon: Flame },
-    { type: 'link', label: 'Analisis', path: '/analisis', icon: FlaskConical },
+    {
+      type: 'link',
+      label: 'Pedidos',
+      path: '/orders',
+      icon: ShoppingCart,
+      permissions: 'pedidos.read'
+    },
+    {
+      type: 'link',
+      label: 'Tostado',
+      path: '/roasts',
+      icon: Flame,
+      permissions: 'tostado.read'
+    },
+    {
+      type: 'link',
+      label: 'Analisis',
+      path: '/analisis',
+      icon: FlaskConical,
+      permissions: 'analisis.read'
+    },
     {
       type: 'group',
       label: 'Usuarios',
       icon: Users,
       key: 'users',
       children: [
-        { type: 'link', label: 'Clientes', path: '/users', icon: Users },
-        { type: 'link', label: 'Usuarios internos', path: '/users/interns', icon: Users },
+        {
+          type: 'link',
+          label: 'Clientes',
+          path: '/users',
+          icon: Users,
+          permissions: 'usuarios.read'
+        },
+        {
+          type: 'link',
+          label: 'Usuarios internos',
+          path: '/users/interns',
+          icon: Users,
+          permissions: 'usuarios.internos.read'
+        }
       ]
     },
-    { type: 'link', label: 'Envios', path: '/envio', icon: Truck },
-    { type: 'link', label: 'Costeo', path: '/costing', icon: Calculator },
-    { type: 'link', label: 'Suscripcion', path: '/suscriptions', icon: Gift },
-    { type: 'link', label: 'Configuración', path: '/settings', icon: Settings }
+    {
+      type: 'link',
+      label: 'Envios',
+      path: '/envio',
+      icon: Truck,
+      permissions: 'envios.read'
+    },
+    {
+      type: 'link',
+      label: 'Costeo',
+      path: '/costing',
+      icon: Calculator,
+      permissions: 'costeo.read'
+    },
+    {
+      type: 'link',
+      label: 'Suscripcion',
+      path: '/suscriptions',
+      icon: Gift,
+      permissions: 'suscripcion.read'
+    },
+    {
+      type: 'link',
+      label: 'Configuración',
+      path: '/settings',
+      icon: Settings
+    }
   ];
 
+  items: SidebarItem[] = [];
 
-  constructor(private router: Router) {
-    // abre el grupo automáticamente si estás dentro de inventario
+  constructor(
+    private router: Router,
+    private permissionAccessService: PermissionAccessService
+  ) {
+    this.items = this.filterItemsByPermissions(this.allItems);
+
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => {
         const url = this.router.url;
         this.openGroups['inventory'] = url.startsWith('/inventory');
+        this.openGroups['users'] = url.startsWith('/users');
       });
+  }
+
+  private hasAccess(permission?: string | string[]): boolean {
+    if (!permission) return true;
+
+    return Array.isArray(permission)
+      ? this.permissionAccessService.hasAnyPermission(permission)
+      : this.permissionAccessService.hasPermission(permission);
+  }
+
+  private filterItemsByPermissions(items: SidebarItem[]): SidebarItem[] {
+    return items
+      .map(item => {
+        if (item.type === 'link') {
+          return this.hasAccess(item.permissions) ? item : null;
+        }
+
+        const visibleChildren = item.children.filter(child =>
+          this.hasAccess(child.permissions)
+        );
+
+        const canViewGroup = this.hasAccess(item.permissions);
+
+        if (!canViewGroup || visibleChildren.length === 0) {
+          return null;
+        }
+
+        return {
+          ...item,
+          children: visibleChildren
+        };
+      })
+      .filter((item): item is SidebarItem => item !== null);
   }
 
   toggleSidebar() {
     this.collapsed = !this.collapsed;
+    this.collapsedChange.emit(this.collapsed);
   }
 
   toggleGroup(key: string) {
@@ -120,9 +258,7 @@ export class SidebarComponent {
     this.openGroups[key] = !this.openGroups[key];
   }
 
-  isGroupActive(group: any): boolean {
-    return group.children.some((c: any) =>
-      this.router.url.startsWith(c.path)
-    );
+  isGroupActive(group: SidebarGroup): boolean {
+    return group.children.some(child => this.router.url.startsWith(child.path));
   }
 }

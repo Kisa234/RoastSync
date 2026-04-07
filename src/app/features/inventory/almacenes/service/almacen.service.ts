@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, shareReplay, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
-import { Almacen, CreateAlmacenDto, UpdateAlmacenDto } from '../../../../shared/models/almacen';
+import { AjustarStockPayload, Almacen, CreateAlmacenDto, TrasladarStockPayload, UpdateAlmacenDto } from '../../../../shared/models/almacen';
 
 @Injectable({ providedIn: 'root' })
 export class AlmacenService {
@@ -13,7 +13,16 @@ export class AlmacenService {
   private almacenRequestCache = new Map<string, Observable<Almacen>>();
   private nombreCache = new Map<string, Observable<string>>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
+
+  ajustarStock(payload: AjustarStockPayload) {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/ajustar-stock`, payload);
+  }
+
+  trasladarStock(payload: TrasladarStockPayload) {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/trasladar-stock`, payload);
+  }
+
 
   // GET /almacen/activos
   getAlmacenesActivos(): Observable<Almacen[]> {
@@ -102,4 +111,7 @@ export class AlmacenService {
     this.almacenRequestCache.clear();
     this.nombreCache.clear();
   }
+
+
+
 }

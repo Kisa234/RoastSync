@@ -9,6 +9,15 @@
       <p class="text-gray-600">Gestión de lotes de café tostado</p>
     </div>
 
+    <div class="mb-4">
+      <div class="text-lg font-semibold text-[#1F1F1F]">
+        Costo Total Inventario:
+        <span class="text-[#B8672E]">
+          {{ costoInventario | currency:'PEN':'symbol':'1.2-2' }}
+        </span>
+      </div>
+    </div>
+
     <!-- <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
       (click)="showHistoric = false">
       <lucide-icon [img]="History" class="w-5 h-5 mr-2"></lucide-icon>
