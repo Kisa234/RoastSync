@@ -1,9 +1,14 @@
-<div class="flex h-screen" *ngIf="authReady">
-      <app-sidebar class="w-64"></app-sidebar>
-      <div class="flex-1 overflow-auto bg-[#F9F9F9]">
-        <router-outlet></router-outlet>
-        <app-alert></app-alert>
-        <app-confirm-dialog></app-confirm-dialog>
-        <app-prompt-dialog></app-prompt-dialog>
-      </div>
+<div class="flex h-screen overflow-hidden" *ngIf="authReady">
+
+  <!-- SIDEBAR -->
+  <app-sidebar [collapsed]="collapsed" (collapsedChange)="collapsed = $event"></app-sidebar>
+
+  <!-- CONTENIDO -->
+  <div class="flex-1 overflow-auto bg-[#F9F9F9] transition-all duration-300">
+    <app-alert></app-alert>
+    <router-outlet></router-outlet>
+    <app-confirm-dialog></app-confirm-dialog>
+    <app-prompt-dialog></app-prompt-dialog>
+  </div>
+
 </div>

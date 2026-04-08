@@ -1,10 +1,10 @@
-import { LoteService } from './../../../features/inventory/service/lote.service';
+import { LoteService } from '../../../features/inventory/lotes-verdes/service/lote.service';
 import { UserService } from './../../../features/users/service/users-service.service';
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, output, ViewChild } from '@angular/core';
 import { LucideAngularModule, Download, X, Printer } from 'lucide-angular';
 import { FichaTueste } from '../../models/ficha-tueste';
-import { LoteTostadoService } from '../../../features/inventory/service/lote-tostado.service';
+import { LoteTostadoService } from '../../../features/inventory/lotes-tostados/service/lote-tostado.service';
 import { User } from '../../models/user';
 import { Lote } from '../../models/lote';
 
@@ -55,6 +55,9 @@ export class FichaTuesteComponent implements OnInit {
     eliminado: false
   }
 
+  agtromGour = 0;
+
+
   constructor(
     readonly loteTostadoSvc: LoteTostadoService,
     readonly userService: UserService,
@@ -65,7 +68,7 @@ export class FichaTuesteComponent implements OnInit {
     this.loadData();
   }
 
-  private loadData() {
+  private async loadData() {
     this.loteTostadoSvc.getFichaTueste(this.id).subscribe(loteTostado => {
       this.data = loteTostado;
       this.loteService.getById(loteTostado.id_lote).subscribe(lote => {
@@ -75,6 +78,10 @@ export class FichaTuesteComponent implements OnInit {
         })
       })
     });
+  }
+
+  calcAgtrom(){
+    this.agtromGour = parseFloat(((this.data.agtrom! + 1.528 ) * 0.74294).toFixed(1));
   }
 
   formatTiempoSegundos(segundos: number): string {

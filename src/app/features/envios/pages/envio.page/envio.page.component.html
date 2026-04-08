@@ -71,7 +71,7 @@
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
           <tr *ngFor="let e of envios; trackBy: trackByEnvioId" class="hover:bg-[#F9F9F9]">
             <td class="px-6 py-4 text-sm text-gray-700 font-mono">{{ e.id_lote_tostado }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ e.id_cliente | userName }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ e.id_cliente | UserNamePipe | async }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ e.cantidad.toLocaleString('en-US') }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">
               <span class="inline-block px-2 py-0.5 text-xs rounded-full border"

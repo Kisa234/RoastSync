@@ -24,7 +24,7 @@ import { RoastsService } from '../service/roasts.service';
 import { Tueste } from '../../../shared/models/tueste';
 import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../shared/pipes/time.pipe";
-import { LoteService } from '../../inventory/service/lote.service';
+import { LoteService } from '../../inventory/lotes-verdes/service/lote.service';
 
 
 interface ExtendedPedido extends Pedido {

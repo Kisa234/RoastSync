@@ -24,8 +24,7 @@ import { LucideAngularModule, ChevronDown } from 'lucide-angular';
   }]
 })
 export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnChanges {
-  @HostListener('document:click', ['$event.target'])
-  
+
 
   @Input() items: any[] = [];
   @Input() displayField = '';
@@ -35,6 +34,18 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
   @Input() multiple = false;
   @Input() multipleAsString = false;
   @Input() displayFn?: (item: any) => string;
+
+  @HostListener('document:click', ['$event.target'])
+  onDocumentClick(target: EventTarget | null) {
+    if (!(target instanceof HTMLElement)) return;
+    this.onClickOutside(target);
+  }
+
+  onClickOutside(target: HTMLElement) {
+    if (this.open && !this.elementRef.nativeElement.contains(target)) {
+      this.open = false;
+    }
+  }
 
   search = '';
   filtered: any[] = [];
@@ -120,9 +131,6 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
       }
     }
   }
-
-
-
 
   registerOnChange(fn: any): void { this.onChange = fn; }
   registerOnTouched(fn: any): void { this.onTouch = fn; }
@@ -217,15 +225,7 @@ export class SelectSearchComponent implements ControlValueAccessor, OnInit, OnCh
     return this.selected ? this.getLabel(this.selected) : this.placeholder;
   }
 
-  onDocumentClick(target: HTMLElement) {
-    this.onClickOutside(target);
-  }
 
-  onClickOutside(target: HTMLElement) {
-    if (this.open && !this.elementRef.nativeElement.contains(target)) {
-      this.open = false;
-    }
-  }
 
   addNew() {
     const value = this.search.trim();

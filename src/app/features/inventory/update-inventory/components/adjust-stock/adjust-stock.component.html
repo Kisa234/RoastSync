@@ -1,0 +1,141 @@
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center z-10 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl overflow-visible">
+
+    <div class="flex justify-between items-center px-6 pt-4">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Ajustar Stock</h2>
+        <p class="text-gray-600 text-sm">Corrige la cantidad registrada en un almacén</p>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+        <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="px-6 pt-4">
+      <div class="rounded-xl border border-[#ECECEC] bg-[#FAFAFA] p-4 mb-4">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <div class="text-gray-500">Entidad</div>
+            <div class="font-medium text-[#1F1F1F]">{{ row.displayName }}</div>
+          </div>
+          <div>
+            <div class="text-gray-500">Tipo</div>
+            <div class="font-medium text-[#1F1F1F]">{{ row.tipo }}</div>
+          </div>
+          <div class="col-span-2">
+            <div class="text-gray-500">ID</div>
+            <div class="font-medium text-[#1F1F1F] break-all">{{ row.id }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 pt-2">
+      <ul class="flex border-b border-[#E5E5E5]">
+        <li *ngFor="let t of tabs" class="mr-6">
+          <button
+            (click)="selectTab(t.key)"
+            class="pb-2 text-sm font-medium transition"
+            [class.border-b-2]="activeTab===t.key"
+            [class.border-[#B8672E]]="activeTab===t.key"
+            [class.text-[#1F1F1F]]="activeTab===t.key"
+            [class.text-gray-500]="activeTab!==t.key">
+            {{ t.label }}
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="px-6 py-5">
+      <form *ngIf="activeTab==='manual'" class="grid grid-cols-2 gap-x-6 gap-y-4">
+
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1">Almacén *</label>
+          <select
+            [(ngModel)]="model.id_almacen"
+            name="id_almacen"
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="">Seleccionar almacén</option>
+            <option *ngFor="let alm of row.almacenes" [value]="alm.id_almacen">
+              {{ alm.nombre }} - Stock actual: {{ alm.cantidad }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Cantidad actual</label>
+          <input
+            type="number"
+            [value]="selectedAlmacenCantidad"
+            disabled
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 bg-gray-100 text-gray-500" />
+        </div>
+
+        <div class="col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Nueva cantidad *</label>
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="model.nueva_cantidad"
+            name="nueva_cantidad"
+            placeholder="Ej: 25"
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+        </div>
+
+        <!-- <ng-container *ngIf="isProducto">
+          <div class="col-span-1">
+            <label class="block text-gray-700 text-sm mb-1">Gramaje *</label>
+            <input
+              type="number"
+              min="1"
+              [(ngModel)]="model.gramaje"
+              name="gramaje"
+              placeholder="Ej: 250"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+          </div>
+
+          <div class="col-span-1">
+            <label class="block text-gray-700 text-sm mb-1">Molienda *</label>
+            <select
+              [(ngModel)]="model.molienda"
+              name="molienda"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+              <option [ngValue]="null">Seleccionar molienda</option>
+              <option *ngFor="let item of moliendaOptions" [ngValue]="item">
+                {{ item }}
+              </option>
+            </select>
+          </div>
+        </ng-container> -->
+
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1">Motivo</label>
+          <textarea
+            [(ngModel)]="model.motivo"
+            name="motivo"
+            placeholder="Ej: Corrección de inventario por validación física"
+            rows="3"
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition"></textarea>
+        </div>
+      </form>
+    </div>
+
+    <div class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5] space-x-2">
+      <button
+        (click)="onCancel()"
+        class="px-4 py-2 rounded border border-[#A67C52] hover:bg-[#F3F2F1]">
+        Cancelar
+      </button>
+
+      <button
+        (click)="saveManual()"
+        class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] flex items-center"
+        [disabled]="isButtonDisabled()"
+        [class.opacity-50]="isButtonDisabled()">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2"></lucide-icon>
+        Guardar ajuste
+      </button>
+    </div>
+
+  </div>
+</div>

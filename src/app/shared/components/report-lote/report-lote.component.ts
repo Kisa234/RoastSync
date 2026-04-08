@@ -1,7 +1,7 @@
 import { CommonModule, NgFor, NgIf } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { Coffee, Download, FlaskConical, LucideAngularModule, X } from "lucide-angular";
-import { SpiderGraphComponent } from "../../../features/inventory/components/spider-graph/spider-graph.component";
+import { SpiderGraphComponent } from "../spider-graph/spider-graph.component";
 import { RouterLink } from "@angular/router";
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
 import { Muestra } from "../../models/muestra";
@@ -11,14 +11,14 @@ import { AnalisisSensorial } from "../../models/analisis-sensorial";
 import { AnalisisFisico } from "../../models/analisis-fisico";
 import { AnalisisDefectos } from "../../models/analisis-defectos";
 import { switchMap, tap } from "rxjs";
-import { LoteService } from "../../../features/inventory/service/lote.service";
-import { MuestraService } from "../../../features/inventory/service/muestra.service";
+import { LoteService } from "../../../features/inventory/lotes-verdes/service/lote.service";
+import { MuestraService } from "../../../features/inventory/muestras/service/muestra.service";
 import { AnalisisService } from "../../../features/analysis/service/analisis.service";
 import { AnalisisFisicoService } from "../../../features/analysis/service/analisis-fisico.service";
 import { AnalisisSensorialService } from "../../../features/analysis/service/analisis-sensorial.service";
 import { AnalisisDefectosService } from "../../../features/analysis/service/analisis-defectos.service";
 import { UiService } from "../../services/ui.service";
-import { AnalisisPdfComponent } from "../../../features/inventory/components/analisis-pdf/analisis-pdf.component";
+import { AnalisisPdfComponent } from "../../../features/inventory/pages/analisis-pdf/analisis-pdf.component";
 import { NotasSensorialesPipe } from "../../pipes/notas.pipe";
 
 @Component({

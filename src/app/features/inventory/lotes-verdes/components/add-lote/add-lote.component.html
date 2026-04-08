@@ -1,0 +1,298 @@
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md  flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg overflow-visible">
+
+    <!-- Header con pestañas -->
+    <div class="flex justify-between items-center px-6 pt-4">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Crear Nueva Lote</h2>
+        <p class="text-gray-600 text-sm">Registra una nuevo lote</p>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+        <lucide-icon [img]="X" class="w-5 h-5" />
+      </button>
+    </div>
+
+    <div class="px-6 pt-6">
+      <ul class="flex border-b border-[#E5E5E5]">
+        <li *ngFor="let t of tabs" class="mr-6">
+          <button (click)="selectTab(t.key)" class="pb-2 text-sm font-medium transition"
+            [class.border-b-2]="activeTab===t.key" [class.border-[#B8672E]]="activeTab===t.key"
+            [class.text-[#1F1F1F]]="activeTab===t.key" [class.text-gray-500]="activeTab!==t.key">
+            {{ t.label }}
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-5">
+
+      <!-- DESDE MUESTRA -->
+      <div *ngIf="activeTab==='desde-muestra'" class="grid grid-cols-2 gap-x-6 gap-y-4">
+        <!-- Selector de muestra -->
+        <div class="col-span-1 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Muestra *</label>
+          <select-search name="muestra" [(ngModel)]="selectedMuestraId" (ngModelChange)="onMuestraChange($event)"
+            [items]="muestras" displayField="id_muestra" valueField="id_muestra"
+            placeholder="Seleccionar Muestra"></select-search>
+        </div>
+        <!-- Peso nuevo -->
+        <div class="col-span-1 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Peso (Gr) *</label>
+          <input type="number" min="1" [(ngModel)]="model.peso" name="peso"
+            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+        </div>
+        <!-- datos de muestra -->
+        <form class="grid grid-cols-2 gap-x-6 gap-y-4 col-span-2">
+          <!-- Productor -->
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1" for="productor">
+              Productor
+            </label>
+            <input id="productor" type="text" [(ngModel)]="model.productor" name="productor" disabled
+              placeholder="Ej: Simon Brown" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+          </div>
+
+          <!-- Finca -->
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1" for="finca">
+              Finca
+            </label>
+            <input id="finca" type="text" [(ngModel)]="model.finca" name="finca" disabled placeholder="Ej: Las Chimoyas"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+          </div>
+
+          <!-- Departamento -->
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1" for="departamento">
+              Departamento
+            </label>
+            <input id="departamento" type="text" [(ngModel)]="model.departamento" name="departamento" disabled
+              placeholder="Ej: Simon Brown" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+          </div>
+
+          <!-- Distrito -->
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1" for="distrito">
+              Distrito
+            </label>
+            <input id="Distrito" type="text" [(ngModel)]="model.distrito" name="Distrito" disabled
+              placeholder="Ej: Simon Brown" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+          </div>
+
+          <!-- Costo -->
+          <div class="col-span-1 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1">Costo (PEN)</label>
+            <input type="number" min="1" [(ngModel)]="model.costo" name="costo"
+              class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+          </div>
+
+          <!-- Almacen -->
+          <div class="col-span-1 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1">Almacen*</label>
+            <select [(ngModel)]="model.almacen" name="clasificacion" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+              <option value="" disabled selected>Selecciona Almacen</option>
+              <option *ngFor="let a of almacenes" [value]="a.id_almacen">{{ a.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="col-span-2 sm:col-span-1">
+            <label for="cliente" class="block text-gray-700 text-sm mb-1">Cliente *</label>
+            <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
+              valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+          </div>
+
+          <!-- Variedades -->
+          <div class="col-span-2 sm:col-span-1">
+            <label class="block text-gray-700 text-sm mb-1" for="Variedades">
+              Variedades
+            </label>
+            <input id="variedades" type="text" [(ngModel)]="model.variedades" name="variedades" disabled
+              placeholder="Ej: Simon Brown" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+          </div>
+
+          <!-- Proceso -->
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Proceso</label>
+            <div class="relative">
+              <select [(ngModel)]="model.proceso" name="proceso" disabled class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+                <option value="" disabled selected>Selecciona el proceso</option>
+                <option *ngFor="let p of procesos" [value]="p">{{ p }}</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Clasificacion *</label>
+            <div class="relative">
+              <select [(ngModel)]="model.clasificacion" name="clasificacion" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+                <option value="" disabled selected>Selecciona la clasificaion</option>
+                <option *ngFor="let c of clasificaciones" [value]="c">{{ c }}</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
+              </div>
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+
+      <!-- MANUAL -->
+      <form *ngIf="activeTab==='manual'" class="grid grid-cols-2 gap-x-6 gap-y-4">
+        <!-- Productor -->
+        <div class="col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="productor">
+            Productor
+          </label>
+          <input id="productor" type="text" [(ngModel)]="model.productor" name="productor" placeholder="Ej: Simon Brown"
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+        </div>
+
+        <!-- Finca -->
+        <div class="col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="finca">
+            Finca
+          </label>
+          <input id="finca" type="text" [(ngModel)]="model.finca" name="finca" placeholder="Ej: Las Chimoyas" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+        </div>
+
+        <!-- Departamento -->
+        <div class="col-span-2 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="productor">
+            Departamento
+          </label>
+          <select-search name="depto" [items]="departamentos" displayField="nombre" valueField="nombre"
+            placeholder="Departamento" [(ngModel)]="model.departamento" (ngModelChange)="onDeptoChange($event)">
+          </select-search>
+        </div>
+
+        <!-- Distrito -->
+        <div class="col-span-2 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="productor">
+            Distrito
+          </label>
+          <select-search name="prov" [items]="distritos" displayField="nombre" valueField="nombre"
+            placeholder="Distrito" [(ngModel)]="model.distrito" [disabled]="!model.departamento">
+          </select-search>
+        </div>
+
+
+
+
+        <!-- Peso (kg) -->
+        <div class="col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="peso">
+            Peso (gr) *
+          </label>
+          <input id="peso" type="number" min="0" [(ngModel)]="model.peso" name="peso" required class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
+           focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
+        </div>
+
+        <!-- cliente -->
+        <div class="col-span-1">
+          <label class="block text-gray-700 text-sm mb-1" for="productor">
+            Cliente
+          </label>
+          <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
+            valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+        </div>
+
+        <!-- Costo -->
+        <div class="col-span-1 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Costo (PEN)</label>
+          <input type="number" min="1" [(ngModel)]="model.costo" name="costo"
+            class="w-full border border-[#E5E5E5] rounded px-3 py-2" />
+        </div>
+
+        <!-- Almacen -->
+        <div class="col-span-1 sm:col-span-1">
+          <label class="block text-gray-700 text-sm mb-1">Almacen*</label>
+          <select [(ngModel)]="model.almacen" name="clasificacion" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="" disabled selected>Selecciona Almacen</option>
+            <option *ngFor="let a of almacenes" [value]="a.id_almacen">{{ a.nombre }}</option>
+          </select>
+        </div>
+
+
+        <!-- Variedades -->
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1" for="peso"> Variedades*</label>
+          <select-search class="w-full col-span-2" name="variedades" [(ngModel)]="model.variedades" [items]="variedades"
+            displayField="nombre" valueField="nombre" placeholder="Seleccionar variedades"
+            [multiple]="true"></select-search>
+        </div>
+
+
+        <!-- Proceso -->
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1">Proceso *</label>
+          <div class="relative">
+            <select [(ngModel)]="model.proceso" name="proceso" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+              <option value="" disabled selected>Selecciona el proceso</option>
+              <option *ngFor="let p of procesos" [value]="p">{{ p }}</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Clasificacion -->
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1">Clasificacion *</label>
+          <div class="relative">
+            <select [(ngModel)]="model.clasificacion" name="clasificacion" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
+                   focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+              <option value="" disabled selected>Selecciona la clasificaion</option>
+              <option *ngFor="let c of clasificaciones" [value]="c">{{ c }}</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400" />
+            </div>
+          </div>
+        </div>
+
+
+
+      </form>
+
+
+    </div>
+
+
+    <!-- Footer -->
+    <div class="flex justify-end items-center px-6 py-4 border-t border-[#E5E5E5] space-x-2">
+      <button (click)="onCancel()" class="px-4 py-2 rounded border border-[#A67C52] hover:bg-[#F3F2F1]">
+        Cancelar
+      </button>
+
+      <!-- Botón dinámico -->
+      <button *ngIf="activeTab==='manual'" (click)="saveManual()"
+        class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] flex items-center">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />Guardar
+      </button>
+      <button *ngIf="activeTab==='desde-muestra'" (click)="saveFromMuestra()" class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52]
+        disabled:opacity-50 flex items-center" [disabled]="isButtonDisabled()">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />
+        Crear Lote
+      </button>
+    </div>
+  </div>
+</div>

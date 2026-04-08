@@ -6,7 +6,7 @@ import { SelectSearchComponent } from '../../../../shared/components/select-sear
 
 import { EnviosService } from '../../service/envios.service';
 import { UserService } from '../../../users/service/users-service.service';
-import { LoteTostadoService } from '../../../inventory/service/lote-tostado.service';
+import { LoteTostadoService } from '../../../inventory/lotes-tostados/service/lote-tostado.service';
 
 import { Envio } from '../../../../shared/models/envio';
 import { User } from '../../../../shared/models/user';

@@ -1,0 +1,205 @@
+<!-- src/app/features/orders/page/orders-page.component.html -->
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Pedidos</h1>
+      <p class="text-gray-600">Gestiona pedidos de Venta Verde, Tostado Verde y Maquila</p>
+    </div>
+
+    <div class="flex space-x-3">
+      <!-- Pedido Normal -->
+      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openAdd()">
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+        Pedido de Lotes
+      </button>
+
+      <!-- Pedido de Maquila -->
+      <button
+        class="flex items-center bg-[#F4F4F4] text-[#1F1F1F] px-4 py-2 rounded shadow hover:bg-[#E5E5E5] transition"
+        (click)="openAddMaquila()">
+        <lucide-icon [img]="Factory" class="w-5 h-5 mr-2" />
+        Pedido de Maquila
+      </button>
+    </div>
+  </div>
+
+  <!-- TABLA PRINCIPAL -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 space-y-6">
+    <div>
+      <h2 class="text-xl font-semibold text-[#1F1F1F]">Lista de Pedidos</h2>
+    </div>
+
+    <div class="overflow-x-auto m-1 rounded-lg shadow-sm">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo Pedido</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad (Gr/Un)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Gramaje (Gr)</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let p of pedidos" class="hover:bg-[#F9F9F9]">
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.tipo_pedido }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_user | UserNamePipe | async }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.cantidad | number }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.gramaje ? p.gramaje : 'N/A' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_lote_tostado || p.id_lote || 'N/A' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.estado_pedido }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.fecha_registro | date:'dd/MM/yyyy' }}</td>
+            <td class="px-6 py-4 text-right text-sm space-x-2">
+              <button (click)="view(p)" class="text-gray-500 hover:text-[#B8672E]">
+                <lucide-icon [img]="Eye" class="w-5 h-5" />
+              </button>
+              <button (click)="edit(p)" class="text-gray-500 hover:text-[#B8672E]">
+                <lucide-icon [img]="Edit2" class="w-5 h-5" />
+              </button>
+              <button (click)="delete(p)" class="text-gray-500 hover:text-red-600">
+                <lucide-icon [img]="Trash2" class="w-5 h-5" />
+              </button>
+              <button (click)="complete(p)" class="text-gray-500 hover:text-green-600">
+                <lucide-icon [img]="Check" class="w-5 h-5" />
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="pedidos.length === 0">
+            <td colspan="8" class="px-6 py-6 text-center text-gray-500">
+              No hay pedidos registrados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TABLA ABAJO CON PAGINADOR -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 space-y-6 mt-6">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Órdenes Completadas</h2>
+        <p class="text-sm text-gray-500">
+          Mostrando {{ paginatedPedidos.length }} de {{ totalPedidos }} órdenes
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+        <!-- Buscador -->
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
+          placeholder="Buscar por lote o usuario..."
+          class="border border-[#E5E5E5] rounded-lg px-4 py-2 text-sm bg-white text-gray-700 w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+
+        <!-- Fecha -->
+        <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="applyFilters()"
+          class="border border-[#E5E5E5] rounded-lg px-4 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+
+        <!-- Tipo pedido -->
+        <select [(ngModel)]="selectedTipoPedido" (ngModelChange)="applyFilters()"
+          class="border border-[#E5E5E5] rounded-lg px-4 py-2 text-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+          <option value="">Todos los tipos</option>
+          <option value="Venta Verde">Venta Verde</option>
+          <option value="Venta Tostado">Tostado Verde</option>
+          <option value="Maquila">Maquila</option>
+          <option value="Maquila">Suscripcion</option>
+        </select>
+
+        <!-- Limpiar -->
+        <button (click)="clearFilters()"
+          class="px-4 py-2 rounded-lg border border-[#E5E5E5] text-sm bg-white text-gray-700 hover:bg-[#F4F4F4]">
+          Limpiar
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-lg border border-[#E5E5E5]">
+
+
+
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo Pedido</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let p of paginatedPedidos" class="hover:bg-[#FCFCFC] transition">
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.tipo_pedido }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_user | UserNamePipe | async }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.cantidad | number }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.id_lote_tostado || p.id_lote || 'N/A' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ p.fecha_registro | date:'dd/MM/yyyy' }}</td>
+            <td class="px-6 py-4 text-right text-sm space-x-2">
+              <button (click)="view(p)" class="text-gray-500 hover:text-[#B8672E]">
+                <lucide-icon [img]="Eye" class="w-5 h-5" />
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="paginatedPedidos.length === 0">
+            <td colspan="8" class="px-6 py-8 text-center text-gray-500">
+              No hay órdenes para mostrar.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINADOR -->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-2">
+      <div class="text-sm text-gray-500">
+        Página {{ currentPage }} de {{ totalPages }}
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button (click)="goToPreviousPage()" [disabled]="currentPage === 1"
+          class="px-4 py-2 rounded-lg border border-[#E5E5E5] text-sm bg-white text-gray-700 hover:bg-[#F4F4F4] disabled:opacity-50 disabled:cursor-not-allowed">
+          Anterior
+        </button>
+
+        <div class="flex items-center gap-1">
+          <button *ngFor="let page of visiblePages" (click)="goToPage(page)"
+            class="w-9 h-9 rounded-lg text-sm border transition" [ngClass]="page === currentPage
+              ? 'bg-[#B8672E] text-white border-[#B8672E]'
+              : 'bg-white text-gray-700 border-[#E5E5E5] hover:bg-[#F4F4F4]'">
+            {{ page }}
+          </button>
+        </div>
+
+        <button (click)="goToNextPage()" [disabled]="currentPage === totalPages || totalPages === 0"
+          class="px-4 py-2 rounded-lg border border-[#E5E5E5] text-sm bg-white text-gray-700 hover:bg-[#F4F4F4] disabled:opacity-50 disabled:cursor-not-allowed">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modales -->
+<add-order *ngIf="showAddOrder" (close)="showAddOrder = false" (create)="onOrderCreated($event)"></add-order>
+
+<add-maquila *ngIf="showAddMaquilaOrder" (close)="showAddMaquilaOrder = false"
+  (create)="onMaquilaCreated($event)"></add-maquila>
+
+<!-- EDIT NORMAL -->
+<edit-order *ngIf="showEditOrder && selectedPedido?.tipo_pedido !== 'Maquila'" [orderId]="selectedOrderId"
+  (close)="showEditOrder = false" (edit)="onOrderEdit($event)"></edit-order>
+
+<!-- EDIT MAQUILA -->
+<edit-maquila *ngIf="showEditOrder && selectedPedido?.tipo_pedido === 'Maquila'" [pedido]="selectedPedido!"
+  (close)="showEditOrder = false" (updated)="onMaquilaEdit($event)"></edit-maquila>
+
+<view-order *ngIf="showViewOrder" [orderId]="selectedOrderId" (close)="showViewOrder = false"></view-order>

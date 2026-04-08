@@ -14,7 +14,7 @@
       </button>
     </div>
 
-    <div class="flex w-full h-[480px]">
+    <div class="flex w-full h-[520px]">
 
       <!-- Form -->
       <form class="grid grid-cols-2 gap-x-6 gap-y-4 px-6 py-5 flex-1">
@@ -51,6 +51,16 @@
           <label class="block text-gray-700 text-sm mb-1">Tostado disponible (Gr)</label>
           <input [value]="pesoTostadoDisp" disabled
             class="w-full bg-gray-50 text-gray-700 border border-[#E5E5E5] rounded-lg px-3 py-2" />
+        </div>
+
+        <!-- ALMACENES -->
+        <div class="col-span-2">
+          <label class="block text-gray-700 text-sm mb-1 ">Almacen</label>
+          <select [(ngModel)]="orden.id_almacen" name="almacen"
+            class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option value="" disabled selected>Selecciona un almacen</option>
+            <option *ngFor="let a of Almacenes" [value]="a.id_almacen">{{ a.nombre }}</option>
+          </select>
         </div>
 
         <!-- Fecha de Tueste -->
@@ -106,13 +116,7 @@
           </div>
         </div>
 
-        <!-- Botón Agregar batch -->
-        <div class="col-span-2">
-          <button type="button" (click)="agregarBatch()"
-            class="w-full bg-[#B8672E] text-white rounded-lg px-4 py-2 hover:bg-[#A67C52] transition">
-            Agregar Batch
-          </button>
-        </div>
+
       </form>
 
       <!-- Tabla de batches -->
@@ -157,14 +161,23 @@
     </div>
 
     <!-- Footer -->
-    <div class="flex justify-end items-center space-x-4 px-6 py-4 border-t border-[#E5E5E5]">
-      <button (click)="cerrar()"
-        class="px-4 py-2 border border-[#A67C52] text-[#1F1F1F] rounded-lg hover:bg-[#F3F2F1] transition">
-        Cancelar
-      </button>
-      <button (click)="guardar()" class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition">
-        Guardar Orden
-      </button>
+    <div class="flex justify-between w-full items-center space-x-4 px-6 py-4 border-t border-[#E5E5E5]">
+      <!-- Botón Agregar batch -->
+      <div class="flex-1/2">
+        <button type="button" (click)="agregarBatch()"
+          class="w-full bg-[#B8672E] text-white rounded-lg px-4 py-2 hover:bg-[#A67C52] transition">
+          Agregar Batch
+        </button>
+      </div>
+      <div class="flex-1/2 flex justify-end items-center space-x-4">
+        <button (click)="cerrar()"
+          class="px-4 py-2 border border-[#A67C52] text-[#1F1F1F] rounded-lg hover:bg-[#F3F2F1] transition">
+          Cancelar
+        </button>
+        <button (click)="guardar()" class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition">
+          Guardar Orden
+        </button>
+      </div>
     </div>
   </div>
 </div>

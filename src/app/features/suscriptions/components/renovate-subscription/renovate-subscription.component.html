@@ -27,7 +27,7 @@
         >
           <option value="" disabled selected>Seleccionar usuario</option>
           <option *ngFor="let user of users" [value]="user.id_user">
-             {{ user.id_user | userName }}
+             {{ user.id_user | UserNamePipe | async }}
           </option>
         </select>
       </div>

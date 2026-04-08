@@ -1,24 +1,24 @@
 // src/app/features/roasts/components/order-roasts-modal/order-roasts-modal.component.ts
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CommonModule }  from '@angular/common';
-import { FormsModule }   from '@angular/forms';
-import {  LucideAngularModule } from 'lucide-angular';
-import { X, Edit, Check }    from 'lucide-angular';
-import { RoastsService }      from '../../service/roasts.service';
-import { Tueste }             from '../../../../shared/models/tueste';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
+import { X, Edit, Check } from 'lucide-angular';
+import { RoastsService } from '../../service/roasts.service';
+import { Tueste } from '../../../../shared/models/tueste';
 import { EditRoastComponent } from '../edit-roast/edit-roast.component';
 import { CompleteRoastComponent } from '../complete-roast/complete-roast.component';
 
 @Component({
   selector: 'order-roasts',
   standalone: true,
-  imports: [ 
-    CommonModule, 
-    FormsModule, 
+  imports: [
+    CommonModule,
+    FormsModule,
     LucideAngularModule,
     EditRoastComponent,
     CompleteRoastComponent
-   ],
+  ],
   templateUrl: './order-roasts.component.html',
 })
 export class OrderRoastsComponent implements OnInit {
@@ -32,11 +32,11 @@ export class OrderRoastsComponent implements OnInit {
   roasts: Tueste[] = [];
   isLoading = false;
 
-  readonly X     = X;
+  readonly X = X;
   readonly Edit = Edit;
   readonly Check = Check;
 
-  constructor(private roastsSvc: RoastsService) {}
+  constructor(private roastsSvc: RoastsService) { }
 
   ngOnInit() {
     this.loadRoasts();
@@ -46,7 +46,11 @@ export class OrderRoastsComponent implements OnInit {
     this.isLoading = true;
     this.roastsSvc.getTuestesByPedido(this.orderId)
       .subscribe(list => {
-        this.roasts = list;
+        this.roasts = [...list].sort((a, b) => {
+          const batchA = Number(a.num_batch) || 0;
+          const batchB = Number(b.num_batch) || 0;
+          return batchA - batchB;
+        });
         this.isLoading = false;
       }, _ => {
         this.roasts = [];
@@ -60,22 +64,22 @@ export class OrderRoastsComponent implements OnInit {
 
   openEdit(id: string) {
     this.selectedId = id;
-    this.showEdit   = true;
-  }
-  
-  onRoasterUpdated(updated: Tueste) {
-    this.showEdit = false;
-    this.loadRoasts(); 
+    this.showEdit = true;
   }
 
-  openComplete(id:string) {
+  onRoasterUpdated(updated: Tueste) {
+    this.showEdit = false;
+    this.loadRoasts();
+  }
+
+  openComplete(id: string) {
     this.selectedId = id;
-    this.showComplete  = true;
+    this.showComplete = true;
   }
 
   onCompleted(saved: Tueste) {
     this.showComplete = false;
     this.loadRoasts();
   }
-  
+
 }

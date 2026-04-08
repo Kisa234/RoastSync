@@ -2,7 +2,7 @@ import { RoastsService } from './../../service/roasts.service';
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoteService } from '../../../inventory/service/lote.service';
+import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
 import { PedidoService } from '../../../orders/service/orders.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { UiService } from '../../../../shared/services/ui.service';

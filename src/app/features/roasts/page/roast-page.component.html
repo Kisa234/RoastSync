@@ -219,7 +219,7 @@
             <td class="px-4 py-2">{{ t.id_lote }}</td>
             <td class="px-4 py-2">{{ t.fecha_tueste | date:'dd/MM/yyyy'}}</td>
             <td class="px-4 py-2">{{ t.tostadora }}</td>
-            <td class="px-4 py-2">{{ t.id_cliente | userName }}</td>
+            <td class="px-4 py-2">{{ t.id_cliente | UserNamePipe | async }}</td>
             <td class="px-4 py-2">{{ t.densidad }}</td>
             <td class="px-4 py-2">{{ t.humedad }}</td>
             <td class="px-4 py-2">{{ t.peso_entrada| number }} Gr</td>

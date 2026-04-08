@@ -1,3 +1,4 @@
+import { Almacen } from './../../../../shared/models/almacen';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -5,13 +6,15 @@ import { LucideAngularModule } from 'lucide-angular';
 import { X, Check } from 'lucide-angular';
 
 import { PedidoService } from '../../../orders/service/orders.service';
-import { LoteService } from '../../../inventory/service/lote.service';
+import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { Pedido } from '../../../../shared/models/pedido';
 import { UiService } from '../../../../shared/services/ui.service';
 import { AnalisisService } from '../../../analysis/service/analisis.service';
 import { AvgTueste } from '../../../../shared/models/avg-tueste';
 import { RoastsService } from '../../service/roasts.service';
+import { LoteVerdeConInventario } from '../../../../shared/models/lote';
+import { AlmacenService } from '../../../inventory/almacenes/service/almacen.service';
 
 
 interface Batch {
@@ -35,8 +38,9 @@ export class AddRoasterComponent implements OnInit {
 
   // Listas para selects
   clientes: any[] = [];
-  lotes: any[] = [];
-  lotesAll: any[] = [];
+  lotes: LoteVerdeConInventario[] = [];
+  lotesAll: LoteVerdeConInventario[] = [];
+  Almacenes: Almacen[] = [];
 
   // Modelo principal
   orden: Partial<Pedido> = {
@@ -81,16 +85,20 @@ export class AddRoasterComponent implements OnInit {
     private userSvc: UserService,
     private roastSvc: RoastsService,
     private uiSvc: UiService,
-    private analisisSvc: AnalisisService
+    private analisisSvc: AnalisisService,
+    private almacenSvc: AlmacenService
   ) { }
 
   ngOnInit() {
     this.userSvc.getUsers().subscribe(usuarios => {
-      this.loteSvc.getAll().subscribe(lotes => {
+      this.loteSvc.getLotesVerdesConInventario().subscribe(lotes => {
         this.lotesAll = lotes;
         this.clientes = usuarios.filter(u =>
           lotes.some(l => l.id_user === u.id_user)
         );
+        this.almacenSvc.getAlmacenesActivos().subscribe(almacenes => {
+          this.Almacenes = almacenes;
+        });
       });
     });
 
@@ -115,9 +123,11 @@ export class AddRoasterComponent implements OnInit {
 
   onLoteChange() {
     const sel = this.lotes.find(l => l.id_lote === this.orden.id_lote);
-    this.pesoVerdeDisp = sel?.peso || 0;
-    this.pesoTostadoDisp = sel?.peso_tostado || 0;
+    this.pesoVerdeDisp = sel?.inventarioLotes.reduce((total, inv) => total + (inv.cantidad_kg || 0), 0) || 0;
+    this.pesoTostadoDisp = sel?.inventarioLotes.reduce((total, inv) => total + (inv.cantidad_tostado_kg || 0), 0) || 0;
+    this.Almacenes = sel?.inventarioLotes?.map(inv => inv.id_almacen).flatMap(id => this.Almacenes.filter(a => a.id_almacen === id)) || [];
   }
+
 
 
 
@@ -182,16 +192,96 @@ export class AddRoasterComponent implements OnInit {
     return true;
   }
 
+  validarFormulario(): boolean {
+    if (!this.orden.id_user) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar un cliente.', 4000);
+      return false;
+    }
+
+    if (!this.orden.id_lote) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar un lote.', 4000);
+      return false;
+    }
+
+    if (!this.orden.id_almacen) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar un almacén.', 4000);
+      return false;
+    }
+
+    if (!this.orden.fecha_tueste) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar la fecha de tueste.', 4000);
+      return false;
+    }
+
+    if (!this.orden.comentario || !String(this.orden.comentario).trim()) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar el tipo de tueste.', 4000);
+      return false;
+    }
+
+    if (!this.orden.tostadora || !String(this.orden.tostadora).trim()) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar la tostadora.', 4000);
+      return false;
+    }
+
+    if (this.orden.facturado === undefined || this.orden.facturado === null) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes indicar si es facturado o no.', 4000);
+      return false;
+    }
+
+    if (!this.orden.cantidad || this.orden.cantidad <= 0) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes ingresar una cantidad válida para el batch verde.', 4000);
+      return false;
+    }
+
+    if (!this.batchTostado || this.batchTostado <= 0) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes ingresar una cantidad válida para el batch tostado.', 4000);
+      return false;
+    }
+
+    if (!this.batches.length) {
+      this.uiSvc.alert('warning', 'Campo requerido', 'Debes agregar al menos un batch.', 4000);
+      return false;
+    }
+
+    const batchInvalido = this.batches.some(
+      b => !b.pesoVerde || b.pesoVerde <= 0 || !b.pesoTostado || b.pesoTostado <= 0
+    );
+
+    if (batchInvalido) {
+      this.uiSvc.alert('warning', 'Batches incompletos', 'Todos los batches deben tener pesos válidos.', 4000);
+      return false;
+    }
+
+    if (this.totalVerde > this.pesoVerdeDisp) {
+      this.uiSvc.alert('warning', 'Stock insuficiente', 'El peso verde total de los batches supera el verde disponible.', 5000);
+      return false;
+    }
+
+    if (!this.validarPesos()) {
+      return false;
+    }
+
+    return true;
+  }
+
   guardar() {
-    console.log('Guardar orden de tueste', this.orden);
-    if (!this.validarPesos()) return;
-    if (!this.batches.length) return;
+
+    if (!this.validarFormulario()) return;
+
     this.orden.pesos = this.batches.map(b => b.pesoVerde);
-    // construir payload
+
     const payload = { ...this.orden };
-    this.pedidoSvc.createPedido(payload).subscribe(res => {
-      this.create.emit(res);
-      this.close.emit();
+
+    this.pedidoSvc.createPedido(payload).subscribe({
+      next: (res) => {
+        this.uiSvc.alert('success', 'Orden creada', 'La orden de tueste fue creada correctamente.', 3000);
+        this.create.emit(res);
+        this.close.emit();
+      },
+      error: (err) => {
+        console.error(err);
+        this.uiSvc.alert('error', 'Error', 'No se pudo guardar la orden de tueste.', 5000);
+      }
     });
   }
 }

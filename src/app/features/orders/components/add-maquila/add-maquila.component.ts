@@ -7,10 +7,10 @@ import { UserService } from '../../../users/service/users-service.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { Pedido } from '../../../../shared/models/pedido';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
-import { ProductoService } from '../../../products/service/producto.service';
-import { LoteTostadoService } from '../../../inventory/service/lote-tostado.service';
+import { LoteTostadoService } from '../../../inventory/lotes-tostados/service/lote-tostado.service';
 import { Producto } from '../../../../shared/models/producto';
 import { User } from '../../../../shared/models/user';
+import { ProductoService } from '../../../inventory/products/service/producto.service';
 
 @Component({
   selector: 'add-maquila',

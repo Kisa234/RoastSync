@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { BoxTemplateService } from '../../service/box-template.service';
 import { BoxOpcionService } from '../../service/box-opcion.service';
-import { LoteService } from '../../../inventory/service/lote.service';
+import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { Lote } from '../../../../shared/models/lote';
 import { forkJoin, map, switchMap } from 'rxjs';
