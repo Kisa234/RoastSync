@@ -79,7 +79,6 @@
             <tr>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Tipo de Pedido</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Cantidad</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Cliente</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Comentario</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Fecha de Envío</th>
             </tr>
@@ -94,11 +93,7 @@
               <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">
                 {{ p.cantidad | number:'1.0-2' }} gr
               </td>
-
-              <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">
-                {{ p.id_cliente | UserNamePipe | async }}
-              </td>
-
+=
               <td class="px-6 py-4 text-sm text-zinc-700">
                 {{ p.comentario || '—' }}
               </td>

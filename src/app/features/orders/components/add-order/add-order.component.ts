@@ -55,7 +55,7 @@ export class AddOrderComponent implements OnInit {
     private userSvc: UserService,
     private almacenService: AlmacenService,
     private uiService: UiService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.userSvc.getUsers().subscribe(users => {
@@ -64,8 +64,10 @@ export class AddOrderComponent implements OnInit {
       const admins = users.filter(u => u.rol === 'admin');
 
       this.loteSvc.getLotesVerdesConInventario().subscribe(lotes => {
-        this.lotes = lotes.filter(lote =>
-          admins.some(admin => admin.id_user === lote.id_user)
+        this.lotes = lotes.filter(
+          lote =>
+            admins.some(admin => admin.id_user === lote.id_user) &&
+            this.getPesoGeneral(lote) > 0
         );
       });
     });
@@ -74,6 +76,8 @@ export class AddOrderComponent implements OnInit {
       this.almacenes = a;
     });
   }
+
+
 
   getPesoGeneral(lote: LoteVerdeConInventario): number {
     return lote.inventarioLotes.reduce((total, i) => total + (i.cantidad_kg || 0), 0);

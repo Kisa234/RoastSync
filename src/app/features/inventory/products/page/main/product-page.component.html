@@ -90,8 +90,8 @@
 </div>
 
 <!-- Modales -->
-<productos *ngIf="showProductos" (closes)="showProductos = false"></productos>
+<productos *ngIf="showProductos" (closes)="closeModals()"></productos>
 
-<categorias *ngIf="showCategorias" (closes)="showCategorias = false"></categorias>
+<categorias *ngIf="showCategorias" (closes)="closeModals()"></categorias>
 
-<ingreso-product *ngIf="showIngresoProducto" (close)="showIngresoProducto = false"></ingreso-product>
+<ingreso-product *ngIf="showIngresoProducto" (closes)="closeModals()"></ingreso-product>

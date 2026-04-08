@@ -136,34 +136,17 @@ export class ProductPageComponent implements OnInit {
     this.showIngresoProducto = true;
   }
 
+  closeModals() {
+    this.showProductos = false;
+    this.showCategorias = false;
+    this.showIngresoProducto = false;
+    this.loadInventarios(); // recarga inventarios para actualizar stock después de cualquier cambio
+  }
+
   // ✅ Movimientos
   goToMovimientos(idProducto: string): void {
     this.router.navigate(['/inventory/productos/movimientos', idProducto]);
   }
 
-  // 🔹 Eventos de Productos
-  onEditProducto(producto: Producto) {
-    console.log('Editar producto', producto);
-  }
 
-  onDeleteProducto(producto: Producto) {
-    console.log('Eliminar producto', producto);
-  }
-
-  onAddProducto() {
-    console.log('Agregar nuevo producto');
-  }
-
-  // 🔹 Eventos de Categorías
-  onEditCategoria(categoria: Categoria) {
-    console.log('Editar categoría', categoria);
-  }
-
-  onDeleteCategoria(categoria: Categoria) {
-    console.log('Eliminar categoría', categoria);
-  }
-
-  onAddCategoria() {
-    console.log('Agregar nueva categoría');
-  }
 }

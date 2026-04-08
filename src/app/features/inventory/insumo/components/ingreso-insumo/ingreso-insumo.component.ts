@@ -7,14 +7,8 @@ import { Insumo } from '../../../../../shared/models/insumo';
 
 import { AlmacenService } from '../../../almacenes/service/almacen.service';
 import { InsumoService } from '../../service/insumo.service';
-import { InventarioInsumoService } from '../../service/inventario-insumo.service';
-
-export interface CreateIngresoInsumoForm {
-  id_insumo: string;
-  id_almacen: string;
-  cantidad: number;
-  precio_compra: number;
-}
+import { IngresoInsumoService } from '../../service/ingreso-insumo.service';
+import { IngresoInsumo } from '../../../../../shared/models/ingreso-insumo';
 
 @Component({
   selector: 'app-ingreso-insumo',
@@ -32,17 +26,20 @@ export class IngresoInsumoComponent implements OnInit {
   almacenes: Almacen[] = [];
   insumos: Insumo[] = [];
 
-  form: CreateIngresoInsumoForm = {
+  form: IngresoInsumo = {
+    id_ingreso: '',
     id_insumo: '',
     id_almacen: '',
     cantidad: 0,
-    precio_compra: 0
+    precio_compra: 0,
+    fecha_ingreso: '',
+    id_user: ''
   };
 
   constructor(
     private almacenService: AlmacenService,
     private insumoService: InsumoService,
-    private inventarioInsumoService: InventarioInsumoService
+    private ingresoInsumoService: IngresoInsumoService
   ) {}
 
   ngOnInit(): void {
@@ -50,14 +47,14 @@ export class IngresoInsumoComponent implements OnInit {
     this.getInsumos();
   }
 
-  getAlmacenes(): void {
+  getAlmacenes() {
     this.almacenService.getAlmacenesActivos().subscribe({
       next: (data) => this.almacenes = data,
       error: (err) => console.error('Error al cargar almacenes', err)
     });
   }
 
-  getInsumos(): void {
+  getInsumos() {
     this.insumoService.getAll().subscribe({
       next: (data) => this.insumos = data,
       error: (err) => console.error('Error al cargar insumos', err)
@@ -68,13 +65,13 @@ export class IngresoInsumoComponent implements OnInit {
     return this.insumos.filter(i => i.activo);
   }
 
-  save(): void {
+  save() {
     if (this.loading) return;
     if (!this.form.id_insumo || !this.form.id_almacen || this.form.cantidad <= 0) return;
 
     this.loading = true;
 
-    this.inventarioInsumoService.create(this.form as any).subscribe({
+    this.ingresoInsumoService.createIngreso(this.form).subscribe({
       next: () => {
         this.loading = false;
         this.saved.emit();

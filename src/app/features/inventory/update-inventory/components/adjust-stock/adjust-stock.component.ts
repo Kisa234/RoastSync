@@ -57,14 +57,14 @@ export class AdjustStockComponent {
     id_almacen: string;
     nueva_cantidad: number | null;
     motivo: string;
-    gramaje: number | null;
-    molienda: Molienda | null;
+    // gramaje: number | null;
+    // molienda: Molienda | null;
   } = {
     id_almacen: '',
     nueva_cantidad: null,
     motivo: '',
-    gramaje: null,
-    molienda: null
+    // gramaje: null,
+    // molienda: null
   };
 
   loading = false;
@@ -111,15 +111,15 @@ export class AdjustStockComponent {
     if (this.model.nueva_cantidad === null || this.model.nueva_cantidad === undefined) return true;
     if (Number(this.model.nueva_cantidad) < 0) return true;
 
-    if (this.isProducto) {
-      if (this.model.gramaje === null || this.model.gramaje === undefined || Number(this.model.gramaje) <= 0) {
-        return true;
-      }
+    // if (this.isProducto) {
+    //   if (this.model.gramaje === null || this.model.gramaje === undefined || Number(this.model.gramaje) <= 0) {
+    //     return true;
+    //   }
 
-      if (!this.model.molienda) {
-        return true;
-      }
-    }
+    //   if (!this.model.molienda) {
+    //     return true;
+    //   }
+    // }
 
     return this.loading;
   }
@@ -140,17 +140,17 @@ export class AdjustStockComponent {
       return;
     }
 
-    if (this.isProducto) {
-      if (!this.model.gramaje || Number(this.model.gramaje) <= 0) {
-        this.uiSvc.alert('warning', 'Atención', 'El gramaje es requerido para producto');
-        return;
-      }
+    // if (this.isProducto) {
+    //   if (!this.model.gramaje || Number(this.model.gramaje) <= 0) {
+    //     this.uiSvc.alert('warning', 'Atención', 'El gramaje es requerido para producto');
+    //     return;
+    //   }
 
-      if (!this.model.molienda) {
-        this.uiSvc.alert('warning', 'Atención', 'La molienda es requerida para producto');
-        return;
-      }
-    }
+    //   if (!this.model.molienda) {
+    //     this.uiSvc.alert('warning', 'Atención', 'La molienda es requerida para producto');
+    //     return;
+    //   }
+    // }
 
     const payload: AjustarStockPayload = {
       entidad: this.mapTipoToBackend(this.row.tipo),
@@ -158,8 +158,8 @@ export class AdjustStockComponent {
       id_almacen: this.model.id_almacen,
       nueva_cantidad: Number(this.model.nueva_cantidad),
       motivo: this.model.motivo?.trim() || undefined,
-      gramaje: this.isProducto ? Number(this.model.gramaje) : null,
-      molienda: this.isProducto ? this.model.molienda : null
+      // gramaje: this.isProducto ? Number(this.model.gramaje) : null,
+      // molienda: this.isProducto ? this.model.molienda : null
     };
 
     this.loading = true;

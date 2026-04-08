@@ -118,7 +118,7 @@
               <td class="px-6 py-4 text-sm font-semibold text-zinc-900">
                 {{ pesoTotalInventarios | number:'1.0-2' }} kg
               </td>
-              <td class="px-6 py-4 text-sm font-semibold text-zinc-900">
+              <td *ngIf="lote.tipo_lote == 'Lote Tostado'"  class="px-6 py-4 text-sm font-semibold text-zinc-900">
                 {{ pesoTotalTostadoInventarios | number:'1.0-2' }} kg
               </td>
             </tr>
@@ -156,7 +156,6 @@
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Tipo</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Acción</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Comentario</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Usuario</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Fecha</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Acciones</th>
             </tr>
@@ -181,9 +180,6 @@
                 {{ r.comentario }}
               </td>
 
-              <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">
-                {{ r.usuario | UserNamePipe | async }}
-              </td>
 
               <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">
                 {{ r.fecha | date:'dd/MM/yyyy HH:mm' }}

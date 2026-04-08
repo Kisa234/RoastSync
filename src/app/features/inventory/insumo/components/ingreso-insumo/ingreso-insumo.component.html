@@ -66,6 +66,19 @@
                 placeholder="1" />
             </div>
 
+            <!-- Precio compra -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Precio compra *</label>
+              <input
+                type="number"
+                [(ngModel)]="form.precio_compra"
+                name="precio_compra"
+                required
+                min="0"
+                step="0.01"
+                class="w-full border border-[#E5E5E5] rounded-lg p-2 focus:outline-none focus:ring-1 focus:ring-[#B8672E]"
+                placeholder="0.00" />
+            </div>
           </div>
 
         </div>

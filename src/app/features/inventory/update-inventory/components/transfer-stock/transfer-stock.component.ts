@@ -133,15 +133,15 @@ export class TransferStockComponent implements OnInit {
     if (Number(this.model.cantidad) <= 0) return true;
     if (Number(this.model.cantidad) > this.selectedOrigenCantidad) return true;
 
-    if (this.isProducto) {
-      if (this.model.gramaje === null || this.model.gramaje === undefined || Number(this.model.gramaje) <= 0) {
-        return true;
-      }
+    // if (this.isProducto) {
+    //   if (this.model.gramaje === null || this.model.gramaje === undefined || Number(this.model.gramaje) <= 0) {
+    //     return true;
+    //   }
 
-      if (!this.model.molienda) {
-        return true;
-      }
-    }
+    //   if (!this.model.molienda) {
+    //     return true;
+    //   }
+    // }
 
     return this.loading;
   }
@@ -172,17 +172,17 @@ export class TransferStockComponent implements OnInit {
       return;
     }
 
-    if (this.isProducto) {
-      if (!this.model.gramaje || Number(this.model.gramaje) <= 0) {
-        this.uiSvc.alert('warning', 'Atención', 'El gramaje es requerido para producto');
-        return;
-      }
+    // if (this.isProducto) {
+    //   if (!this.model.gramaje || Number(this.model.gramaje) <= 0) {
+    //     this.uiSvc.alert('warning', 'Atención', 'El gramaje es requerido para producto');
+    //     return;
+    //   }
 
-      if (!this.model.molienda) {
-        this.uiSvc.alert('warning', 'Atención', 'La molienda es requerida para producto');
-        return;
-      }
-    }
+    //   if (!this.model.molienda) {
+    //     this.uiSvc.alert('warning', 'Atención', 'La molienda es requerida para producto');
+    //     return;
+    //   }
+    // }
 
     const payload: TrasladarStockPayload = {
       entidad: this.mapTipoToBackend(this.row.tipo),
@@ -191,9 +191,11 @@ export class TransferStockComponent implements OnInit {
       id_almacen_destino: this.model.id_almacen_destino,
       cantidad: Number(this.model.cantidad),
       motivo: this.model.motivo?.trim() || undefined,
-      gramaje: this.isProducto ? Number(this.model.gramaje) : null,
-      molienda: this.isProducto ? this.model.molienda : null
+      // gramaje: this.isProducto ? Number(this.model.gramaje) : null,
+      // molienda: this.isProducto ? this.model.molienda : null
     };
+
+    console.log('Payload para traslado de stock:', payload);
 
     this.loading = true;
 
