@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Eye, Edit2, Trash2, History, Plus } from 'lucide-angular';
+import { LucideAngularModule, Search, Eye, Edit2, Trash2, History, Plus, EyeOff } from 'lucide-angular';
 
 import { ReportLoteComponent } from '../../../../../shared/components/report-lote/report-lote.component';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
@@ -42,6 +42,7 @@ export class LoteVerdeComponent {
   readonly Trash2 = Trash2;
   readonly History = History;
   readonly Plus = Plus;
+  readonly EyeOff = EyeOff;
 
   lotes: LoteVerdeConInventario[] = [];
   private _lotesFiltrados: LoteVerdeConInventario[] = [];
@@ -97,6 +98,19 @@ export class LoteVerdeComponent {
       (total, inv) => total + Number(inv.cantidad_kg || 0),
       0
     );
+  }
+
+  filtroTipo: 'admin' | 'cliente' = 'admin';
+
+  getLotesFiltrados(): LoteVerdeConInventario[] {
+    if (this.filterTextVerde.trim()) {
+      return this.lotesFiltrados;
+    }
+
+    return this.lotesFiltrados.filter(l => {
+      const user = this.usuarios.find(u => u.id_user === l.id_user);
+      return user?.rol === this.filtroTipo;
+    });
   }
 
   aplicarFiltro() {

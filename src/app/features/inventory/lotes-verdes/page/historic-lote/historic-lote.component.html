@@ -36,12 +36,12 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-7 border-b border-zinc-200">
         <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
           <p class="text-[11px] uppercase text-zinc-500">Peso Verde inicial</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ lote.peso | number:'1.0-2' }} kg</p>
+          <p class="mt-1 font-semibold text-zinc-900">{{ lote.peso | number:'1.0-2' }} gr</p>
         </div>
 
         <div *ngIf="lote.tipo_lote == 'Lote Tostado'" class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
           <p class="text-[11px] uppercase text-zinc-500">Peso Tostado Inicial</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ lote.peso_tostado | number:'1.0-2' }} kg</p>
+          <p class="mt-1 font-semibold text-zinc-900">{{ lote.peso_tostado | number:'1.0-2' }} gr</p>
         </div>
 
 
@@ -98,10 +98,10 @@
                 {{ inv.almacen?.nombre || 'N/A' }}
               </td>
               <td class="px-6 py-4 text-sm text-zinc-900">
-                {{ inv.cantidad_kg | number:'1.0-2' }} kg
+                {{ inv.cantidad_kg | number:'1.0-2' }} gr
               </td>
               <td *ngIf="lote.tipo_lote == 'Lote Tostado'" class="px-6 py-4 text-sm text-zinc-900">
-                {{ inv.cantidad_tostado_kg | number:'1.0-2' }} kg
+                {{ inv.cantidad_tostado_kg | number:'1.0-2' }} gr
               </td>
             </tr>
 
@@ -116,10 +116,10 @@
             <tr>
               <td class="px-6 py-4 text-sm font-semibold text-zinc-900">Peso total</td>
               <td class="px-6 py-4 text-sm font-semibold text-zinc-900">
-                {{ pesoTotalInventarios | number:'1.0-2' }} kg
+                {{ pesoTotalInventarios | number:'1.0-2' }} gr
               </td>
               <td *ngIf="lote.tipo_lote == 'Lote Tostado'"  class="px-6 py-4 text-sm font-semibold text-zinc-900">
-                {{ pesoTotalTostadoInventarios | number:'1.0-2' }} kg
+                {{ pesoTotalTostadoInventarios | number:'1.0-2' }} gr
               </td>
             </tr>
           </tfoot>

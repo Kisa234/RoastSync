@@ -27,14 +27,29 @@
   <!-- Contenedor -->
   <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
 
-    <!-- Buscador -->
-    <div class="mb-4 relative w-full max-w-lg">
-      <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400">
-      </lucide-icon>
+    <div class="flex flex-col md:flex-row md:justify-between mb-4">
 
-      <input type="text" [(ngModel)]="filterTextVerde" (ngModelChange)="onSearchChange()"
-        placeholder="Buscar por cliente, productor, finca o provincia..." class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2
-               focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+      <!-- Buscador -->
+      <div class="mb-4 relative w-full max-w-lg">
+        <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400"></lucide-icon>
+        <input type="text" [(ngModel)]="filterTextVerde" (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por cliente, productor, finca o provincia..."
+          class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+      </div>
+
+      <!-- Filtros de tipo -->
+      <div class="flex gap-2 mb-4">
+        <button (click)="filtroTipo = 'admin'" [class]="filtroTipo === 'admin'
+          ? 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#B8672E] text-white'
+          : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
+          Tienda
+        </button>
+        <button (click)="filtroTipo = 'cliente'" [class]="filtroTipo === 'cliente'
+          ? 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#B8672E] text-white'
+          : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
+          Clientes
+        </button>
+      </div>
     </div>
 
     <!-- Tabla -->
@@ -58,55 +73,36 @@
         </thead>
 
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
-
-          <!-- ADMIN -->
-          <tr class="bg-[#F3F3F3]">
-            <td colspan="11" class="text-left text-xs uppercase text-gray-500 py-2 px-6">
-              Lotes de Fortunato
-            </td>
-          </tr>
-
-          <ng-container *ngFor="let l of getLotesAdmin()">
+          <ng-container *ngFor="let l of getLotesFiltrados()">
             <tr>
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | UserNamePipe |  async }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | UserNamePipe | async }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.distrito }}</td>
+
+              <!-- Almacén -->
               <td class="px-6 py-4 text-sm text-gray-700">
                 <ng-container *ngIf="l.inventarioLotes.length; else sinAlmacen">
 
-                  <!-- Un solo inventario -->
                   <ng-container *ngIf="l.inventarioLotes.length === 1; else multiple">
                     {{ l.inventarioLotes[0].almacen?.nombre || 'N/A' }}
                   </ng-container>
 
-                  <!-- Más de un inventario -->
                   <ng-template #multiple>
                     <div class="relative inline-block group">
-
-                      <!-- Texto corto -->
                       <span class="cursor-pointer font-medium text-[#1F1F1F]">
                         {{ l.inventarioLotes[0].almacen?.nombre }}
                         +{{ l.inventarioLotes.length - 1 }}
                       </span>
-
-                      <!-- Popup -->
                       <div class="absolute left-0 top-full mt-2 w-64 bg-white border border-[#E5E5E5] rounded-lg shadow-lg
-                    opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                    transition-all duration-200 z-30">
-
+                        opacity-0 invisible group-hover:opacity-100 group-hover:visible
+                        transition-all duration-200 z-30">
                         <div class="p-3 space-y-1">
                           <div *ngFor="let inv of l.inventarioLotes" class="flex justify-between text-xs text-gray-700">
-                            <span class="font-medium">
-                              {{ inv.almacen?.nombre || 'N/A' }}
-                            </span>
-
-                            <span class="text-gray-500">
-                              {{ inv.cantidad_kg | number:'1.0-2' }} kg
-                            </span>
+                            <span class="font-medium">{{ inv.almacen?.nombre || 'N/A' }}</span>
+                            <span class="text-gray-500">{{ inv.cantidad_kg | number:'1.0-2' }} gr</span>
                           </div>
                         </div>
-
                       </div>
                     </div>
                   </ng-template>
@@ -120,15 +116,20 @@
                   </span>
                 </ng-template>
               </td>
+
               <td class="px-6 py-4 text-sm text-gray-700">
-                {{ getPesoInventario(l) | number:'1.0-2' }} kg
+                {{ getPesoInventario(l) | number:'1.0-2' }} gr
               </td>
+
+              <!-- Variedades -->
               <td class="px-6 py-4">
                 <span *ngFor="let v of getVariedadesArray(l.variedades)"
                   class="inline-block text-center bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full mr-1">
                   {{ v }}
                 </span>
               </td>
+
+              <!-- Proceso -->
               <td class="px-6 py-4">
                 <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
                     'bg-green-100 text-green-800': l.proceso.toLowerCase() === 'natural',
@@ -138,15 +139,16 @@
                   {{ l.proceso }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-700">
-                {{ l.clasificacion || 'N/A' }}
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-700">
-                {{ l.fecha_registro | date:'dd/MM/yyyy' }}
-              </td>
+
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.clasificacion || 'N/A' }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ l.fecha_registro | date:'dd/MM/yyyy' }}</td>
+
+              <!-- Acciones -->
               <td class="px-6 py-4 text-right text-sm space-x-2">
                 <button (click)="onReport(l)" class="text-gray-500 hover:text-gray-700">
-                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                  <lucide-icon [img]="l.id_analisis ? Eye : EyeOff"
+                    [class]="l.id_analisis ? 'w-5 h-5' : 'w-5 h-5 text-red-500'">
+                  </lucide-icon>
                 </button>
                 <button (click)="openHistoric(l)" class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="History" class="w-5 h-5"></lucide-icon>
@@ -160,126 +162,20 @@
               </td>
             </tr>
           </ng-container>
-
-          <!-- CLIENTE -->
-          <tr class="bg-[#F3F3F3]">
-            <td colspan="11" class="text-left text-xs uppercase text-gray-500 py-2 px-6">
-              Lotes de Cliente
-            </td>
-          </tr>
-
-          <ng-container *ngFor="let l of getLotesCliente()">
-            <tr>
-              <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | UserNamePipe | async }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ l.distrito }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">
-                <ng-container *ngIf="l.inventarioLotes.length; else sinAlmacen">
-
-                  <!-- Un solo inventario -->
-                  <ng-container *ngIf="l.inventarioLotes.length === 1; else multiple">
-                    {{ l.inventarioLotes[0].almacen?.nombre || 'N/A' }}
-                  </ng-container>
-
-                  <!-- Más de un inventario -->
-                  <ng-template #multiple>
-                    <div class="relative inline-block group">
-
-                      <!-- Texto corto -->
-                      <span class="cursor-pointer font-medium text-[#1F1F1F]">
-                        {{ l.inventarioLotes[0].almacen?.nombre }}
-                        +{{ l.inventarioLotes.length - 1 }}
-                      </span>
-
-                      <!-- Popup -->
-                      <div class="absolute left-0 top-full mt-2 w-64 bg-white border border-[#E5E5E5] rounded-lg shadow-lg
-                    opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                    transition-all duration-200 z-30">
-
-                        <div class="p-3 space-y-1">
-                          <div *ngFor="let inv of l.inventarioLotes" class="flex justify-between text-xs text-gray-700">
-                            <span class="font-medium">
-                              {{ inv.almacen?.nombre || 'N/A' }}
-                            </span>
-
-                            <span class="text-gray-500">
-                              {{ inv.cantidad_kg | number:'1.0-2' }} kg
-                            </span>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                  </ng-template>
-
-                </ng-container>
-
-                <ng-template #sinAlmacen>
-                  <span (click)="openAsignar(l)"
-                    class="text-gray-400 hover:text-[#B8672E] cursor-pointer transition font-medium">
-                    Sin almacén
-                  </span>
-                </ng-template>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-700">
-                {{ getPesoInventario(l) | number:'1.0-2' }} kg
-              </td>
-              <td class="px-6 py-4">
-                <span *ngFor="let v of getVariedadesArray(l.variedades)"
-                  class="inline-block bg-[#E5E5E5] text-gray-700 text-xs px-2 py-0.5 rounded-full mr-1">
-                  {{ v }}
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <span class="inline-block text-xs px-2 py-0.5 rounded-full" [ngClass]="{
-                    'bg-green-100 text-green-800': l.proceso.toLowerCase() === 'natural',
-                    'bg-blue-100 text-blue-800': l.proceso.toLowerCase() === 'lavado',
-                    'bg-yellow-100 text-yellow-800': l.proceso.toLowerCase() === 'honey'
-                  }">
-                  {{ l.proceso }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-700">
-                {{ l.clasificacion || 'N/A' }}
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-700">
-                {{ l.fecha_registro | date:'dd/MM/yyyy' }}
-              </td>
-              <td class="px-6 py-4 text-right text-sm space-x-2">
-                <button (click)="onReport(l)" class="text-gray-500 hover:text-gray-700">
-                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
-                </button>
-                <button (click)="openHistoric(l)" class="text-gray-500 hover:text-gray-700">
-                  <lucide-icon [img]="History" class="w-5 h-5"></lucide-icon>
-                </button>
-                <button (click)="openEdit(l)" class="text-gray-500 hover:text-gray-700">
-                  <lucide-icon [img]="Edit2" class="w-5 h-5"></lucide-icon>
-                </button>
-                <button (click)="delete(l)" class="text-gray-500 hover:text-red-600">
-                  <lucide-icon [img]="Trash2" class="w-5 h-5"></lucide-icon>
-                </button>
-              </td>
-            </tr>
-          </ng-container>
-
         </tbody>
+
       </table>
     </div>
   </div>
 </div>
 
 <!-- MODALES -->
+<add-lote *ngIf="showAddLote" (close)="showAddLote = false" (create)="onCreated()"></add-lote>
 
-<add-lote *ngIf="showAddLote" (close)="showAddLote = false" (create)="onCreated()">
-</add-lote>
+<edit-lote *ngIf="showEditLote" [loteId]="selectedLoteId" (close)="showEditLote = false"
+  (create)="onUpdated()"></edit-lote>
 
-<edit-lote *ngIf="showEditLote" [loteId]="selectedLoteId" (close)="showEditLote = false" (create)="onUpdated()">
-</edit-lote>
-
-
-<report-lote *ngIf="showReportLote" [loteId]="selectedLoteId" (close)="showReportLote = false">
-</report-lote>
+<report-lote *ngIf="showReportLote" [loteId]="selectedLoteId" (close)="showReportLote = false"></report-lote>
 
 <add-inventory *ngIf="showAddInventory" [loteId]="selectedLoteId" (close)="showAddInventory = false"
   (create)="onInventoryCreated()"></add-inventory>

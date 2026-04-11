@@ -18,10 +18,10 @@ import { User } from '../../../../../shared/models/user';
 import { LoteTostadoService } from '../../service/lote-tostado.service';
 import { UserService } from '../../../../users/service/users-service.service';
 import { UiService } from '../../../../../shared/services/ui.service';
-import { FichaTuesteComponent } from '../../../../../shared/components/ficha-tueste/ficha-tueste.component';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { LoteTostadoConInventario } from '../../../../../shared/models/lote-tostado';
 import { AddInventoryLoteTostadoComponent } from "../../components/add-inventory-lote-tostado/add-inventory-lote-tostado.component";
+import { FichaTuesteComponent } from '../../components/ficha-tueste/ficha-tueste.component';
 
 type FilterKey = 'todos' | 'enviados' | 'no-enviados';
 

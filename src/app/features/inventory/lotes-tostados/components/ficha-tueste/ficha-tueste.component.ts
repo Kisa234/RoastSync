@@ -1,12 +1,12 @@
-import { LoteService } from '../../../features/inventory/lotes-verdes/service/lote.service';
-import { UserService } from './../../../features/users/service/users-service.service';
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, output, ViewChild } from '@angular/core';
 import { LucideAngularModule, Download, X, Printer } from 'lucide-angular';
-import { FichaTueste } from '../../models/ficha-tueste';
-import { LoteTostadoService } from '../../../features/inventory/lotes-tostados/service/lote-tostado.service';
-import { User } from '../../models/user';
-import { Lote } from '../../models/lote';
+import { FichaTueste } from '../../../../../shared/models/ficha-tueste';
+import { User } from '../../../../../shared/models/user';
+import { Lote } from '../../../../../shared/models/lote';
+import { LoteTostadoService } from '../../service/lote-tostado.service';
+import { UserService } from '../../../../users/service/users-service.service';
+import { LoteService } from '../../../lotes-verdes/service/lote.service';
 
 @Component({
   selector: 'ficha-tueste',

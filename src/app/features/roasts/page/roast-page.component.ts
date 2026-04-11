@@ -19,12 +19,12 @@ import { EditRoastComponent } from '../components/edit-roast/edit-roast.componen
 import { EditOrderComponent } from '../components/edit-order/edit-order.component';
 import { UiService } from '../../../shared/services/ui.service';
 import { LoteTostado } from '../../../shared/models/lote-tostado';
-import { FichaTuesteComponent } from "../../../shared/components/ficha-tueste/ficha-tueste.component";
 import { RoastsService } from '../service/roasts.service';
 import { Tueste } from '../../../shared/models/tueste';
 import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../shared/pipes/time.pipe";
 import { LoteService } from '../../inventory/lotes-verdes/service/lote.service';
+import { FichaTuesteComponent } from '../../inventory/lotes-tostados/components/ficha-tueste/ficha-tueste.component';
 
 
 interface ExtendedPedido extends Pedido {
