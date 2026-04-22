@@ -17,7 +17,7 @@ export class UserService {
   // cache de peticiones en curso
   private userRequestCache = new Map<string, Observable<User>>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** Obtiene todos los usuarios, opcionalmente filtrando por texto (nombre o email) */
   getUsers(): Observable<User[]> {
@@ -74,6 +74,11 @@ export class UserService {
         this.userRequestCache.delete(id);
       })
     );
+  }
+
+  /** Obtiene usuarios internos (no cliente) */
+  getUsersInternal(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseUrl}/internal`);
   }
 
   /** Elimina un usuario */

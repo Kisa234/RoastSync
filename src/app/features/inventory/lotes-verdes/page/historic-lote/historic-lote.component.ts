@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe, JsonPipe, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, ArrowLeft, GitCompare } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, GitCompare, Eye } from 'lucide-angular';
 
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { Pedido } from '../../../../../shared/models/pedido';
@@ -13,6 +13,7 @@ import { LoteService } from '../../service/lote.service';
 import { PedidoService } from '../../../../orders/service/orders.service';
 import { HistorialService } from '../../../../../shared/services/historial.service';
 import { VerCambiosComponent } from "../../components/ver-cambios/ver-cambios.component";
+import { ViewOrderComponent } from '../../../../orders/components/view-order/view-order.component';
 
 type TipoFiltro = 'TODOS' | 'HISTORIAL' | 'PEDIDO';
 
@@ -23,8 +24,8 @@ interface RegistroVista {
   usuario: string;
   fecha: string | Date;
   raw: Historial | Pedido;
+  tipoPedido?: string;
 }
-
 @Component({
   selector: 'historic-lote',
   standalone: true,
@@ -35,7 +36,8 @@ interface RegistroVista {
     DecimalPipe,
     UserNamePipe,
     LucideAngularModule,
-    VerCambiosComponent
+    VerCambiosComponent,
+    ViewOrderComponent
   ],
   templateUrl: './historic-lote.component.html',
   styles: ``
@@ -43,6 +45,7 @@ interface RegistroVista {
 export class HistoricLote implements OnInit {
   readonly ArrowLeft = ArrowLeft;
   readonly GitCompare = GitCompare;
+  readonly Eye = Eye;
 
   loteId = '';
   pedidos: Pedido[] = [];
@@ -50,6 +53,10 @@ export class HistoricLote implements OnInit {
 
   registros: RegistroVista[] = [];
   filtroTipo: TipoFiltro = 'TODOS';
+  filtroTipoPedido: string = 'TODOS';
+
+  showPedido = false;
+  selectedPedidoId = '';
 
   page = 1;
   pageSize = 5;
@@ -153,6 +160,7 @@ export class HistoricLote implements OnInit {
     const pedidosMapeados: RegistroVista[] = (this.pedidos ?? []).map(p => ({
       tipo: 'PEDIDO',
       accion: p.tipo_pedido,
+      tipoPedido: p.tipo_pedido,
       comentario: this.getPedidoComentario(p),
       usuario: (p as any).id_user || '',
       fecha: (p as any).fecha_registro,
@@ -165,13 +173,43 @@ export class HistoricLote implements OnInit {
     this.page = 1;
   }
 
-  getPedidoComentario(p: Pedido): string {
-    return `pedido de ${p.cantidad} gr`;
+
+  onFiltroChange(): void {
+    this.page = 1;
+  }
+
+  onFiltroTipoPedidoChange(): void {
+    if (this.filtroTipoPedido !== 'TODOS') {
+      this.filtroTipo = 'PEDIDO';
+    }
+
+    this.page = 1;
   }
 
   get registrosFiltrados(): RegistroVista[] {
-    if (this.filtroTipo === 'TODOS') return this.registros;
-    return this.registros.filter(r => r.tipo === this.filtroTipo);
+    if (this.filtroTipo === 'TODOS') {
+      return this.registros;
+    }
+
+    if (this.filtroTipo === 'HISTORIAL') {
+      return this.registros.filter(r => r.tipo === 'HISTORIAL');
+    }
+
+    if (this.filtroTipo === 'PEDIDO') {
+      return this.registros.filter(r => {
+        if (r.tipo !== 'PEDIDO') return false;
+
+        if (this.filtroTipoPedido === 'TODOS') return true;
+
+        return (r.accion || '').trim().toUpperCase() === this.filtroTipoPedido;
+      });
+    }
+
+    return this.registros;
+  }
+
+  getPedidoComentario(p: Pedido): string {
+    return `pedido de ${p.cantidad} gr`;
   }
 
   get registrosPaginados(): RegistroVista[] {
@@ -189,7 +227,7 @@ export class HistoricLote implements OnInit {
       0
     );
   }
-  
+
   get pesoTotalTostadoInventarios(): number {
     return (this.lote.inventarioLotes || []).reduce(
       (total, inv) => total + (inv.cantidad_tostado_kg || 0),
@@ -213,8 +251,11 @@ export class HistoricLote implements OnInit {
     this.openHistorial(historial);
   }
 
-  onFiltroChange(): void {
-    this.page = 1;
+  openPedido(registro: RegistroVista): void {
+    const pedido = registro.raw as any;
+
+    this.selectedPedidoId = pedido.id_pedido;
+    this.showPedido = true;
   }
 
   prevPage(): void {

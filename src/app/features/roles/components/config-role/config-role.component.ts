@@ -11,8 +11,8 @@ import { RolService } from '../../service/rol-service.service';
 import { PermisoService } from '../../service/permiso-service.service';
 import { RolPermisoService } from '../../service/rol-permiso-service.service';
 import { UserService } from '../../../users/service/users-service.service';
-import { CreateRolComponent } from "../../create-rol/create-rol.component";
 import { UiService } from '../../../../shared/services/ui.service';
+import { CreateRolComponent } from '../create-rol/create-rol.component';
 
 
 @Component({
@@ -103,7 +103,7 @@ export class ConfigRoleComponent implements OnInit {
    * ======================= */
   loadUsers() {
     this.loadingUsers = true;
-    this.userService.getUsersByRole('admin').subscribe({
+    this.userService.getUsersInternal().subscribe({
       next: users => {
         this.users = users;
         this.loadingUsers = false;

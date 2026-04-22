@@ -12,6 +12,7 @@ import { Pedido } from '../../../../shared/models/pedido';
 import { User } from '../../../../shared/models/user';
 import { Almacen } from '../../../../shared/models/almacen';
 import { LoteVerdeConInventario } from '../../../../shared/models/lote';
+import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
 
 @Component({
   selector: 'view-order',
@@ -20,6 +21,7 @@ import { LoteVerdeConInventario } from '../../../../shared/models/lote';
     CommonModule,
     FormsModule,
     LucideAngularModule,
+    UserNamePipe
   ],
   templateUrl: './view-order.component.html',
   styles: ``

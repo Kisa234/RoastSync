@@ -218,7 +218,7 @@ export const appRoutes: Routes = [
         path: 'settings',
         component: SettingsPageComponent,
         canActivate: [permissionGuard],
-        data: { permissions: ['configuracion.roles.read'] }
+        data: { permissions: ['configuracion.read'] }
       },
 
       {

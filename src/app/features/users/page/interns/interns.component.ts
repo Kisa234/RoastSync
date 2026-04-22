@@ -51,7 +51,7 @@ export class InternsComponent implements OnInit {
 
   loadInterns() {
     this.users$ = this.userSvc
-      .getUsersByRole('admin')
+      .getUsersInternal()
       .pipe(
         map(users =>
           users.filter(u =>

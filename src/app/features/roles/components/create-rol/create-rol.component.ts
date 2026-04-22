@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { X, LucideAngularModule } from 'lucide-angular';
-import { RolService } from '../service/rol-service.service';
+import { RolService } from '../../service/rol-service.service';
 
 @Component({
   selector: 'create-role',

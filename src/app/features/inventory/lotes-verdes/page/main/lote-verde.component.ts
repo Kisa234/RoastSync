@@ -99,7 +99,6 @@ export class LoteVerdeComponent {
       0
     );
   }
-
   filtroTipo: 'admin' | 'cliente' = 'admin';
 
   getLotesFiltrados(): LoteVerdeConInventario[] {
@@ -132,8 +131,10 @@ export class LoteVerdeComponent {
         cliente.includes(term);
 
       if (match && user?.rol === 'admin') {
-        const pesoInventario = this.getPesoInventario(l);
-        this.costoInventarioVerde += Number(l.costo ?? 0) * pesoInventario;
+        const pesoInventarioGr = this.getPesoInventario(l);
+        const pesoInventarioKg = pesoInventarioGr / 1000;
+
+        this.costoInventarioVerde += Number(l.costo ?? 0) * pesoInventarioKg;
       }
 
       return match;
