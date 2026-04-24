@@ -36,7 +36,8 @@ export interface LoteTostadoConInventario {
   peso: number;
   fecha_registro: string;
   id_user: string;
-
+  eliminado?: boolean;
+  
   lote: Lote;
 
   inventarioLotesTostados: InventarioLoteTostado[];

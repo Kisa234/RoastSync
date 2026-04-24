@@ -1,181 +1,174 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import { CommonModule, NgIf } from '@angular/common';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, X, Check } from 'lucide-angular';
-import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
 
-import { EnviosService } from '../../service/envios.service';
 import { UserService } from '../../../users/service/users-service.service';
+import { AlmacenService } from '../../../inventory/almacenes/service/almacen.service';
 import { LoteTostadoService } from '../../../inventory/lotes-tostados/service/lote-tostado.service';
 
-import { Envio } from '../../../../shared/models/envio';
 import { User } from '../../../../shared/models/user';
-import { LoteTostado } from '../../../../shared/models/lote-tostado';
-import { Observable } from 'rxjs';
-import { combineLatest } from 'rxjs';
-import { map, finalize} from 'rxjs/operators';
+import { Almacen } from '../../../../shared/models/almacen';
+import { CreateEnvio } from '../../../../shared/models/envio';
+import { LoteTostado, LoteTostadoConInventario } from '../../../../shared/models/lote-tostado';
+import { EnviosService } from '../../service/envios.service';
+import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
 
 @Component({
   selector: 'add-envio',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, SelectSearchComponent],
-  templateUrl: './add-envio.component.html'
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    SelectSearchComponent,
+  ],
+  templateUrl: './add-envio.component.html',
 })
-export class AddEnvioComponent {
+export class AddEnvioComponent implements OnInit {
+  @Output() close = new EventEmitter<void>();
+  @Output() create = new EventEmitter<void>();
+
   readonly X = X;
   readonly Check = Check;
 
-  @Output() close = new EventEmitter<void>();
-  @Output() create = new EventEmitter<Envio>();
-
-  // Datos tipados
-  clientes: User[] = [];
-  lotesCliente: LoteTostado[] = [];
-  selectedLote: LoteTostado | null = null;
-
-  // UI
   saving = false;
-  cantidadError = '';
 
-  // Modelo que respeta tu DTO (clasificación se calcula en backend)
-  model: {
-    id_cliente: string;
-    id_lote_tostado: string;
-    cantidad: number | null;
-    comentario?: string;
-  } = {
-      id_cliente: '',
-      id_lote_tostado: '',
-      cantidad: null,
-      comentario: ''
-    };
+  model: CreateEnvio = {
+    id_cliente: '',
+    id_lote_tostado: '',
+    id_almacen: '',
+    cantidad: 0,
+    comentario: '',
+    origen: 'LOTE_TOSTADO'
+  };
+
+  clientes: User[] = [];
+  lotes: LoteTostadoConInventario[] = [];
+  lotesCliente: LoteTostadoConInventario[] = [];
+
+  almacenes: Almacen[] = [];
+  almacenesFiltrados: Almacen[] = [];
+
+  selectedLote?: LoteTostadoConInventario;
+  availableQty = 0;
 
   constructor(
-    private enviosSvc: EnviosService,
-    private userSvc: UserService,
-    private loteSvc: LoteTostadoService
-  ) { }
+    private enviosService: EnviosService,
+    private userService: UserService,
+    private loteTostadoService: LoteTostadoService,
+    private almacenService: AlmacenService,
+    
+  ) {}
 
   ngOnInit(): void {
-    this.loadClientes();
+    this.userService.getUsers().subscribe(users => {
+      this.clientes = users.filter(u => u.rol === 'cliente');
+    });
+
+    this.loteTostadoService.getLotesTostadosConInventario().subscribe(lotes => {
+      this.lotes = lotes;
+    });
+
+    this.almacenService.getAlmacenesActivos().subscribe(almacenes => {
+      this.almacenes = almacenes;
+    });
   }
 
-  private loadClientes(): void {
-    combineLatest([
-      this.userSvc.getUsers(),
-      this.loteSvc.getAll()
-    ])
-      .pipe(
-        map(([users, lotes]) => {
-          // Si quieres “cualquier lote”, quita el filtro de peso.
-          const idsConLote = new Set(
-            (lotes ?? [])
-              .filter((l: LoteTostado) => (l.peso ?? 0) > 0) // ⇦ solo con stock
-              .map((l: LoteTostado) => l.id_user)
-          );
-          return (users ?? []).filter((u: User) => idsConLote.has(u.id_user));
-        })
-      )
-      .subscribe((filtered: User[]) => {
-        this.clientes = filtered;
-      });
-  }
-
-  onClienteChange(id_user: string): void {
-    this.model.id_cliente = id_user || '';
+  onClienteChange(idCliente: string): void {
+    this.model.id_cliente = idCliente;
     this.model.id_lote_tostado = '';
-    this.model.cantidad = null;
-    this.selectedLote = null;
-    this.cantidadError = '';
-    this.loadLotesByCliente(id_user);
+    this.model.id_almacen = '';
+    this.model.cantidad = 0;
+
+    this.selectedLote = undefined;
+    this.availableQty = 0;
+    this.almacenesFiltrados = [];
+
+    this.lotesCliente = this.lotes.filter(lote =>
+      lote.id_user === idCliente &&
+      !lote.eliminado
+    );
   }
 
-  loadingLotes = false;
+  onLoteChange(idLoteTostado: string): void {
+    this.model.id_lote_tostado = idLoteTostado;
+    this.model.id_almacen = '';
+    this.model.cantidad = 0;
+    this.availableQty = 0;
 
-  private loadLotesByCliente(id_user: string): void {
-    this.lotesCliente = [];
-    this.selectedLote = null;
-    this.loadingLotes = true;
+    this.selectedLote = this.lotesCliente.find(
+      lote => lote.id_lote_tostado === idLoteTostado
+    );
 
-    const lotes$: Observable<LoteTostado[]> = this.loteSvc.getAll();
+    if (!this.selectedLote) {
+      this.almacenesFiltrados = [];
+      return;
+    }
 
-    lotes$
-      .pipe(
-        map((list: LoteTostado[]) =>
-          (list ?? []).filter(l =>
-            l.id_user === id_user && (l.peso ?? 0) > 0
-          )
-        ),
-        finalize(() => this.loadingLotes = false)
+    const idsAlmacenesConStock = [
+      ...new Set(
+        (this.selectedLote.inventarioLotesTostados || [])
+          .filter(inv => Number(inv.cantidad_kg || 0) > 0)
+          .map(inv => inv.almacen?.id_almacen)
+          .filter((id): id is string => !!id)
       )
-      .subscribe({
-        next: (items: LoteTostado[]) => {
-          this.lotesCliente = items;
-        },
-        error: () => {
-          this.lotesCliente = [];
-        }
-      });
+    ];
+
+    this.almacenesFiltrados = this.almacenes.filter(a =>
+      idsAlmacenesConStock.includes(a.id_almacen)
+    );
   }
 
-  onLoteChange(id: string): void {
-    this.selectedLote = this.lotesCliente.find(l => l.id_lote_tostado === id) ?? null;
+  onAlmacenChange(): void {
+    if (!this.selectedLote || !this.model.id_almacen) {
+      this.availableQty = 0;
+      return;
+    }
+
+    const inventario = this.selectedLote.inventarioLotesTostados?.find(
+      inv => inv.almacen?.id_almacen === this.model.id_almacen
+    );
+
+    this.availableQty = Number(inventario?.cantidad_kg || 0);
     this.validarCantidad();
   }
 
   validarCantidad(): void {
-    this.cantidadError = '';
-    const qty = Number(this.model.cantidad ?? 0);
-    const stock = Number(this.selectedLote?.peso ?? 0);
+    const cantidad = Number(this.model.cantidad || 0);
 
-    if (!qty || qty <= 0) return;
-    if (!Number.isInteger(qty)) {
-      this.cantidadError = 'La cantidad debe ser un entero en gramos.';
+    if (cantidad < 0) {
+      this.model.cantidad = 0;
       return;
     }
-    if (qty > stock) {
-      this.cantidadError = 'La cantidad excede el stock disponible del lote.';
+
+    if (cantidad > this.availableQty) {
+      this.model.cantidad = this.availableQty;
     }
   }
 
   canSave(): boolean {
-    return !!(
-      this.model.id_cliente &&
-      this.model.id_lote_tostado &&
-      this.model.cantidad &&
-      this.model.cantidad > 0 &&
-      !this.cantidadError
-    );
+    return !!this.model.id_cliente
+      && !!this.model.id_lote_tostado
+      && !!this.model.id_almacen
+      && Number(this.model.cantidad) > 0
+      && Number(this.model.cantidad) <= this.availableQty;
   }
 
   save(): void {
-    if (!this.canSave()) return;
+    if (!this.canSave() || this.saving) return;
+
     this.saving = true;
 
-    const payload: {
-      origen: 'LOTE_TOSTADO';
-      id_lote_tostado: string;
-      id_cliente: string;
-      cantidad: number;
-      comentario?: string;
-    } = {
-      origen: 'LOTE_TOSTADO',
-      id_lote_tostado: this.model.id_lote_tostado,
-      id_cliente: this.model.id_cliente,
-      cantidad: this.model.cantidad!,
-      comentario: this.model.comentario?.trim() || undefined
-    };
-
-    console.log(payload);
-
-    this.enviosSvc.createEnvio(payload).subscribe({
-      next: (envio) => {
+    this.enviosService.createEnvio(this.model).subscribe({
+      next: () => {
         this.saving = false;
-        this.create.emit(envio);
+        this.create.emit();
+        this.close.emit();
       },
       error: (err) => {
         this.saving = false;
-        console.error('Error creando envío', err);
+        console.error('Error creando envío:', err);
       }
     });
   }
