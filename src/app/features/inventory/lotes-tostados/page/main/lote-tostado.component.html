@@ -156,7 +156,7 @@
             </td>
 
             <td class="px-6 py-4 text-sm text-gray-700">
-              {{ t.peso.toLocaleString('en-US') }}
+              {{ getStockRealTostado(t).toLocaleString('en-US') }}
             </td>
 
             <td class="px-6 py-4 text-right text-sm">
@@ -200,3 +200,9 @@
   [loteTostadoId]="selectedLoteTostado.id_lote_tostado" (close)="closeAsignarInventarioLoteTostado()"
   (create)="onInventarioLoteTostadoCreated()">
 </add-inventory-lote-tostado>
+
+<report-lote-tostado
+  *ngIf="showAnalisis"
+  [loteId]="selectedTuesteId"
+  (close)="showAnalisis = false">
+</report-lote-tostado>

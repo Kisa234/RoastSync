@@ -1,6 +1,81 @@
 @media print {
-  html, body { background:#fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .backdrop-blur-md { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-  #fichaPrint { background:#fff !important; box-shadow:none !important; border-radius:0 !important; }
-  .print-hidden { display:none !important; }
+  @page {
+    size: 4cm 3cm;
+    margin: 0;
+  }
+
+  html, body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 4cm !important;
+    height: 3cm !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #fichaPrint,
+  #fichaPrint * {
+    visibility: visible !important;
+  }
+
+  #fichaPrint {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 4cm !important;
+    height: 3cm !important;
+
+    padding: 0.15cm !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+
+    background: #fff !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+
+    transform: none !important;
+  }
+
+  #fichaPrint img {
+    width: 1.4cm !important;
+    height: auto !important;
+  }
+
+  #fichaPrint .text-lg {
+    font-size: 7px !important;
+    margin-bottom: 4px !important;
+  }
+
+  #fichaPrint .text-sm {
+    font-size: 5.5px !important;
+    line-height: 1.1 !important;
+  }
+
+  #fichaPrint .grid {
+    gap: 2px 6px !important;
+  }
+
+  #fichaPrint .mb-4 {
+    margin-bottom: 4px !important;
+  }
+
+  #fichaPrint .pb-1 {
+    padding-bottom: 1px !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  .backdrop-blur-md {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }

@@ -2,50 +2,65 @@
   <div class="w-full space-y-6">
 
     <!-- Header -->
-    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div>
-        <button
-          type="button"
-          (click)="goBack()"
-          class="mb-2 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition"
-        >
+        <button type="button" (click)="goBack()"
+          class="mb-1 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition">
           <lucide-icon [img]="ArrowLeft" class="w-4 h-4"></lucide-icon>
           Volver
         </button>
 
-        <h1 class="text-2xl md:text-3xl font-bold text-zinc-900">
+        <h1 class="text-2xl font-bold text-zinc-900">
           Histórico Lote Tostado
         </h1>
       </div>
 
-      <div class="text-sm text-zinc-600 space-y-1 md:min-w-[260px]">
-        <p>
-          Cliente:
-          <span class="font-medium text-zinc-900">{{ LoteTostado.id_user! | UserNamePipe | async }}</span>
-        </p>
-        <p>
-          Lote:
-          <span class="font-medium text-zinc-900">{{ LoteTostado.id_lote_tostado }}</span>
-        </p>
-        <p>
-          Fecha:
-          <span class="font-medium text-zinc-900">{{ LoteTostado.fecha_registro | date:'dd/MM/yyyy' }}</span>
-        </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm min-w-fit">
+        <div>
+          <p class="text-zinc-500">Cliente</p>
+          <p class="font-semibold text-zinc-900">
+            {{ LoteTostado.id_user! | UserNamePipe | async }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-zinc-500">Lote Tostado</p>
+          <p class="font-semibold text-zinc-900">
+            {{ LoteTostado.id_lote_tostado }}
+          </p>
+        </div>
+
+        <div>
+          <p class="text-zinc-500">Fecha</p>
+          <p class="font-semibold text-zinc-900">
+            {{ LoteTostado.fecha_registro | date:'dd/MM/yyyy' }}
+          </p>
+        </div>
       </div>
     </div>
 
-    <!-- Bloque 1: Resumen -->
+    <!-- BLOQUE 1: Resumen + Inventario -->
     <section class="bg-white border border-zinc-200 rounded-xl overflow-hidden">
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 border-b border-zinc-200">
+
+      <!-- Resumen horizontal -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 border-b border-zinc-200">
+
         <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Peso</p>
+          <p class="text-[11px] uppercase text-zinc-500">Peso inicial</p>
           <p class="mt-1 font-semibold text-zinc-900">
             {{ LoteTostado.peso | number:'1.0-2' }} gr
           </p>
         </div>
 
         <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Perfil Tostado</p>
+          <p class="text-[11px] uppercase text-zinc-500">Stock real</p>
+          <p class="mt-1 font-semibold text-zinc-900">
+            {{ pesoTotalInventarios | number:'1.0-2' }} gr
+          </p>
+        </div>
+
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
+          <p class="text-[11px] uppercase text-zinc-500">Perfil tostado</p>
           <p class="mt-1 font-semibold text-zinc-900">
             {{ LoteTostado.perfil_tostado || 'N/A' }}
           </p>
@@ -58,60 +73,146 @@
           </p>
         </div>
 
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
+          <p class="text-[11px] uppercase text-zinc-500">Productor</p>
+          <p class="mt-1 font-semibold text-zinc-900">
+            {{ lote.productor || 'N/A' }}
+          </p>
+        </div>
+
         <div class="px-4 py-3">
           <p class="text-[11px] uppercase text-zinc-500">Variedades</p>
           <p class="mt-1 font-semibold text-zinc-900">
-            {{ lote.variedades.length ? lote.variedades.join(', ') : '—' }}
-          </p>
+            {{ lote.variedades.length ? lote.variedades.join(', ') : '—' }} </p>
         </div>
       </div>
 
-      <div class="flex items-center justify-between px-4 py-3 bg-[#FCFCFC] border-b border-zinc-200">
-        <h2 class="text-lg font-semibold text-zinc-900">Movimientos</h2>
-        <span class="text-sm text-zinc-500">
-          {{ envios.length || 0 }} registro{{ (envios.length || 0) === 1 ? '' : 's' }}
-        </span>
-      </div>
-
+      <!-- Tabla inventario -->
       <div class="overflow-x-auto">
         <table class="min-w-full table-auto">
           <thead class="bg-[#F9F9F9] border-b border-zinc-200">
             <tr>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Tipo de Pedido</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-900 uppercase">
+                Almacén
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-900 uppercase">
+                Stock actual
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-zinc-200">
+            <tr *ngFor="let inv of LoteTostado.inventarioLotesTostados">
+              <td class="px-6 py-4 text-sm font-medium text-zinc-900">
+                {{ inv.almacen?.nombre || 'N/A' }}
+              </td>
+
+              <td class="px-6 py-4 text-sm text-zinc-900">
+                {{ inv.cantidad_kg | number:'1.0-2' }} gr
+              </td>
+            </tr>
+
+            <tr *ngIf="!LoteTostado.inventarioLotesTostados.length">
+              <td colspan="2" class="px-6 py-8 text-center text-sm text-zinc-500">
+                No hay inventario asignado para este lote tostado.
+              </td>
+            </tr>
+          </tbody>
+
+          <tfoot *ngIf="LoteTostado.inventarioLotesTostados.length" class="bg-[#FCFCFC] border-t border-zinc-200">
+            <tr>
+              <td class="px-6 py-4 text-sm font-semibold text-zinc-900">
+                Stock total
+              </td>
+
+              <td class="px-6 py-4 text-sm font-semibold text-zinc-900">
+                {{ pesoTotalInventarios | number:'1.0-2' }} gr
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOQUE 2: Envíos / movimientos -->
+    <section class="bg-white border border-zinc-200 rounded-xl overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 bg-[#FCFCFC] border-b border-zinc-200">
+        <div>
+          <h2 class="text-lg font-semibold text-zinc-900">
+            Actividad del lote
+          </h2>
+          <span class="text-sm text-zinc-500">
+            {{ registros.length || 0 }} registro{{ (registros.length || 0) === 1 ? '' : 's' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full table-fixed">
+
+          <thead class="bg-[#F9F9F9] border-b border-zinc-200">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Tipo</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Acción</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Cantidad</th>
               <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Comentario</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Fecha de Envío</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Responsable</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Fecha</th>
+              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Acciones</th>
             </tr>
           </thead>
 
           <tbody class="bg-white divide-y divide-zinc-200">
-            <tr *ngFor="let p of envios">
-              <td class="px-6 py-4 text-sm font-medium text-zinc-900 whitespace-nowrap">
-                {{ p.clasificacion }}
+            <tr *ngFor="let r of registros">
+              <td class="px-6 py-4 text-sm font-medium text-zinc-900">
+                {{ r.tipo }}
               </td>
 
-              <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">
-                {{ p.cantidad | number:'1.0-2' }} gr
-              </td>
-=
               <td class="px-6 py-4 text-sm text-zinc-700">
-                {{ p.comentario || '—' }}
+                {{ r.accion }}
               </td>
 
-              <td class="px-6 py-4 text-sm text-zinc-700 whitespace-nowrap">
-                {{ p.fecha ? (p.fecha | date:'dd/MM/yyyy') : 'N/A' }}
+              <td class="px-6 py-4 text-sm text-zinc-700">
+                {{ r.cantidad ? (r.cantidad | number:'1.0-2') + ' gr' : '—' }}
+              </td>
+
+              <td class="px-6 py-4 text-sm text-zinc-700 ">
+                {{ r.comentario }}
+              </td>
+
+              <td class="px-6 py-4 text-sm text-zinc-700">
+                <span class="text-xs text-zinc-500">{{ r.responsableTitulo }}:</span>
+                {{ r.responsableId | UserNamePipe | async }}
+              </td>
+
+              <td class="px-6 py-4 text-sm text-zinc-700">
+                {{ r.fecha | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td class="px-6 py-4 text-sm text-zinc-700">
+                <button *ngIf="r.id_pedido" (click)="openPedido(r)" class="text-gray-500 hover:text-[#B8672E]"
+                  title="Ver pedido">
+                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                </button>
+
+                <span *ngIf="!r.id_pedido" class="text-zinc-400">—</span>
               </td>
             </tr>
 
-            <tr *ngIf="!envios.length">
-              <td colspan="5" class="px-6 py-10 text-center text-sm text-zinc-500">
-                Sin movimientos para este lote.
+            <tr *ngIf="!registros.length">
+              <td colspan="7" class="px-6 py-10 text-center text-sm text-zinc-500">
+                Sin actividad para este lote tostado.
               </td>
             </tr>
           </tbody>
+
         </table>
       </div>
     </section>
 
   </div>
 </div>
+
+
+<view-order *ngIf="showPedido" [orderId]="selectedPedidoId" (close)="showPedido = false">
+</view-order>

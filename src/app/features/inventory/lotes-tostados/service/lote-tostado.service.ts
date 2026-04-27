@@ -37,11 +37,15 @@ export class LoteTostadoService {
     return this.http.get<FichaTueste>(`${this.baseUrl}/ficha/${id}`);
   }
 
-  getloteconlote(): Observable<LoteTostadoConLote[]>{
+  getloteconlote(): Observable<LoteTostadoConLote[]> {
     return this.http.get<LoteTostadoConLote[]>(`${this.baseUrl}/lote-con-lote/`);
   }
-  
-  getLotesTostadosConInventario(): Observable<LoteTostadoConInventario[]>{
+
+  getLotesTostadosConInventario(): Observable<LoteTostadoConInventario[]> {
     return this.http.get<LoteTostadoConInventario[]>(`${this.baseUrl}/inventario`);
+  }
+
+  getLoteTostadoConInventario(id: string): Observable<LoteTostadoConInventario> {
+    return this.http.get<LoteTostadoConInventario>(`${this.baseUrl}/inventario/${id}`);
   }
 }

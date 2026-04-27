@@ -1,16 +1,24 @@
 import { CommonModule, DatePipe, DecimalPipe, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, Eye } from 'lucide-angular';
+import { forkJoin } from 'rxjs';
+
+
 
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { Envio } from '../../../../../shared/models/envio';
 import { Lote } from '../../../../../shared/models/lote';
-import { LoteTostado } from '../../../../../shared/models/lote-tostado';
+import { LoteTostado, LoteTostadoConInventario } from '../../../../../shared/models/lote-tostado';
 
 import { LoteTostadoService } from '../../service/lote-tostado.service';
 import { LoteService } from '../../../lotes-verdes/service/lote.service';
 import { EnviosService } from '../../../../envios/service/envios.service';
+import { HistorialService } from '../../../../../shared/services/historial.service';
+import { Historial } from '../../../../../shared/models/historial';
+import { ViewOrderComponent } from '../../../../orders/components/view-order/view-order.component';
+
+
 
 @Component({
   selector: 'historic-lote-tostado',
@@ -20,16 +28,25 @@ import { EnviosService } from '../../../../envios/service/envios.service';
     DecimalPipe,
     CommonModule,
     UserNamePipe,
-    LucideAngularModule
+    LucideAngularModule,
+    ViewOrderComponent
   ],
   templateUrl: './historic-lote-tostado.component.html',
   styles: ``
 })
 export class HistoricLoteTostadoComponent implements OnInit {
   readonly ArrowLeft = ArrowLeft;
+  readonly Eye = Eye;
 
-  loteId: string = '';
+  loteId = '';
   envios: Envio[] = [];
+  historiales: Historial[] = [];
+
+  showPedido = false;
+  selectedPedidoId = '';
+  registros: any[] = [];
+
+  pesoTotalInventarios = 0;
 
   lote: Lote = {
     id_lote: '',
@@ -41,23 +58,25 @@ export class HistoricLoteTostadoComponent implements OnInit {
     eliminado: false
   };
 
-  LoteTostado: LoteTostado = {
+  LoteTostado: LoteTostadoConInventario = {
     id_lote_tostado: '',
     id_lote: '',
     fecha_tostado: new Date(),
     perfil_tostado: '',
     peso: 0,
     fecha_registro: new Date(),
-    id_user: ''
+    id_user: '',
+    inventarioLotesTostados: [],
+    lote: this.lote
   };
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly location: Location,
     private readonly loteTostadoService: LoteTostadoService,
-    private readonly loteService: LoteService,
-    private readonly enviosService: EnviosService
-  ) {}
+    private readonly enviosService: EnviosService,
+    private readonly historialService: HistorialService
+  ) { }
 
   ngOnInit(): void {
     this.loteId = this.route.snapshot.paramMap.get('id') || '';
@@ -71,25 +90,28 @@ export class HistoricLoteTostadoComponent implements OnInit {
   }
 
   loadData(): void {
-    this.loteTostadoService.getById(this.loteId).subscribe({
+    this.loteTostadoService.getLoteTostadoConInventario(this.loteId).subscribe({
       next: (loteTostado) => {
-        this.LoteTostado = loteTostado;
+        this.LoteTostado = {
+          ...loteTostado,
+          inventarioLotesTostados: loteTostado.inventarioLotesTostados ?? [],
+          lote: loteTostado.lote ?? this.lote
+        };
 
-        this.loteService.getById(loteTostado.id_lote).subscribe({
-          next: (lote) => {
-            this.lote = lote;
+        this.lote = this.LoteTostado.lote;
+        this.calcularTotales();
 
-            this.enviosService.getEnviosByLote(loteTostado.id_lote_tostado).subscribe({
-              next: (envios) => {
-                this.envios = envios ?? [];
-              },
-              error: (err) => {
-                console.error('Error al cargar envíos:', err);
-              }
-            });
+        forkJoin({
+          envios: this.enviosService.getEnviosByLote(loteTostado.id_lote_tostado),
+          historiales: this.historialService.getByEntidad(loteTostado.id_lote_tostado)
+        }).subscribe({
+          next: ({ envios, historiales }) => {
+            this.envios = envios ?? [];
+            this.historiales = historiales ?? [];
+            this.construirRegistros();
           },
           error: (err) => {
-            console.error('Error al cargar lote verde relacionado:', err);
+            console.error('Error al cargar actividad del lote:', err);
           }
         });
       },
@@ -97,6 +119,49 @@ export class HistoricLoteTostadoComponent implements OnInit {
         console.error('Error al cargar lote tostado:', err);
       }
     });
+  }
+
+
+  private construirRegistros(): void {
+    const registrosEnvios = this.envios.map(e => ({
+      tipo: 'ENVIO',
+      accion: e.clasificacion || 'ENVÍO',
+      comentario: e.comentario || 'Envío de café tostado',
+      responsableTitulo: 'Cliente',
+      responsableId: e.id_cliente,
+      cantidad: e.cantidad,
+      fecha: e.fecha,
+      id_pedido: null
+    }));
+
+    const registrosHistorial = this.historiales.map(h => ({
+      tipo: 'HISTORIAL',
+      accion: h.accion,
+      comentario: h.comentario || '—',
+      responsableTitulo: 'Realizado por',
+      responsableId: h.id_user,
+      cantidad: null,
+      fecha: h.fecha_registro,
+      id_pedido: h.id_pedido || null
+    }));
+
+    this.registros = [...registrosEnvios, ...registrosHistorial]
+      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+  }
+
+  calcularTotales(): void {
+    this.pesoTotalInventarios =
+      this.LoteTostado.inventarioLotesTostados?.reduce(
+        (total: number, inv: any) => total + Number(inv.cantidad_kg || 0),
+        0
+      ) ?? 0;
+  }
+
+  openPedido(r: any): void {
+    if (!r.id_pedido) return;
+
+    this.selectedPedidoId = r.id_pedido;
+    this.showPedido = true;
   }
 
   goBack(): void {

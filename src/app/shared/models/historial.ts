@@ -7,5 +7,6 @@ export interface Historial {
   comentario: string | null,
   objeto_antes: any | null,
   objeto_despues: any|null,
-  fecha_registro: Date
+  fecha_registro: Date,
+  id_pedido?: string | null
 }

@@ -10,7 +10,6 @@ import { OverviewComponent } from './features/dashboard/page/overview/overview.c
 import { RoastsPage } from './features/roasts/page/roast-page.component';
 import { AnalisisPage } from './features/analysis/page/analisis.component';
 import { InventoryPage } from './features/inventory/pages/inventory/inventory-page.component';
-import { EnvioPageComponent } from './features/envios/pages/envio.page/envio.page.component';
 import { SettingsPageComponent } from './features/settings/page/settings-page.component';
 import { SuscriptionPageComponent } from './features/suscriptions/page/suscription-page.component';
 import { AuthComponent } from './features/auth/page/auth.component';
@@ -32,6 +31,7 @@ import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { permissionGuard } from './guards/permission.guard';
 import { UpdateInventoryComponent } from './features/inventory/update-inventory/pages/update-inventory.component';
+import { EnvioPageComponent } from './features/envios/pages/main/envio.page.component';
 
 export const appRoutes: Routes = [
 

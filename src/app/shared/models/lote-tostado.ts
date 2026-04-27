@@ -31,10 +31,10 @@ export interface LoteTostadoConLote {
 export interface LoteTostadoConInventario {
   id_lote_tostado: string;
   id_lote: string;
-  fecha_tostado: string;
+  fecha_tostado: Date;
   perfil_tostado: string;
   peso: number;
-  fecha_registro: string;
+  fecha_registro: Date;
   id_user: string;
   eliminado?: boolean;
   
@@ -43,5 +43,5 @@ export interface LoteTostadoConInventario {
   inventarioLotesTostados: InventarioLoteTostado[];
 
   id_analisis_rapido?: string;
-  entregado?: string;
+  entregado?: Date;
 }

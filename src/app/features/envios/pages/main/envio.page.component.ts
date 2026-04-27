@@ -42,7 +42,6 @@ export class EnvioPageComponent {
   constructor(private enviosSvc: EnviosService) { }
 
   ngOnInit() {
-    this.resetRange();       // setea últimos 30 días
     this.fetchEnvios();      // carga inicial
   }
 
@@ -69,8 +68,19 @@ export class EnvioPageComponent {
   }
 
   private fetchEnvios() {
+    if (!this.startDate && !this.endDate) {
+      this.enviosSvc.getAllEnvios().subscribe(list => this.envios = list || []);
+      return;
+    }
+
     this.enviosSvc.getEnviosByFechaRange(this.startDate, this.endDate)
       .subscribe(list => this.envios = list || []);
+  }
+
+  resetHistoric() {
+    this.startDate = '';
+    this.endDate = '';
+    this.fetchEnvios();
   }
 
   openAddEnvio() {

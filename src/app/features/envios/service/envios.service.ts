@@ -33,6 +33,9 @@ export class EnviosService {
   }
 
   // ---- Queries específicas ----
+  getAllEnvios(): Observable<Envio[]> {
+    return this.http.get<Envio[]>(`${this.baseUrl}`);
+  }
 
   getEnviosByLote(id_lote_tostado: string): Observable<Envio[]> {
     return this.http.get<Envio[]>(`${this.baseUrl}/lote/${id_lote_tostado}`);

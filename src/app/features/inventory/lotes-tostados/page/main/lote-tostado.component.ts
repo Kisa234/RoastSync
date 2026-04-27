@@ -22,6 +22,7 @@ import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { LoteTostadoConInventario } from '../../../../../shared/models/lote-tostado';
 import { AddInventoryLoteTostadoComponent } from "../../components/add-inventory-lote-tostado/add-inventory-lote-tostado.component";
 import { FichaTuesteComponent } from '../../components/ficha-tueste/ficha-tueste.component';
+import { ReportLoteTostadoComponent } from '../../components/report-lote-tostado/report-lote-tostado.component';
 
 type FilterKey = 'todos' | 'enviados' | 'no-enviados';
 
@@ -37,7 +38,8 @@ type FilterKey = 'todos' | 'enviados' | 'no-enviados';
     FichaTuesteComponent,
     UserNamePipe,
     RouterOutlet,
-    AddInventoryLoteTostadoComponent
+    AddInventoryLoteTostadoComponent,
+    ReportLoteTostadoComponent
   ],
   templateUrl: './lote-tostado.component.html',
   styles: []
@@ -71,6 +73,7 @@ export class LoteTostadoComponent {
   showHistoric = false;
   showReport = false;
   showFicha = false;
+  showAnalisis = false;
 
   selectedTuesteId = '';
   selectedLoteTostado: LoteTostadoConInventario | null = null;
@@ -99,6 +102,13 @@ export class LoteTostadoComponent {
       this.tostados = tostados;
       this.aplicarFiltro();
     });
+  }
+
+  getStockRealTostado(t: any): number {
+    return t.inventarioLotesTostados?.reduce(
+      (total: number, inv: any) => total + Number(inv.cantidad_kg || 0),
+      0
+    ) ?? 0;
   }
 
   aplicarFiltro() {
@@ -189,6 +199,8 @@ export class LoteTostadoComponent {
     );
   }
 
+
+
   openAsignarInventarioLoteTostado(lote: LoteTostadoConInventario): void {
     this.selectedLoteTostado = lote;
     this.showAsignarInventarioModal = true;
@@ -228,7 +240,7 @@ export class LoteTostadoComponent {
     }
 
     this.selectedTuesteId = t.id_lote_tostado;
-    this.showReport = true;
+    this.showAnalisis = true;
   }
 
   async exportStickerTostado(t: LoteTostadoConInventario) {
