@@ -4,6 +4,7 @@ import { Tueste } from '../../../shared/models/tueste';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { AvgTueste } from '../../../shared/models/avg-tueste';
+import { PedidoConLote } from '../../../shared/models/pedido';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,10 @@ import { AvgTueste } from '../../../shared/models/avg-tueste';
 export class RoastsService {
 
   private readonly baseUrl = `${environment.apiUrl}/tueste`;
-  private readonly baseUrlP = `${environment.apiUrl}/p`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  
+
 
   getTuesteById(id: string): Observable<Tueste> {
     return this.http.get<Tueste>(`${this.baseUrl}/${id}`);
@@ -38,16 +38,17 @@ export class RoastsService {
     return this.http.get<Tueste[]>(`${this.baseUrl}/pedido/${id}`);
   }
 
-  completarTostado(id:string, tueste:Tueste): Observable<Tueste> {
-    return this.http.put<Tueste>(`${this.baseUrl}/c/${id}`, {tueste});
+  completarTostado(id: string, tueste: Tueste): Observable<Tueste> {
+    return this.http.put<Tueste>(`${this.baseUrl}/c/${id}`, { tueste });
   }
 
-  getAverageTueste(id:string): Observable<AvgTueste> {
+  getAverageTueste(id: string): Observable<AvgTueste> {
     return this.http.get<AvgTueste>(`${this.baseUrl}/ref/${id}`);
   }
 
   getTuestesByLote(idLote: string): Observable<Tueste[]> {
     return this.http.get<Tueste[]>(`${this.baseUrl}/lote/${idLote}`);
   }
+
 
 }

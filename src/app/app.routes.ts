@@ -14,7 +14,6 @@ import { SettingsPageComponent } from './features/settings/page/settings-page.co
 import { SuscriptionPageComponent } from './features/suscriptions/page/suscription-page.component';
 import { AuthComponent } from './features/auth/page/auth.component';
 import { ClientFormComponent } from './features/client-form/pages/client-form.component';
-import { CostingComponent } from './features/costing/pages/costing.component';
 import { LoteTostadoComponent } from './features/inventory/lotes-tostados/page/main/lote-tostado.component';
 import { InternsComponent } from './features/users/page/interns/interns.component';
 import { ClientsComponent } from './features/users/page/clients/clients.component';
@@ -32,6 +31,9 @@ import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { permissionGuard } from './guards/permission.guard';
 import { UpdateInventoryComponent } from './features/inventory/update-inventory/pages/update-inventory.component';
 import { EnvioPageComponent } from './features/envios/pages/main/envio.page.component';
+import { KardexComponent } from './features/costing/pages/kardex/kardex.component';
+import { CostingComponent } from './features/costing/pages/main/costing.component';
+import { StadisticComponent } from './features/costing/pages/stadistic/stadistic.component';
 
 export const appRoutes: Routes = [
 
@@ -230,9 +232,29 @@ export const appRoutes: Routes = [
 
       {
         path: 'costing',
-        component: CostingComponent,
         canActivate: [permissionGuard],
-        data: { permissions: ['costeo.read'] }
+        data: { permissions: ['costeo.read'] },
+        children: [
+          { path: '', redirectTo: 'calculadora', pathMatch: 'full' },
+          {
+            path: 'calculadora',
+            component: CostingComponent,
+            canActivate: [permissionGuard],
+            data: { permissions: ['costeo.read'] }
+          },
+          {
+            path: 'prices',
+            component: KardexComponent,
+            canActivate: [permissionGuard],
+            data: { permissions: ['costeo.kardex.read'] }
+          },
+          {
+            path: 'stadistics',
+            component: StadisticComponent,
+            canActivate: [permissionGuard],
+            data: { permissions: ['costeo.read'] }
+          }
+        ]
       },
 
       {

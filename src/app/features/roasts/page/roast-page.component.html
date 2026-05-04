@@ -5,11 +5,21 @@
       <h1 class="text-2xl font-bold text-[#1F1F1F]">Tuestes</h1>
       <p class="text-gray-600">Gestiona las órdenes de tueste y revisa el historial</p>
     </div>
-    <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
-      (click)="openAddRoaster()">
-      <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
-      Nuevo Tostado
-    </button>
+    <div class="flex items-center gap-3">
+      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openAddBalonGas()">
+        <lucide-icon [img]="Flame" class="w-5 h-5 mr-2" />
+        Nuevo Balón de Gas
+      </button>
+
+      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+        (click)="openAddRoaster()">
+        <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
+        Nuevo Tostado
+      </button>
+    </div>
+
+
   </div>
 
   <!-- 1) Pendientes -->
@@ -24,7 +34,7 @@
               <div class="font-medium">{{ o.id_lote }}</div>
             </div>
             <div class="text-sm text-gray-600">
-              {{ o.cantidad | number }} Gr - {{o.pesos?.length}} Batch — Cliente: {{(o.userName)}}
+              {{ o.cantidad | number }} Gr - {{o.pesos?.length}} Batch — Cliente: {{(o.lote?.id_user | UserNamePipe | async) || 'Desconocido'}}
             </div>
             <div class="text-sm text-gray-600">
               Fecha: {{ o.fecha_tueste | date:'dd/MM/yyyy' }} —
@@ -259,3 +269,10 @@
 
 <ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false">
 </ficha-tueste>
+
+
+<add-balon-gas
+  *ngIf="showAddBalonGas"
+  (close)="showAddBalonGas = false"
+  (created)="onBalonGasCreated()">
+</add-balon-gas>

@@ -1,8 +1,8 @@
 // src/app/features/orders/service/pedido.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient }  from '@angular/common/http';
-import { Observable }  from 'rxjs';
-import { Pedido } from '../../../shared/models/pedido';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Pedido, PedidoConLote } from '../../../shared/models/pedido';
 import { environment } from '../../../../environments/environment';
 
 
@@ -12,7 +12,7 @@ import { environment } from '../../../../environments/environment';
 export class PedidoService {
   private base = `${environment.apiUrl}/pedido`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** Listar todos los pedidos */
   getPedidos(): Observable<Pedido[]> {
@@ -65,11 +65,25 @@ export class PedidoService {
   }
 
   /** Obtener pedidos por lote */
-  getPedidosByLote(idLote:string):Observable<Pedido[]>{
+  getPedidosByLote(idLote: string): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(`${this.base}/lote/${idLote}`);
   }
 
-  setFacturado(id:string):Observable<Pedido>{
+  setFacturado(id: string): Observable<Pedido> {
     return this.http.put<Pedido>(`${this.base}/facturar/${id}`, {});
   }
+
+
+  getPedidosConLote(): Observable<PedidoConLote[]> {
+    return this.http.get<PedidoConLote[]>(`${this.base}/con-lote`);
+  }
+
+  getPedidoConLote(id: string): Observable<PedidoConLote> {
+    return this.http.get<PedidoConLote>(`${this.base}/con-lote/${id}`);
+  }
+
+  getPedidosConLoteByEstadoYTipo(estado: string, tipo: string): Observable<PedidoConLote[]> {
+    return this.http.get<PedidoConLote[]>(`${this.base}/con-lote/estado/${estado}/tipo/${encodeURIComponent(tipo)}`);
+  }
+
 }

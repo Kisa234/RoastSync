@@ -3,14 +3,14 @@ import { User } from './../../../shared/models/user';
 import { Component } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Plus, Sheet } from 'lucide-angular';
+import { LucideAngularModule, Plus, Sheet, Flame } from 'lucide-angular';
 import { X, Check, Eye, Edit, Trash, ReceiptText } from 'lucide-angular';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
 
 import { AddRoasterComponent } from '../components/add-order-roast/add-order-roast.component';
-import { Pedido } from '../../../shared/models/pedido';
+import { Pedido, PedidoConLote } from '../../../shared/models/pedido';
 import { PedidoService } from '../../orders/service/orders.service';
 import { UserService } from '../../users/service/users-service.service';
 import { catchError, map, Observable, of } from 'rxjs';
@@ -25,11 +25,10 @@ import { UserNamePipe } from "../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../shared/pipes/time.pipe";
 import { LoteService } from '../../inventory/lotes-verdes/service/lote.service';
 import { FichaTuesteComponent } from '../../inventory/lotes-tostados/components/ficha-tueste/ficha-tueste.component';
+import { AddBalonGasComponent } from "../components/add-balon-gas/add-balon-gas.component";
 
 
-interface ExtendedPedido extends Pedido {
-  userName?: string;
-}
+
 
 @Component({
   selector: 'roasts-page',
@@ -45,12 +44,14 @@ interface ExtendedPedido extends Pedido {
     EditOrderComponent,
     FichaTuesteComponent,
     UserNamePipe,
-    MinSecPipe
+    MinSecPipe,
+    AddBalonGasComponent
   ],
   templateUrl: './roast-page.component.html',
 })
 export class RoastsPage {
   readonly Plus = Plus;
+  readonly Flame = Flame;
   readonly X = X;
   readonly Check = Check;
   readonly Eye = Eye;
@@ -59,9 +60,9 @@ export class RoastsPage {
   readonly Sheet = Sheet;
   readonly ReceiptText = ReceiptText;
 
-  pendingOrders: ExtendedPedido[] = [];
-  allHistoryRoasts: ExtendedPedido[] = [];
-  filteredHistoryRoasts: ExtendedPedido[] = [];
+  pendingOrders: PedidoConLote[] = [];
+  allHistoryRoasts: PedidoConLote[] = [];
+  filteredHistoryRoasts: PedidoConLote[] = [];
   allRoasts: Tueste[] = [];
   filteredAllRoasts: Tueste[] = [];
 
@@ -78,12 +79,13 @@ export class RoastsPage {
   selectedOrder?: Pedido;
   selectedTuesteId = '';
   showFichaTueste = false;
+  showAddBalonGas = false;
 
   // paginator 
   page = 1;
   pageSize = 5;
   totalPages = 1;
-  pagedHistoryRoasts: ExtendedPedido[] = [];
+  pagedHistoryRoasts: PedidoConLote[] = [];
 
   // filter client 
 
@@ -114,41 +116,35 @@ export class RoastsPage {
 
 
   private loadPending() {
-    this.pedidoSvc.getPedidosByEstado('Pendiente')
-      .pipe(
-        map(list => list.filter(p => p.tipo_pedido === 'Orden Tueste'))
-      )
-      .subscribe(list => {
-        // Copiamos en ExtendedPedido[]
-        this.pendingOrders = list.map(p => ({ ...p }));
-        // Por cada pedido, pedimos el nombre
-        this.pendingOrders.forEach(p => {
-          this.userSvc.getUserById(p.id_user).subscribe(
-            user => p.userName = user?.nombre || 'Desconocido',
-            () => p.userName = 'Desconocido'
-          );
-        });
+    this.pedidoSvc
+      .getPedidosConLoteByEstadoYTipo('Pendiente', 'Orden Tueste')
+      .subscribe({
+        next: (list) => {
+          this.pendingOrders = list ?? [];
+        },
+        error: (error) => {
+          console.error('Error cargando órdenes de tueste pendientes con lote:', error);
+          this.pendingOrders = [];
+        }
       });
   }
 
   loadHistory() {
-    this.pedidoSvc.getPedidosByEstado('Completado').pipe(
-      map(list => list.filter(p => p.tipo_pedido === 'Orden Tueste')),
-      catchError(() => of([]))
-    ).subscribe(list => {
-      this.allHistoryRoasts = list.map(p => ({ ...p }));
-      // carga userName igual que antes...
-      this.allHistoryRoasts.forEach(p =>
-        this.userSvc.getUserById(p.id_user).subscribe(
-          u => p.userName = u?.nombre ?? 'Desconocido',
-          () => p.userName = 'Desconocido'
-        )
-      );
-      // Aplica filtro la primera vez
-      this.applyFilter();
-    });
+    this.pedidoSvc
+      .getPedidosConLoteByEstadoYTipo('Completado', 'Orden Tueste')
+      .subscribe({
+        next: (list) => {
+          this.allHistoryRoasts = list ?? [];
+          this.applyFilter();
+        },
+        error: (error) => {
+          console.error('Error cargando historial de tuestes:', error);
+          this.allHistoryRoasts = [];
+          this.filteredHistoryRoasts = [];
+          this.pagedHistoryRoasts = [];
+        }
+      });
   }
-
   loadAllRoasts() {
     this.roastsSvc.getAllTuestes().subscribe(list => {
       this.allRoasts = list;
@@ -156,7 +152,7 @@ export class RoastsPage {
     });
   }
 
-  facturarPedido(o: ExtendedPedido) {
+  facturarPedido(o: PedidoConLote) {
 
     if (o.facturado) {
       this.uiSvc.alert(
@@ -301,6 +297,14 @@ export class RoastsPage {
     this.showFichaTueste = true;
   }
 
+  openAddBalonGas() {
+    this.showAddBalonGas = true;
+  }
+
+  onBalonGasCreated() {
+    this.showAddBalonGas = false;
+  }
+
   updatePagedHistory() {
     const start = (this.page - 1) * this.pageSize;
     const end = start + this.pageSize;
@@ -323,7 +327,7 @@ export class RoastsPage {
       id_pedido: h.id_pedido,
       Lote: h.id_lote,
       Fecha: h.fecha_tueste,
-      Cliente: h.userName ?? h.id_user,
+      Cliente: h.usuario_nombre,
       Cantidad: h.cantidad,
       'Tipo de Tueste': h.comentario,
       Facturado: h.facturado ? 'Sí' : 'No',

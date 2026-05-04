@@ -1,0 +1,57 @@
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h2 class="text-lg font-semibold text-[#1F1F1F]">
+          Nuevo Balón de Gas
+        </h2>
+        <p class="text-sm text-gray-500">
+          Se registrará como disponible.
+        </p>
+      </div>
+
+      <button (click)="close.emit()" class="text-gray-500 hover:text-gray-700">
+        <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="text-sm text-gray-600">Precio</label>
+        <input
+          type="number"
+          [(ngModel)]="form.precio"
+          name="precio"
+          min="0"
+          step="0.01"
+          class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+          placeholder="Ej: 65.00"
+        />
+      </div>
+
+      <div *ngIf="errorMessage" class="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+        {{ errorMessage }}
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 mt-6">
+      <button
+        type="button"
+        (click)="close.emit()"
+        class="px-4 py-2 rounded border border-[#E5E5E5] text-[#1F1F1F] hover:bg-[#F9F9F9]">
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        (click)="save()"
+        [disabled]="loading"
+        class="flex items-center px-4 py-2 bg-[#B8672E] text-white rounded hover:bg-[#A67C52] transition disabled:opacity-50 disabled:cursor-not-allowed">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2"></lucide-icon>
+        {{ loading ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+
+  </div>
+</div>

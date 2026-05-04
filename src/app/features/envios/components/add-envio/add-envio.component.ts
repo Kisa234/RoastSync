@@ -44,6 +44,8 @@ export class AddEnvioComponent implements OnInit {
   };
 
   clientes: User[] = [];
+  private readonly FORTUNATO_ID = '25eba595-1556-4a90-a3c7-27edc759a127';
+
   lotes: LoteTostadoConInventario[] = [];
   lotesCliente: LoteTostadoConInventario[] = [];
 
@@ -58,14 +60,15 @@ export class AddEnvioComponent implements OnInit {
     private userService: UserService,
     private loteTostadoService: LoteTostadoService,
     private almacenService: AlmacenService,
-    
-  ) {}
+
+  ) { }
 
   ngOnInit(): void {
     this.userService.getUsers().subscribe(users => {
-      this.clientes = users.filter(u => u.rol === 'cliente');
+      this.clientes = users.filter(u =>
+        u.rol === 'cliente' || u.id_user === this.FORTUNATO_ID
+      );
     });
-
     this.loteTostadoService.getLotesTostadosConInventario().subscribe(lotes => {
       this.lotes = lotes;
     });
@@ -85,10 +88,13 @@ export class AddEnvioComponent implements OnInit {
     this.availableQty = 0;
     this.almacenesFiltrados = [];
 
-    this.lotesCliente = this.lotes.filter(lote =>
-      lote.id_user === idCliente &&
-      !lote.eliminado
-    );
+    const esFortuanto = idCliente === this.FORTUNATO_ID;
+
+    this.lotesCliente = this.lotes.filter(lote => {
+      if (lote.eliminado) return false;
+      if (esFortuanto) return lote.id_user !== idCliente;
+      return lote.id_user === idCliente;
+    });
   }
 
   onLoteChange(idLoteTostado: string): void {

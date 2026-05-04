@@ -1,0 +1,130 @@
+<div class="min-h-screen p-6 bg-[#F9F9F9]">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-[#1F1F1F]">Estadísticas de Ventas</h1>
+    <p class="text-gray-600">Análisis de ventas por clasificación de café</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 mb-6">
+    <div class="flex flex-wrap gap-3 items-end">
+      <div class="w-40">
+        <label class="block text-xs text-gray-600 mb-1">Desde</label>
+        <input type="date" [(ngModel)]="startDate" (ngModelChange)="onFilterChange()"
+          class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+      </div>
+      <div class="w-40">
+        <label class="block text-xs text-gray-600 mb-1">Hasta</label>
+        <input type="date" [(ngModel)]="endDate" (ngModelChange)="onFilterChange()"
+          class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+      </div>
+      <div class="flex gap-3">
+        <button (click)="resetRange()"
+          class="text-sm text-gray-600 hover:text-[#B8672E] underline">
+          Últimos 3 meses
+        </button>
+        <button (click)="resetHistoric()"
+          class="text-sm text-gray-600 hover:text-[#B8672E] underline">
+          Histórico
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+      <p class="text-xs text-gray-500 mb-1">Total Pedidos</p>
+      <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalPedidos }}</p>
+    </div>
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+      <p class="text-xs text-gray-500 mb-1">Kilos Totales</p>
+      <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalKilos | number:'1.0-0' }} kg</p>
+    </div>
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+      <p class="text-xs text-gray-500 mb-1">Clasificaciones</p>
+      <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.length }}</p>
+    </div>
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+      <p class="text-xs text-gray-500 mb-1">Más vendida</p>
+      <p class="text-2xl font-bold text-[#B8672E]">
+        {{ stats[0]?.clasificacion | titlecase }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Gráficas -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+    <!-- Barras -->
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Kilos vendidos por clasificación</h2>
+      <apx-chart
+        *ngIf="barSeries.length"
+        [series]="barSeries"
+        [chart]="barChart"
+        [xaxis]="barXAxis"
+        [yaxis]="barYAxis"
+        [colors]="barColors"
+        [plotOptions]="barPlotOptions"
+        [dataLabels]="barDataLabels">
+      </apx-chart>
+      <p *ngIf="!barSeries.length" class="text-center text-sm text-gray-400 py-8">
+        Sin datos en el periodo seleccionado.
+      </p>
+    </div>
+
+    <!-- Torta -->
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Distribución de pedidos</h2>
+      <apx-chart
+        *ngIf="pieSeries.length"
+        [series]="pieSeries"
+        [chart]="pieChart"
+        [labels]="pieLabels"
+        [colors]="pieColors"
+        [legend]="pieLegend">
+      </apx-chart>
+      <p *ngIf="!pieSeries.length" class="text-center text-sm text-gray-400 py-8">
+        Sin datos en el periodo seleccionado.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Tabla resumen -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Resumen por clasificación</h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Clasificación</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Total Pedidos</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Kilos Totales</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Prom. por Pedido</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lotes Distintos</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Prom. por Lote</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let s of stats">
+            <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ s.clasificacion | titlecase }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ s.totalPedidos }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ s.kilosTotales | number:'1.2-2' }} kg</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ s.promedioPorPedido | number:'1.2-2' }} kg</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ s.lotes.size }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ s.promedioPorLote | number:'1.2-2' }} kg</td>
+          </tr>
+          <tr *ngIf="stats.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-400">
+              Sin datos en el periodo seleccionado.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

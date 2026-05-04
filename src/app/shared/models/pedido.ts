@@ -1,3 +1,4 @@
+import { Lote } from "./lote";
 import { Molienda } from "./molienda";
 
 export interface Pedido {
@@ -33,4 +34,8 @@ export interface Pedido {
   creado_por_id?: string;
   completado_por_id?: string;
   fecha_completado?: Date;
+}
+
+export interface PedidoConLote extends Pedido {
+  lote?: Lote | null;
 }

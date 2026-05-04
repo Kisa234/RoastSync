@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { NgFor, NgIf, NgClass } from '@angular/common';
-import { FilePenLine, LucideAngularModule, Users, Flame } from 'lucide-angular';
+import { FilePenLine, LucideAngularModule, Users, Flame, ChartBar } from 'lucide-angular';
 import { PermissionAccessService } from '../../services/permission-access.service';
 import {
   House,
@@ -177,11 +177,34 @@ export class SidebarComponent {
       permissions: 'envios.read'
     },
     {
-      type: 'link',
+      type: 'group',
       label: 'Costeo',
-      path: '/costing',
       icon: Calculator,
-      permissions: 'costeo.read'
+      key: 'costing',
+      permissions: 'costeo.read',
+      children: [
+        {
+          type: 'link',
+          label: 'Calculadora',
+          path: '/costing/calculadora',
+          icon: Calculator,
+          permissions: 'costeo.read'
+        },
+        {
+          type: 'link',
+          label: 'Precios',
+          path: '/costing/prices',
+          icon: Calculator,
+          permissions: 'costeo.kardex.read'
+        },
+        {
+          type: 'link',
+          label: 'Estadísticas',
+          path: '/costing/stadistics',
+          icon: ChartBar,
+          permissions: 'costeo.read'
+        }
+      ]
     },
     {
       type: 'link',
