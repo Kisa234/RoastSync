@@ -103,14 +103,14 @@ export class RoastsPage {
 
   ngOnInit() {
     this.loadPending();
-    this.loadHistory();
-    this.loadClients();
+    this.loadClients(() => this.loadHistory());
     this.loadAllRoasts();
   }
 
-  loadClients() {
+  loadClients(callback?: () => void) {
     this.userSvc.getUsers().subscribe(list => {
       this.clients = list;
+      callback?.();
     });
   }
 
@@ -136,6 +136,7 @@ export class RoastsPage {
         next: (list) => {
           this.allHistoryRoasts = list ?? [];
           this.applyFilter();
+          console.log('Órdenes de tueste completadas con lote cargadas:', this.allHistoryRoasts);
         },
         error: (error) => {
           console.error('Error cargando historial de tuestes:', error);
@@ -152,49 +153,43 @@ export class RoastsPage {
     });
   }
 
+  getEstadoFacturacion(p: PedidoConLote): 'ES_NUESTRO' | 'FACTURADO' | 'NO_FACTURADO' {
+    const duenioLote = this.clients.find(c => c.id_user === p.lote?.id_user);
+    if (duenioLote?.rol === 'admin') return 'ES_NUESTRO';
+    if (p.facturado === true) return 'FACTURADO';
+    return 'NO_FACTURADO';
+  }
+
   facturarPedido(o: PedidoConLote) {
+    const estado = this.getEstadoFacturacion(o);
 
-    if (o.facturado) {
-      this.uiSvc.alert(
-        'info',
-        'Pedido ya facturado',
-        `El pedido de tueste del lote ${o.id_lote} ya está marcado como facturado.`,
-        1500
-      );
+    if (estado === 'ES_NUESTRO') {
+      this.uiSvc.alert('info', 'Pedido interno',
+        `El lote ${o.id_lote} pertenece a la tienda y no se puede facturar.`, 1500);
       return;
     }
 
-    if (o.estadoFacturacion === "ES_NUESTRO") {
-      this.uiSvc.alert(
-        'info',
-        'Pedido de tueste interno',
-        `El pedido de tueste del lote ${o.id_lote} es un pedido interno de la empresa y no se puede facturar.`,
-        1500
-      );
+    if (estado === 'FACTURADO') {
+      this.uiSvc.alert('info', 'Pedido ya facturado',
+        `El pedido del lote ${o.id_lote} ya está marcado como facturado.`, 1500);
       return;
     }
-
 
     this.uiSvc.confirm({
       title: 'Facturar pedido',
       message: `¿Confirma que desea marcar el pedido de tueste del lote ${o.id_lote} como facturado?`,
       confirmText: 'Sí',
       cancelText: 'No'
-    }).then(
-      confirmed => {
-        if (confirmed) {
-          this.pedidoSvc.setFacturado(o.id_pedido).subscribe(updated => {
-            this.allHistoryRoasts = this.allHistoryRoasts.map(p =>
-              p.id_pedido === updated.id_pedido ? { ...p, estadoFacturacion: "FACTURADO" } : p
-            );
-
-            this.applyFilter();
-          });
-
-        }
+    }).then(confirmed => {
+      if (confirmed) {
+        this.pedidoSvc.setFacturado(o.id_pedido).subscribe(updated => {
+          this.allHistoryRoasts = this.allHistoryRoasts.map(p =>
+            p.id_pedido === updated.id_pedido ? { ...p, facturado: true } : p
+          );
+          this.applyFilter();
+        });
       }
-    )
-
+    });
   }
 
   toggleAllRoasts() {

@@ -7,7 +7,6 @@ export interface Pedido {
   tipo_pedido: string;
   cantidad: number;
   facturado?: boolean;
-  estadoFacturacion?: 'ES_NUESTRO' | 'FACTURADO' | 'NO_FACTURADO';
   estado_pedido: string;
 
   id_user: string;
