@@ -1,18 +1,33 @@
- <div *ngIf="alert" class="fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg p-4 flex items-start space-x-3 z-50"
-         [ngClass]="{
+<div *ngIf="alert" class="fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg p-4 flex items-start space-x-3 z-50"
+  [ngClass]="{
            'border-l-4 border-green-500': alert.type==='success',
            'border-l-4 border-red-500': alert.type==='error',
            'border-l-4 border-yellow-500': alert.type==='warning',
            'border-l-4 border-blue-500': alert.type==='info'
          }">
-      <div class="flex-shrink-0">
-        <lucide-icon [img]="icons[alert.type]" class="w-6 h-6 text-current" />
-      </div>
-      <div class="flex-1">
-        <h3 class="font-semibold text-gray-800">{{ alert.title }}</h3>
-        <p class="text-sm text-gray-600">{{ alert.message }}</p>
-      </div>
-      <button class="text-gray-400 hover:text-gray-600" (click)="close()">
-        <lucide-icon [img]="X" class="w-5 h-5" />
-      </button>
+  <div class="flex-shrink-0">
+    <lucide-icon [img]="icons[alert.type]" class="w-6 h-6 text-current" />
+  </div>
+  <div class="flex-1">
+    <h3 class="font-semibold text-gray-800">{{ alert.title }}</h3>
+    <p class="text-sm text-gray-600">{{ alert.message }}</p>
+  </div>
+  <button class="text-gray-400 hover:text-gray-600" (click)="close()">
+    <lucide-icon [img]="icons['X']" class="w-5 h-5" />
+  </button>
+</div>
+
+<div *ngIf="progress"
+  class="fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-lg p-4 z-50 border-l-4 border-blue-500">
+  <div class="flex items-center justify-between mb-2">
+    <div class="flex items-center gap-2">
+      <lucide-icon [img]="icons['info']" class="w-5 h-5 text-blue-500 animate-pulse" />
+      <h3 class="font-semibold text-gray-800 text-sm">{{ progress.message }}</h3>
     </div>
+    <span class="text-sm font-bold text-blue-600">{{ progress.percent }}%</span>
+  </div>
+  <div class="w-full bg-gray-200 rounded-full h-2">
+    <div class="bg-blue-500 h-2 rounded-full transition-all duration-300" [style.width.%]="progress.percent">
+    </div>
+  </div>
+</div>

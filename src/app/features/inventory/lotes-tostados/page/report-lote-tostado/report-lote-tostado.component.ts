@@ -2,7 +2,7 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { LucideAngularModule, FileSpreadsheet, Download, TestTube, ArrowLeft } from 'lucide-angular';
+import { LucideAngularModule, FileSpreadsheet, Download, TestTube, ArrowLeft, Pencil } from 'lucide-angular';
 import { firstValueFrom } from 'rxjs';
 import { formatDate } from '@angular/common';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
@@ -12,6 +12,8 @@ import { Tueste } from '../../../../../shared/models/tueste';
 import { RoastsService } from '../../../../roasts/service/roasts.service';
 import { LoteTostadoService } from '../../service/lote-tostado.service';
 import { UserService } from '../../../../users/service/users-service.service';
+import { UiService } from '../../../../../shared/services/ui.service';
+import { EditRoastCompletedComponent } from '../../../../roasts/components/edit-roast-completed/edit-roast-completed.component';
 
 @Component({
   selector: 'report-lote-tostado',
@@ -23,7 +25,8 @@ import { UserService } from '../../../../users/service/users-service.service';
     FormsModule,
     CommonModule,
     UserNamePipe,
-    MinSecPipe
+    MinSecPipe,
+    EditRoastCompletedComponent
   ]
 })
 export class ReportLoteTostadoComponent implements OnInit {
@@ -34,7 +37,10 @@ export class ReportLoteTostadoComponent implements OnInit {
   readonly FileSpreadsheet = FileSpreadsheet;
   readonly TestTube = TestTube;
   readonly ArrowLeft = ArrowLeft;
+  readonly Pencil = Pencil;
 
+  editingRoastId: string | null = null;
+  clienteNombre: string = '';
   currentDate: Date = new Date();
   ficha: FichaTueste = {
     id_lote: '', humedad: 0, densidad: 0, caramelizacion: 0,
@@ -48,7 +54,8 @@ export class ReportLoteTostadoComponent implements OnInit {
     private roastSvc: RoastsService,
     private loteTostadoSvc: LoteTostadoService,
     private userService: UserService,
-    private location: Location
+    private location: Location,
+    private uiService: UiService
   ) { }
 
 
@@ -68,12 +75,24 @@ export class ReportLoteTostadoComponent implements OnInit {
 
   private loadTuestes(): void {
     this.roastSvc.getTuestesByLote(this.id)
-      .subscribe(data => {
+      .subscribe(async data => {
         this.tuestes = data.sort((a, b) => a.num_batch - b.num_batch);
+
+        // Resolver nombre del cliente
+        if (this.tuestes[0]?.id_cliente) {
+          try {
+            const user = await firstValueFrom(
+              this.userService.getUserById(this.tuestes[0].id_cliente)
+            );
+            this.clienteNombre = user?.nombre_comercial || user?.nombre || this.tuestes[0].id_cliente;
+          } catch {
+            this.clienteNombre = this.tuestes[0].id_cliente;
+          }
+        }
+
         this.loadFicha();
       });
   }
-
   formatTiempoSegundos(segundos: number): string {
     const minutos = Math.floor(segundos / 60);
     const segundosRest = Math.round(segundos % 60);
@@ -167,98 +186,164 @@ export class ReportLoteTostadoComponent implements OnInit {
     writeFileXLSX(wb, filename);
   }
 
-  exportPdf(): void {
-    const host = document.getElementById('pdfContent');
-    if (!host) return;
+  async exportPdf(): Promise<void> {
+    const { default: jsPDF } = await import('jspdf');
+    const { default: autoTable } = await import('jspdf-autotable');
 
-    const pages = Array.from(host.querySelectorAll<HTMLElement>('.page-container'));
-    const pageHtml = (pages.length ? pages : [host]).map(el => {
-      const clone = el.cloneNode(true) as HTMLElement;
-      clone.querySelectorAll('.no-print,[data-no-print]').forEach(n => n.remove());
-      return `<div class="page-container">${clone.innerHTML}</div>`;
-    }).join('');
+    this.uiService.showProgress('Generando PDF...', 5);
 
-    // 1) Copiamos <link rel="stylesheet"> para asegurar Tailwind/estilos
-    const linksHtml = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-      .map(l => `<link rel="stylesheet" href="${(l as HTMLLinkElement).href}">`)
-      .join('');
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const margin = 12;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const contentWidth = pageWidth - margin * 2;
 
-    // 2) También extraemos reglas de estilos locales (no cross-origin)
-    const extractedStyles = Array.from(document.styleSheets)
-      .map(sheet => {
-        try {
-          return Array.from((sheet as CSSStyleSheet).cssRules || [])
-            .map(r => (r as CSSRule).cssText).join('\n');
-        } catch { return ''; }
-      }).join('\n');
-
-    // 3) CSS para print-window (landscape + evitar cortes/overflow)
-    const pageCss = `
-    @page { size: A4 landscape; margin: 10mm; }
-
-    html, body { height: 100%; }
-    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-    .page-container {
-      position: relative;
-      width: 277mm;       /* 297 - (10mm*2) */
-      min-height: 190mm;
-      margin: 0 auto;
-      page-break-after: always;
-      overflow: hidden;
+    // ── LOGOS ──
+    this.uiService.showProgress('Cargando logos...', 15);
+    let logoIzq = '', logoDer = '', logoFinal = '';
+    let dimIzq = { w: 0, h: 0 }, dimDer = { w: 0, h: 0 }, dimFinal = { w: 0, h: 0 };
+    try {
+      logoIzq = await this.imageToBase64('assets/img/lo-bueno-negro-rojo.png');
+      logoDer = await this.imageToBase64('assets/img/logotipo.png');
+      logoFinal = await this.imageToBase64('assets/img/logo-negro.png');
+      dimIzq = await this.getImgDimensions(logoIzq, 50, 14);
+      dimDer = await this.getImgDimensions(logoDer, 50, 14);
+      dimFinal = await this.getImgDimensions(logoFinal, 40, 12);
+    } catch (e) {
+      console.warn('Logos no cargados', e);
     }
-    .page-container:last-child { page-break-after: auto; }
 
-    .print-page { box-sizing: border-box; height: 100%; }
+    this.uiService.showProgress('Construyendo encabezado...', 35);
+    const logoH = 14;
+    if (logoIzq) pdf.addImage(logoIzq, 'PNG', margin, margin + (logoH - dimIzq.h) / 2, dimIzq.w, dimIzq.h);
+    if (logoDer) pdf.addImage(logoDer, 'PNG', pageWidth - margin - dimDer.w, margin + (logoH - dimDer.h) / 2, dimDer.w, dimDer.h);
 
-    .overflow-x-auto, .overflow-auto, .overflow-hidden, .overflow-scroll {
-      overflow: visible !important;
-    }
-    
+    let y = margin + logoH + 6;
+    pdf.setDrawColor(200, 200, 200);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, y - 2, pageWidth - margin, y - 2);
 
+    pdf.setFontSize(18); pdf.setFont('helvetica', 'bold');
+    pdf.text('Reporte Lote Tostado', margin, y + 6);
+    y += 14;
 
-    table { width: 100% !important; border-collapse: collapse !important; table-layout: auto; }
-    thead { display: table-header-group; }
-    tfoot { display: table-footer-group; }
-    tbody tr { break-inside: avoid; page-break-inside: avoid; }
-    th, td { padding: 2px 4px !important; font-size: 11px !important; }
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'bold'); pdf.text('Cliente:', margin, y);
+    pdf.setFont('helvetica', 'normal'); pdf.text(` ${this.clienteNombre}`, margin + 14, y); y += 5;
+    pdf.setFont('helvetica', 'bold'); pdf.text('Lote:', margin, y);
+    pdf.setFont('helvetica', 'normal'); pdf.text(` ${this.id}`, margin + 10, y); y += 5;
+    pdf.setFont('helvetica', 'bold'); pdf.text('Fecha:', margin, y);
+    pdf.setFont('helvetica', 'normal');
+    const fecha = this.tuestes[0]?.fecha_tueste
+      ? new Date(this.tuestes[0].fecha_tueste).toLocaleDateString('es-PE') : '';
+    pdf.text(` ${fecha}`, margin + 12, y);
+    y += 10;
 
-    .sticky, .sticky th, .sticky td { position: static !important; }
+    // ── DATOS GENERALES ──
+    this.uiService.showProgress('Agregando datos generales...', 55);
+    pdf.setFontSize(11); pdf.setFont('helvetica', 'bold');
+    pdf.text('Datos Generales', margin, y);
+    y += 5;
 
-    .shadow, .shadow-md, .shadow-lg { box-shadow: none !important; }
-  `;
+    const generales = [
+      ['Humedad', `${this.ficha.humedad?.toFixed(2)}%`, 'Densidad', `${this.ficha.densidad?.toFixed(2)}`],
+      ['% Caramelización', `${this.ficha.caramelizacion?.toFixed(2)}%`, 'Desarrollo', `${this.ficha.desarrollo?.toFixed(2)}`],
+      ['Tueste', this.ficha.tueste, 'Temp. Desarrollo', `${this.ficha.temp_desarrollo?.toFixed(2)}`],
+      ['Agtrom Comercial', `${this.ficha.agtrom?.toFixed(2)}`, 'Tiempo', this.formatTiempoSegundos(this.ficha.tiempo)],
+      ['Peso Total', `${this.ficha.peso_total}`, '', ''],
+    ];
 
-    // 4) Base href para que rutas relativas funcionen en la ventana
-    const baseHref =
-      (document.querySelector('base') as HTMLBaseElement)?.href || document.baseURI;
+    autoTable(pdf, {
+      startY: y, margin: { left: margin, right: margin },
+      body: generales, theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2 },
+      columnStyles: {
+        0: { fontStyle: 'bold', fillColor: [245, 245, 245], cellWidth: contentWidth * 0.2 },
+        1: { cellWidth: contentWidth * 0.3 },
+        2: { fontStyle: 'bold', fillColor: [245, 245, 245], cellWidth: contentWidth * 0.2 },
+        3: { cellWidth: contentWidth * 0.3 },
+      },
+    });
 
-    const w = window.open('', '_blank', 'width=900,height=700');
-    if (!w) return;
+    y = (pdf as any).lastAutoTable.finalY + 8;
 
-    w.document.open();
-    w.document.write(`
-    <html>
-      <head>
-        <meta charset="utf-8" />
-        <base href="${baseHref}">
-        ${linksHtml}
-        <style>${pageCss}</style>
-        <style>${extractedStyles}</style>
-        <title>Reporte_Lote_Tostado_${this.id}</title>
-      </head>
-      <body>${pageHtml}</body>
-    </html>
-  `);
-    w.document.close();
+    // ── VARIABLES DE TUESTE ──
+    this.uiService.showProgress('Generando tabla de batches...', 75);
+    pdf.setFontSize(11); pdf.setFont('helvetica', 'bold');
+    pdf.text('Variables de Tueste', margin, y);
+    pdf.setFontSize(9); pdf.setFont('helvetica', 'normal');
+    pdf.text(`${this.tuestes.length} registros`, pageWidth - margin, y, { align: 'right' });
+    y += 5;
 
-    // 5) Imprime cuando carguen hojas/recursos
-    w.addEventListener('load', () => {
-      (w.document as any).fonts?.ready?.finally(() => {
-        setTimeout(() => { try { w.focus(); w.print(); } finally { w.close(); } }, 100);
-      });
+    const headers = [
+      'Batch', 'Peso\nEntrada', 'Tostadora', 'Temp\nEntr.', 'Llama\nInic.',
+      'Aire\nInic.', 'Pto No\nRetorno', 'T. Crack', 'Temp\nCrack',
+      'Temp\nSalida', 'T. Total', '% Car.', 'Desarr.', 'Grados\nDes.',
+      'Agtrom\nCom.', 'Agtrom\nGour.', 'Peso\nSalida', 'Merma'
+    ];
+
+    const rows = this.tuestes.map(t => [
+      t.num_batch, t.peso_entrada, t.tostadora, t.temperatura_entrada,
+      t.llama_inicial, t.aire_inicial, t.punto_no_retorno,
+      this.formatTiempoSegundos(t.tiempo_despues_crack),
+      t.temperatura_crack, t.temperatura_salida,
+      this.formatTiempoSegundos(t.tiempo_total),
+      t.porcentaje_caramelizacion, t.desarrollo, t.grados_desarrollo,
+      t.agtrom_comercial, t.agtrom_gourmet, t.peso_salida, t.merma,
+    ]);
+
+    autoTable(pdf, {
+      startY: y, margin: { left: margin, right: margin },
+      head: [headers], body: rows, theme: 'striped',
+      styles: { fontSize: 7, cellPadding: 1.5, halign: 'center' },
+      headStyles: { fillColor: [50, 50, 50], textColor: 255, fontSize: 7, fontStyle: 'bold', halign: 'center' },
+      columnStyles: { 0: { cellWidth: 8 }, 2: { halign: 'left' } },
+      didDrawPage: () => {
+        pdf.setFontSize(8); pdf.setFont('helvetica', 'normal');
+        pdf.text(`Página ${pdf.getNumberOfPages()}`, pageWidth - margin, pageHeight - 6, { align: 'right' });
+        if (logoFinal) {
+          pdf.addImage(logoFinal, 'PNG', (pageWidth - dimFinal.w) / 2, pageHeight - margin - dimFinal.h, dimFinal.w, dimFinal.h);
+        }
+      }
+    });
+
+    // ── GUARDAR ──
+    this.uiService.showProgress('Guardando archivo...', 90);
+    await new Promise(r => setTimeout(r, 100)); // tick para que se vea el 90%
+
+    pdf.save(`Reporte_Lote_Tostado_${this.id}.pdf`);
+
+    this.uiService.clearProgress();
+    this.uiService.alert('success', 'PDF generado', 'El reporte se descargó correctamente.');
+  }
+
+  private getImgDimensions(base64: string, maxW: number, maxH: number): Promise<{ w: number, h: number }> {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const ratio = img.width / img.height;
+        let w = maxW;
+        let h = w / ratio;
+        if (h > maxH) {
+          h = maxH;
+          w = h * ratio;
+        }
+        resolve({ w, h });
+      };
+      img.src = base64;
     });
   }
 
+  private async imageToBase64(url: string): Promise<string> {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
 
   async exportSticker(t: Tueste) {
     const lote = t.id_lote ?? this.id ?? '';
@@ -324,6 +409,15 @@ export class ReportLoteTostadoComponent implements OnInit {
     a.href = canvas.toDataURL('image/png');
     a.download = `Sticker_${lote}_B${batch}_${formatDate(t.fecha_tueste, 'yyyyMMdd', 'es-PE')}.png`;
     a.click(); a.remove();
+  }
+
+  onRoastSaved(updated: Tueste): void {
+    const idx = this.tuestes.findIndex(t => t.id_tueste === updated.id_tueste);
+    if (idx !== -1) {
+      this.tuestes[idx] = updated;
+      this.tuestes = [...this.tuestes];
+    }
+    this.loadFicha(); 
   }
 }
 

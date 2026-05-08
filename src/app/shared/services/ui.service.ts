@@ -36,6 +36,10 @@ export class UiService {
 
   private promptResolve!: (result: { confirmed: boolean; value?: string }) => void;
 
+  private _progress$ = new BehaviorSubject<{ message: string; percent: number } | null>(null);
+  progress$: Observable<{ message: string; percent: number } | null> = this._progress$.asObservable();
+
+ 
 
   /** Alertas */
   alert(type: AlertType, title: string, message: string, duration = 4000) {
@@ -81,6 +85,14 @@ export class UiService {
   rejectPrompt() {
     this.promptResolve({ confirmed: false });
     this._prompt$.next(null);
+  }
+
+   showProgress(message: string, percent: number) {
+    this._progress$.next({ message, percent });
+  }
+
+  clearProgress() {
+    this._progress$.next(null);
   }
 
 }

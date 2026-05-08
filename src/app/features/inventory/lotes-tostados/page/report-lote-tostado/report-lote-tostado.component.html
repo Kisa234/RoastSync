@@ -4,7 +4,7 @@
 
       <!-- HEADER -->
       <button type="button" (click)="goBack()"
-        class="mb-2 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition">
+        class="no-print mb-2 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition">
         <lucide-icon [img]="ArrowLeft" class="w-4 h-4"></lucide-icon>
         Volver
       </button>
@@ -16,7 +16,8 @@
           </h1>
 
           <div class="text-sm text-gray-600 space-y-1 print:text-xs">
-            <p><span class="font-medium text-gray-900">Cliente:</span> {{ tuestes[0].id_cliente | UserNamePipe | async }}</p>
+            <p><span class="font-medium text-gray-900">Cliente:</span> {{ tuestes[0].id_cliente | UserNamePipe | async
+              }}</p>
             <p><span class="font-medium text-gray-900">Lote:</span> {{ id }}</p>
             <p><span class="font-medium text-gray-900">Fecha:</span> {{ tuestes[0].fecha_tueste | date:'dd/MM/yyyy' }}
             </p>
@@ -186,10 +187,16 @@
                 </td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm text-right print:px-1 print:py-1">{{ t.merma }}</td>
                 <td class="px-3 py-2 whitespace-nowrap text-sm text-right print:px-1 print:py-1">
-                  <button type="button" class="text-gray-500 hover:text-gray-700 no-print" (click)="exportSticker(t)"
-                    title="Generar sticker">
-                    <lucide-icon [img]="TestTube" class="w-5 h-5" />
-                  </button>
+                  <div class="flex items-center justify-end gap-2 no-print">
+                    <button type="button" class="text-gray-500 hover:text-blue-600 transition"
+                      (click)="editingRoastId = t.id_tueste" title="Editar batch">
+                      <lucide-icon [img]="Pencil" class="w-5 h-5" />
+                    </button>
+                    <button type="button" class="text-gray-500 hover:text-gray-700" (click)="exportSticker(t)"
+                      title="Generar sticker">
+                      <lucide-icon [img]="TestTube" class="w-5 h-5" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -200,3 +207,8 @@
     </div>
   </div>
 </div>
+
+<!-- Modal editar batch -->
+<edit-roast-completed *ngIf="editingRoastId" [roastId]="editingRoastId!" (close)="editingRoastId = null"
+  (saved)="onRoastSaved($event)">
+</edit-roast-completed>

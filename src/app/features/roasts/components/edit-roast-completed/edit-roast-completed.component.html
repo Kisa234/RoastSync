@@ -1,0 +1,201 @@
+<ng-container *ngIf="roast.id_tueste; else loading">
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10">
+                <div>
+                    <h2 class="text-lg font-semibold flex items-center gap-2">
+                        <lucide-icon [img]="Pencil" class="w-5 h-5 text-[#B8672E]" />
+                        Editar Batch – {{ roast.num_batch }}
+                    </h2>
+                    <p class="text-sm text-gray-500">Edita todos los parámetros del batch completado</p>
+                </div>
+                <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600">
+                    <lucide-icon [img]="X" class="w-5 h-5" />
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+
+                <!-- SECCIÓN: Variables de Tueste -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                        Variables de Tueste
+                    </h3>
+                    <div class="grid grid-cols-3 gap-4">
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Tostadora</label>
+                            <input type="text" [(ngModel)]="roast.tostadora" name="tostadora"
+                                class="w-full border rounded px-3 py-2 bg-gray-100" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Densidad (g/l)</label>
+                            <input type="number" [(ngModel)]="roast.densidad" name="densidad"
+                                class="w-full border rounded px-3 py-2 bg-gray-100" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Humedad (%)</label>
+                            <input type="number" [(ngModel)]="roast.humedad" name="humedad"
+                                class="w-full border rounded px-3 py-2 bg-gray-100" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Peso Entrada (kg)</label>
+                            <input type="number" [(ngModel)]="roast.peso_entrada" name="pesoEntrada"
+                                (ngModelChange)="updateMerma()" class="w-full border rounded px-3 py-2 bg-gray-100" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Temperatura Entrada (°C)</label>
+                            <input type="number" [(ngModel)]="roast.temperatura_entrada" name="temperaturaEntrada"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.temperatura_entrada }}</sub>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Llama Inicial (%)</label>
+                            <input type="number" [(ngModel)]="roast.llama_inicial" name="llamaInicial"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.llama_inicial }}</sub>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Aire Inicial (%)</label>
+                            <input type="number" [(ngModel)]="roast.aire_inicial" name="aireInicial"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.aire_inicial }}</sub>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Punto No Retorno (°C)</label>
+                            <input type="number" [(ngModel)]="roast.punto_no_retorno" name="puntoNoRetorno"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.punto_no_retorno }}</sub>
+                        </div>
+
+                        <app-time-input label="Tiempo Después Crack" [prom]="ref.tiempo_despues_crack"
+                            [(ngModel)]="roast.tiempo_despues_crack" name="tiempoDespuesCrack">
+                        </app-time-input>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Temperatura Crack (°C)</label>
+                            <input type="number" [(ngModel)]="roast.temperatura_crack" name="temperaturaCrack"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.temperatura_crack }}</sub>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Temperatura Salida (°C)</label>
+                            <input type="number" [(ngModel)]="roast.temperatura_salida" name="temperaturaSalida"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.temperatura_salida }}</sub>
+                        </div>
+
+                        <app-time-input label="Tiempo Total" [prom]="ref.tiempo_total" [(ngModel)]="roast.tiempo_total"
+                            name="tiempoTotal">
+                        </app-time-input>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">% Caramelización</label>
+                            <input type="number" [(ngModel)]="roast.porcentaje_caramelizacion"
+                                name="porcentajeCaramelizacion"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.porcentaje_caramelizacion }}</sub>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Desarrollo (%)</label>
+                            <input type="number" [(ngModel)]="roast.desarrollo" name="desarrollo"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.desarrollo }}</sub>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Grados Desarrollo</label>
+                            <input type="number" [(ngModel)]="roast.grados_desarrollo" name="gradosDesarrollo"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                            <sub class="text-xs text-gray-400">prom: {{ ref.grados_desarrollo }}</sub>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: Datos de Completado -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                        Datos de Completado
+                    </h3>
+                    <div class="grid grid-cols-3 gap-4">
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Peso Salida (kg)</label>
+                            <input type="number" [(ngModel)]="roast.peso_salida" name="pesoSalida"
+                                (ngModelChange)="updateMerma()"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Merma (%)</label>
+                            <input type="number" [value]="roast.merma" disabled
+                                class="w-full border rounded px-3 py-2 bg-gray-100" />
+                        </div>
+
+                        <div>
+                            <!-- spacer -->
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Agtrom Gourmet</label>
+                            <input type="number" [(ngModel)]="roast.agtrom_gourmet" name="agtromGourmet"
+                                (ngModelChange)="calcAgtrom()"
+                                class="w-full border rounded px-3 py-2 focus:ring focus:ring-[#B8672E]" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Agtrom Comercial</label>
+                            <input type="number" [value]="roast.agtrom_comercial" disabled
+                                class="w-full border rounded px-3 py-2 bg-gray-100" />
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Resumen -->
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+                    <h3 class="font-semibold mb-2">Resumen</h3>
+                    <div class="grid grid-cols-4 gap-3">
+                        <div>Peso entrada: <span class="font-medium">{{ roast.peso_entrada }}g</span></div>
+                        <div>Peso salida: <span class="font-medium">{{ roast.peso_salida }}g</span></div>
+                        <div>Merma: <span class="font-medium">{{ roast.merma }}%</span></div>
+                        <div>Rendimiento: <span class="font-medium">
+                                {{ ((roast.peso_salida! / roast.peso_entrada!) * 100) | number:'1.1-1' }}%
+                            </span></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end items-center gap-3 px-6 py-4 border-t bg-gray-50 sticky bottom-0">
+                <button (click)="onSave()"
+                    class="bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition">
+                    Guardar cambios
+                </button>
+                <button (click)="close.emit()" class="px-4 py-2 rounded border hover:bg-gray-100 transition">
+                    Cancelar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #loading>
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <p class="text-white">Cargando datos del batch…</p>
+    </div>
+</ng-template>
