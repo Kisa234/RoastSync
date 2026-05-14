@@ -29,13 +29,16 @@ export class FichaTuesteComponent implements OnInit {
     desarrollo: 0,
     temp_desarrollo: 0,
     agtrom: 0,
+    agtrom_gourmet: 0,
     tiempo: 0,
     tueste: '',
     id_lote_tostado: '',
     peso_total: 0,
+    merma: 0,
+    merma_gr: 0
   }
 
-  user: User ={
+  user: User = {
     id_user: '',
     nombre: '',
     email: '',
@@ -45,7 +48,7 @@ export class FichaTuesteComponent implements OnInit {
     eliminado: false,
     fecha_registro: new Date()
   }
-  lote:Lote={
+  lote: Lote = {
     id_lote: '',
     peso: 0,
     variedades: [],
@@ -61,7 +64,7 @@ export class FichaTuesteComponent implements OnInit {
   constructor(
     readonly loteTostadoSvc: LoteTostadoService,
     readonly userService: UserService,
-    readonly loteService: LoteService, 
+    readonly loteService: LoteService,
   ) { }
 
   ngOnInit() {
@@ -70,19 +73,16 @@ export class FichaTuesteComponent implements OnInit {
 
   private async loadData() {
     this.loteTostadoSvc.getFichaTueste(this.id).subscribe(loteTostado => {
-      this.data = loteTostado;
+      this.data = loteTostado;  // ya no se llama calcAgtrom()
       this.loteService.getById(loteTostado.id_lote).subscribe(lote => {
-        this.lote=lote;
-        this.userService.getUserById(lote.id_user!).subscribe(user =>{
-          this.user= user; 
-        })
-      })
+        this.lote = lote;
+        this.userService.getUserById(lote.id_user!).subscribe(user => {
+          this.user = user;
+        });
+      });
     });
   }
 
-  calcAgtrom(){
-    this.agtromGour = parseFloat(((this.data.agtrom! + 1.528 ) * 0.74294).toFixed(1));
-  }
 
   formatTiempoSegundos(segundos: number): string {
     const minutos = Math.floor(segundos / 60);

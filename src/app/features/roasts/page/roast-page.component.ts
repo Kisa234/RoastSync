@@ -318,15 +318,18 @@ export class RoastsPage {
     /* ===============================
      * HOJA 1 – HISTORIAL DE PEDIDOS
      * =============================== */
-    const pedidosSheet = this.filteredHistoryRoasts.map(h => ({
-      id_pedido: h.id_pedido,
-      Lote: h.id_lote,
-      Fecha: h.fecha_tueste,
-      Cliente: h.usuario_nombre,
-      Cantidad: h.cantidad,
-      'Tipo de Tueste': h.comentario,
-      Facturado: h.facturado ? 'Sí' : 'No',
-    }));
+    const pedidosSheet = this.filteredHistoryRoasts.map(h => {
+      const cliente = this.clients.find(c => c.id_user === h.lote?.id_user);
+      return {
+        id_pedido: h.id_pedido,
+        Lote: h.id_lote,
+        Fecha: h.fecha_tueste,
+        Cliente: cliente?.nombre ?? 'Desconocido',  // ← fix
+        Cantidad: h.cantidad,
+        'Tipo de Tueste': h.comentario,
+        Facturado: h.facturado ? 'Sí' : 'No',
+      };
+    });
 
     const wsPedidos = XLSX.utils.json_to_sheet(pedidosSheet);
 

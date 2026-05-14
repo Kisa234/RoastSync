@@ -45,7 +45,10 @@ export class ReportLoteTostadoComponent implements OnInit {
   ficha: FichaTueste = {
     id_lote: '', humedad: 0, densidad: 0, caramelizacion: 0,
     desarrollo: 0, temp_desarrollo: 0, agtrom: 0,
-    tiempo: 0, tueste: '', id_lote_tostado: '', peso_total: 0
+    tiempo: 0, tueste: '', id_lote_tostado: '', peso_total: 0,
+    agtrom_gourmet: 0,
+    merma: 0,
+    merma_gr: 0
   };
   tuestes: Tueste[] = [];
 
@@ -417,7 +420,7 @@ export class ReportLoteTostadoComponent implements OnInit {
       this.tuestes[idx] = updated;
       this.tuestes = [...this.tuestes];
     }
-    this.loadFicha(); 
+    this.loadFicha();
   }
 }
 

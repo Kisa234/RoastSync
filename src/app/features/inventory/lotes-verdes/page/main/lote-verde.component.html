@@ -21,6 +21,12 @@
         <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
         Agregar Lote
       </button>
+
+      <button (click)="exportLotesVerdes()"
+        class="flex items-center bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition">
+        <lucide-icon [img]="Sheet" class="w-5 h-5 mr-2"></lucide-icon>
+        Exportar Excel
+      </button>
     </div>
   </div>
 
@@ -39,12 +45,12 @@
 
       <!-- Filtros de tipo -->
       <div class="flex gap-2 mb-4">
-        <button (click)="filtroTipo = 'admin'" [class]="filtroTipo === 'admin'
+        <button (click)="filtroTipo = 'admin'; aplicarFiltro()" [class]="filtroTipo === 'admin'
           ? 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#B8672E] text-white'
           : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
           Tienda
         </button>
-        <button (click)="filtroTipo = 'cliente'" [class]="filtroTipo === 'cliente'
+        <button (click)="filtroTipo = 'cliente'; aplicarFiltro()" [class]="filtroTipo === 'cliente'
           ? 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#B8672E] text-white'
           : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
           Clientes

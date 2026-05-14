@@ -8,7 +8,8 @@ import {
   Clipboard,
   History,
   TestTube,
-  Tag
+  Tag,
+  Sheet
 } from 'lucide-angular';
 import { Router, RouterOutlet } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -23,6 +24,10 @@ import { LoteTostadoConInventario } from '../../../../../shared/models/lote-tost
 import { AddInventoryLoteTostadoComponent } from "../../components/add-inventory-lote-tostado/add-inventory-lote-tostado.component";
 import { FichaTuesteComponent } from '../../components/ficha-tueste/ficha-tueste.component';
 import { ReportLoteTostadoComponent } from '../../components/report-lote-tostado/report-lote-tostado.component';
+
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 
 type FilterKey = 'todos' | 'enviados' | 'no-enviados';
 
@@ -52,6 +57,8 @@ export class LoteTostadoComponent {
   readonly History = History;
   readonly TestTube = TestTube;
   readonly Tag = Tag;
+  readonly Sheet = Sheet;
+
 
   tostados: LoteTostadoConInventario[] = [];
   tostadosFiltrados: LoteTostadoConInventario[] = [];
@@ -115,11 +122,17 @@ export class LoteTostadoComponent {
     let result = [...this.tostados];
 
     switch (this.filterTostado) {
-      case 'enviados':
-        result = result.filter(t => !!t.entregado && t.peso === 0);
-        break;
       case 'no-enviados':
-        result = result.filter(t => !t.entregado || t.peso > 0);
+        result = result.filter(t => {
+          const stockReal = this.getStockRealTostado(t);
+          return stockReal > 0;  // ← solo los que tienen stock disponible
+        });
+        break;
+      case 'enviados':
+        result = result.filter(t => {
+          const stockReal = this.getStockRealTostado(t);
+          return stockReal === 0;  // ← los que ya no tienen stock
+        });
         break;
     }
 
@@ -173,9 +186,9 @@ export class LoteTostadoComponent {
         return user?.rol === 'admin';
       })
       .reduce((total, t) => {
-        const pesoInventario = this.getPesoInventarioTostado(t);
+        const pesoInventarioKg = this.getPesoInventarioTostado(t) / 1000;  // ← gr → kg
         const costo = Number(t.lote?.costo || 0);
-        return total + costo * pesoInventario;
+        return total + costo * pesoInventarioKg;
       }, 0);
   }
 
@@ -307,5 +320,39 @@ export class LoteTostadoComponent {
     a.download = `StickerTostado_${lote}_${formatDate(new Date(), 'yyyyMMdd_HHmm', 'es-PE')}.png`;
     a.click();
     a.remove();
+  }
+
+
+  exportLotesTostados() {
+    const data = this.tostadosFiltrados.map(t => {
+      const user = this.usuarios.find(u => u.id_user === t.id_user);
+      const cliente = user?.nombre_comercial || user?.nombre || 'Desconocido';
+      const almacenes = (t.inventarioLotesTostados || [])
+        .map(inv => `${inv.almacen?.nombre || 'N/A'}: ${inv.cantidad_kg} gr`)
+        .join(' | ');
+
+      return {
+        'ID Tostado': t.id_lote_tostado,
+        'ID Lote Verde': t.id_lote,
+        'Productor': t.lote?.productor || '',
+        'Cliente': cliente,
+        'Perfil': t.perfil_tostado || '',
+        'Almacén': almacenes || 'Sin almacén',
+        'Fecha': t.fecha_tostado
+          ? new Date(t.fecha_tostado).toLocaleDateString('es-PE')
+          : '',
+        'Stock (gr)': this.getStockRealTostado(t),
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Lotes Café Tostado');
+
+    const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    const filtro = this.filterTostado === 'no-enviados' ? 'disponibles'
+      : this.filterTostado === 'enviados' ? 'enviados' : 'historico';
+    saveAs(blob, `lotes_tostados_${filtro}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 }

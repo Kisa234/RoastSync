@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Eye, Edit2, Trash2, History, Plus, EyeOff } from 'lucide-angular';
+import { LucideAngularModule, Search, Eye, Edit2, Trash2, History, Plus, EyeOff, Sheet } from 'lucide-angular';
 
 import { ReportLoteComponent } from '../../../../../shared/components/report-lote/report-lote.component';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
@@ -14,6 +14,10 @@ import { AddLoteComponent } from '../../../lotes-verdes/components/add-lote/add-
 import { AddInventoryComponent } from '../../../lotes-verdes/components/add-inventory/add-inventory.component';
 import { EditLoteComponent } from '../../../lotes-verdes/components/edit-lote/edit-lote.component';
 import { LoteService } from '../../../lotes-verdes/service/lote.service';
+
+
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-lote-verde',
@@ -43,6 +47,8 @@ export class LoteVerdeComponent {
   readonly History = History;
   readonly Plus = Plus;
   readonly EyeOff = EyeOff;
+  readonly Sheet = Sheet;
+
 
   lotes: LoteVerdeConInventario[] = [];
   private _lotesFiltrados: LoteVerdeConInventario[] = [];
@@ -101,17 +107,6 @@ export class LoteVerdeComponent {
   }
   filtroTipo: 'admin' | 'cliente' = 'admin';
 
-  getLotesFiltrados(): LoteVerdeConInventario[] {
-    if (this.filterTextVerde.trim()) {
-      return this.lotesFiltrados;
-    }
-
-    return this.lotesFiltrados.filter(l => {
-      const user = this.usuarios.find(u => u.id_user === l.id_user);
-      return user?.rol === this.filtroTipo;
-    });
-  }
-
   aplicarFiltro() {
     const term = this.filterTextVerde.trim().toLowerCase();
     this.costoInventarioVerde = 0;
@@ -130,14 +125,20 @@ export class LoteVerdeComponent {
         l.proceso?.toLowerCase().includes(term) ||
         cliente.includes(term);
 
+      // costo solo cuenta lotes admin que hacen match
       if (match && user?.rol === 'admin') {
-        const pesoInventarioGr = this.getPesoInventario(l);
-        const pesoInventarioKg = pesoInventarioGr / 1000;
-
+        const pesoInventarioKg = this.getPesoInventario(l) / 1000;
         this.costoInventarioVerde += Number(l.costo ?? 0) * pesoInventarioKg;
       }
 
       return match;
+    });
+  }
+
+  getLotesFiltrados(): LoteVerdeConInventario[] {
+    return this.lotesFiltrados.filter(l => {
+      const user = this.usuarios.find(u => u.id_user === l.id_user);
+      return user?.rol === this.filtroTipo;
     });
   }
 
@@ -229,4 +230,40 @@ export class LoteVerdeComponent {
     this.showAddInventory = false;
     this.loadLotes();
   }
+
+
+  exportLotesVerdes() {
+    const data = this.getLotesFiltrados().map(l => {
+      const user = this.usuarios.find(u => u.id_user === l.id_user);
+      const cliente = user?.nombre_comercial || user?.nombre || 'Desconocido';
+      const almacenes = (l.inventarioLotes || [])
+        .map(inv => `${inv.almacen?.nombre || 'N/A'}: ${inv.cantidad_kg} gr`)
+        .join(' | ');
+
+      return {
+        'ID Lote': l.id_lote,
+        'Cliente': cliente,
+        'Productor': l.productor || '',
+        'Distrito': l.distrito || '',
+        'Almacén': almacenes || 'Sin almacén',
+        'Peso (gr)': this.getPesoInventario(l),
+        'Variedades': (l.variedades || []).join(', '),
+        'Proceso': l.proceso || '',
+        'Clasificación': l.clasificacion || '',
+        'Fecha': l.fecha_registro
+          ? new Date(l.fecha_registro).toLocaleDateString('es-PE')
+          : '',
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Lotes Café Verde');
+
+    const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    const tipo = this.filtroTipo === 'admin' ? 'Tienda' : 'Clientes';
+    saveAs(blob, `lotes_verdes_${tipo}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+
 }
