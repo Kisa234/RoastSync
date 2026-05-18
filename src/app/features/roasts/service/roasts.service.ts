@@ -50,5 +50,10 @@ export class RoastsService {
     return this.http.get<Tueste[]>(`${this.baseUrl}/lote/${idLote}`);
   }
 
+  getTuestesByRango(desde: string, hasta: string): Observable<Tueste[]> {
+    return this.http.get<Tueste[]>(`${this.baseUrl}/rango`, {
+      params: { desde, hasta }
+    });
+  }
 
 }

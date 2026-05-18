@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { NgFor, NgIf, NgClass } from '@angular/common';
-import { FilePenLine, LucideAngularModule, Users, Flame, ChartBar } from 'lucide-angular';
+import { FilePenLine, LucideAngularModule, Users, Flame, ChartBar, LogOut } from 'lucide-angular';
 import { PermissionAccessService } from '../../services/permission-access.service';
 import {
   House,
@@ -16,6 +16,8 @@ import {
   ChevronLeft
 } from 'lucide-angular';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../../features/auth/service/auth.service';
+import { UiService } from '../../services/ui.service';
 
 type SidebarLink = {
   type: 'link';
@@ -55,10 +57,12 @@ export class SidebarComponent {
   readonly Flame = Flame;
   readonly ChevronDown = ChevronDown;
   readonly ChevronLeft = ChevronLeft;
+  readonly LogOut = LogOut;
 
   openGroups: Record<string, boolean> = {
     inventory: true,
-    users: false
+    users: false,
+    roasts: false
   };
 
   private allItems: SidebarItem[] = [
@@ -134,11 +138,27 @@ export class SidebarComponent {
       permissions: 'pedidos.read'
     },
     {
-      type: 'link',
+      type: 'group',
       label: 'Tostado',
-      path: '/roasts',
       icon: Flame,
-      permissions: 'tostado.read'
+      key: 'roasts',
+      permissions: 'tostado.read',
+      children: [
+        {
+          type: 'link',
+          label: 'Tostado',
+          path: '/roasts',
+          icon: Flame,
+          permissions: 'tostado.read'
+        },
+        {
+          type: 'link',
+          label: 'Estadísticas',
+          path: '/roasts/stadistic',
+          icon: ChartBar,
+          permissions: 'tostado.read'
+        }
+      ]
     },
     {
       type: 'link',
@@ -225,7 +245,9 @@ export class SidebarComponent {
 
   constructor(
     private router: Router,
-    private permissionAccessService: PermissionAccessService
+    private permissionAccessService: PermissionAccessService,
+    private authService: AuthService,
+    private uiService: UiService
   ) {
     this.items = this.filterItemsByPermissions(this.allItems);
 
@@ -271,17 +293,45 @@ export class SidebarComponent {
       .filter((item): item is SidebarItem => item !== null);
   }
 
+  async logout() {
+    const ok = await this.uiService.confirm({
+      title: 'Cerrar sesión',
+      message: '¿Estás seguro que deseas cerrar sesión?',
+      confirmText: 'Cerrar sesión',
+      cancelText: 'Cancelar'
+    });
+
+    if (!ok) return;
+
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
   toggleSidebar() {
     this.collapsed = !this.collapsed;
     this.collapsedChange.emit(this.collapsed);
   }
 
   toggleGroup(key: string) {
-    if (this.collapsed) return;
+    if (this.collapsed) {
+      this.collapsed = false;
+      this.collapsedChange.emit(false);
+      return;
+    }
     this.openGroups[key] = !this.openGroups[key];
   }
 
   isGroupActive(group: SidebarGroup): boolean {
     return group.children.some(child => this.router.url.startsWith(child.path));
   }
+
+
+  onLinkClick() {
+    if (this.collapsed) {
+      this.collapsed = false;
+      this.collapsedChange.emit(false);
+    }
+  }
+
+
 }

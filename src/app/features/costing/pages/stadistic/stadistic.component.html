@@ -39,8 +39,8 @@
       <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalPedidos }}</p>
     </div>
     <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
-      <p class="text-xs text-gray-500 mb-1">Kilos Totales</p>
-      <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalKilos | number:'1.0-0' }} kg</p>
+      <p class="text-xs text-gray-500 mb-1">Peso Total</p>
+      <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalKilos | number:'1.0-0' }} Gr</p>
     </div>
     <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
       <p class="text-xs text-gray-500 mb-1">Clasificaciones</p>
@@ -102,7 +102,7 @@
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Clasificación</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Total Pedidos</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Kilos Totales</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso Total</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Prom. por Pedido</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lotes Distintos</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Prom. por Lote</th>
@@ -112,10 +112,10 @@
           <tr *ngFor="let s of stats">
             <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ s.clasificacion | titlecase }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ s.totalPedidos }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ s.kilosTotales | number:'1.2-2' }} kg</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ s.promedioPorPedido | number:'1.2-2' }} kg</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ s.kilosTotales | number:'1.0-0' }} gr</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ s.promedioPorPedido | number:'1.0-0' }} gr</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ s.lotes.size }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ s.promedioPorLote | number:'1.2-2' }} kg</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ s.promedioPorLote | number:'1.0-0' }} gr</td>
           </tr>
           <tr *ngIf="stats.length === 0">
             <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-400">

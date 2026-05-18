@@ -1,9 +1,9 @@
-// src/app/features/orders/service/pedido.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Pedido, PedidoConLote } from '../../../shared/models/pedido';
 import { environment } from '../../../../environments/environment';
+import { EstadisticasTueste } from '../../../shared/models/estadisticas-tueste';
 
 
 @Injectable({
@@ -84,6 +84,21 @@ export class PedidoService {
 
   getPedidosConLoteByEstadoYTipo(estado: string, tipo: string): Observable<PedidoConLote[]> {
     return this.http.get<PedidoConLote[]>(`${this.base}/con-lote/estado/${estado}/tipo/${encodeURIComponent(tipo)}`);
+  }
+
+
+  /** Obtener pedidos por rango de fechas */
+  getPedidosByRango(desde: string, hasta: string): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.base}/rango`, {
+      params: { desde, hasta }
+    });
+  }
+
+  /** Obtener estadísticas de tueste */
+  getEstadisticasTueste(desde: string, hasta: string): Observable<EstadisticasTueste> {
+    return this.http.get<EstadisticasTueste>(`${this.base}/estadisticas/tueste`, {
+      params: { desde, hasta }
+    });
   }
 
 }

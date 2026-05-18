@@ -1,0 +1,353 @@
+<div class="min-h-screen p-6 bg-[#F9F9F9]">
+
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-[#1F1F1F]">Estadísticas de Tueste</h1>
+        <p class="text-gray-600">Análisis de batches y rendimiento por tostadora</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 mb-6">
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="w-40">
+                <label class="block text-xs text-gray-600 mb-1">Desde</label>
+                <input type="date" [(ngModel)]="startDate" (ngModelChange)="onFilterChange()"
+                    class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+            </div>
+            <div class="w-40">
+                <label class="block text-xs text-gray-600 mb-1">Hasta</label>
+                <input type="date" [(ngModel)]="endDate" (ngModelChange)="onFilterChange()"
+                    class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+            </div>
+            <div class="flex gap-3">
+                <button (click)="resetRange()" class="text-sm text-gray-600 hover:text-[#B8672E] underline">
+                    Último mes
+                </button>
+                <button (click)="resetHistoric()" class="text-sm text-gray-600 hover:text-[#B8672E] underline">
+                    Histórico
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <ng-container *ngIf="!loading && stats; else loadingTpl">
+
+        <!-- KPIs -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+
+            <!-- 1 -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Prom. Batch / Día Tostado</p>
+                <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.promedioBatchPorDiaTostado | number:'1.1-1' }}</p>
+                <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Promedio de batches en días con tueste</p>
+                    <p class="text-gray-400">Total batches ÷ días que tuvieron tueste</p>
+                    <p class="mt-1 text-white">
+                        {{ stats.batchFortunato + stats.batchTerceros }} batches ÷
+                        {{ ((stats.batchFortunato + stats.batchTerceros) / stats.promedioBatchPorDiaTostado) |
+                        number:'1.0-0' }} días
+                        = {{ stats.promedioBatchPorDiaTostado | number:'1.1-1' }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Prom. Batch / Día Total</p>
+                <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.promedioBatchPorDiaTotales | number:'1.1-1' }}</p>
+                <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Promedio sobre todos los días del periodo</p>
+                    <p class="text-gray-400">Total batches ÷ días totales del rango</p>
+                    <p class="mt-1 text-white">
+                        {{ stats.batchFortunato + stats.batchTerceros }} batches ÷
+                        {{ ((stats.batchFortunato + stats.batchTerceros) / stats.promedioBatchPorDiaTotales) |
+                        number:'1.0-0' }} días
+                        = {{ stats.promedioBatchPorDiaTotales | number:'1.1-1' }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Prom. Batch / Pedido</p>
+                <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.promedioBatchPorPedido | number:'1.1-1' }}</p>
+                <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Batches promedio por orden de tueste</p>
+                    <p class="text-gray-400">Total batches ÷ total pedidos</p>
+                    <p class="mt-1 text-white">
+                        {{ stats.batchFortunato + stats.batchTerceros }} batches ÷
+                        {{ pedidosRango.length }} pedidos
+                        = {{ stats.promedioBatchPorPedido | number:'1.1-1' }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4 -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Peso Prom. por Batch</p>
+                <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.pesoPromedioPorBatch | number:'1.0-0' }} gr</p>
+                <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Peso promedio de entrada por batch</p>
+                    <p class="text-gray-400">Suma de pesos de entrada ÷ total batches</p>
+                    <p class="mt-1 text-white">
+                        {{ stats.pesoPromedioPorBatch * (stats.batchFortunato + stats.batchTerceros) | number:'1.0-0' }}
+                        gr ÷
+                        {{ stats.batchFortunato + stats.batchTerceros }} batches
+                        = {{ stats.pesoPromedioPorBatch | number:'1.0-0' }} gr
+                    </p>
+                </div>
+            </div>
+
+            <!-- 5 -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Kilos Tostados en Candela</p>
+                <p class="text-2xl font-bold text-[#B8672E]">{{ stats.kilosTostadosCandela | number:'1.0-0' }} gr</p>
+                <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Suma de peso entrada en tostadora Candela</p>
+                    <p class="text-gray-400">{{ stats.batchTostadosCandela }} batches tostados en Candela</p>
+                    <p class="mt-1 text-white">
+                        Promedio por batch:
+                        {{ stats.batchTostadosCandela > 0 ? (stats.kilosTostadosCandela / stats.batchTostadosCandela |
+                        number:'1.0-0') : 0 }} gr
+                    </p>
+                </div>
+            </div>
+
+            <!-- 6 -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Batch en Candela</p>
+                <p class="text-2xl font-bold text-[#B8672E]">{{ stats.batchTostadosCandela }}</p>
+                <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Batches tostados en máquina Candela</p>
+                    <p class="text-gray-400">Del total de {{ stats.batchFortunato + stats.batchTerceros }} batches</p>
+                    <p class="mt-1 text-white">
+                        {{ stats.batchTostadosCandela }} ÷ {{ stats.batchFortunato + stats.batchTerceros }}
+                        = {{ (stats.batchTostadosCandela / (stats.batchFortunato + stats.batchTerceros)) * 100 |
+                        number:'1.1-1' }}%
+                    </p>
+                </div>
+            </div>
+
+            <!-- 7 -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Batch Fortunato</p>
+                <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.batchFortunato }}</p>
+                <div class="absolute bottom-full right-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Batches de pedidos propios</p>
+                    <p class="text-gray-400">Pedidos cuyo cliente es Fortunato (tienda)</p>
+                    <p class="mt-1 text-white">
+                        {{ stats.batchFortunato }} de {{ stats.batchFortunato + stats.batchTerceros }} totales
+                        = {{ (stats.batchFortunato / (stats.batchFortunato + stats.batchTerceros)) * 100 |
+                        number:'1.1-1' }}%
+                    </p>
+                </div>
+            </div>
+
+            <!-- 8 -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Batch Terceros</p>
+                <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.batchTerceros }}</p>
+                <div class="absolute bottom-full right-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+                opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Batches de pedidos de clientes externos</p>
+                    <p class="text-gray-400">Pedidos cuyo cliente no es Fortunato</p>
+                    <p class="mt-1 text-white">
+                        {{ stats.batchTerceros }} de {{ stats.batchFortunato + stats.batchTerceros }} totales
+                        = {{ (stats.batchTerceros / (stats.batchFortunato + stats.batchTerceros)) * 100 | number:'1.1-1'
+                        }}%
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Gráficas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Barras — Fortunato vs Terceros -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+                <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Fortunato vs Terceros</h2>
+                <apx-chart *ngIf="barSeries.length" [series]="barSeries" [chart]="barChart" [xaxis]="barXAxis"
+                    [yaxis]="barYAxis" [colors]="barColors" [plotOptions]="barPlotOptions" [dataLabels]="barDataLabels">
+                </apx-chart>
+            </div>
+
+            <!-- Donut — Candela vs Otras -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+                <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Distribución por Tostadora</h2>
+                <apx-chart *ngIf="pieSeries.length" [series]="pieSeries" [chart]="pieChart" [labels]="pieLabels"
+                    [colors]="pieColors" [legend]="pieLegend">
+                </apx-chart>
+            </div>
+
+        </div>
+
+    </ng-container>
+
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex gap-2">
+                <button (click)="tablaVista = 'pedidos'" class="px-4 py-2 rounded text-sm font-medium transition"
+                    [ngClass]="tablaVista === 'pedidos'
+          ? 'bg-[#B8672E] text-white'
+          : 'border border-[#E5E5E5] text-gray-600 hover:bg-gray-50'">
+                    Pedidos ({{ pedidosRango.length }})
+                </button>
+                <button (click)="tablaVista = 'tuestes'" class="px-4 py-2 rounded text-sm font-medium transition"
+                    [ngClass]="tablaVista === 'tuestes'
+          ? 'bg-[#B8672E] text-white'
+          : 'border border-[#E5E5E5] text-gray-600 hover:bg-gray-50'">
+                    Tuestes ({{ tuestesRango.length }})
+                </button>
+            </div>
+
+            <button (click)="exportar()"
+                class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition text-sm">
+                <lucide-angular [img]="FileSpreadsheet" class="w-4 h-4" />
+                Exportar Excel
+            </button>
+        </div>
+
+        <!-- Tabla Pedidos -->
+        <div *ngIf="tablaVista === 'pedidos'" class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+                <thead class="bg-[#F9F9F9]">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha Tueste</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tostadora</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo Tueste</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Facturado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#E5E5E5]">
+                    <tr *ngFor="let p of pagedPedidos">
+                        <td class="px-4 py-3 font-medium">{{ p.id_lote }}</td>
+                        <td class="px-4 py-3 font-medium">{{ p.id_user | UserNamePipe | async}}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ p.fecha_tueste | date:'dd/MM/yyyy' }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ p.tostadora }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ p.cantidad | number:'1.0-0' }} gr</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs" [ngClass]="p.estado_pedido === 'Completado'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-yellow-100 text-yellow-800'">
+                                {{ p.estado_pedido }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs" [ngClass]="{
+                'bg-blue-100 text-blue-800': p.comentario === 'Tueste Claro',
+                'bg-yellow-100 text-yellow-800': p.comentario === 'Tueste Medio',
+                'bg-gray-800 text-white': p.comentario === 'Tueste Oscuro'
+              }">
+                                {{ p.comentario }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs"
+                                [ngClass]="p.facturado ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                                {{ p.facturado ? 'Sí' : 'No' }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr *ngIf="pedidosRango.length === 0">
+                        <td colspan="7" class="px-4 py-8 text-center text-gray-400">Sin pedidos en el periodo.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Paginator Pedidos -->
+            <div *ngIf="totalPagesPedidos > 1"
+                class="mt-4 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
+                <span class="text-gray-600">Página {{ pagePedidos }} de {{ totalPagesPedidos }}</span>
+                <div class="flex gap-2">
+                    <button [disabled]="pagePedidos === 1" (click)="pagePedidos = pagePedidos - 1"
+                        class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40 disabled:cursor-not-allowed">
+                        ← Anterior
+                    </button>
+                    <button [disabled]="pagePedidos === totalPagesPedidos" (click)="pagePedidos = pagePedidos + 1"
+                        class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40 disabled:cursor-not-allowed">
+                        Siguiente →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla Tuestes -->
+        <div *ngIf="tablaVista === 'tuestes'" class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+                <thead class="bg-[#F9F9F9]">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tostadora</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Batch</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso Entrada</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso Salida</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tiempo Total</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Merma</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#E5E5E5]">
+                    <tr *ngFor="let t of pagedTuestes">
+                        <td class="px-4 py-3 font-medium">{{ t.id_lote }}</td>
+                        <td class="px-4 py-3 font-medium">{{ t.id_cliente | UserNamePipe | async }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ t.fecha_tueste | date:'dd/MM/yyyy' }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ t.tostadora }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ t.num_batch }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ t.peso_entrada | number:'1.0-0' }} gr</td>
+                        <td class="px-4 py-3 text-gray-600">{{ t.peso_salida | number:'1.0-0' }} gr</td>
+                        <td class="px-4 py-3 text-gray-600">{{ t.tiempo_total | minSec }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ t.merma }}%</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs" [ngClass]="t.estado_tueste === 'Completado'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-yellow-100 text-yellow-800'">
+                                {{ t.estado_tueste }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr *ngIf="tuestesRango.length === 0">
+                        <td colspan="9" class="px-4 py-8 text-center text-gray-400">Sin tuestes en el periodo.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Paginator Tuestes -->
+            <div *ngIf="totalPagesTuestes > 1"
+                class="mt-4 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
+                <span class="text-gray-600">Página {{ pageTuestes }} de {{ totalPagesTuestes }}</span>
+                <div class="flex gap-2">
+                    <button [disabled]="pageTuestes === 1" (click)="pageTuestes = pageTuestes - 1"
+                        class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40 disabled:cursor-not-allowed">
+                        ← Anterior
+                    </button>
+                    <button [disabled]="pageTuestes === totalPagesTuestes" (click)="pageTuestes = pageTuestes + 1"
+                        class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40 disabled:cursor-not-allowed">
+                        Siguiente →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading / Sin datos -->
+    <ng-template #loadingTpl>
+        <div class="flex items-center justify-center py-20 text-gray-400">
+            <p *ngIf="loading">Cargando estadísticas...</p>
+            <p *ngIf="!loading && !stats">Sin datos en el periodo seleccionado.</p>
+        </div>
+    </ng-template>
+
+</div>

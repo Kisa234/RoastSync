@@ -7,7 +7,7 @@ import { ClientLayoutComponent } from './layouts/client/client-layout.component'
 
 // Pages
 import { OverviewComponent } from './features/dashboard/page/overview/overview.component';
-import { RoastsPage } from './features/roasts/page/roast-page.component';
+import { RoastsPage } from './features/roasts/page/main/roast-page.component';
 import { AnalisisPage } from './features/analysis/page/analisis.component';
 import { InventoryPage } from './features/inventory/pages/inventory/inventory-page.component';
 import { SettingsPageComponent } from './features/settings/page/settings-page.component';
@@ -34,6 +34,8 @@ import { EnvioPageComponent } from './features/envios/pages/main/envio.page.comp
 import { KardexComponent } from './features/costing/pages/kardex/kardex.component';
 import { CostingComponent } from './features/costing/pages/main/costing.component';
 import { StadisticComponent } from './features/costing/pages/stadistic/stadistic.component';
+import { StadisticRoastComponent } from './features/roasts/page/stadistic/stadistic.component';
+import { RoastComponent } from './features/roasts/page/shell/roast.component';
 
 export const appRoutes: Routes = [
 
@@ -182,14 +184,18 @@ export const appRoutes: Routes = [
         path: 'orders',
         component: OrdersPage,
         canActivate: [permissionGuard],
-        data: { permissions: ['pedidos.read'] }
+        data: { permissions: ['pedidos.read'] },
       },
 
       {
         path: 'roasts',
-        component: RoastsPage,
+        component: RoastComponent,
         canActivate: [permissionGuard],
-        data: { permissions: ['tostado.read'] }
+        data: { permissions: ['tostado.read'] },
+        children: [
+          { path: '', component: RoastsPage },
+          { path: 'stadistic', component: StadisticRoastComponent }
+        ]
       },
 
       {
