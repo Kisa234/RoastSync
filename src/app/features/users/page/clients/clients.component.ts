@@ -26,18 +26,17 @@ import { EditClientComponent } from '../../components/edit-client/edit-client.co
 })
 export class ClientsComponent implements OnInit {
 
-  // icons
-  readonly Search = Search;
-  readonly Mail = Mail;
-  readonly Phone = Phone;
-  readonly Edit2 = Edit2;
-  readonly Trash2 = Trash2;
+  readonly Search   = Search;
+  readonly Mail     = Mail;
+  readonly Phone    = Phone;
+  readonly Edit2    = Edit2;
+  readonly Trash2   = Trash2;
   readonly UserPlus = UserPlus;
 
   users$!: Observable<User[]>;
   filterText = '';
 
-  showAddClient = false;
+  showAddClient  = false;
   showEditClient = false;
   selectedUserId?: string;
 
@@ -55,20 +54,16 @@ export class ClientsComponent implements OnInit {
       .getUsersByRole('cliente')
       .pipe(
         map(users =>
-          users.filter(u =>
-            u.nombre.toLowerCase().includes(this.filterText.toLowerCase())
-          )
+          users
+            .filter(u => u.nombre.toLowerCase().includes(this.filterText.toLowerCase()))
+            .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
         )
       );
   }
 
-  onSearchChange() {
-    this.loadClients();
-  }
+  onSearchChange() { this.loadClients(); }
 
-  openAddClient() {
-    this.showAddClient = true;
-  }
+  openAddClient() { this.showAddClient = true; }
 
   onClientCreated() {
     this.showAddClient = false;
@@ -88,9 +83,7 @@ export class ClientsComponent implements OnInit {
       cancelText: 'Cancelar'
     }).then(ok => {
       if (ok) {
-        this.userSvc.deleteUser(u.id_user).subscribe(() => {
-          this.loadClients();
-        });
+        this.userSvc.deleteUser(u.id_user).subscribe(() => this.loadClients());
       }
     });
   }

@@ -21,7 +21,6 @@ import { UserNamePipe } from "../../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../../shared/pipes/time.pipe";
 import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
 import { FichaTuesteComponent } from '../../../inventory/lotes-tostados/components/ficha-tueste/ficha-tueste.component';
-import { AddBalonGasComponent } from "../../components/add-balon-gas/add-balon-gas.component";
 
 
 
@@ -41,7 +40,6 @@ import { AddBalonGasComponent } from "../../components/add-balon-gas/add-balon-g
     FichaTuesteComponent,
     UserNamePipe,
     MinSecPipe,
-    AddBalonGasComponent
   ],
   templateUrl: './roast-page.component.html',
 })

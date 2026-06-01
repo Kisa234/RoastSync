@@ -1,7 +1,7 @@
 export interface User {
   id_user: string;
   nombre: string;
-  nombre_comercial?:string;
+  nombre_comercial?: string;
   email: string;
   documento_tipo?: string;
   documento_identidad?: string;
@@ -11,11 +11,12 @@ export interface User {
   numero_telefono: number;
   rol: string;
   id_rol?: string;
-  tuestes? : number,
-  suscripcion?: boolean,
-  cant_suscripciones?: number,
+  tuestes?: number;
+  suscripcion?: boolean;
+  cant_suscripciones?: number;
   password: string;
   eliminado: boolean;
   fecha_registro: Date;
   fecha_editado?: Date;
+  fecha_primera_compra?: Date | null;
 }

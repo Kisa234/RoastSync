@@ -6,11 +6,7 @@
       <p class="text-gray-600">Gestiona las órdenes de tueste y revisa el historial</p>
     </div>
     <div class="flex items-center gap-3">
-      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
-        (click)="openAddBalonGas()">
-        <lucide-icon [img]="Flame" class="w-5 h-5 mr-2" />
-        Nuevo Balón de Gas
-      </button>
+      
 
       <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
         (click)="openAddRoaster()">
@@ -269,6 +265,3 @@
 <ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false">
 </ficha-tueste>
 
-
-<add-balon-gas *ngIf="showAddBalonGas" (close)="showAddBalonGas = false" (created)="onBalonGasCreated()">
-</add-balon-gas>
