@@ -1,0 +1,249 @@
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md flex items-center justify-center z-40 p-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl overflow-visible">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center px-8 pt-6">
+      <div>
+        <h2 class="text-xl font-semibold text-[#1F1F1F]">Registrar Balón de Gas</h2>
+        <p class="text-gray-600 text-sm">Ingresa un balón actual o uno histórico</p>
+      </div>
+      <button (click)="onCancel()" class="text-gray-400 hover:text-gray-600">
+        <lucide-icon [img]="X" class="w-5 h-5"></lucide-icon>
+      </button>
+    </div>
+
+    <!-- Precio -->
+    <div class="px-8 pt-5">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Precio del balón <span class="text-red-500">*</span></label>
+      <div class="relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-medium">S/</span>
+        <input type="number" [(ngModel)]="precio" min="0" step="0.01" placeholder="0.00"
+          class="w-full border border-[#E5E5E5] rounded-lg pl-9 pr-4 py-2.5 text-sm text-[#1F1F1F] focus:outline-none focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] transition placeholder-gray-400" />
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex border-b border-[#E5E5E5] mt-5 px-8">
+      <button (click)="setModo('ACTUAL')" class="pb-2 mr-6 text-sm font-medium transition border-b-2"
+        [ngClass]="modo==='ACTUAL' ? 'border-[#B8672E] text-[#B8672E]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        Actual
+      </button>
+      <button (click)="setModo('HISTORICO')" class="pb-2 text-sm font-medium transition border-b-2"
+        [ngClass]="modo==='HISTORICO' ? 'border-[#B8672E] text-[#B8672E]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        Histórico
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-8 py-6 min-h-[340px]">
+
+      <!-- ══ ACTUAL ══ -->
+      <ng-container *ngIf="modo === 'ACTUAL'">
+
+        <!-- Paso PEDIDO -->
+        <ng-container *ngIf="pasoActual === 'PEDIDO'">
+          <h3 class="text-sm font-semibold text-[#1F1F1F] mb-1">Selecciona el pedido de tueste</h3>
+          <p class="text-xs text-gray-500 mb-3">El balón se iniciará con el batch que elijas.</p>
+
+          <div *ngIf="loadingPedidos" class="text-center py-8 text-gray-400 text-sm">Cargando pedidos...</div>
+          <div *ngIf="!loadingPedidos && pedidosActuales.length === 0" class="text-center py-8 text-gray-400 text-sm">
+            No hay pedidos de tueste pendientes
+          </div>
+
+          <div class="space-y-2 max-h-64 overflow-y-auto">
+            <button *ngFor="let p of pedidosActuales" (click)="selPedidoActual(p)"
+              class="w-full text-left px-4 py-3 rounded-lg border transition"
+              [ngClass]="pedidoSelActual?.id_pedido === p.id_pedido ? 'border-[#B8672E] bg-[#FDF5EE]' : 'border-[#E5E5E5] hover:border-[#B8672E]'">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-semibold text-[#1F1F1F]">{{ p.id_lote || 'Sin lote' }}</p>
+                  <p class="text-xs text-gray-500 mt-0.5">{{ p.cantidad | number }} gr · {{ p.estado_pedido }}</p>
+                </div>
+                <span class="text-xs text-gray-400 shrink-0 ml-2">{{ p.fecha_tueste | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Paso BATCH -->
+        <ng-container *ngIf="pasoActual === 'BATCH'">
+          <div class="flex items-center gap-2 mb-3">
+            <button (click)="volverAPedidosActual()" class="text-xs text-[#B8672E] hover:underline">← Pedidos</button>
+            <span class="text-xs text-gray-300">/</span>
+            <span class="text-xs font-medium text-[#1F1F1F]">{{ pedidoSelActual?.id_lote || 'Sin lote' }}</span>
+          </div>
+          <h3 class="text-sm font-semibold text-[#1F1F1F] mb-1">Selecciona el batch de inicio</h3>
+
+          <div *ngIf="loadingBatches" class="text-center py-8 text-gray-400 text-sm">Cargando batches...</div>
+          <div class="space-y-2 max-h-64 overflow-y-auto">
+            <button *ngFor="let t of batchesActuales" (click)="batchSelActual = t"
+              class="w-full text-left px-4 py-3 rounded-lg border transition"
+              [ngClass]="batchSelActual?.id_tueste === t.id_tueste ? 'border-[#B8672E] bg-[#FDF5EE]' : 'border-[#E5E5E5] hover:border-[#B8672E]'">
+              <p class="text-sm font-medium text-[#1F1F1F]">Batch #{{ t.num_batch }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t.tostadora }} · {{ t.peso_entrada }} kg</p>
+            </button>
+          </div>
+        </ng-container>
+
+      </ng-container>
+
+      <!-- ══ HISTÓRICO ══ -->
+      <ng-container *ngIf="modo === 'HISTORICO'">
+
+        <!-- INICIO: buscar pedidos -->
+        <ng-container *ngIf="pasoHistorico === 'INICIO_PEDIDO'">
+          <h3 class="text-sm font-semibold text-[#1F1F1F] mb-1">Batch de inicio</h3>
+          <p class="text-xs text-gray-500 mb-3">¿En qué fecha comenzó a usarse el balón?</p>
+          <div class="flex gap-2 mb-4">
+            <input type="date" [(ngModel)]="fechaInicio"
+              class="flex-1 border border-[#E5E5E5] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E]" />
+            <button (click)="buscarPedidosInicio()"
+              class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition text-sm">
+              Buscar
+            </button>
+          </div>
+          <div *ngIf="loadingPedidosInicio" class="text-center py-6 text-gray-400 text-sm">Buscando pedidos...</div>
+          <div *ngIf="!loadingPedidosInicio && pedidosInicio.length === 0 && fechaInicio"
+            class="text-center py-6 text-gray-400 text-sm">No hay pedidos de tueste en esa fecha</div>
+          <div class="space-y-2 max-h-60 overflow-y-auto">
+            <button *ngFor="let p of pedidosInicio" (click)="selPedidoInicio(p)"
+              class="w-full text-left px-4 py-3 rounded-lg border transition"
+              [ngClass]="pedidoSelInicio?.id_pedido === p.id_pedido ? 'border-[#B8672E] bg-[#FDF5EE]' : 'border-[#E5E5E5] hover:border-[#B8672E]'">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-semibold text-[#1F1F1F]">{{ p.id_lote || 'Sin lote' }}</p>
+                  <p class="text-xs text-gray-500 mt-0.5">{{ p.cantidad | number }} gr</p>
+                </div>
+                <span class="text-xs text-gray-400 shrink-0 ml-2">{{ p.fecha_tueste | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- INICIO: elegir batch -->
+        <ng-container *ngIf="pasoHistorico === 'INICIO_BATCH'">
+          <div class="flex items-center gap-2 mb-3">
+            <button (click)="volverAPedidosInicio()" class="text-xs text-[#B8672E] hover:underline">← Pedidos inicio</button>
+            <span class="text-xs text-gray-300">/</span>
+            <span class="text-xs font-medium text-[#1F1F1F]">{{ pedidoSelInicio?.id_lote || 'Sin lote' }}</span>
+          </div>
+          <h3 class="text-sm font-semibold text-[#1F1F1F] mb-1">Selecciona el batch de inicio</h3>
+          <div *ngIf="loadingBatchesInicio" class="text-center py-6 text-gray-400 text-sm">Cargando batches...</div>
+          <div class="space-y-2 max-h-60 overflow-y-auto">
+            <button *ngFor="let t of batchesInicio" (click)="batchSelInicio = t"
+              class="w-full text-left px-4 py-3 rounded-lg border transition"
+              [ngClass]="batchSelInicio?.id_tueste === t.id_tueste ? 'border-[#B8672E] bg-[#FDF5EE]' : 'border-[#E5E5E5] hover:border-[#B8672E]'">
+              <p class="text-sm font-medium text-[#1F1F1F]">Batch #{{ t.num_batch }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t.tostadora }} · {{ t.peso_entrada }} kg</p>
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- FIN: buscar pedidos -->
+        <ng-container *ngIf="pasoHistorico === 'FIN_PEDIDO'">
+          <div class="flex items-center gap-2 mb-3">
+            <button (click)="volverAInicio()" class="text-xs text-gray-500 hover:text-[#B8672E]">← Batch inicio</button>
+            <span class="text-xs text-gray-300">/</span>
+            <span class="text-xs font-medium text-emerald-600">Inicio: Batch #{{ batchSelInicio?.num_batch }}</span>
+          </div>
+          <h3 class="text-sm font-semibold text-[#1F1F1F] mb-1">Batch de fin</h3>
+          <p class="text-xs text-gray-500 mb-3">¿En qué fecha terminó de usarse el balón?</p>
+          <div class="flex gap-2 mb-4">
+            <input type="date" [(ngModel)]="fechaFin"
+              class="flex-1 border border-[#E5E5E5] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E]" />
+            <button (click)="buscarPedidosFin()"
+              class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition text-sm">
+              Buscar
+            </button>
+          </div>
+          <div *ngIf="loadingPedidosFin" class="text-center py-6 text-gray-400 text-sm">Buscando pedidos...</div>
+          <div *ngIf="!loadingPedidosFin && pedidosFin.length === 0 && fechaFin"
+            class="text-center py-6 text-gray-400 text-sm">No hay pedidos de tueste en esa fecha</div>
+          <div class="space-y-2 max-h-56 overflow-y-auto">
+            <button *ngFor="let p of pedidosFin" (click)="selPedidoFin(p)"
+              class="w-full text-left px-4 py-3 rounded-lg border transition"
+              [ngClass]="pedidoSelFin?.id_pedido === p.id_pedido ? 'border-[#B8672E] bg-[#FDF5EE]' : 'border-[#E5E5E5] hover:border-[#B8672E]'">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-semibold text-[#1F1F1F]">{{ p.id_lote || 'Sin lote' }}</p>
+                  <p class="text-xs text-gray-500 mt-0.5">{{ p.cantidad | number }} gr</p>
+                </div>
+                <span class="text-xs text-gray-400 shrink-0 ml-2">{{ p.fecha_tueste | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- FIN: elegir batch -->
+        <ng-container *ngIf="pasoHistorico === 'FIN_BATCH'">
+          <div class="flex items-center gap-2 mb-3">
+            <button (click)="volverAPedidosFin()" class="text-xs text-[#B8672E] hover:underline">← Pedidos fin</button>
+            <span class="text-xs text-gray-300">/</span>
+            <span class="text-xs font-medium text-[#1F1F1F]">{{ pedidoSelFin?.id_lote || 'Sin lote' }}</span>
+          </div>
+          <h3 class="text-sm font-semibold text-[#1F1F1F] mb-1">Selecciona el batch de fin</h3>
+          <div *ngIf="loadingBatchesFin" class="text-center py-6 text-gray-400 text-sm">Cargando batches...</div>
+          <div class="space-y-2 max-h-56 overflow-y-auto">
+            <button *ngFor="let t of batchesFin" (click)="batchSelFin = t"
+              class="w-full text-left px-4 py-3 rounded-lg border transition"
+              [ngClass]="batchSelFin?.id_tueste === t.id_tueste ? 'border-[#B8672E] bg-[#FDF5EE]' : 'border-[#E5E5E5] hover:border-[#B8672E]'">
+              <p class="text-sm font-medium text-[#1F1F1F]">Batch #{{ t.num_batch }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t.tostadora }} · {{ t.peso_entrada }} kg</p>
+            </button>
+          </div>
+        </ng-container>
+
+      </ng-container>
+
+      <!-- Error -->
+      <div *ngIf="errorMsg" class="mt-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+        {{ errorMsg }}
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-between items-center px-8 py-5 border-t border-[#E5E5E5]">
+
+      <!-- Izquierda: siempre Cancelar -->
+      <button (click)="onCancel()"
+        class="px-4 py-2 rounded border border-[#E5E5E5] text-gray-600 hover:bg-[#F3F2F1] text-sm transition">
+        Cancelar
+      </button>
+
+      <!-- Derecha: navegación + guardar según contexto -->
+      <div class="flex gap-2">
+
+        <!-- ACTUAL: paso PEDIDO — sin botón derecho hasta que elija pedido -->
+
+        <!-- ACTUAL: paso BATCH — guardar -->
+        <button *ngIf="modo === 'ACTUAL' && pasoActual === 'BATCH'"
+          (click)="save()" [disabled]="saving || !canSaveActual()"
+          class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] disabled:opacity-50 flex items-center text-sm transition">
+          <lucide-icon [img]="Check" class="w-4 h-4 mr-2"></lucide-icon>
+          {{ saving ? 'Guardando...' : 'Guardar balón' }}
+        </button>
+
+        <!-- HISTÓRICO: INICIO_PEDIDO — sin botón hasta que elija pedido -->
+
+        <!-- HISTÓRICO: INICIO_BATCH — siguiente -->
+        <button *ngIf="modo === 'HISTORICO' && pasoHistorico === 'INICIO_BATCH'"
+          (click)="irAFin()"
+          class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] text-sm transition">
+          Siguiente →
+        </button>
+
+        <!-- HISTÓRICO: FIN_PEDIDO — sin botón hasta que elija pedido -->
+
+        <!-- HISTÓRICO: FIN_BATCH — guardar -->
+        <button *ngIf="modo === 'HISTORICO' && pasoHistorico === 'FIN_BATCH'"
+          (click)="save()" [disabled]="saving || !canSaveHistorico()"
+          class="px-4 py-2 rounded bg-[#B8672E] text-white hover:bg-[#A67C52] disabled:opacity-50 flex items-center text-sm transition">
+          <lucide-icon [img]="Check" class="w-4 h-4 mr-2"></lucide-icon>
+          {{ saving ? 'Guardando...' : 'Guardar balón' }}
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+</div>

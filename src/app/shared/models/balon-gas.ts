@@ -43,3 +43,10 @@ export interface BalonGasModalData {
   balon?: BalonGas;
   id_tueste?: string;
 }
+
+
+export interface EstadisticasBalonGas {
+  ultimoPrecio: number | null;
+  promedioTuestesPorBalon: number | null;
+  totalBalonesFinalizados: number;
+}

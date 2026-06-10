@@ -166,6 +166,44 @@
                 </div>
             </div>
 
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Costo balón / Batch</p>
+                <p class="text-2xl font-bold text-[#1F1F1F]">
+                    <ng-container
+                        *ngIf="estadisticasBalonGas?.ultimoPrecio && estadisticasBalonGas?.promedioTuestesPorBalon; else sinDato9">
+                        S/ {{ (estadisticasBalonGas!.ultimoPrecio! / estadisticasBalonGas!.promedioTuestesPorBalon!) |
+                        number:'1.2-2' }}
+                    </ng-container>
+                    <ng-template #sinDato9><span class="text-gray-300">—</span></ng-template>
+                </p>
+                <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+        opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Costo de gas por batch</p>
+                    <p class="text-gray-400">Precio último balón ÷ promedio de batches por balón</p>
+                    <p class="mt-1 text-white" *ngIf="estadisticasBalonGas">
+                        S/ {{ estadisticasBalonGas.ultimoPrecio | number:'1.2-2' }} ÷
+                        {{ estadisticasBalonGas.promedioTuestesPorBalon | number:'1.1-1' }} batches
+                    </p>
+                </div>
+            </div>
+
+            <!-- 10 — Batches por balón -->
+            <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+                <p class="text-xs text-gray-500 mb-1">Batches / Balón</p>
+                <p class="text-2xl font-bold text-[#1F1F1F]">
+                    <ng-container *ngIf="estadisticasBalonGas?.promedioTuestesPorBalon; else sinDato10">
+                        {{ estadisticasBalonGas!.promedioTuestesPorBalon! | number:'1.1-1' }}
+                    </ng-container>
+                    <ng-template #sinDato10><span class="text-gray-300">—</span></ng-template>
+                </p>
+                <div class="absolute bottom-full right-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+        opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+                    <p class="font-semibold mb-1 text-[#D4956A]">Promedio de batches por balón de gas</p>
+                    <p class="text-gray-400">Calculado sobre {{ estadisticasBalonGas?.totalBalonesFinalizados ?? 0 }}
+                        balones finalizados</p>
+                </div>
+            </div>
+
         </div>
 
         <!-- Gráficas -->

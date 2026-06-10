@@ -1,1 +1,70 @@
-<p>balon-gas works!</p>
+<div class="min-h-screen p-6 bg-[#F9F9F9]">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Balones de Gas</h1>
+      <p class="text-gray-600">Historial y gestión de balones de gas</p>
+    </div>
+    <button (click)="showModal = true"
+      class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition">
+      <lucide-icon [img]="Plus" class="w-5 h-5 mr-2"></lucide-icon>
+      Agregar Balón
+    </button>
+  </div>
+
+  <!-- Contenedor -->
+  <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
+
+    <!-- Tabla -->
+    <div class="rounded-lg shadow-sm overflow-x-auto">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Precio</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha ingreso</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Inicio uso</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fin uso</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+
+          <tr *ngIf="loading">
+            <td colspan="5" class="px-6 py-10 text-center text-gray-400 text-sm">Cargando...</td>
+          </tr>
+
+          <tr *ngIf="!loading && balones.length === 0">
+            <td colspan="5" class="px-6 py-10 text-center text-gray-400 text-sm">
+              No hay balones de gas registrados
+            </td>
+          </tr>
+
+          <tr *ngFor="let b of balones" class="hover:bg-[#F9F9F9]">
+            <td class="px-6 py-4">
+              <span class="inline-block text-xs font-medium px-2 py-0.5 rounded-full"
+                [ngClass]="badgeEstado(b.estado)">
+                {{ labelEstado(b.estado) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">
+              S/ {{ b.precio | number:'1.2-2' }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ formatFecha(b.fecha_ingreso) }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ formatFecha(b.fecha_inicio_uso) }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ formatFecha(b.fecha_fin_uso) }}</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal -->
+<add-balon-gas
+  *ngIf="showModal"
+  (close)="showModal = false"
+  (created)="onCreated()">
+</add-balon-gas>

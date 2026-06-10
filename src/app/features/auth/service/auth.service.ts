@@ -32,6 +32,18 @@ export class AuthService {
       );
   }
 
+  // ← nuevo
+  loginPin(documento_identidad: string, pin: string): Observable<LoginResp> {
+    return this.http
+      .post<LoginResp>(`${this.apiUrl}/login-pin`, { documento_identidad, pin })
+      .pipe(
+        tap(resp => {
+          localStorage.setItem('access_token', resp.accessToken);
+          localStorage.setItem('refresh_token', resp.refreshToken);
+        })
+      );
+  }
+
   logout(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -41,11 +53,7 @@ export class AuthService {
     const refreshToken = localStorage.getItem('refresh_token');
     return this.http
       .post<{ accessToken: string }>(`${this.apiUrl}/refresh`, { refreshToken })
-      .pipe(
-        tap(r => {
-          localStorage.setItem('access_token', r.accessToken);
-        })
-      );
+      .pipe(tap(r => localStorage.setItem('access_token', r.accessToken)));
   }
 
   getToken(): string | null {

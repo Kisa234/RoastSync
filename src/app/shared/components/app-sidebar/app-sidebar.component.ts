@@ -153,6 +153,13 @@ export class SidebarComponent {
         },
         {
           type: 'link',
+          label: 'Balones de Gas',
+          path: '/roasts/balones-gas',
+          icon: Flame,
+          permissions: 'tostado.read'
+        },
+        {
+          type: 'link',
           label: 'Estadísticas',
           path: '/roasts/stadistic',
           icon: ChartBar,

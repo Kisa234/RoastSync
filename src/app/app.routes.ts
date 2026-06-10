@@ -36,6 +36,7 @@ import { CostingComponent } from './features/costing/pages/main/costing.componen
 import { StadisticComponent } from './features/costing/pages/stadistic/stadistic.component';
 import { StadisticRoastComponent } from './features/roasts/page/stadistic/stadistic.component';
 import { RoastComponent } from './features/roasts/page/shell/roast.component';
+import { BalonesGasComponent } from './features/roasts/page/balon-gas/balon-gas.component';
 
 export const appRoutes: Routes = [
 
@@ -194,7 +195,8 @@ export const appRoutes: Routes = [
         data: { permissions: ['tostado.read'] },
         children: [
           { path: '', component: RoastsPage },
-          { path: 'stadistic', component: StadisticRoastComponent }
+          { path: 'stadistic', component: StadisticRoastComponent },
+          { path: 'balones-gas', component: BalonesGasComponent }
         ]
       },
 

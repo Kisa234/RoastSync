@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { PedidoService } from '../../../orders/service/orders.service';
 import { EstadisticasTueste } from '../../../../shared/models/estadisticas-tueste';
-
+import { BalonGasService } from '../../service/balon-gas.service';
 import { RoastsService } from '../../service/roasts.service';
 import { Tueste } from '../../../../shared/models/tueste';
 import { Pedido } from '../../../../shared/models/pedido';
@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 import { FileSpreadsheet, LucideAngularModule } from 'lucide-angular';
 import { UserNamePipe } from "../../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../../shared/pipes/time.pipe";
+import { EstadisticasBalonGas } from '../../../../shared/models/balon-gas';
 
 
 @Component({
@@ -30,7 +31,7 @@ export class StadisticRoastComponent implements OnInit {
   loading = false;
 
   stats: EstadisticasTueste | null = null;
-
+  estadisticasBalonGas: EstadisticasBalonGas | null = null;  // ← nuevo
 
   pedidosRango: Pedido[] = [];
   tuestesRango: Tueste[] = [];
@@ -59,11 +60,13 @@ export class StadisticRoastComponent implements OnInit {
 
   constructor(
     private pedidoSvc: PedidoService,
-    private roastsSvc: RoastsService
+    private roastsSvc: RoastsService,
+    private balonGasSvc: BalonGasService,  // ← nuevo
   ) { }
 
   ngOnInit(): void {
     this.resetRange();
+    this.loadEstadisticasBalonGas();  // ← nuevo
   }
 
   private toISO(d: Date): string {
@@ -96,7 +99,7 @@ export class StadisticRoastComponent implements OnInit {
   loadData(): void {
     this.pagePedidos = 1;
     this.pageTuestes = 1;
-    
+
     if (!this.startDate || !this.endDate) return;
     this.loading = true;
 
@@ -118,25 +121,28 @@ export class StadisticRoastComponent implements OnInit {
     });
   }
 
+  // ← nuevo: carga estadísticas de balón de gas (son históricas, no dependen del rango)
+  loadEstadisticasBalonGas(): void {
+    this.balonGasSvc.getEstadisticas().subscribe({
+      next: data => { this.estadisticasBalonGas = data; },
+      error: () => { this.estadisticasBalonGas = null; }
+    });
+  }
+
   updateCharts(): void {
     if (!this.stats) return;
 
-    // Barras — Fortunato vs Terceros
     this.barSeries = [{
       name: 'Batches',
       data: [this.stats.batchFortunato, this.stats.batchTerceros]
     }];
 
-    // Donut — Candela vs Otras
-    const totalBatch = this.stats.batchTostadosCandela +
-      (this.stats.batchFortunato + this.stats.batchTerceros - this.stats.batchTostadosCandela);
     this.pieSeries = [
       this.stats.batchTostadosCandela,
       Math.max(0, (this.stats.batchFortunato + this.stats.batchTerceros) - this.stats.batchTostadosCandela)
     ];
   }
 
-  // exportar datos a Excel
   async exportar(): Promise<void> {
     const XLSX = await import('xlsx');
     const { utils, writeFileXLSX } = XLSX;
@@ -149,7 +155,6 @@ export class StadisticRoastComponent implements OnInit {
       }));
     };
 
-    // ---- Hoja 1: Pedidos ----
     const pedidosData = this.pedidosRango.map(p => ({
       'ID Pedido': p.id_pedido,
       'Lote': p.id_lote,
@@ -164,7 +169,6 @@ export class StadisticRoastComponent implements OnInit {
       'Fecha Completado': p.fecha_completado ?? '',
     }));
 
-    // ---- Hoja 2: Tuestes ----
     const tuestesData = this.tuestesRango.map(t => ({
       'ID Tueste': t.id_tueste,
       'Lote': t.id_lote,
@@ -195,23 +199,19 @@ export class StadisticRoastComponent implements OnInit {
 
     const wsPedidos = utils.json_to_sheet(pedidosData);
     const wsTuestes = utils.json_to_sheet(tuestesData);
-
     wsPedidos['!cols'] = fitToColumns(pedidosData);
     wsTuestes['!cols'] = fitToColumns(tuestesData);
 
     const wb = utils.book_new();
     utils.book_append_sheet(wb, wsPedidos, 'Pedidos Tueste');
     utils.book_append_sheet(wb, wsTuestes, 'Tuestes');
-
     writeFileXLSX(wb, `estadisticas_tueste_${this.startDate}_${this.endDate}.xlsx`);
   }
 
   // Paginación pedidos
   pagePedidos = 1;
   pageSizePedidos = 10;
-  get totalPagesPedidos(): number {
-    return Math.ceil(this.pedidosRango.length / this.pageSizePedidos) || 1;
-  }
+  get totalPagesPedidos(): number { return Math.ceil(this.pedidosRango.length / this.pageSizePedidos) || 1; }
   get pagedPedidos() {
     const start = (this.pagePedidos - 1) * this.pageSizePedidos;
     return this.pedidosRango.slice(start, start + this.pageSizePedidos);
@@ -220,12 +220,9 @@ export class StadisticRoastComponent implements OnInit {
   // Paginación tuestes
   pageTuestes = 1;
   pageSizeTuestes = 10;
-  get totalPagesTuestes(): number {
-    return Math.ceil(this.tuestesRango.length / this.pageSizeTuestes) || 1;
-  }
+  get totalPagesTuestes(): number { return Math.ceil(this.tuestesRango.length / this.pageSizeTuestes) || 1; }
   get pagedTuestes() {
     const start = (this.pageTuestes - 1) * this.pageSizeTuestes;
     return this.tuestesRango.slice(start, start + this.pageSizeTuestes);
   }
-
 }
