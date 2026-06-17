@@ -81,6 +81,12 @@ export class RoastsPage {
   totalPages = 1;
   pagedHistoryRoasts: PedidoConLote[] = [];
 
+  activeTab: 'historial' | 'sin_facturar' = 'historial';
+  sinFacturarRoasts: PedidoConLote[] = [];
+  pagedSinFacturar: PedidoConLote[] = [];
+  pageSF = 1;
+  totalPagesSF = 1;
+
   // filter client 
 
   clients: User[] = [];
@@ -218,31 +224,40 @@ export class RoastsPage {
   private applyFilter() {
     const desde = this.startDate ? new Date(this.startDate) : null;
     const hasta = this.endDate ? new Date(this.endDate) : null;
-    const nivel = this.historyLevel; // e.g. "Claro"
+    const nivel = this.historyLevel;
 
     this.filteredHistoryRoasts = this.allHistoryRoasts.filter(h => {
       const fecha = new Date(h.fecha_tueste!);
-      // rango de fechas
-      const inRange =
-        (!desde || fecha >= desde) &&
-        (!hasta || fecha <= hasta);
-
-      // nivel de tueste: el comentario es "Tueste Claro"/"Tueste Medio"/…
-      const nivelMatch =
-        !nivel ||
-        h.comentario === `Tueste ${nivel}`;
-
-      const clientMatch =
-        !this.selectedClientId || h.id_user === this.selectedClientId;
-
+      const inRange = (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
+      const nivelMatch = !nivel || h.comentario === `Tueste ${nivel}`;
+      const clientMatch = !this.selectedClientId || h.id_user === this.selectedClientId;
       return inRange && nivelMatch && clientMatch;
     });
 
+    // 👇 Sin facturar: NO_FACTURADO dentro del mismo filtro
+    this.sinFacturarRoasts = this.filteredHistoryRoasts.filter(h =>
+      this.getEstadoFacturacion(h) === 'NO_FACTURADO'
+    );
+
     this.totalPages = Math.ceil(this.filteredHistoryRoasts.length / this.pageSize) || 1;
+    this.totalPagesSF = Math.ceil(this.sinFacturarRoasts.length / this.pageSize) || 1;
     this.page = 1;
+    this.pageSF = 1;
     this.updatePagedHistory();
+    this.updatePagedSinFacturar();
   }
 
+  updatePagedSinFacturar() {
+    const start = (this.pageSF - 1) * this.pageSize;
+    this.pagedSinFacturar = this.sinFacturarRoasts.slice(start, start + this.pageSize);
+  }
+
+  changePageSF(delta: number) {
+    const next = this.pageSF + delta;
+    if (next < 1 || next > this.totalPagesSF) return;
+    this.pageSF = next;
+    this.updatePagedSinFacturar();
+  }
   openAddRoaster() {
     this.showAddRoaster = true;
   }

@@ -76,6 +76,10 @@ export class UserService {
     );
   }
 
+  changePassword(id: string, currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.baseUrl}/${id}/password`, { currentPassword, newPassword });
+  }
+
   /** Obtiene usuarios internos (no cliente) */
   getUsersInternal(): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseUrl}/internal`);

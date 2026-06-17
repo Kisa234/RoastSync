@@ -1,32 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../service/auth.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Coffee, Delete, LucideAngularModule } from 'lucide-angular';
-import { Router } from '@angular/router';
+import { Coffee, Eye, EyeOff, LucideAngularModule } from 'lucide-angular';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-auth',
-  imports: [ReactiveFormsModule, CommonModule, LucideAngularModule],
+  imports: [ReactiveFormsModule, FormsModule, CommonModule, LucideAngularModule, RouterLink],
   templateUrl: './auth.component.html',
   styles: ``
 })
 export class AuthComponent implements OnInit {
 
   readonly Coffee = Coffee;
-  readonly Delete = Delete;
+  readonly Eye = Eye;
+  readonly EyeOff = EyeOff;
 
   loading  = false;
   errorMsg: string | null = null;
+  showPin  = false;
 
   dniForm!: FormGroup;
-
-  // PIN ingresado (máx 6 dígitos)
-  pin      = '';
-  maxPin   = 6;
-
-  // Teclado shuffleado
-  teclado: number[] = [];
+  pin = '';
 
   constructor(
     private fb: FormBuilder,
@@ -38,32 +34,12 @@ export class AuthComponent implements OnInit {
     this.dniForm = this.fb.group({
       documento_identidad: ['', [Validators.required, Validators.minLength(8)]]
     });
-    this.shuffleTeclado();
   }
 
   get dni() { return this.dniForm.get('documento_identidad')!; }
 
-  shuffleTeclado(): void {
-    const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    for (let i = digits.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [digits[i], digits[j]] = [digits[j], digits[i]];
-    }
-    this.teclado = digits;
-  }
-
-  presionar(digit: number): void {
-    if (this.pin.length >= this.maxPin) return;
-    this.pin += digit.toString();
-  }
-
-  borrar(): void {
-    this.pin = this.pin.slice(0, -1);
-  }
-
   limpiar(): void {
     this.pin = '';
-    this.shuffleTeclado();
   }
 
   async onSubmit(): Promise<void> {
@@ -81,7 +57,7 @@ export class AuthComponent implements OnInit {
         this.router.navigate(['/dashboard']);
       }
     } catch (err: any) {
-      this.errorMsg = err?.error?.error || 'DNI o PIN incorrecto';
+      this.errorMsg = err?.error?.error || 'DNI o contraseña incorrectos';
       this.limpiar();
     } finally {
       this.loading = false;

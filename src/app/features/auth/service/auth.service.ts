@@ -19,7 +19,7 @@ interface LoginResp {
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/user`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login(email: string, password: string): Observable<LoginResp> {
     return this.http
@@ -81,4 +81,13 @@ export class AuthService {
       id_rol: string;
     }>(`${this.apiUrl}/me`);
   }
+
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/reset-password`, { token, newPassword });
+  }
+
 }

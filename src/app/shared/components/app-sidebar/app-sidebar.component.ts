@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { NgFor, NgIf, NgClass } from '@angular/common';
-import { FilePenLine, LucideAngularModule, Users, Flame, ChartBar, LogOut } from 'lucide-angular';
+import { FilePenLine, LucideAngularModule, Users, Flame, ChartBar, LogOut, UserCircle } from 'lucide-angular';
 import { PermissionAccessService } from '../../services/permission-access.service';
 import {
   House,
@@ -48,7 +48,8 @@ type SidebarItem = SidebarLink | SidebarGroup;
     RouterModule,
     LucideAngularModule
   ],
-  templateUrl: './app-sidebar.component.html'
+  templateUrl: './app-sidebar.component.html',
+  styleUrls: ['./app-sidebar.component.css']
 })
 export class SidebarComponent {
   @Input() collapsed = false;
@@ -60,7 +61,7 @@ export class SidebarComponent {
   readonly LogOut = LogOut;
 
   openGroups: Record<string, boolean> = {
-    inventory: true,
+    inventory: false,
     users: false,
     roasts: false
   };
@@ -245,7 +246,13 @@ export class SidebarComponent {
       label: 'Configuración',
       path: '/settings',
       icon: Settings
-    }
+    },
+    {
+      type: 'link',
+      label: 'Perfil',
+      path: '/profile',
+      icon: UserCircle
+    },
   ];
 
   items: SidebarItem[] = [];
@@ -258,13 +265,19 @@ export class SidebarComponent {
   ) {
     this.items = this.filterItemsByPermissions(this.allItems);
 
+    // Estado inicial según la URL actual (no solo en navegaciones futuras)
+    this.updateOpenGroups(this.router.url);
+
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(() => {
-        const url = this.router.url;
-        this.openGroups['inventory'] = url.startsWith('/inventory');
-        this.openGroups['users'] = url.startsWith('/users');
+        this.updateOpenGroups(this.router.url);
       });
+  }
+
+  private updateOpenGroups(url: string): void {
+    this.openGroups['inventory'] = url.startsWith('/inventory');
+    this.openGroups['users'] = url.startsWith('/users');
   }
 
   private hasAccess(permission?: string | string[]): boolean {
@@ -332,13 +345,10 @@ export class SidebarComponent {
     return group.children.some(child => this.router.url.startsWith(child.path));
   }
 
-
   onLinkClick() {
     if (this.collapsed) {
       this.collapsed = false;
       this.collapsedChange.emit(false);
     }
   }
-
-
 }

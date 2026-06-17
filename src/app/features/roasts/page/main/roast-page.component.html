@@ -6,7 +6,7 @@
       <p class="text-gray-600">Gestiona las órdenes de tueste y revisa el historial</p>
     </div>
     <div class="flex items-center gap-3">
-      
+
 
       <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
         (click)="openAddRoaster()">
@@ -74,86 +74,180 @@
 
   <!-- 2) Historial -->
   <section class="flex-1 bg-white rounded-lg shadow-sm p-6">
-    <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">
-      <ng-container *ngIf="!showAllRoasts; else allRoastsHeader">
+
+    <!-- Pestañas -->
+    <div class="flex gap-6 border-b border-[#E5E5E5] mb-4">
+      <button (click)="activeTab = 'historial'; showAllRoasts = false" class="pb-2 text-sm font-medium transition"
+        [class.border-b-2]="activeTab === 'historial'" [class.border-[#B8672E]]="activeTab === 'historial'"
+        [class.text-[#1F1F1F]]="activeTab === 'historial'" [class.text-gray-500]="activeTab !== 'historial'">
         Historial de Tuestes
-      </ng-container>
-      <ng-template #allRoastsHeader>
-        Todos los Tuestes
-      </ng-template>
-    </h2>
+      </button>
+      <button (click)="activeTab = 'sin_facturar'; showAllRoasts = false"
+        class="pb-2 text-sm font-medium transition flex items-center gap-2"
+        [class.border-b-2]="activeTab === 'sin_facturar'" [class.border-[#B8672E]]="activeTab === 'sin_facturar'"
+        [class.text-[#1F1F1F]]="activeTab === 'sin_facturar'" [class.text-gray-500]="activeTab !== 'sin_facturar'">
+        Sin Facturar
+        <span *ngIf="sinFacturarRoasts.length"
+          class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-semibold">
+          {{ sinFacturarRoasts.length }}
+        </span>
+      </button>
+    </div>
 
-    <!-- filtros: solo si no está en modo "todos los tuestes" -->
+    <!-- Filtros -->
     <div class="mb-4 flex items-center justify-between gap-3">
-
-      <!-- Filtros -->
       <div class="flex gap-2 max-w-2xl w-full">
-        <!-- Fecha inicio -->
         <input type="date" [(ngModel)]="startDate" (ngModelChange)="onFilterChange()"
           class="w-1/4 border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
-
-        <!-- Fecha fin -->
         <input type="date" [(ngModel)]="endDate" (ngModelChange)="onFilterChange()"
           class="w-1/4 border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
-
-        <!-- Select clientes -->
         <select [(ngModel)]="selectedClientId" (ngModelChange)="onFilterChange()"
           class="w-1/2 border border-[#E5E5E5] rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
           <option value="">Todos los clientes</option>
-          <option *ngFor="let c of clients" [value]="c.id_user">
-            {{ c.nombre }}
-          </option>
+          <option *ngFor="let c of clients" [value]="c.id_user">{{ c.nombre }}</option>
         </select>
-
-        <!-- Toggle todos los tuestes -->
-        <button
+        <button *ngIf="activeTab === 'historial'"
           class="inline-flex items-center rounded-lg px-3 py-2 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
-          [ngClass]="showAllRoasts 
-        ? 'bg-[#B8672E] text-white shadow' 
-        : 'border border-[#E5E5E5] text-[#1F1F1F]'" (click)="toggleAllRoasts()">
+          [ngClass]="showAllRoasts ? 'bg-[#B8672E] text-white shadow' : 'border border-[#E5E5E5] text-[#1F1F1F]'"
+          (click)="toggleAllRoasts()">
           Todos los Tuestes
         </button>
       </div>
-
-      <!-- Exportar -->
       <button (click)="exportHistoryToExcel()"
         class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition whitespace-nowrap">
         <lucide-icon [img]="Sheet" class="w-5 h-5"></lucide-icon>
         Exportar Excel
       </button>
-
     </div>
 
+    <!-- TAB: Historial -->
+    <ng-container *ngIf="activeTab === 'historial'">
+      <div *ngIf="!showAllRoasts">
+        <div *ngIf="filteredHistoryRoasts.length; else noHist">
+          <ul class="space-y-4">
+            <li *ngFor="let h of pagedHistoryRoasts" class="border border-[#E5E5E5] rounded-lg p-4">
+              <div class="flex justify-between items-center mb-2">
+                <div>
+                  <span class="font-medium">{{ h.id_lote }}</span>
+                  <span class="text-sm text-gray-600"> — {{ h.fecha_tueste | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="inline-block text-xs rounded-full px-2 py-0.5 font-medium" [ngClass]="{
+                  'bg-yellow-100 text-yellow-800': getEstadoFacturacion(h) === 'ES_NUESTRO',
+                  'bg-green-100 text-green-800':   getEstadoFacturacion(h) === 'FACTURADO',
+                  'bg-red-100 text-red-800':       getEstadoFacturacion(h) === 'NO_FACTURADO'
+                }">
+                    {{ getEstadoFacturacion(h) === 'ES_NUESTRO' ? 'Es nuestro'
+                    : getEstadoFacturacion(h) === 'FACTURADO' ? 'Facturado'
+                    : 'No facturado' }}
+                  </span>
+                  <span class="inline-block px-2 py-0.5 text-xs rounded-full" [ngClass]="{
+                  'bg-blue-100 text-blue-800':  h.comentario==='Tueste Claro',
+                  'bg-yellow-100 text-yellow-800': h.comentario==='Tueste Medio',
+                  'bg-gray-800 text-white':     h.comentario==='Tueste Oscuro'
+                }">{{ h.comentario }}</span>
+                  <span class="inline-block text-xs bg-green-100 text-green-800 rounded-full">Completado</span>
+                  <button (click)="onFichaTueste(h.id_nuevoLote_tostado!)" class="text-gray-500 hover:text-gray-700">
+                    <lucide-icon [img]="Eye" class="w-5 h-5" />
+                  </button>
+                  <button (click)="facturarPedido(h)" class="text-gray-500 hover:text-gray-700">
+                    <lucide-icon [img]="ReceiptText" class="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              <div class="text-sm text-gray-700">Cantidad: {{ h.cantidad | number }} Gr</div>
+            </li>
+          </ul>
+          <div *ngIf="totalPages > 1"
+            class="mt-6 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
+            <span class="text-gray-600">Página {{ page }} de {{ totalPages }}</span>
+            <div class="flex items-center gap-2">
+              <button class="px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40"
+                [disabled]="page === 1" (click)="changePage(-1)">← Anterior</button>
+              <button class="px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40"
+                [disabled]="page === totalPages" (click)="changePage(1)">Siguiente →</button>
+            </div>
+          </div>
+        </div>
+        <ng-template #noHist>
+          <p class="text-gray-500">No hay tuestes en el historial.</p>
+        </ng-template>
+      </div>
 
-    <!-- listado historial -->
-    <div *ngIf="!showAllRoasts">
-      <div *ngIf="filteredHistoryRoasts.length; else noHist">
+      <!-- Tabla todos los tuestes -->
+      <div *ngIf="showAllRoasts" class="overflow-y-auto">
+        <table class="w-full text-sm border border-[#E5E5E5] rounded-lg">
+          <thead class="bg-[#F9F9F9] sticky top-0">
+            <tr>
+              <th class="px-4 py-2 text-left">Lote</th>
+              <th class="px-4 py-2 text-left">Fecha</th>
+              <th class="px-4 py-2 text-left">Tostadora</th>
+              <th class="px-4 py-2 text-left">Cliente</th>
+              <th class="px-4 py-2 text-left">Densidad</th>
+              <th class="px-4 py-2 text-left">Humedad</th>
+              <th class="px-4 py-2 text-left">Peso de Entrada</th>
+              <th class="px-4 py-2 text-left">Temperatura de Entrada</th>
+              <th class="px-4 py-2 text-left">Llama Inicial</th>
+              <th class="px-4 py-2 text-left">Aire Inicial</th>
+              <th class="px-4 py-2 text-left">Punto de no retorno</th>
+              <th class="px-4 py-2 text-left">Temperatura de Salida</th>
+              <th class="px-4 py-2 text-left">Tiempo Total</th>
+              <th class="px-4 py-2 text-left">% De Caramelizacion</th>
+              <th class="px-4 py-2 text-left">Desarrollo</th>
+              <th class="px-4 py-2 text-left">Grados de Desarrollo</th>
+              <th class="px-4 py-2 text-left">Peso de Salida</th>
+              <th class="px-4 py-2 text-left">Merma</th>
+              <th class="px-4 py-2 text-left">Agtrom Comercial</th>
+              <th class="px-4 py-2 text-left">Agtrom Gourmet</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of filteredAllRoasts" class="border-t">
+              <td class="px-4 py-2">{{ t.id_lote }}</td>
+              <td class="px-4 py-2">{{ t.fecha_tueste | date:'dd/MM/yyyy'}}</td>
+              <td class="px-4 py-2">{{ t.tostadora }}</td>
+              <td class="px-4 py-2">{{ t.id_cliente | UserNamePipe | async }}</td>
+              <td class="px-4 py-2">{{ t.densidad }}</td>
+              <td class="px-4 py-2">{{ t.humedad }}</td>
+              <td class="px-4 py-2">{{ t.peso_entrada | number }} Gr</td>
+              <td class="px-4 py-2">{{ t.temperatura_entrada }} °C</td>
+              <td class="px-4 py-2">{{ t.llama_inicial }}</td>
+              <td class="px-4 py-2">{{ t.aire_inicial }}</td>
+              <td class="px-4 py-2">{{ t.punto_no_retorno }} °C</td>
+              <td class="px-4 py-2">{{ t.temperatura_salida }} °C</td>
+              <td class="px-4 py-2">{{ t.tiempo_total | minSec }} min</td>
+              <td class="px-4 py-2">{{ t.porcentaje_caramelizacion }}%</td>
+              <td class="px-4 py-2">{{ t.desarrollo }} min</td>
+              <td class="px-4 py-2">{{ t.grados_desarrollo }}°C</td>
+              <td class="px-4 py-2">{{ t.peso_salida }} Gr</td>
+              <td class="px-4 py-2">{{ t.merma }}%</td>
+              <td class="px-4 py-2">{{ t.agtrom_comercial }}%</td>
+              <td class="px-4 py-2">{{ t.agtrom_gourmet }}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+
+    <!-- TAB: Sin Facturar -->
+    <ng-container *ngIf="activeTab === 'sin_facturar'">
+      <div *ngIf="sinFacturarRoasts.length; else noSinFacturar">
         <ul class="space-y-4">
-          <li *ngFor="let h of pagedHistoryRoasts" class="border border-[#E5E5E5] rounded-lg p-4">
-
+          <li *ngFor="let h of pagedSinFacturar" class="border border-red-100 rounded-lg p-4">
             <div class="flex justify-between items-center mb-2">
               <div>
                 <span class="font-medium">{{ h.id_lote }}</span>
                 <span class="text-sm text-gray-600"> — {{ h.fecha_tueste | date:'dd/MM/yyyy HH:mm' }}</span>
               </div>
               <div class="flex items-center space-x-2">
-                <span class="inline-block text-xs rounded-full px-2 py-0.5 font-medium" [ngClass]="{
-                    'bg-yellow-100 text-yellow-800': getEstadoFacturacion(h) === 'ES_NUESTRO',
-                    'bg-green-100 text-green-800':   getEstadoFacturacion(h) === 'FACTURADO',
-                    'bg-red-100 text-red-800':       getEstadoFacturacion(h) === 'NO_FACTURADO'
-                }">
-                  {{ getEstadoFacturacion(h) === 'ES_NUESTRO' ? 'Es nuestro'
-                  : getEstadoFacturacion(h) === 'FACTURADO' ? 'Facturado'
-                  : 'No facturado' }}
+                <span class="inline-block text-xs rounded-full px-2 py-0.5 font-medium bg-red-100 text-red-800">
+                  No facturado
                 </span>
-
-
                 <span class="inline-block px-2 py-0.5 text-xs rounded-full" [ngClass]="{
-                  'bg-blue-100 text-blue-800': h.comentario==='Tueste Claro',
-                  'bg-yellow-100 text-yellow-800': h.comentario==='Tueste Medio',
-                  'bg-gray-800 text-white': h.comentario==='Tueste Oscuro'
-                }">{{ h.comentario }}</span>
-                <span class="inline-block text-xs bg-green-100 text-green-800 rounded-full">Completado</span>
+                'bg-blue-100 text-blue-800':     h.comentario==='Tueste Claro',
+                'bg-yellow-100 text-yellow-800': h.comentario==='Tueste Medio',
+                'bg-gray-800 text-white':        h.comentario==='Tueste Oscuro'
+              }">{{ h.comentario }}</span>
                 <button (click)="onFichaTueste(h.id_nuevoLote_tostado!)" class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="Eye" class="w-5 h-5" />
                 </button>
@@ -163,91 +257,29 @@
               </div>
             </div>
             <div class="text-sm text-gray-700">Cantidad: {{ h.cantidad | number }} Gr</div>
+            <div class="text-sm text-gray-500 mt-1">
+              Cliente: {{ h.id_user | UserNamePipe | async }}
+            </div>
           </li>
         </ul>
-        <div *ngIf="totalPages > 1"
+        <div *ngIf="totalPagesSF > 1"
           class="mt-6 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
-
-          <!-- Info -->
-          <span class="text-gray-600">
-            Página {{ page }} de {{ totalPages }}
-          </span>
-
-          <!-- Controles -->
+          <span class="text-gray-600">Página {{ pageSF }} de {{ totalPagesSF }}</span>
           <div class="flex items-center gap-2">
-            <button class="px-3 py-1.5 rounded-lg border border-[#E5E5E5] text-[#1F1F1F]
-             hover:bg-[#F9F9F9] disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="page === 1"
-              (click)="changePage(-1)">
-              ← Anterior
-            </button>
-
-            <button class="px-3 py-1.5 rounded-lg border border-[#E5E5E5] text-[#1F1F1F]
-             hover:bg-[#F9F9F9] disabled:opacity-40 disabled:cursor-not-allowed" [disabled]="page === totalPages"
-              (click)="changePage(1)">
-              Siguiente →
-            </button>
+            <button class="px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40"
+              [disabled]="pageSF === 1" (click)="changePageSF(-1)">← Anterior</button>
+            <button class="px-3 py-1.5 rounded-lg border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40"
+              [disabled]="pageSF === totalPagesSF" (click)="changePageSF(1)">Siguiente →</button>
           </div>
         </div>
       </div>
-      <ng-template #noHist>
-        <p class="text-gray-500">No hay tuestes en el historial.</p>
+      <ng-template #noSinFacturar>
+        <p class="text-gray-500">No hay lotes tostados sin facturar.</p>
       </ng-template>
-    </div>
+    </ng-container>
 
-    <!-- tabla todos los tuestes -->
-    <div *ngIf="showAllRoasts" class="overflow-y-auto">
-      <table class="w-full text-sm border border-[#E5E5E5] rounded-lg">
-        <thead class="bg-[#F9F9F9] sticky top-0">
-          <tr>
-            <th class="px-4 py-2 text-left">Lote</th>
-            <th class="px-4 py-2 text-left">Fecha</th>
-            <th class="px-4 py-2 text-left">Tostadora</th>
-            <th class="px-4 py-2 text-left">Cliente</th>
-            <th class="px-4 py-2 text-left">Densidad</th>
-            <th class="px-4 py-2 text-left">Humedad</th>
-            <th class="px-4 py-2 text-left">Peso de Entrada</th>
-            <th class="px-4 py-2 text-left">Temperatura de Entrada</th>
-            <th class="px-4 py-2 text-left">LLlama Inicial</th>
-            <th class="px-4 py-2 text-left">Aire Inicial</th>
-            <th class="px-4 py-2 text-left">Punto de no retorno</th>
-            <th class="px-4 py-2 text-left">Temperatura de Salida</th>
-            <th class="px-4 py-2 text-left">Tiempo Total</th>
-            <th class="px-4 py-2 text-left">% De Caramelizacion</th>
-            <th class="px-4 py-2 text-left">Desarrollo</th>
-            <th class="px-4 py-2 text-left">Grados de Desarrollo</th>
-            <th class="px-4 py-2 text-left">Peso de Salida</th>
-            <th class="px-4 py-2 text-left">Merma</th>
-            <th class="px-4 py-2 text-left">Agtrom Comercial</th>
-            <th class="px-4 py-2 text-left">Agtrom Gourmet</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let t of filteredAllRoasts" class="border-t">
-            <td class="px-4 py-2">{{ t.id_lote }}</td>
-            <td class="px-4 py-2">{{ t.fecha_tueste | date:'dd/MM/yyyy'}}</td>
-            <td class="px-4 py-2">{{ t.tostadora }}</td>
-            <td class="px-4 py-2">{{ t.id_cliente | UserNamePipe | async }}</td>
-            <td class="px-4 py-2">{{ t.densidad }}</td>
-            <td class="px-4 py-2">{{ t.humedad }}</td>
-            <td class="px-4 py-2">{{ t.peso_entrada| number }} Gr</td>
-            <td class="px-4 py-2">{{ t.temperatura_entrada }} °C</td>
-            <td class="px-4 py-2">{{ t.llama_inicial }}</td>
-            <td class="px-4 py-2">{{ t.aire_inicial }}</td>
-            <td class="px-4 py-2">{{ t.punto_no_retorno }} °C</td>
-            <td class="px-4 py-2">{{ t.temperatura_salida }} °C</td>
-            <td class="px-4 py-2">{{ t.tiempo_total | minSec}} min</td>
-            <td class="px-4 py-2">{{ t.porcentaje_caramelizacion }}%</td>
-            <td class="px-4 py-2">{{ t.desarrollo }} min</td>
-            <td class="px-4 py-2">{{ t.grados_desarrollo }}°C</td>
-            <td class="px-4 py-2">{{ t.peso_salida }} Gr</td>
-            <td class="px-4 py-2">{{ t.merma }}%</td>
-            <td class="px-4 py-2">{{ t.agtrom_comercial }}%</td>
-            <td class="px-4 py-2">{{ t.agtrom_gourmet }}%</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   </section>
+
 
 </div>
 
@@ -264,4 +296,3 @@
 
 <ficha-tueste *ngIf="showFichaTueste" [id]="selectedTuesteId" (close)="showFichaTueste=false">
 </ficha-tueste>
-

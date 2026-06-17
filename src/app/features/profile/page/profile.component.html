@@ -1,0 +1,125 @@
+<div class="min-h-screen p-6 bg-[#F9F9F9]">
+
+  <div *ngIf="loading" class="bg-white border border-[#E5E5E5] rounded-2xl p-8 text-center text-gray-500">
+    Cargando información...
+  </div>
+
+  <div *ngIf="!loading" class="bg-white border border-[#E5E5E5] rounded-2xl shadow-sm overflow-hidden">
+
+    <!-- Banner -->
+    <div class="h-28 bg-gradient-to-r from-[#C8A88D] to-[#A67C52]"></div>
+
+    <div class="px-8 pb-8">
+      <!-- Avatar + nombre + acciones -->
+      <div class="flex items-end justify-between -mt-10 mb-8">
+        <div class="flex items-end gap-4">
+          <div class="w-20 h-20 rounded-full bg-[#FFEBD6] border-4 border-white flex items-center justify-center text-2xl font-semibold text-[#A67C52] shadow-sm">
+            {{ initials }}
+          </div>
+          <div class="pb-1">
+            <h2 class="text-lg font-semibold text-[#1F1F1F]">{{ profile.nombre || 'Sin nombre' }}</h2>
+            <p class="text-sm text-gray-500">{{ profile.email }}</p>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button *ngIf="!editMode" type="button" (click)="enableEdit()"
+            class="flex items-center gap-2 bg-[#B8672E] text-white px-4 py-2 rounded-lg shadow hover:bg-[#A67C52] transition text-sm">
+            <lucide-icon [img]="Pencil" class="w-4 h-4"></lucide-icon>
+            Editar
+          </button>
+
+          <ng-container *ngIf="editMode">
+            <button type="button" (click)="cancelEdit()"
+              class="px-4 py-2 rounded-lg border border-[#E5E5E5] text-sm text-gray-700 hover:bg-[#F9F9F9] transition">
+              Cancelar
+            </button>
+            <button type="button" (click)="saveProfile()" [disabled]="savingProfile"
+              class="flex items-center gap-2 bg-[#B8672E] text-white px-4 py-2 rounded-lg shadow hover:bg-[#A67C52] transition text-sm disabled:opacity-50">
+              <lucide-icon [img]="Save" class="w-4 h-4"></lucide-icon>
+              {{ savingProfile ? 'Guardando...' : 'Guardar' }}
+            </button>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Campos -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Nombre</label>
+          <input type="text" [(ngModel)]="profile.nombre" name="nombre" [disabled]="!editMode"
+            class="w-full border rounded-lg px-3 py-2 text-sm transition"
+            [ngClass]="editMode ? 'border-[#E5E5E5] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]' : 'border-transparent bg-[#F9F9F9] text-gray-700'" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Email</label>
+          <input type="email" [(ngModel)]="profile.email" name="email" [disabled]="!editMode"
+            class="w-full border rounded-lg px-3 py-2 text-sm transition"
+            [ngClass]="editMode ? 'border-[#E5E5E5] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]' : 'border-transparent bg-[#F9F9F9] text-gray-700'" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Teléfono</label>
+          <input type="number" [(ngModel)]="profile.numero_telefono" name="numero_telefono" [disabled]="!editMode"
+            class="w-full border rounded-lg px-3 py-2 text-sm transition"
+            [ngClass]="editMode ? 'border-[#E5E5E5] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]' : 'border-transparent bg-[#F9F9F9] text-gray-700'" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de documento</label>
+          <select [(ngModel)]="profile.documento_tipo" name="documento_tipo" [disabled]="!editMode"
+            class="w-full border rounded-lg px-3 py-2 text-sm transition"
+            [ngClass]="editMode ? 'border-[#E5E5E5] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]' : 'border-transparent bg-[#F9F9F9] text-gray-700'">
+            <option value="">Seleccionar</option>
+            <option *ngFor="let t of documentoTipos" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Número de documento</label>
+          <input type="text" [(ngModel)]="profile.documento_identidad" name="documento_identidad" [disabled]="!editMode"
+            class="w-full border rounded-lg px-3 py-2 text-sm transition"
+            [ngClass]="editMode ? 'border-[#E5E5E5] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]' : 'border-transparent bg-[#F9F9F9] text-gray-700'" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Fecha de nacimiento</label>
+          <input type="date" [(ngModel)]="profile.fecha_nacimiento" name="fecha_nacimiento" [disabled]="!editMode"
+            class="w-full border rounded-lg px-3 py-2 text-sm transition"
+            [ngClass]="editMode ? 'border-[#E5E5E5] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]' : 'border-transparent bg-[#F9F9F9] text-gray-700'" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Dirección</label>
+          <input type="text" [(ngModel)]="profile.direccion" name="direccion" [disabled]="!editMode"
+            class="w-full border rounded-lg px-3 py-2 text-sm transition"
+            [ngClass]="editMode ? 'border-[#E5E5E5] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]' : 'border-transparent bg-[#F9F9F9] text-gray-700'" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Departamento</label>
+          <input type="text" [(ngModel)]="profile.departamento" name="departamento" [disabled]="!editMode"
+            class="w-full border rounded-lg px-3 py-2 text-sm transition"
+            [ngClass]="editMode ? 'border-[#E5E5E5] bg-white focus:outline-none focus:ring-2 focus:ring-[#B8672E]' : 'border-transparent bg-[#F9F9F9] text-gray-700'" />
+        </div>
+      </div>
+
+      <!-- Seguridad -->
+      <div class="mt-8 pt-6 border-t border-[#E5E5E5] flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-semibold text-[#1F1F1F]">Seguridad</h3>
+          <p class="text-xs text-gray-500">Actualiza tu contraseña de acceso</p>
+        </div>
+        <button type="button" (click)="showPasswordModal = true"
+          class="flex items-center gap-2 border border-[#B8672E] text-[#B8672E] px-4 py-2 rounded-lg hover:bg-[#FCF8F5] transition text-sm">
+          <lucide-icon [img]="KeyRound" class="w-4 h-4"></lucide-icon>
+          Cambiar contraseña
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<change-password-modal *ngIf="showPasswordModal" [userId]="currentUserId"
+  (close)="showPasswordModal = false"></change-password-modal>

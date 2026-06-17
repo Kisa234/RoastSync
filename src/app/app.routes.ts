@@ -12,7 +12,6 @@ import { AnalisisPage } from './features/analysis/page/analisis.component';
 import { InventoryPage } from './features/inventory/pages/inventory/inventory-page.component';
 import { SettingsPageComponent } from './features/settings/page/settings-page.component';
 import { SuscriptionPageComponent } from './features/suscriptions/page/suscription-page.component';
-import { AuthComponent } from './features/auth/page/auth.component';
 import { ClientFormComponent } from './features/client-form/pages/client-form.component';
 import { LoteTostadoComponent } from './features/inventory/lotes-tostados/page/main/lote-tostado.component';
 import { InternsComponent } from './features/users/page/interns/interns.component';
@@ -37,17 +36,40 @@ import { StadisticComponent } from './features/costing/pages/stadistic/stadistic
 import { StadisticRoastComponent } from './features/roasts/page/stadistic/stadistic.component';
 import { RoastComponent } from './features/roasts/page/shell/roast.component';
 import { BalonesGasComponent } from './features/roasts/page/balon-gas/balon-gas.component';
+import { ProfileComponent } from './features/profile/page/profile.component';
+import { AuthShellComponent } from './features/auth/page/shell/auth-shell.component';
+import { AuthComponent } from './features/auth/page/login/auth.component';
+import { ForgotPasswordComponent } from './features/auth/page/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './features/auth/page/reset-password/reset-password.component';
 
 export const appRoutes: Routes = [
 
   {
-    path: 'login',
+    path: '',
     component: AuthLayoutComponent,
-    canActivateChild: [smartRedirectGuard],
     children: [
-      { path: '', component: AuthComponent }
+      {
+        path: '',
+        component: AuthShellComponent,
+        children: [
+          {
+            path: 'login',
+            canActivate: [smartRedirectGuard],
+            component: AuthComponent
+          },
+          {
+            path: 'forgot-password',
+            component: ForgotPasswordComponent,
+          },
+          {
+            path: 'reset-password',
+            component: ResetPasswordComponent,
+          }
+        ]
+      }
     ]
   },
+
 
   {
     path: 'client',
@@ -271,6 +293,10 @@ export const appRoutes: Routes = [
           import('./features/inventory/pages/analisis/analisis-pdf-page.component')
             .then(m => m.PdfPageComponent),
         canActivate: [AnalysisCompleteGuard]
+      },
+      {
+        path: 'profile',
+        component: ProfileComponent,
       },
 
       {
