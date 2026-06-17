@@ -44,31 +44,32 @@ import { ResetPasswordComponent } from './features/auth/page/reset-password/rese
 
 export const appRoutes: Routes = [
 
-  {
-    path: '',
-    component: AuthLayoutComponent,
-    children: [
-      {
-        path: '',
-        component: AuthShellComponent,
-        children: [
-          {
-            path: 'login',
-            canActivate: [smartRedirectGuard],
-            component: AuthComponent
-          },
-          {
-            path: 'forgot-password',
-            component: ForgotPasswordComponent,
-          },
-          {
-            path: 'reset-password',
-            component: ResetPasswordComponent,
-          }
-        ]
-      }
-    ]
-  },
+ {
+  path: '',
+  component: AuthLayoutComponent,
+  children: [
+    {
+      path: '',
+      component: AuthShellComponent,
+      children: [
+        { path: '', redirectTo: 'login', pathMatch: 'full' },
+        {
+          path: 'login',
+          canActivate: [smartRedirectGuard],
+          component: AuthComponent
+        },
+        {
+          path: 'forgot-password',
+          component: ForgotPasswordComponent,
+        },
+        {
+          path: 'reset-password',
+          component: ResetPasswordComponent,
+        }
+      ]
+    }
+  ]
+},
 
 
   {
