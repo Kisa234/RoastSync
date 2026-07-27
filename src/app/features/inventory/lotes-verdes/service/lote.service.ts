@@ -53,9 +53,10 @@ export class LoteService {
     return this.http.post<FusionarLotes>(`${this.baseUrl}/fusionar`, data);
   }
 
-  getLotesVerdesConInventario(): Observable<LoteVerdeConInventario[]> {
+  getLotesVerdesConInventario(incluirEliminados: boolean = false): Observable<LoteVerdeConInventario[]> {
     return this.http.get<LoteVerdeConInventario[]>(
-      `${this.baseUrl}/inventario`
+      `${this.baseUrl}/inventario`,
+      { params: { incluirEliminados: incluirEliminados.toString() } }
     );
   }
 

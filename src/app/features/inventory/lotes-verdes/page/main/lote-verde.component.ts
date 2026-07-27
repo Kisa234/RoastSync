@@ -65,6 +65,7 @@ export class LoteVerdeComponent {
 
   filterTextVerde = '';
   costoInventarioVerde = 0;
+  incluirHistorico = false;
 
   showAddLote = false;
   showEditLote = false;
@@ -93,10 +94,15 @@ export class LoteVerdeComponent {
   }
 
   loadLotes() {
-    this.loteService.getLotesVerdesConInventario().subscribe(lotes => {
+    this.loteService.getLotesVerdesConInventario(this.incluirHistorico).subscribe(lotes => {
       this.lotes = lotes ?? [];
       this.aplicarFiltro();
     });
+  }
+
+  toggleHistorico() {
+    this.incluirHistorico = !this.incluirHistorico;
+    this.loadLotes();
   }
 
   getPesoInventario(l: LoteVerdeConInventario): number {
@@ -126,7 +132,7 @@ export class LoteVerdeComponent {
         cliente.includes(term);
 
       // costo solo cuenta lotes admin que hacen match
-      if (match && user?.rol === 'admin') {
+      if (match && user?.rol === 'admin' && !l.eliminado) {
         const pesoInventarioKg = this.getPesoInventario(l) / 1000;
         this.costoInventarioVerde += Number(l.costo ?? 0) * pesoInventarioKg;
       }

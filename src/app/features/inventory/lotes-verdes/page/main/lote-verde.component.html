@@ -55,6 +55,11 @@
           : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
           Clientes
         </button>
+        <label class="flex items-center gap-2 ml-2 cursor-pointer select-none">
+          <input type="checkbox" [checked]="incluirHistorico" (change)="toggleHistorico()"
+            class="w-4 h-4 accent-[#B8672E]" />
+          <span class="text-sm text-gray-600">Incluir histórico (inactivos)</span>
+        </label>
       </div>
     </div>
 
@@ -80,7 +85,9 @@
 
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
           <ng-container *ngFor="let l of getLotesFiltrados()">
-            <tr>
+            <tr [ngClass]="{
+              'bg-gray-100 opacity-75': l.eliminado
+            }">
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | UserNamePipe | async }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor }}</td>
@@ -159,10 +166,10 @@
                 <button (click)="openHistoric(l)" class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="History" class="w-5 h-5"></lucide-icon>
                 </button>
-                <button (click)="openEdit(l)" class="text-gray-500 hover:text-gray-700">
+                <button *ngIf="!l.eliminado" (click)="openEdit(l)" class="text-gray-500 hover:text-gray-700">
                   <lucide-icon [img]="Edit2" class="w-5 h-5"></lucide-icon>
                 </button>
-                <button (click)="delete(l)" class="text-gray-500 hover:text-red-600">
+                <button *ngIf="!l.eliminado" (click)="delete(l)" class="text-gray-500 hover:text-red-600">
                   <lucide-icon [img]="Trash2" class="w-5 h-5"></lucide-icon>
                 </button>
               </td>
