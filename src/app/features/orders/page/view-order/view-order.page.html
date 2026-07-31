@@ -1,0 +1,238 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Breadcrumb dinámico -->
+  <div class="text-sm text-gray-500 mb-1">
+    <a (click)="goBack()" class="hover:text-[#B8672E] cursor-pointer">{{ breadcrumbOrigen }}</a>
+    <span class="mx-1">/</span>
+    <span class="text-[#1F1F1F] font-medium">
+      {{ isMaquila ? 'Pedido de Maquila' : (model.tipo_pedido || 'Pedido') }}
+    </span>
+  </div>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">
+        {{ isMaquila ? 'Detalle de Pedido de Maquila' : 'Detalle de Pedido' }}
+      </h1>
+      <p class="text-gray-600">
+        {{ isMaquila
+        ? 'Información del lote tostado y líneas de embolsado'
+        : 'Información de la orden de Venta Verde o Tostado Verde' }}
+      </p>
+    </div>
+    <button (click)="goBack()"
+      class="px-4 py-2 border border-[#E5E5E5] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition flex items-center">
+      <lucide-icon [img]="ArrowLeft" class="w-5 h-5 mr-2" />Volver
+    </button>
+  </div>
+
+  <!-- ===== MAQUILA ===== -->
+  <div *ngIf="isMaquila" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Info del lote -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información del Lote</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Cliente</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
+              {{ (model.id_user | UserNamePipe | async) || 'N/A' }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Lote Tostado</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
+              {{ model.id_lote_tostado || 'N/A' }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Almacén</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
+              {{ almacenNombre }}
+            </div>
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Comentario</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700 min-h-[80px]">
+              {{ model.comentario || '—' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Líneas de embolsado -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Líneas de Embolsado</h2>
+
+        <div class="border border-[#E5E5E5] rounded-lg overflow-hidden">
+          <table class="min-w-full text-sm">
+            <thead class="bg-[#F9F9F9]">
+              <tr class="text-left text-xs text-gray-500 uppercase">
+                <th class="py-2 px-3">Gramaje (g)</th>
+                <th class="py-2 px-3">Molienda</th>
+                <th class="py-2 px-3">Cantidad</th>
+                <th class="py-2 px-3">Subtotal (gr)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let b of bolsas" class="border-t border-[#E5E5E5]">
+                <td class="py-2 px-3">{{ b.gramaje }}</td>
+                <td class="py-2 px-3">{{ b.molienda }}</td>
+                <td class="py-2 px-3">{{ b.cantidad }}</td>
+                <td class="py-2 px-3">{{ (b.gramaje || 0) * (b.cantidad || 0) | number }}</td>
+              </tr>
+              <tr *ngIf="bolsas.length === 0">
+                <td colspan="4" class="text-center text-gray-500 py-6">Sin líneas registradas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: resumen -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Resumen</h2>
+
+        <div class="bg-[#F9F9F9] rounded-lg p-4 mb-4">
+          <p class="text-xs text-gray-500 uppercase">Total Bolsas</p>
+          <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalBolsas | number }}</p>
+        </div>
+
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Total en gramos</span>
+            <span class="font-medium text-[#1F1F1F]">{{ totalGramosBolsas | number }} Gr</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Trazabilidad</h2>
+
+        <div class="space-y-3 text-sm">
+          <div>
+            <p class="text-gray-500 text-xs">Creado por</p>
+            <p class="text-[#1F1F1F]">{{ (model.creado_por_id | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Fecha creación</p>
+            <p class="text-[#1F1F1F]">
+              {{ model.fecha_registro ? (model.fecha_registro | date:'dd/MM/yyyy HH:mm') : 'N/A' }}
+            </p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Completado por</p>
+            <p class="text-[#1F1F1F]">{{ (model.completado_por_id | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Fecha completado</p>
+            <p class="text-[#1F1F1F]">
+              {{ model.fecha_completado ? (model.fecha_completado | date:'dd/MM/yyyy HH:mm') : 'N/A' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VENTA VERDE / TOSTADO VERDE ===== -->
+  <div *ngIf="!isMaquila" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información del Pedido</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Tipo Pedido</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
+              {{ model.tipo_pedido || 'N/A' }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Cliente</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
+              {{ (model.id_user | UserNamePipe | async) || 'N/A' }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Lote</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
+              {{ model.id_lote || 'N/A' }}
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Almacén</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
+              {{ getAlmacenNombre(model.id_almacen) }}
+            </div>
+          </div>
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Cantidad (Gr)</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
+              {{ model.cantidad | number }}
+            </div>
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Comentario</label>
+            <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700 min-h-[80px]">
+              {{ model.comentario || '—' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Disponibilidad</h2>
+
+        <div class="bg-[#F9F9F9] rounded-lg p-4">
+          <p class="text-xs text-gray-500 uppercase">Disponible en almacén</p>
+          <p class="text-2xl font-bold text-[#1F1F1F]">{{ availableQty | number }} <span
+              class="text-sm font-normal">Gr</span></p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Trazabilidad</h2>
+
+        <div class="space-y-3 text-sm">
+          <div>
+            <p class="text-gray-500 text-xs">Creado por</p>
+            <p class="text-[#1F1F1F]">{{ (model.creado_por_id | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Fecha creación</p>
+            <p class="text-[#1F1F1F]">
+              {{ model.fecha_registro ? (model.fecha_registro | date:'dd/MM/yyyy HH:mm') : 'N/A' }}
+            </p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Completado por</p>
+            <p class="text-[#1F1F1F]">{{ (model.completado_por_id | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Fecha completado</p>
+            <p class="text-[#1F1F1F]">
+              {{ model.fecha_completado ? (model.fecha_completado | date:'dd/MM/yyyy HH:mm') : 'N/A' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

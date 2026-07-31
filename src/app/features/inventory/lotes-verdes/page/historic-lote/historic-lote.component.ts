@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe, JsonPipe, Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, ArrowLeft, GitCompare, Eye } from 'lucide-angular';
 
@@ -13,7 +13,6 @@ import { LoteService } from '../../service/lote.service';
 import { PedidoService } from '../../../../orders/service/orders.service';
 import { HistorialService } from '../../../../../shared/services/historial.service';
 import { VerCambiosComponent } from "../../components/ver-cambios/ver-cambios.component";
-import { ViewOrderComponent } from '../../../../orders/components/view-order/view-order.component';
 
 type TipoFiltro = 'TODOS' | 'HISTORIAL' | 'PEDIDO';
 
@@ -37,7 +36,6 @@ interface RegistroVista {
     UserNamePipe,
     LucideAngularModule,
     VerCambiosComponent,
-    ViewOrderComponent
   ],
   templateUrl: './historic-lote.component.html',
   styles: ``
@@ -55,8 +53,6 @@ export class HistoricLote implements OnInit {
   filtroTipo: TipoFiltro = 'TODOS';
   filtroTipoPedido: string = 'TODOS';
 
-  showPedido = false;
-  selectedPedidoId = '';
 
   page = 1;
   pageSize = 5;
@@ -91,7 +87,8 @@ export class HistoricLote implements OnInit {
     private readonly location: Location,
     private readonly loteSvc: LoteService,
     private readonly pedidoSvc: PedidoService,
-    private readonly historialService: HistorialService
+    private readonly historialService: HistorialService,
+    private readonly router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -252,10 +249,15 @@ export class HistoricLote implements OnInit {
   }
 
   openPedido(registro: RegistroVista): void {
-    const pedido = registro.raw as any;
+    const pedido = registro.raw as Pedido;
+    if (!pedido?.id_pedido) return;
 
-    this.selectedPedidoId = pedido.id_pedido;
-    this.showPedido = true;
+    this.router.navigate(['/orders', pedido.id_pedido], {
+      queryParams: {
+        origen: `Lote ${this.loteId}`,
+        origenUrl: this.router.url
+      }
+    });
   }
 
   prevPage(): void {
@@ -274,4 +276,6 @@ export class HistoricLote implements OnInit {
   goBack(): void {
     this.location.back();
   }
+
+
 }

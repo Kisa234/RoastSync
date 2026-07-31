@@ -41,35 +41,41 @@ import { AuthShellComponent } from './features/auth/page/shell/auth-shell.compon
 import { AuthComponent } from './features/auth/page/login/auth.component';
 import { ForgotPasswordComponent } from './features/auth/page/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './features/auth/page/reset-password/reset-password.component';
+import { MaquilaFormPage } from './features/orders/page/add-maquila-order/maquila-form-page.component';
+import { OrdersShellComponent } from './features/orders/page/shell/orders-shell.component';
+import { OrderFormPage } from './features/orders/page/order-form-page/order-form-page.component';
+import { BolsaShellComponent } from './features/inventory/bolsa/page/shell/bolsa-shell.componten';
+import { BolsaMainComponent } from './features/inventory/bolsa/page/main/bolsa-main.component';
+import { ViewOrderPage } from './features/orders/page/view-order/view-order.page';
 
 export const appRoutes: Routes = [
 
- {
-  path: '',
-  component: AuthLayoutComponent,
-  children: [
-    {
-      path: '',
-      component: AuthShellComponent,
-      children: [
-        { path: '', redirectTo: 'login', pathMatch: 'full' },
-        {
-          path: 'login',
-          canActivate: [smartRedirectGuard],
-          component: AuthComponent
-        },
-        {
-          path: 'forgot-password',
-          component: ForgotPasswordComponent,
-        },
-        {
-          path: 'reset-password',
-          component: ResetPasswordComponent,
-        }
-      ]
-    }
-  ]
-},
+  {
+    path: '',
+    component: AuthLayoutComponent,
+    children: [
+      {
+        path: '',
+        component: AuthShellComponent,
+        children: [
+          { path: '', redirectTo: 'login', pathMatch: 'full' },
+          {
+            path: 'login',
+            canActivate: [smartRedirectGuard],
+            component: AuthComponent
+          },
+          {
+            path: 'forgot-password',
+            component: ForgotPasswordComponent,
+          },
+          {
+            path: 'reset-password',
+            component: ResetPasswordComponent,
+          }
+        ]
+      }
+    ]
+  },
 
 
   {
@@ -200,17 +206,46 @@ export const appRoutes: Routes = [
               }
             ]
           },
+          {
+            path: 'bolsa',
+            component: BolsaShellComponent,
+            children: [
+              {
+                path: '',
+                component: BolsaMainComponent
+              },
+              // {
+              //   path: 'historico/:id_bolsa',
+              //   component: HistoricBolsaComponent
+              // }
+            ]
+          },
           { path: 'actualizar', component: UpdateInventoryComponent }
         ]
       },
 
       {
         path: 'orders',
-        component: OrdersPage,
+        component: OrdersShellComponent,
         canActivate: [permissionGuard],
         data: { permissions: ['pedidos.read'] },
+        children: [
+          { path: '', component: OrdersPage },
+          { path: 'nuevo', component: OrderFormPage },
+          { path: 'maquila/nuevo', component: MaquilaFormPage },
+          {
+            path: 'maquila/:id/editar',
+            component: MaquilaFormPage,
+            data: { mode: 'edit' },
+          },
+          {
+            path: ':id/editar',
+            component: OrderFormPage,
+            data: { mode: 'edit' },
+          },
+          { path: ':id', component: ViewOrderPage },
+        ]
       },
-
       {
         path: 'roasts',
         component: RoastComponent,

@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe, DecimalPipe, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule, ArrowLeft, Eye } from 'lucide-angular';
 import { forkJoin } from 'rxjs';
 
@@ -16,7 +16,6 @@ import { LoteService } from '../../../lotes-verdes/service/lote.service';
 import { EnviosService } from '../../../../envios/service/envios.service';
 import { HistorialService } from '../../../../../shared/services/historial.service';
 import { Historial } from '../../../../../shared/models/historial';
-import { ViewOrderComponent } from '../../../../orders/components/view-order/view-order.component';
 
 
 
@@ -29,7 +28,6 @@ import { ViewOrderComponent } from '../../../../orders/components/view-order/vie
     CommonModule,
     UserNamePipe,
     LucideAngularModule,
-    ViewOrderComponent
   ],
   templateUrl: './historic-lote-tostado.component.html',
   styles: ``
@@ -42,8 +40,6 @@ export class HistoricLoteTostadoComponent implements OnInit {
   envios: Envio[] = [];
   historiales: Historial[] = [];
 
-  showPedido = false;
-  selectedPedidoId = '';
   registros: any[] = [];
 
   pesoTotalInventarios = 0;
@@ -75,7 +71,9 @@ export class HistoricLoteTostadoComponent implements OnInit {
     private readonly location: Location,
     private readonly loteTostadoService: LoteTostadoService,
     private readonly enviosService: EnviosService,
-    private readonly historialService: HistorialService
+    private readonly historialService: HistorialService,
+    private readonly router: Router,
+
   ) { }
 
   ngOnInit(): void {
@@ -160,8 +158,11 @@ export class HistoricLoteTostadoComponent implements OnInit {
   openPedido(r: any): void {
     if (!r.id_pedido) return;
 
-    this.selectedPedidoId = r.id_pedido;
-    this.showPedido = true;
+    this.router.navigate(['/orders', r.id_pedido], {
+      queryParams: {
+        origen: `Lote Tostado ${this.loteId}`
+      }
+    });
   }
 
   goBack(): void {

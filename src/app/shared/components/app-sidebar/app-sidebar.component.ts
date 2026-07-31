@@ -110,6 +110,13 @@ export class SidebarComponent {
         },
         {
           type: 'link',
+          label: 'Bolsas',
+          path: '/inventory/bolsa',
+          icon: Box,
+          // permissions: 'inventario.bolsa.read'
+        },
+        {
+          type: 'link',
           label: 'Productos',
           path: '/inventory/productos',
           icon: Box,

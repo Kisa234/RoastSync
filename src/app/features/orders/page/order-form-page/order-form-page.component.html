@@ -1,0 +1,103 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Breadcrumb -->
+  <div class="text-sm text-gray-500 mb-1">
+    <a routerLink="/orders" class="hover:text-[#B8672E]">Pedidos</a>
+    <span class="mx-1">/</span>
+    <span class="text-[#1F1F1F] font-medium">
+      {{ mode === 'create' ? 'Nuevo Pedido' : 'Editar Pedido' }}
+    </span>
+  </div>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">
+        {{ mode === 'create' ? 'Nuevo Pedido' : 'Editar Pedido' }}
+      </h1>
+      <p class="text-gray-600">Crea o edita una orden de Venta Verde o Tostado Verde</p>
+    </div>
+    <div class="flex space-x-3">
+      <button (click)="onCancel()"
+        class="px-4 py-2 border border-[#E5E5E5] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition flex items-center">
+        Cancelar
+      </button>
+      <button (click)="onSave()" [disabled]="loading"
+        class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />Guardar Pedido
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información del Pedido</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Tipo Pedido *</label>
+            <select [(ngModel)]="model.tipo_pedido" [disabled]="mode === 'edit'"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E] disabled:bg-[#F9F9F9]">
+              <option value="" disabled>Selecciona tipo</option>
+              <option *ngFor="let t of tipos" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
+            <select-search [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
+              valueField="id_user" placeholder="Seleccionar cliente" [disabled]="mode === 'edit'"></select-search>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Lote *</label>
+            <select [(ngModel)]="model.id_lote" (change)="onLoteChange()" [disabled]="mode === 'edit'"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E] disabled:bg-[#F9F9F9]">
+              <option value="" disabled>Selecciona lote</option>
+              <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Almacén *</label>
+            <select [(ngModel)]="model.id_almacen" (change)="onAlmacenChange()"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+              <option value="" disabled>Selecciona almacén</option>
+              <option *ngFor="let a of almacenesFiltrados" [value]="a.id_almacen">{{ a.nombre }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Cantidad (Gr) *</label>
+            <input type="number" min="1" [(ngModel)]="model.cantidad"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Comentario</label>
+            <textarea [(ngModel)]="model.comentario" rows="3"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Control de Cantidades</h2>
+
+        <div class="bg-[#F9F9F9] rounded-lg p-4">
+          <p class="text-xs text-gray-500 uppercase">Disponible</p>
+          <p class="text-2xl font-bold text-[#1F1F1F]">
+            {{ availableQty | number }} <span class="text-sm font-normal">Gr</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
