@@ -22,7 +22,7 @@
     <div class="mb-4 relative w-full max-w-lg">
       <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400"></lucide-icon>
       <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
-        placeholder="Buscar por ID bolsa, lote tostado, pedido, molienda o comentario..."
+        placeholder="Buscar por ID bolsa, lote tostado, molienda o comentario..."
         class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
     </div>
 
@@ -34,13 +34,10 @@
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">ID Bolsa</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote Tostado</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Pedido</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Gramaje</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Molienda</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad Total</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Almacén</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Comentario</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha Embolsado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
           </tr>
         </thead>
@@ -50,8 +47,9 @@
             <tr [ngClass]="{ 'bg-gray-100 opacity-75': b.eliminado }">
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ b.id_bolsa }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ b.id_lote_tostado }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ b.id_pedido }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ b.gramaje }} gr</td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                {{ (b.id_user | UserNamePipe | async) || 'N/A' }}
+              </td>
 
               <td class="px-6 py-4">
                 <span class="inline-block text-xs px-2 py-0.5 rounded-full bg-[#E5E5E5] text-gray-700">
@@ -59,15 +57,12 @@
                 </span>
               </td>
 
-              <td class="px-6 py-4 text-sm text-gray-700">{{ b.cantidad }}</td>
-
               <!-- Almacén -->
               <td class="px-6 py-4 text-sm text-gray-700">
-                <ng-container *ngIf="b.inventarios?.length; else sinAlmacen">
+                <ng-container *ngIf="b.inventarios.length; else sinAlmacen">
 
                   <ng-container *ngIf="b.inventarios.length === 1; else multiple">
                     {{ b.inventarios[0].almacen?.nombre || 'N/A' }}
-                    <span class="text-gray-500">({{ b.inventarios[0].cantidad }})</span>
                   </ng-container>
 
                   <ng-template #multiple>
@@ -96,7 +91,6 @@
                 </ng-template>
               </td>
 
-              <td class="px-6 py-4 text-sm text-gray-700">{{ b.comentario || '—' }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ b.fecha_embolsado | date:'dd/MM/yyyy' }}</td>
 
               <!-- Acciones -->
@@ -109,7 +103,7 @@
           </ng-container>
 
           <tr *ngIf="!getBolsasFiltradas().length">
-            <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500">
+            <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
               No se encontraron bolsas.
             </td>
           </tr>

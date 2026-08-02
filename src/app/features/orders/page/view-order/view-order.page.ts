@@ -21,7 +21,6 @@ import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     LucideAngularModule,
     UserNamePipe
   ],

@@ -47,6 +47,7 @@ import { OrderFormPage } from './features/orders/page/order-form-page/order-form
 import { BolsaShellComponent } from './features/inventory/bolsa/page/shell/bolsa-shell.componten';
 import { BolsaMainComponent } from './features/inventory/bolsa/page/main/bolsa-main.component';
 import { ViewOrderPage } from './features/orders/page/view-order/view-order.page';
+import { HistoricBolsaComponent } from './features/inventory/bolsa/page/historic/historic-bolsa.component';
 
 export const appRoutes: Routes = [
 
@@ -214,10 +215,10 @@ export const appRoutes: Routes = [
                 path: '',
                 component: BolsaMainComponent
               },
-              // {
-              //   path: 'historico/:id_bolsa',
-              //   component: HistoricBolsaComponent
-              // }
+              {
+                path: 'historico/:id_bolsa',
+                component: HistoricBolsaComponent
+              }
             ]
           },
           { path: 'actualizar', component: UpdateInventoryComponent }

@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, History, Sheet } from 'lucide-angular';
 import { Router } from '@angular/router';
 
-import { BolsaConInventario } from '../../../../../shared/models/bolsa';
+import { Bolsa, BolsaConInventario } from '../../../../../shared/models/bolsa';
 import { BolsaService } from '../../service/bolsa.service';
+import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -19,6 +20,7 @@ import { saveAs } from 'file-saver';
     NgIf,
     NgFor,
     LucideAngularModule,
+    UserNamePipe,
   ],
   templateUrl: './bolsa-main.component.html',
   styles: []
@@ -45,7 +47,11 @@ export class BolsaMainComponent {
 
   loadBolsas() {
     this.bolsaService.getConInventario().subscribe(bolsas => {
-      this.bolsas = bolsas ?? [];
+      // El backend serializa la relación como "inventarioBolsas"; normalizamos a "inventarios".
+      this.bolsas = (bolsas ?? []).map(b => ({
+        ...b,
+        inventarios: (b as any).inventarioBolsas ?? (b as any).inventarios ?? []
+      }));
       this.aplicarFiltro();
     });
   }
@@ -58,7 +64,6 @@ export class BolsaMainComponent {
       return (
         b.id_bolsa?.toLowerCase().includes(term) ||
         b.id_lote_tostado?.toLowerCase().includes(term) ||
-        b.id_pedido?.toLowerCase().includes(term) ||
         b.molienda?.toLowerCase().includes(term) ||
         b.comentario?.toLowerCase().includes(term)
       );
@@ -73,8 +78,9 @@ export class BolsaMainComponent {
     this.aplicarFiltro();
   }
 
-  openHistoric(b: BolsaConInventario) {
-    this.router.navigate(['/inventory/bolsa/historico', b.id_bolsa]);
+
+  openHistoric(bolsa: Bolsa) {
+    this.router.navigate(['/inventory/bolsa/historico', bolsa.id_bolsa]);
   }
 
   exportBolsas() {
@@ -86,12 +92,9 @@ export class BolsaMainComponent {
       return {
         'ID Bolsa': b.id_bolsa,
         'Lote Tostado': b.id_lote_tostado,
-        'Pedido': b.id_pedido,
-        'Gramaje (gr)': b.gramaje,
+        'Cliente': b.id_user || '',
         'Molienda': b.molienda,
-        'Cantidad Total': b.cantidad,
         'Almacén': almacenes || 'Sin almacén',
-        'Comentario': b.comentario || '',
         'Fecha Embolsado': b.fecha_embolsado
           ? new Date(b.fecha_embolsado).toLocaleDateString('es-PE')
           : '',
