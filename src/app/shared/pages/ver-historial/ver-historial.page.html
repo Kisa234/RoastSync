@@ -1,0 +1,113 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto" *ngIf="!loading && historial">
+
+  <!-- Breadcrumb -->
+  <div class="text-sm text-gray-500 mb-1">
+    <span class="text-[#1F1F1F] font-medium">Detalle de Historial</span>
+  </div>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F] flex items-center gap-3">
+        {{ historial.entidad }}
+        <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="accionBadgeClass()">
+          {{ historial.accion }}
+        </span>
+      </h1>
+      <p class="text-gray-600">{{ historial.fecha_registro | date:'dd/MM/yyyy HH:mm' }}</p>
+    </div>
+    <button (click)="goBack()"
+      class="px-4 py-2 border border-[#E5E5E5] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition flex items-center">
+      <lucide-icon [img]="ArrowLeft" class="w-5 h-5 mr-2" />Volver
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Diff UPDATE -->
+      <div *ngIf="diffRows.length" class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Cambios</h2>
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-500 uppercase">
+              <th class="py-2 pr-4">Campo</th>
+              <th class="py-2 pr-4">Antes</th>
+              <th class="py-2 pr-4">Después</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of diffRows" class="border-t border-[#E5E5E5]">
+              <td class="py-2 pr-4 font-medium" [ngClass]="row.changed ? 'text-[#1F1F1F]' : 'text-gray-400'">
+                {{ row.key }}
+              </td>
+              <td class="py-2 pr-4" [ngClass]="row.changed ? 'text-red-600 bg-red-50 rounded px-2' : 'text-gray-500'">
+                {{ row.before }}
+              </td>
+              <td class="py-2 pr-4"
+                [ngClass]="row.changed ? 'text-[#B8672E] bg-[#FFF3E8] rounded px-2 font-medium' : 'text-gray-500'">
+                {{ row.after }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Snapshot CREATE / DELETE -->
+      <div *ngIf="snapshotRows.length" class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">{{ snapshotLabel }}</h2>
+        <table class="min-w-full text-sm">
+          <tbody>
+            <tr *ngFor="let row of snapshotRows" class="border-t border-[#E5E5E5]">
+              <td class="py-2 pr-4 font-medium text-gray-500 w-1/3">{{ row.key }}</td>
+              <td class="py-2 pr-4 text-[#1F1F1F]">{{ row.after }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!diffRows.length && !snapshotRows.length"
+        class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 text-sm text-gray-500">
+        Este registro no guardó un snapshot del objeto — solo la acción y el comentario.
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información General</h2>
+
+        <div class="space-y-3 text-sm">
+          <div>
+            <p class="text-gray-500 text-xs">Entidad afectada</p>
+            <button *ngIf="rutaEntidad" (click)="verEntidad()" class="text-[#B8672E] hover:text-[#A67C52] font-mono">
+              {{ historial.id_entidad }}
+            </button>
+            <p *ngIf="!rutaEntidad" class="text-[#1F1F1F] font-mono">{{ historial.id_entidad }}</p>
+          </div>
+
+          <div>
+            <p class="text-gray-500 text-xs">Realizado por</p>
+            <p class="text-[#1F1F1F]">{{ (historial.id_user | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+
+          <div *ngIf="historial.comentario">
+            <p class="text-gray-500 text-xs">Comentario</p>
+            <p class="text-[#1F1F1F]">{{ historial.comentario }}</p>
+          </div>
+
+          <div *ngIf="historial.id_pedido">
+            <p class="text-gray-500 text-xs">Pedido relacionado</p>
+            <button (click)="verPedido()" class="text-[#B8672E] hover:text-[#A67C52]">
+              Ver pedido →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="h-full flex items-center justify-center text-gray-500">Cargando...</div>

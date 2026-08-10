@@ -17,6 +17,7 @@ export interface Pedido {
 
   id_nuevoLote?: string;
   id_nuevoLote_tostado?: string;
+  id_lote_destino?: string;
   comentario?: string;
   pesos?: number[];
 

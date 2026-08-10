@@ -1,23 +1,18 @@
 import { CommonModule, DatePipe, DecimalPipe, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LucideAngularModule, ArrowLeft, Eye } from 'lucide-angular';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { LucideAngularModule, ArrowLeft, Eye, Truck } from 'lucide-angular';
 import { forkJoin } from 'rxjs';
 
-
-
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
-import { Envio } from '../../../../../shared/models/envio';
 import { Lote } from '../../../../../shared/models/lote';
-import { LoteTostado, LoteTostadoConInventario } from '../../../../../shared/models/lote-tostado';
+import { LoteTostadoConInventario } from '../../../../../shared/models/lote-tostado';
+import { Historial } from '../../../../../shared/models/historial';
+import { Envio } from '../../../../../shared/models/envio';
 
 import { LoteTostadoService } from '../../service/lote-tostado.service';
-import { LoteService } from '../../../lotes-verdes/service/lote.service';
-import { EnviosService } from '../../../../envios/service/envios.service';
 import { HistorialService } from '../../../../../shared/services/historial.service';
-import { Historial } from '../../../../../shared/models/historial';
-
-
+import { EnviosService } from '../../../../envios/service/envios.service';
 
 @Component({
   selector: 'historic-lote-tostado',
@@ -26,22 +21,22 @@ import { Historial } from '../../../../../shared/models/historial';
     DatePipe,
     DecimalPipe,
     CommonModule,
+    RouterLink,
     UserNamePipe,
     LucideAngularModule,
   ],
   templateUrl: './historic-lote-tostado.component.html',
-  styles: ``
 })
 export class HistoricLoteTostadoComponent implements OnInit {
   readonly ArrowLeft = ArrowLeft;
   readonly Eye = Eye;
+  readonly Truck = Truck;
 
   loteId = '';
-  envios: Envio[] = [];
   historiales: Historial[] = [];
+  envios: Envio[] = [];
 
   registros: any[] = [];
-
   pesoTotalInventarios = 0;
 
   lote: Lote = {
@@ -70,10 +65,9 @@ export class HistoricLoteTostadoComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly location: Location,
     private readonly loteTostadoService: LoteTostadoService,
-    private readonly enviosService: EnviosService,
     private readonly historialService: HistorialService,
+    private readonly enviosSvc: EnviosService,
     private readonly router: Router,
-
   ) { }
 
   ngOnInit(): void {
@@ -100,38 +94,22 @@ export class HistoricLoteTostadoComponent implements OnInit {
         this.calcularTotales();
 
         forkJoin({
-          envios: this.enviosService.getEnviosByLote(loteTostado.id_lote_tostado),
-          historiales: this.historialService.getByEntidad(loteTostado.id_lote_tostado)
+          historiales: this.historialService.getByEntidad(loteTostado.id_lote_tostado),
+          envios: this.enviosSvc.getEnviosPorEntidad('LOTE_TOSTADO', loteTostado.id_lote_tostado),
         }).subscribe({
-          next: ({ envios, historiales }) => {
-            this.envios = envios ?? [];
+          next: ({ historiales, envios }) => {
             this.historiales = historiales ?? [];
+            this.envios = envios ?? [];
             this.construirRegistros();
           },
-          error: (err) => {
-            console.error('Error al cargar actividad del lote:', err);
-          }
+          error: (err) => console.error('Error al cargar actividad del lote:', err)
         });
       },
-      error: (err) => {
-        console.error('Error al cargar lote tostado:', err);
-      }
+      error: (err) => console.error('Error al cargar lote tostado:', err)
     });
   }
 
-
   private construirRegistros(): void {
-    const registrosEnvios = this.envios.map(e => ({
-      tipo: 'ENVIO',
-      accion: e.clasificacion || 'ENVÍO',
-      comentario: e.comentario || 'Envío de café tostado',
-      responsableTitulo: 'Cliente',
-      responsableId: e.id_cliente,
-      cantidad: e.cantidad,
-      fecha: e.fecha,
-      id_pedido: null
-    }));
-
     const registrosHistorial = this.historiales.map(h => ({
       tipo: 'HISTORIAL',
       accion: h.accion,
@@ -140,29 +118,43 @@ export class HistoricLoteTostadoComponent implements OnInit {
       responsableId: h.id_user,
       cantidad: null,
       fecha: h.fecha_registro,
-      id_pedido: h.id_pedido || null
+      id_pedido: h.id_pedido || null,
+      id_envio: null as string | null,
     }));
 
-    this.registros = [...registrosEnvios, ...registrosHistorial]
+    const registrosEnvios = this.envios.map(e => ({
+      tipo: 'ENVIO',
+      accion: e.numero_correlativo,
+      comentario: `Estado: ${e.estado}${e.medio_envio ? ' · ' + e.medio_envio : ''}`,
+      responsableTitulo: 'Registrado por',
+      responsableId: e.registrado_por_id,
+      cantidad: null,
+      fecha: e.fecha_registro,
+      id_pedido: null as string | null,
+      id_envio: e.id_envio,
+    }));
+
+    this.registros = [...registrosHistorial, ...registrosEnvios]
       .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
   }
 
   calcularTotales(): void {
     this.pesoTotalInventarios =
       this.LoteTostado.inventarioLotesTostados?.reduce(
-        (total: number, inv: any) => total + Number(inv.cantidad_kg || 0),
-        0
+        (total: number, inv: any) => total + Number(inv.cantidad_kg || 0), 0
       ) ?? 0;
   }
 
   openPedido(r: any): void {
     if (!r.id_pedido) return;
-
     this.router.navigate(['/orders', r.id_pedido], {
-      queryParams: {
-        origen: `Lote Tostado ${this.loteId}`
-      }
+      queryParams: { origen: `Lote Tostado ${this.loteId}` }
     });
+  }
+
+  openEnvio(r: any): void {
+    if (!r.id_envio) return;
+    this.router.navigate(['/envios', r.id_envio]);
   }
 
   goBack(): void {

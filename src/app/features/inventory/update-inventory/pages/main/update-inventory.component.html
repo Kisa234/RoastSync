@@ -1,0 +1,143 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Actualizar Inventario</h1>
+      <p class="text-gray-600">Busca una entidad y ajusta o traslada su stock entre almacenes</p>
+    </div>
+  </div>
+
+  <!-- Card principal -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm">
+
+    <!-- Tabs por tipo -->
+    <div class="flex items-center border-b border-[#E5E5E5] px-6 overflow-x-auto">
+      <button *ngFor="let t of tabs" (click)="setTab(t.key)"
+        class="py-4 mr-6 text-sm font-medium border-b-2 transition whitespace-nowrap flex items-center"
+        [ngClass]="activeTab() === t.key ? 'border-[#B8672E] text-[#B8672E]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        {{ t.label }}
+        <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+          [ngClass]="activeTab() === t.key ? 'bg-[#B8672E] text-white' : 'bg-[#F4F4F4] text-gray-600'">
+          {{ countForTab(t.key) }}
+        </span>
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="p-6 pb-4 flex flex-wrap items-end gap-3">
+      <div class="w-full max-w-sm">
+        <label class="block text-gray-700 text-xs mb-1">Buscar</label>
+        <div class="relative">
+          <lucide-icon [img]="Search" class="absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input [ngModel]="search()" (ngModelChange)="search.set($event)" type="text"
+            placeholder="Nombre, código o referencia..."
+            class="w-full border border-[#E5E5E5] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+        </div>
+      </div>
+
+      <div class="w-56">
+        <label class="block text-gray-700 text-xs mb-1">Cliente</label>
+        <select-search [items]="clientes" displayField="nombre" valueField="id_user"
+          placeholder="Cualquier cliente" [ngModel]="searchUser()"
+          (ngModelChange)="searchUser.set($event)"></select-search>
+      </div>
+
+      <label class="flex items-center gap-2 text-sm text-gray-700 pb-2">
+        <input type="checkbox" [ngModel]="onlyWithStock()" (ngModelChange)="onlyWithStock.set($event)"
+          class="w-4 h-4 accent-[#B8672E]" />
+        Solo con stock
+      </label>
+
+      <button (click)="clearFilters()"
+        class="px-4 py-2 rounded-lg border border-[#E5E5E5] bg-white text-sm text-gray-700 hover:bg-[#F3F2F1] transition">
+        Limpiar filtros
+      </button>
+    </div>
+
+    <!-- Estados -->
+    <div *ngIf="loading()" class="px-6 pb-6 text-center text-gray-500">Cargando información del inventario...</div>
+    <div *ngIf="!loading() && error()" class="px-6 pb-6 text-red-700">{{ error() }}</div>
+
+    <!-- Tabla -->
+    <div *ngIf="!loading() && !error()" class="overflow-x-auto px-6 pb-6">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Nombre / Código</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Referencia</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Stock Total</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Almacén</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let row of filteredRows()" class="hover:bg-[#FCFCFC] transition">
+            <td class="px-4 py-4">
+              <div class="font-semibold text-sm text-[#1F1F1F]">{{ row.displayName }}</div>
+              <div class="text-xs text-gray-500">{{ row.id }}</div>
+            </td>
+
+            <td class="px-4 py-4 text-sm text-gray-700">
+              <ng-container [ngSwitch]="row.tipo">
+                <span *ngSwitchCase="'PRODUCTO'">{{ row.reference | CategoriaProductoNamePipe | async }}</span>
+                <span *ngSwitchCase="'INSUMO'">{{ row.reference | CategoriaInsumoNamePipe | async }}</span>
+                <span *ngSwitchDefault>{{ row.reference || '—' }}</span>
+              </ng-container>
+            </td>
+
+            <td class="px-4 py-4 text-sm text-gray-700">
+              <span *ngIf="row.userId; else noUser">{{ row.userId | UserNamePipe | async }}</span>
+              <ng-template #noUser>—</ng-template>
+            </td>
+
+            <td class="px-4 py-4 text-sm font-semibold text-[#1F1F1F]">{{ row.stockTotal | number }}</td>
+
+            <!-- Almacén: mismo patrón hover que BolsaMainComponent / LoteTostadoComponent -->
+            <td class="px-4 py-4 text-sm text-gray-700">
+              <ng-container *ngIf="row.almacenes.length; else sinAlmacen">
+                <ng-container *ngIf="row.almacenes.length === 1; else multiple">
+                  {{ row.almacenes[0].nombre }}
+                </ng-container>
+                <ng-template #multiple>
+                  <div class="relative inline-block group">
+                    <span class="cursor-pointer font-medium text-[#1F1F1F]">
+                      {{ row.almacenes[0].nombre }} +{{ row.almacenes.length - 1 }}
+                    </span>
+                    <div class="absolute left-0 top-full mt-2 w-64 bg-white border border-[#E5E5E5] rounded-lg shadow-lg
+                        opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30">
+                      <div class="p-3 space-y-1">
+                        <div *ngFor="let alm of row.almacenes" class="flex justify-between text-xs text-gray-700">
+                          <span class="font-medium">{{ alm.nombre }}</span>
+                          <span class="text-gray-500">{{ alm.cantidad | number }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </ng-container>
+              <ng-template #sinAlmacen><span class="text-gray-400">Sin registro</span></ng-template>
+            </td>
+
+            <td class="px-4 py-4 text-right text-sm space-x-2">
+              <button (click)="ajustar(row)" class="text-gray-500 hover:text-[#B8672E]" title="Ajustar stock">
+                <lucide-icon [img]="Pencil" class="w-5 h-5" />
+              </button>
+              <button (click)="trasladar(row)" class="text-gray-500 hover:text-[#B8672E]" title="Trasladar stock">
+                <lucide-icon [img]="RefreshCcw" class="w-5 h-5" />
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredRows().length === 0">
+            <td colspan="6" class="px-4 py-10 text-center text-gray-500">
+              No se encontraron resultados con los filtros aplicados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

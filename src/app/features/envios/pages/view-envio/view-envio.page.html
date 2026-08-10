@@ -1,0 +1,228 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto" *ngIf="envio">
+
+  <!-- Breadcrumb -->
+  <div class="text-sm text-gray-500 mb-1">
+    <a routerLink="/envios" class="hover:text-[#B8672E]">Envíos</a>
+    <span class="mx-1">/</span>
+    <span class="text-[#1F1F1F] font-medium">{{ envio.numero_correlativo }}</span>
+  </div>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F] flex items-center gap-3">
+        {{ envio.numero_correlativo }}
+        <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="estadoBadgeClass()">
+          {{ labelEstado(envio.estado) }}
+        </span>
+      </h1>
+      <p class="text-gray-600">Seguimiento y ciclo de vida del envío</p>
+    </div>
+    <div class="flex flex-wrap gap-2 justify-end">
+      <button (click)="goBack()"
+        class="px-4 py-2 border border-[#E5E5E5] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition flex items-center">
+        <lucide-icon [img]="ArrowLeft" class="w-5 h-5 mr-2" />Volver
+      </button>
+
+      <button *ngIf="puedeProgramar" (click)="irAProgramar()" [disabled]="saving"
+        class="px-4 py-2 border border-[#E5E5E5] text-[#1F1F1F] rounded-lg hover:bg-[#F3F2F1] transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="Calendar" class="w-5 h-5 mr-2" />Programar
+      </button>
+
+      <button *ngIf="puedeDespachar" (click)="irADespachar()" [disabled]="saving"
+        class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="Truck" class="w-5 h-5 mr-2" />Despachar
+      </button>
+
+      <button *ngIf="puedeConfirmarEntrega" (click)="confirmarEntregaEnvio()" [disabled]="saving"
+        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />Confirmar Entrega
+      </button>
+
+      <button *ngIf="puedeCancelar" (click)="cancelarEnvio()" [disabled]="saving"
+        class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="Ban" class="w-5 h-5 mr-2" />Cancelar
+      </button>
+
+      <button *ngIf="puedeRegistrarDevolucion" (click)="registrarDevolucionEnvio()" [disabled]="saving"
+        class="px-4 py-2 border border-orange-300 text-orange-600 rounded-lg hover:bg-orange-50 transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="RotateCcw" class="w-5 h-5 mr-2" />Registrar Devolución
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Dirección de destino -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6" *ngIf="envio.direccion">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Dirección de Destino</h2>
+
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-gray-500 text-xs">Destinatario</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.nombre_destinatario }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Teléfono</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.telefono }}</p>
+          </div>
+          <div class="col-span-2">
+            <p class="text-gray-500 text-xs">Dirección</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.direccion }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Distrito</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.distrito }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Provincia</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.provincia }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Departamento</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.departamento }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">País</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.pais }}</p>
+          </div>
+          <div class="col-span-2" *ngIf="envio.direccion.referencia">
+            <p class="text-gray-500 text-xs">Referencia</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.referencia }}</p>
+          </div>
+          <div class="col-span-2" *ngIf="envio.direccion.observaciones">
+            <p class="text-gray-500 text-xs">Observaciones</p>
+            <p class="text-[#1F1F1F]">{{ envio.direccion.observaciones }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalles del envío -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Detalles del Envío</h2>
+
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-gray-500 text-xs">Medio de envío</p>
+            <p class="text-[#1F1F1F]">{{ envio.medio_envio || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">N.º de tracking</p>
+            <p class="text-[#1F1F1F]">{{ envio.numero_tracking || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Costo de envío</p>
+            <p class="text-[#1F1F1F]">{{ envio.costo_envio != null ? (envio.costo_envio | number) : '—' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">¿Quién paga?</p>
+            <p class="text-[#1F1F1F]">{{ envio.quien_paga || '—' }}</p>
+          </div>
+          <div *ngIf="envio.peso_total_kg != null">
+            <p class="text-gray-500 text-xs">Peso total</p>
+            <p class="text-[#1F1F1F]">{{ envio.peso_total_kg }} kg</p>
+          </div>
+          <div *ngIf="envio.alto_cm || envio.ancho_cm || envio.largo_cm">
+            <p class="text-gray-500 text-xs">Dimensiones</p>
+            <p class="text-[#1F1F1F]">{{ envio.alto_cm || '—' }} × {{ envio.ancho_cm || '—' }} × {{ envio.largo_cm ||
+              '—' }} cm</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paquete y artículos -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6" *ngIf="envio.paquete">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Paquete</h2>
+          <a [routerLink]="['/envios/paquete', envio.paquete.id_paquete]"
+            class="text-sm text-[#B8672E] hover:text-[#A67C52]">
+            Ver paquete →
+          </a>
+        </div>
+
+        <p class="text-sm text-gray-700 mb-3">
+          Cliente: <span class="font-medium">{{ (envio.paquete.id_cliente | UserNamePipe | async) || 'N/A' }}</span>
+        </p>
+
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-500 uppercase">
+              <th class="py-2 pr-4">ID / Código</th>
+              <th class="py-2 pr-4">Cantidad</th>
+              <th class="py-2 pr-4">Unidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of envio.paquete.items" class="border-t border-[#E5E5E5]">
+              <td class="py-2 pr-4 font-mono">{{ item.id_entidad }}</td>
+              <td class="py-2 pr-4">{{ item.cantidad | number }}</td>
+              <td class="py-2 pr-4 text-gray-500">{{ item.unidad_medida }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Trazabilidad</h2>
+
+        <div class="space-y-3 text-sm">
+          <div>
+            <p class="text-gray-500 text-xs">Registrado por</p>
+            <p class="text-[#1F1F1F]">{{ (envio.registrado_por_id | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500 text-xs">Fecha de registro</p>
+            <p class="text-[#1F1F1F]">{{ envio.fecha_registro | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+
+          <div *ngIf="envio.fecha_programada">
+            <p class="text-gray-500 text-xs">Fecha programada</p>
+            <p class="text-[#1F1F1F]">{{ envio.fecha_programada | date:'dd/MM/yyyy' }}</p>
+          </div>
+
+          <div *ngIf="envio.despachado_por_id">
+            <p class="text-gray-500 text-xs">Despachado por</p>
+            <p class="text-[#1F1F1F]">{{ (envio.despachado_por_id | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+          <div *ngIf="envio.fecha_despacho_real">
+            <p class="text-gray-500 text-xs">Fecha de despacho</p>
+            <p class="text-[#1F1F1F]">{{ envio.fecha_despacho_real | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+
+          <div *ngIf="envio.entregado_por_id">
+            <p class="text-gray-500 text-xs">Entregado por</p>
+            <p class="text-[#1F1F1F]">{{ (envio.entregado_por_id | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+          <div *ngIf="envio.fecha_entrega_real">
+            <p class="text-gray-500 text-xs">Fecha de entrega</p>
+            <p class="text-[#1F1F1F]">{{ envio.fecha_entrega_real | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+
+          <div *ngIf="envio.cancelado_por_id">
+            <p class="text-gray-500 text-xs">Cancelado por</p>
+            <p class="text-[#1F1F1F]">{{ (envio.cancelado_por_id | UserNamePipe | async) || 'N/A' }}</p>
+          </div>
+          <div *ngIf="envio.comentario_cancelacion">
+            <p class="text-gray-500 text-xs">Motivo</p>
+            <p class="text-[#1F1F1F]">{{ envio.comentario_cancelacion }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#FFF8F0] border border-[#F0DFC8] rounded-lg p-4 text-sm text-[#8A5A2B]" *ngIf="puedeDespachar">
+        Al despachar se descuenta el stock real de cada artículo del paquete — asegúrate de que la orden esté lista
+        físicamente antes de confirmar.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!envio && loading" class="h-full flex items-center justify-center text-gray-500">
+  Cargando envío...
+</div>

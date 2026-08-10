@@ -1,104 +1,95 @@
-<div class="min-h-screen bg-[#F9F9F9] p-6 md:p-8">
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
   <div class="w-full space-y-6">
+
+    <!-- Breadcrumb -->
+    <div class="text-sm text-gray-500">
+      <a routerLink="/inventory/bolsa" class="hover:text-[#B8672E]">Bolsas</a>
+      <span class="mx-1">/</span>
+      <span class="text-[#1F1F1F] font-medium">Histórico</span>
+    </div>
 
     <!-- Header -->
     <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div>
-        <button type="button" (click)="goBack()"
-          class="mb-1 inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition">
-          <lucide-icon [img]="ArrowLeft" class="w-4 h-4"></lucide-icon>
-          Volver
-        </button>
-
-        <h1 class="text-2xl font-bold text-zinc-900">Histórico de Bolsa</h1>
+        <h1 class="text-2xl font-bold text-[#1F1F1F]">Histórico de Bolsa</h1>
+        <p class="text-gray-600">Trazabilidad completa: inventario y envíos</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm min-w-fit">
-        <div>
-          <p class="text-zinc-500">Cliente</p>
-          <p class="font-semibold text-zinc-900">{{ clienteId | UserNamePipe | async }}</p>
+      <div class="flex items-center gap-3">
+        <div class="grid grid-cols-3 gap-4 text-sm">
+          <div>
+            <p class="text-gray-500">Cliente</p>
+            <p class="font-semibold text-[#1F1F1F]">{{ clienteId | UserNamePipe | async }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Lote</p>
+            <p class="font-semibold text-[#1F1F1F]">{{ loteVerdeId || 'N/A' }}</p>
+          </div>
+          <div>
+            <p class="text-gray-500">Fecha</p>
+            <p class="font-semibold text-[#1F1F1F]">{{ bolsa.fecha_embolsado | date:'dd/MM/yyyy' }}</p>
+          </div>
         </div>
-        <div>
-          <p class="text-zinc-500">Lote</p>
-          <p class="font-semibold text-zinc-900">{{ loteVerdeId || 'N/A' }}</p>
-        </div>
-        <div>
-          <p class="text-zinc-500">Fecha</p>
-          <p class="font-semibold text-zinc-900">{{ bolsa.fecha_embolsado | date:'dd/MM/yyyy' }}</p>
-        </div>
+        <button (click)="goBack()"
+          class="px-4 py-2 border border-[#E5E5E5] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition flex items-center">
+          <lucide-icon [img]="ArrowLeft" class="w-4 h-4 mr-2" />Volver
+        </button>
       </div>
     </div>
 
     <!-- BLOQUE 1: Resumen de la Bolsa -->
-    <section class="bg-white border border-zinc-200 rounded-xl overflow-hidden">
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 border-b border-zinc-200">
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">ID Bolsa</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ bolsa.id_bolsa }}</p>
+    <section class="bg-white border border-[#E5E5E5] rounded-lg shadow-sm overflow-hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 border-b border-[#E5E5E5]">
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">ID Bolsa</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ bolsa.id_bolsa }}</p>
         </div>
-
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Gramaje</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ bolsa.gramaje | number }} g</p>
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">Gramaje</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ bolsa.gramaje | number }} g</p>
         </div>
-
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Molienda</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ bolsa.molienda || 'N/A' }}</p>
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">Molienda</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ bolsa.molienda || 'N/A' }}</p>
         </div>
-
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Producido</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ bolsa.cantidad | number }} uds ({{ subtotalGramos | number }} gr)</p>
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">Producido</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ bolsa.cantidad | number }} uds ({{ subtotalGramos | number }} gr)</p>
         </div>
-
         <div class="px-4 py-3">
-          <p class="text-[11px] uppercase text-zinc-500">Responsable embolsado</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ ( responsableEmbolsadoId  || '') | UserNamePipe | async }}</p>
+          <p class="text-[11px] uppercase text-gray-500">Responsable Embolsado</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ (responsableEmbolsadoId || '') | UserNamePipe | async }}</p>
         </div>
       </div>
 
-
-      <!-- Comentario -->
-      <div *ngIf="bolsa.comentario" class="px-4 py-3 border-b border-zinc-200">
-        <p class="text-[11px] uppercase text-zinc-500 mb-1">Comentario</p>
-        <p class="text-sm text-zinc-700">{{ bolsa.comentario }}</p>
+      <div *ngIf="bolsa.comentario" class="px-4 py-3 border-b border-[#E5E5E5]">
+        <p class="text-[11px] uppercase text-gray-500 mb-1">Comentario</p>
+        <p class="text-sm text-gray-700">{{ bolsa.comentario }}</p>
       </div>
 
-      <!-- Tabla inventario -->
       <div class="overflow-x-auto">
         <table class="min-w-full table-auto">
-          <thead class="bg-[#F9F9F9] border-b border-zinc-200">
+          <thead class="bg-[#F9F9F9] border-b border-[#E5E5E5]">
             <tr>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-900 uppercase">Almacén</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-zinc-900 uppercase">Stock actual</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Almacén</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Stock Actual</th>
             </tr>
           </thead>
-
-          <tbody class="divide-y divide-zinc-200">
+          <tbody class="divide-y divide-[#E5E5E5]">
             <tr *ngFor="let inv of bolsa.inventarios">
-              <td class="px-6 py-4 text-sm font-medium text-zinc-900">
-                {{ inv.almacen?.nombre || 'N/A' }}
-              </td>
-              <td class="px-6 py-4 text-sm text-zinc-900">
-                {{ inv.cantidad | number }} uds
-              </td>
+              <td class="px-6 py-4 text-sm font-medium text-[#1F1F1F]">{{ inv.almacen?.nombre || 'N/A' }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ inv.cantidad | number }} uds</td>
             </tr>
-
             <tr *ngIf="!bolsa.inventarios.length">
-              <td colspan="2" class="px-6 py-8 text-center text-sm text-zinc-500">
+              <td colspan="2" class="px-6 py-8 text-center text-sm text-gray-500">
                 No hay inventario asignado para esta bolsa.
               </td>
             </tr>
           </tbody>
-
-          <tfoot *ngIf="bolsa.inventarios.length" class="bg-[#FCFCFC] border-t border-zinc-200">
+          <tfoot *ngIf="bolsa.inventarios.length" class="bg-[#F9F9F9] border-t border-[#E5E5E5]">
             <tr>
-              <td class="px-6 py-4 text-sm font-semibold text-zinc-900">Stock total</td>
-              <td class="px-6 py-4 text-sm font-semibold text-zinc-900">
-                {{ stockTotal | number }} uds
-              </td>
+              <td class="px-6 py-4 text-sm font-semibold text-[#1F1F1F]">Stock total</td>
+              <td class="px-6 py-4 text-sm font-semibold text-[#1F1F1F]">{{ stockTotal | number }} uds</td>
             </tr>
           </tfoot>
         </table>
@@ -106,85 +97,90 @@
     </section>
 
     <!-- BLOQUE 2: Información del Lote de Origen -->
-    <section *ngIf="loteTostado" class="bg-white border border-zinc-200 rounded-xl overflow-hidden">
-      <div class="px-4 py-3 bg-[#FCFCFC] border-b border-zinc-200">
-        <h2 class="text-lg font-semibold text-zinc-900">Información del Lote de Origen</h2>
+    <section *ngIf="loteTostado" class="bg-white border border-[#E5E5E5] rounded-lg shadow-sm overflow-hidden">
+      <div class="px-4 py-3 bg-[#F9F9F9] border-b border-[#E5E5E5]">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Información del Lote de Origen</h2>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6">
-
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Lote Verde</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ loteTostado.lote.id_lote || 'N/A' }}</p>
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">Lote Verde</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ loteTostado.lote.id_lote || 'N/A' }}</p>
         </div>
-
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Perfil tostado</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ loteTostado.perfil_tostado || 'N/A' }}</p>
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">Perfil Tostado</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ loteTostado.perfil_tostado || 'N/A' }}</p>
         </div>
-
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Proceso</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ loteTostado.lote.proceso || 'N/A' }}</p>
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">Proceso</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ loteTostado.lote.proceso || 'N/A' }}</p>
         </div>
-
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Variedades</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ loteTostado.lote.variedades || 'N/A' }}</p>
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">Variedades</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ loteTostado.lote.variedades || 'N/A' }}</p>
         </div>
-
-        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-zinc-200">
-          <p class="text-[11px] uppercase text-zinc-500">Productor</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ loteTostado.lote.productor || 'N/A' }}</p>
+        <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
+          <p class="text-[11px] uppercase text-gray-500">Productor</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ loteTostado.lote.productor || 'N/A' }}</p>
         </div>
-
         <div class="px-4 py-3">
-          <p class="text-[11px] uppercase text-zinc-500">Distrito</p>
-          <p class="mt-1 font-semibold text-zinc-900">{{ loteTostado.lote.distrito || 'N/A' }}</p>
+          <p class="text-[11px] uppercase text-gray-500">Distrito</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ loteTostado.lote.distrito || 'N/A' }}</p>
         </div>
       </div>
     </section>
 
     <!-- BLOQUE 3: Actividad -->
-    <section class="bg-white border border-zinc-200 rounded-xl overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-3 bg-[#FCFCFC] border-b border-zinc-200">
+    <section class="bg-white border border-[#E5E5E5] rounded-lg shadow-sm overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 bg-[#F9F9F9] border-b border-[#E5E5E5]">
         <div>
-          <h2 class="text-lg font-semibold text-zinc-900">Actividad de la bolsa</h2>
-          <span class="text-sm text-zinc-500">
-            {{ historiales.length || 0 }} registro{{ (historiales.length || 0) === 1 ? '' : 's' }}
+          <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Actividad de la Bolsa</h2>
+          <span class="text-sm text-gray-500">
+            {{ registros.length || 0 }} registro{{ (registros.length || 0) === 1 ? '' : 's' }}
           </span>
         </div>
       </div>
 
       <div class="overflow-x-auto">
         <table class="min-w-full table-auto">
-          <thead class="bg-[#F9F9F9] border-b border-zinc-200">
+          <thead class="bg-[#F9F9F9] border-b border-[#E5E5E5]">
             <tr>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Acción</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Comentario</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Responsable</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Fecha</th>
-              <th class="px-6 py-4 text-left text-xs font-medium text-zinc-600 uppercase">Acciones</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acción</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Comentario</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Responsable</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acciones</th>
             </tr>
           </thead>
 
-          <tbody class="bg-white divide-y divide-zinc-200">
-            <tr *ngFor="let h of historiales">
-              <td class="px-6 py-4 text-sm font-medium text-zinc-900">{{ h.accion }}</td>
-              <td class="px-6 py-4 text-sm text-zinc-700">{{ h.comentario || '—' }}</td>
-              <td class="px-6 py-4 text-sm text-zinc-700">{{ h.id_user | UserNamePipe | async }}</td>
-              <td class="px-6 py-4 text-sm text-zinc-700">{{ h.fecha_registro | date:'dd/MM/yyyy HH:mm' }}</td>
+          <tbody class="bg-white divide-y divide-[#E5E5E5]">
+            <tr *ngFor="let r of registros">
               <td class="px-6 py-4 text-sm">
-                <button *ngIf="h.id_pedido" (click)="openPedido(h.id_pedido)"
-                  class="text-gray-500 hover:text-[#B8672E]" title="Ver pedido">
-                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium" [ngClass]="{
+                  'bg-blue-50 text-blue-700 border border-blue-200': r.tipo === 'HISTORIAL',
+                  'bg-[#FFF8F0] text-[#8A5A2B] border border-[#F0DFC8]': r.tipo === 'ENVIO'
+                }">
+                  {{ r.tipo }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm font-medium text-[#1F1F1F]">{{ r.accion }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ r.comentario }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ r.usuarioId | UserNamePipe | async }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ r.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="px-6 py-4 text-sm">
+                <button *ngIf="r.id_pedido" (click)="openPedido(r.id_pedido)" class="text-gray-500 hover:text-[#B8672E]" title="Ver pedido">
+                  <lucide-icon [img]="Eye" class="w-5 h-5" />
                 </button>
-                <span *ngIf="!h.id_pedido" class="text-zinc-400">—</span>
+                <button *ngIf="r.id_envio" (click)="openEnvio(r.id_envio)" class="text-gray-500 hover:text-[#B8672E]" title="Ver envío">
+                  <lucide-icon [img]="Truck" class="w-5 h-5" />
+                </button>
+                <span *ngIf="!r.id_pedido && !r.id_envio" class="text-gray-400">—</span>
               </td>
             </tr>
 
-            <tr *ngIf="!historiales.length">
-              <td colspan="5" class="px-6 py-10 text-center text-sm text-zinc-500">
+            <tr *ngIf="!registros.length">
+              <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
                 Sin actividad registrada para esta bolsa.
               </td>
             </tr>

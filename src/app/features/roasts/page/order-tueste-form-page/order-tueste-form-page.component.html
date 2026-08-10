@@ -1,0 +1,235 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Breadcrumb -->
+  <div class="text-sm text-gray-500 mb-1">
+    <a routerLink="/roasts" class="hover:text-[#B8672E]">Tostado</a>
+    <span class="mx-1">/</span>
+    <span class="text-[#1F1F1F] font-medium">
+      {{ mode === 'create' ? 'Nueva Orden de Tueste' : 'Editar Orden de Tueste' }}
+    </span>
+  </div>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Orden de Tueste</h1>
+      <p class="text-gray-600">Genera tu orden y divide en batches</p>
+    </div>
+    <div class="flex space-x-3">
+      <button (click)="onCancel()"
+        class="px-4 py-2 border border-[#E5E5E5] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition flex items-center">
+        Cancelar
+      </button>
+      <button (click)="onSave()" [disabled]="saving"
+        class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />Guardar Orden
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Información general -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información General</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
+            <select [(ngModel)]="orden.id_user" (ngModelChange)="onClienteChange()" [disabled]="mode === 'edit'"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E] disabled:bg-[#F9F9F9]">
+              <option value="" disabled>Selecciona cliente</option>
+              <option *ngFor="let u of clientes" [value]="u.id_user">{{ u.nombre }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Lote *</label>
+            <select [(ngModel)]="orden.id_lote" (ngModelChange)="onLoteChange()"
+              [disabled]="!orden.id_user || mode === 'edit'"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E] disabled:bg-[#F9F9F9]">
+              <option value="" disabled>Selecciona lote</option>
+              <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>
+            </select>
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Almacén *</label>
+            <select [(ngModel)]="orden.id_almacen" (ngModelChange)="onAlmacenChange()"
+              [disabled]="!almacenesConStock.length || mode === 'edit'"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E] disabled:bg-[#F9F9F9]">
+              <option value="" disabled>
+                {{ orden.id_lote ? 'Selecciona un almacén con stock' : 'Selecciona un lote primero' }}
+              </option>
+              <option *ngFor="let a of almacenesConStock" [value]="a.id_almacen">
+                {{ a.nombre }} — {{ a.pesoVerde | number }} gr verde
+              </option>
+            </select>
+            <p class="text-xs text-gray-500 mt-1">
+              Solo se muestran los almacenes donde este lote tiene stock disponible.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Verde disponible (Gr)</label>
+            <input [value]="pesoVerdeDisp | number" disabled
+              class="w-full bg-[#F9F9F9] text-gray-700 border border-[#E5E5E5] rounded-lg px-3 py-2" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Tostado disponible (Gr)</label>
+            <input [value]="pesoTostadoDisp | number" disabled
+              class="w-full bg-[#F9F9F9] text-gray-700 border border-[#E5E5E5] rounded-lg px-3 py-2" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Fecha de Tueste</label>
+            <input type="date" [(ngModel)]="orden.fecha_tueste"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Tipo de Tueste</label>
+            <select [(ngModel)]="orden.comentario"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+              <option value="" disabled>Selecciona tipo</option>
+              <option *ngFor="let t of tiposTueste" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Tostadora</label>
+            <select [(ngModel)]="orden.tostadora"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+              <option value="" disabled>Selecciona tostadora</option>
+              <option *ngFor="let t of Tostadoras" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Facturado</label>
+            <select [(ngModel)]="orden.facturado"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+              <option [ngValue]="undefined" disabled>Selecciona</option>
+              <option [ngValue]="true">Sí</option>
+              <option [ngValue]="false">No</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Batch Verde total (Gr)</label>
+            <input type="number" [(ngModel)]="orden.cantidad" (ngModelChange)="onBatchVerdeGlobalChange()"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Batch Tostado total (Gr)</label>
+            <input type="number" [(ngModel)]="batchTostado" (ngModelChange)="onBatchTostadoGlobalChange()"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Batches -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Batches</h2>
+          <button (click)="agregarBatch()" class="flex items-center text-sm text-[#B8672E] hover:text-[#A67C52]">
+            <lucide-icon [img]="Plus" class="w-4 h-4 mr-1" />Agregar batch
+          </button>
+        </div>
+
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-500 uppercase">
+              <th class="py-2 pr-4">#</th>
+              <th class="py-2 pr-4">Verde (Gr)</th>
+              <th class="py-2 pr-4">Tostado (Gr)</th>
+              <th class="py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of batches" class="border-t border-[#E5E5E5]">
+              <td class="py-2 pr-4 text-gray-700">{{ b.id }}</td>
+              <td class="py-2 pr-4">
+                <input type="number" min="0" [(ngModel)]="b.pesoVerde" (ngModelChange)="onBatchVerdeChange(b)"
+                  class="w-full border border-[#E5E5E5] rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+              </td>
+              <td class="py-2 pr-4">
+                <input type="number" min="0" [(ngModel)]="b.pesoTostado" (ngModelChange)="onBatchTostadoChange(b)"
+                  class="w-full border border-[#E5E5E5] rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+              </td>
+              <td class="py-2">
+                <button (click)="quitarBatch(b)" class="text-gray-400 hover:text-red-600">
+                  <lucide-icon [img]="Trash2" class="w-4 h-4" />
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="batches.length === 0">
+              <td colspan="4" class="text-center text-gray-500 py-6">Sin batches agregados.</td>
+            </tr>
+            <tr *ngIf="batches.length" class="border-t border-[#E5E5E5] font-semibold">
+              <td class="py-2 pr-4 text-[#1F1F1F]">Total</td>
+              <td class="py-2 pr-4 text-[#1F1F1F]">{{ totalVerde | number }}</td>
+              <td class="py-2 pr-4 text-[#1F1F1F]">{{ totalTostado | number }}</td>
+              <td class="py-2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Stock por Almacén</h2>
+
+        <div *ngIf="!almacenesConStock.length" class="text-sm text-gray-500">
+          Selecciona un lote para ver dónde tiene stock.
+        </div>
+
+        <div *ngFor="let a of almacenesConStock; let last = last" class="py-2"
+          [ngClass]="!last ? 'border-b border-[#E5E5E5]' : ''">
+          <div class="flex justify-between items-start text-sm">
+            <span class="font-medium text-[#1F1F1F]" [ngClass]="a.id_almacen === orden.id_almacen ? 'text-[#B8672E]' : ''">
+              {{ a.nombre }}
+            </span>
+            <div class="text-right">
+              <div class="text-[#1F1F1F]">{{ a.pesoVerde | number }} gr verde</div>
+              <div class="text-gray-500 text-xs">{{ a.pesoTostado | number }} gr tostado</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Resumen</h2>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Total batches</span>
+            <span class="font-medium text-[#1F1F1F]">{{ batches.length }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Verde en batches</span>
+            <span class="font-medium text-[#1F1F1F]">{{ totalVerde | number }} gr</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#FFF8F0] border border-[#F0DFC8] rounded-lg p-4 text-sm text-[#8A5A2B]">
+        <ng-container *ngIf="mode === 'create'">
+          El disponible mostrado corresponde solo al almacén elegido arriba — un mismo lote puede tener stock en
+          varios almacenes a la vez.
+        </ng-container>
+        <ng-container *ngIf="mode === 'edit'">
+          Cliente, lote y almacén no se pueden cambiar una vez creada la orden.
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="h-full flex items-center justify-center text-gray-500">Cargando...</div>

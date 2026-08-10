@@ -1,0 +1,6 @@
+export enum EstadoPaquete {
+  EN_PREPARACION = 'EN_PREPARACION',
+  LISTO = 'LISTO',
+  DESPACHADO = 'DESPACHADO',
+  CANCELADO = 'CANCELADO',
+}

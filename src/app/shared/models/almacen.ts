@@ -18,7 +18,7 @@ export type UpdateAlmacenDto = Partial<CreateAlmacenDto>;
 
 
 export interface AjustarStockPayload {
-  entidad: 'LOTE' | 'LOTE_TOSTADO' | 'PRODUCTO' | 'MUESTRA' | 'INSUMO';
+  entidad: 'LOTE' | 'LOTE_TOSTADO' | 'PRODUCTO' | 'MUESTRA' | 'INSUMO' | 'BOLSA'; // 👈 agregado
   id_entidad: string;
   id_almacen: string;
   nueva_cantidad: number;
@@ -28,7 +28,7 @@ export interface AjustarStockPayload {
 }
 
 export interface TrasladarStockPayload {
-  entidad: 'LOTE' | 'LOTE_TOSTADO' | 'PRODUCTO' | 'MUESTRA' | 'INSUMO';
+  entidad: 'LOTE' | 'LOTE_TOSTADO' | 'PRODUCTO' | 'MUESTRA' | 'INSUMO' | 'BOLSA'; // 👈 agregado
   id_entidad: string;
   id_almacen_origen: string;
   id_almacen_destino: string;

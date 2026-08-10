@@ -207,7 +207,7 @@ export class SidebarComponent {
     {
       type: 'link',
       label: 'Envios',
-      path: '/envio',
+      path: '/envios',
       icon: Truck,
       permissions: 'envios.read'
     },

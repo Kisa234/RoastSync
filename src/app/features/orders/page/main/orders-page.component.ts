@@ -2,11 +2,12 @@ import { CommonModule, DatePipe, NgClass, NgFor } from '@angular/common';
 import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Check, Edit2, Eye, Factory, LucideAngularModule, Plus, Trash2 } from 'lucide-angular';
+import { Check, Edit2, Eye, Factory, LucideAngularModule, PackageCheck, Plus, Trash2 } from 'lucide-angular';
 import { forkJoin } from 'rxjs';
 import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
 import { Pedido } from '../../../../shared/models/pedido';
 import { PedidoService } from '../../service/orders.service';
+import { PaqueteService } from '../../../envios/service/paquete.service';
 import { UiService } from '../../../../shared/services/ui.service';
 
 type TabPedidos = 'pendientes' | 'completados';
@@ -32,6 +33,7 @@ export class OrdersPage implements OnInit {
   readonly Trash2 = Trash2;
   readonly Check = Check;
   readonly Factory = Factory;
+  readonly PackageCheck = PackageCheck;
 
   activeTab: TabPedidos = 'pendientes';
 
@@ -48,9 +50,10 @@ export class OrdersPage implements OnInit {
 
   constructor(
     private pedidoSvc: PedidoService,
+    private paqueteSvc: PaqueteService,
     private uiSvc: UiService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.getData();
@@ -90,11 +93,16 @@ export class OrdersPage implements OnInit {
 
   openAdd() { this.router.navigate(['/orders/nuevo']); }
   openAddMaquila() { this.router.navigate(['/orders/maquila/nuevo']); }
+  openAddDespacho() { this.router.navigate(['/orders/despacho/nuevo']); }
 
   edit(p: Pedido) {
-    p.tipo_pedido === 'Maquila'
-      ? this.router.navigate(['/orders/maquila', p.id_pedido, 'editar'])
-      : this.router.navigate(['/orders', p.id_pedido, 'editar']);
+    if (p.tipo_pedido === 'Maquila') {
+      this.router.navigate(['/orders/maquila', p.id_pedido, 'editar']);
+    } else if (p.tipo_pedido === 'OrdenDespacho') {
+      this.router.navigate(['/orders/despacho', p.id_pedido, 'editar']);
+    } else {
+      this.router.navigate(['/orders', p.id_pedido, 'editar']);
+    }
   }
 
   view(p: Pedido) { this.router.navigate(['/orders', p.id_pedido]); }
@@ -121,8 +129,48 @@ export class OrdersPage implements OnInit {
       confirmText: 'Completar',
       cancelText: 'Cancelar'
     }).then((ok) => {
-      if (ok) {
-        this.pedidoSvc.completarPedido(p.id_pedido).subscribe(() => this.getData());
+      if (!ok) return;
+
+      this.pedidoSvc.completarPedido(p.id_pedido).subscribe({
+        next: () => {
+          if (p.tipo_pedido === 'OrdenDespacho') {
+            this.afterCompletarDespacho(p.id_pedido);
+          } else {
+            this.getData();
+          }
+        },
+        error: (err) => {
+          const msg = err?.error?.error || 'No se pudo completar el pedido.';
+          this.uiSvc.alert('error', 'Error', msg);
+        }
+      });
+    });
+  }
+
+  /** Al completar una OrdenDespacho, el backend generó un Paquete en EN_PREPARACION.
+   *  Se pregunta si quiere ir directo a prepararlo, sin bloquear el refresh de la tabla
+   *  aunque diga que no. */
+  private afterCompletarDespacho(idPedido: string) {
+    this.getData();
+
+    this.paqueteSvc.getByPedidoOrigen(idPedido).subscribe({
+      next: (paquete) => {
+        if (!paquete) return; // no debería pasar si completarPedido fue exitoso, pero por si acaso
+
+        this.uiSvc.confirm({
+          title: 'Paquete generado',
+          message: '¿Deseas ir a preparar el paquete ahora?',
+          confirmText: 'Ir a preparar',
+          cancelText: 'Más tarde'
+        }).then((ir) => {
+          if (ir) {
+            this.router.navigate(['/envios/paquete', paquete.id_paquete]);
+          }
+        });
+      },
+      error: () => {
+        // El pedido sí se completó — un fallo acá no debe ensuciar ese resultado con un error rojo.
+        console.error('[OrdersPage] No se pudo obtener el paquete generado para el pedido', idPedido);
       }
     });
   }

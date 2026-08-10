@@ -14,7 +14,6 @@ import {
 import { Router, RouterOutlet } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { formatDate } from '@angular/common';
-
 import { User } from '../../../../../shared/models/user';
 import { LoteTostadoService } from '../../service/lote-tostado.service';
 import { UserService } from '../../../../users/service/users-service.service';
@@ -24,12 +23,8 @@ import { LoteTostadoConInventario } from '../../../../../shared/models/lote-tost
 import { AddInventoryLoteTostadoComponent } from "../../components/add-inventory-lote-tostado/add-inventory-lote-tostado.component";
 import { FichaTuesteComponent } from '../../components/ficha-tueste/ficha-tueste.component';
 import { ReportLoteTostadoComponent } from '../../components/report-lote-tostado/report-lote-tostado.component';
-
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-
-
-type FilterKey = 'todos' | 'enviados' | 'no-enviados';
 
 @Component({
   selector: 'app-lote-tostado',
@@ -50,7 +45,6 @@ type FilterKey = 'todos' | 'enviados' | 'no-enviados';
   styles: []
 })
 export class LoteTostadoComponent {
-
   readonly Search = Search;
   readonly Eye = Eye;
   readonly Clipboard = Clipboard;
@@ -59,29 +53,20 @@ export class LoteTostadoComponent {
   readonly Tag = Tag;
   readonly Sheet = Sheet;
 
-
   tostados: LoteTostadoConInventario[] = [];
   tostadosFiltrados: LoteTostadoConInventario[] = [];
   usuarios: User[] = [];
   costoInventario = 0;
 
   filterTextTostado = '';
-  filterTostado: FilterKey = 'no-enviados';
-
-  filtersTostado = [
-    { key: 'todos', label: 'HISTORICO' },
-    { key: 'enviados', label: 'LOTES ENVIADOS' },
-    { key: 'no-enviados', label: 'LOTES DISPONIBLES' }
-  ];
+  filtroTipo: 'admin' | 'cliente' = 'admin';
+  incluirHistorico = false;
 
   startDate = '';
   endDate = '';
 
-  showHistoric = false;
-  showReport = false;
   showFicha = false;
   showAnalisis = false;
-
   selectedTuesteId = '';
   selectedLoteTostado: LoteTostadoConInventario | null = null;
   showAsignarInventarioModal = false;
@@ -100,15 +85,21 @@ export class LoteTostadoComponent {
 
   loadUsuarios() {
     this.userService.getUsers().subscribe(users => {
-      this.usuarios = users;
+      this.usuarios = users ?? [];
+      this.aplicarFiltro();
     });
   }
 
   loadTostados() {
-    this.loteTostadoService.getLotesTostadosConInventario().subscribe(tostados => {
-      this.tostados = tostados;
+    this.loteTostadoService.getLotesTostadosConInventario(this.incluirHistorico).subscribe(tostados => {
+      this.tostados = tostados ?? [];
       this.aplicarFiltro();
     });
+  }
+
+  toggleHistorico() {
+    this.incluirHistorico = !this.incluirHistorico;
+    this.loadTostados();
   }
 
   getStockRealTostado(t: any): number {
@@ -121,34 +112,15 @@ export class LoteTostadoComponent {
   aplicarFiltro() {
     let result = [...this.tostados];
 
-    switch (this.filterTostado) {
-      case 'no-enviados':
-        result = result.filter(t => {
-          const stockReal = this.getStockRealTostado(t);
-          return stockReal > 0;  // ← solo los que tienen stock disponible
-        });
-        break;
-      case 'enviados':
-        result = result.filter(t => {
-          const stockReal = this.getStockRealTostado(t);
-          return stockReal === 0;  // ← los que ya no tienen stock
-        });
-        break;
-    }
-
     if (this.filterTextTostado.trim()) {
       const term = this.filterTextTostado.toLowerCase();
-
       result = result.filter(t => {
         const user = this.usuarios.find(u => u.id_user === t.id_user);
         const cliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
-
         const almacenes = (t.inventarioLotesTostados || [])
           .map(inv => inv.almacen?.nombre?.toLowerCase() || '')
           .join(' ');
-
         const variedadesTexto = (t.lote?.variedades || []).join(' ').toLowerCase();
-
         return (
           t.id_lote_tostado?.toLowerCase().includes(term) ||
           t.perfil_tostado?.toLowerCase().includes(term) ||
@@ -167,10 +139,7 @@ export class LoteTostadoComponent {
     if (this.startDate || this.endDate) {
       const desde = this.startDate ? new Date(this.startDate) : null;
       const hasta = this.endDate ? new Date(this.endDate) : null;
-
-      if (hasta) {
-        hasta.setHours(23, 59, 59, 999);
-      }
+      if (hasta) hasta.setHours(23, 59, 59, 999);
 
       result = result.filter(t => {
         const fecha = new Date(t.fecha_tostado);
@@ -180,24 +149,27 @@ export class LoteTostadoComponent {
 
     this.tostadosFiltrados = result;
 
+    // Costo solo cuenta lotes admin, activos, que hacen match con los filtros de arriba
     this.costoInventario = result
       .filter(t => {
         const user = this.usuarios.find(u => u.id_user === t.id_user);
-        return user?.rol === 'admin';
+        return user?.rol === 'admin' && !t.eliminado;
       })
       .reduce((total, t) => {
-        const pesoInventarioKg = this.getPesoInventarioTostado(t) / 1000;  // ← gr → kg
+        const pesoInventarioKg = this.getPesoInventarioTostado(t) / 1000;
         const costo = Number(t.lote?.costo || 0);
         return total + costo * pesoInventarioKg;
       }, 0);
   }
 
-  onSearchChange() {
-    this.aplicarFiltro();
+  getLotesFiltrados(): LoteTostadoConInventario[] {
+    return this.tostadosFiltrados.filter(t => {
+      const user = this.usuarios.find(u => u.id_user === t.id_user);
+      return user?.rol === this.filtroTipo;
+    });
   }
 
-  aplicarFiltroEstado(key: string) {
-    this.filterTostado = key as FilterKey;
+  onSearchChange() {
     this.aplicarFiltro();
   }
 
@@ -211,8 +183,6 @@ export class LoteTostadoComponent {
       0
     );
   }
-
-
 
   openAsignarInventarioLoteTostado(lote: LoteTostadoConInventario): void {
     this.selectedLoteTostado = lote;
@@ -230,15 +200,11 @@ export class LoteTostadoComponent {
   }
 
   onReportTueste(t: LoteTostadoConInventario) {
-    this.router.navigate(
-      ['/inventory/lotes-tostados/reporte', t.id_lote_tostado]
-    );
+    this.router.navigate(['/inventory/lotes-tostados/reporte', t.id_lote_tostado]);
   }
 
   openHistoric(t: LoteTostadoConInventario) {
-    this.router.navigate(
-      ['/inventory/lotes-tostados/historico', t.id_lote_tostado]
-    );
+    this.router.navigate(['/inventory/lotes-tostados/historico', t.id_lote_tostado]);
   }
 
   openFicha(t: LoteTostadoConInventario) {
@@ -251,7 +217,6 @@ export class LoteTostadoComponent {
       this.uiService.alert('error', 'Error', 'El lote no tiene análisis asociado');
       return;
     }
-
     this.selectedTuesteId = t.id_lote_tostado;
     this.showAnalisis = true;
   }
@@ -274,10 +239,8 @@ export class LoteTostadoComponent {
     canvas.height = H * dpr;
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
-
     const ctx = canvas.getContext('2d')!;
     ctx.scale(dpr, dpr);
-
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = '#111111';
@@ -287,11 +250,9 @@ export class LoteTostadoComponent {
     const cols = [700, 440, 260];
     const x = [20, 20 + cols[0], 20 + cols[0] + cols[1]];
     const yHeader = 70, yValue = 170;
-
     ctx.font = '600 26px system-ui';
     ctx.fillStyle = '#111111';
     ['Lote', 'Cliente', 'Fecha'].forEach((h, i) => ctx.fillText(h, x[i], yHeader));
-
     ctx.beginPath();
     ctx.moveTo(20, yHeader + 16);
     ctx.lineTo(W - 20, yHeader + 16);
@@ -300,7 +261,6 @@ export class LoteTostadoComponent {
 
     const valueFont = '500 36px ui-monospace';
     ctx.font = valueFont;
-
     const drawFit = (text: string, xi: number, maxW: number) => {
       let size = 36;
       while (ctx.measureText(text).width > maxW && size > 12) {
@@ -310,7 +270,6 @@ export class LoteTostadoComponent {
       ctx.fillText(text, xi, yValue);
       ctx.font = valueFont;
     };
-
     drawFit(String(lote), x[0], cols[0] - 30);
     drawFit(String(cliente), x[1], cols[1] - 30);
     ctx.fillText(String(fecha), x[2], yValue);
@@ -322,15 +281,13 @@ export class LoteTostadoComponent {
     a.remove();
   }
 
-
   exportLotesTostados() {
-    const data = this.tostadosFiltrados.map(t => {
+    const data = this.getLotesFiltrados().map(t => {
       const user = this.usuarios.find(u => u.id_user === t.id_user);
       const cliente = user?.nombre_comercial || user?.nombre || 'Desconocido';
       const almacenes = (t.inventarioLotesTostados || [])
         .map(inv => `${inv.almacen?.nombre || 'N/A'}: ${inv.cantidad_kg} gr`)
         .join(' | ');
-
       return {
         'ID Tostado': t.id_lote_tostado,
         'ID Lote Verde': t.id_lote,
@@ -344,15 +301,12 @@ export class LoteTostadoComponent {
         'Stock (gr)': this.getStockRealTostado(t),
       };
     });
-
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Lotes Café Tostado');
-
     const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([buffer], { type: 'application/octet-stream' });
-    const filtro = this.filterTostado === 'no-enviados' ? 'disponibles'
-      : this.filterTostado === 'enviados' ? 'enviados' : 'historico';
-    saveAs(blob, `lotes_tostados_${filtro}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    const tipo = this.filtroTipo === 'admin' ? 'Tienda' : 'Clientes';
+    saveAs(blob, `lotes_tostados_${tipo}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 }

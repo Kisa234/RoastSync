@@ -1,0 +1,221 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto" *ngIf="!loading && paquete">
+
+  <!-- Breadcrumb -->
+  <div class="text-sm text-gray-500 mb-1">
+    <a [routerLink]="['/envios/paquete', idPaquete]" class="hover:text-[#B8672E]">Paquete {{ idPaquete }}</a>
+    <span class="mx-1">/</span>
+    <span class="text-[#1F1F1F] font-medium">Nuevo Envío</span>
+  </div>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Nuevo Envío</h1>
+      <p class="text-gray-600">Registra la dirección de destino para despachar el paquete</p>
+    </div>
+    <div class="flex space-x-3">
+      <button (click)="onCancel()"
+        class="px-4 py-2 border border-[#E5E5E5] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition flex items-center">
+        Cancelar
+      </button>
+      <button (click)="onSave()" [disabled]="saving || !canSave()"
+        class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />Crear Envío
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Dirección de destino -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Dirección de Destino</h2>
+          <button *ngIf="clienteUser" (click)="usarDatosCliente()"
+            class="flex items-center text-sm text-[#B8672E] hover:text-[#A67C52]">
+            <lucide-icon [img]="UserIcon" class="w-4 h-4 mr-1" />
+            Usar datos del cliente
+          </button>
+        </div>
+
+        <p *ngIf="clienteUser" class="text-xs text-gray-500 mb-4">
+          El cliente no tiene distrito, provincia ni referencia guardados — esos campos siempre se llenan a mano.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Nombre del destinatario *</label>
+            <input type="text" [(ngModel)]="model.direccion.nombre_destinatario"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Teléfono *</label>
+            <input type="text" [(ngModel)]="model.direccion.telefono"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">País</label>
+            <input type="text" [(ngModel)]="model.direccion.pais"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Dirección *</label>
+            <input type="text" [(ngModel)]="model.direccion.direccion"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Departamento *</label>
+            <select-search [ngModel]="selectedDepartamentoId" (ngModelChange)="onDepartamentoChange($event)"
+              [items]="departamentos" displayField="nombre" valueField="id"
+              placeholder="Seleccionar departamento"></select-search>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Provincia *</label>
+            <select-search [ngModel]="selectedProvinciaId" (ngModelChange)="onProvinciaChange($event)"
+              [items]="provincias" displayField="nombre" valueField="id" placeholder="Seleccionar provincia"
+              [disabled]="!selectedDepartamentoId || !provincias.length"></select-search>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Distrito *</label>
+            <select-search [ngModel]="selectedDistritoId" (ngModelChange)="onDistritoChange($event)"
+              [items]="distritosFiltrados" displayField="nombre" valueField="id" placeholder="Seleccionar distrito"
+              [disabled]="!selectedProvinciaId || !distritosFiltrados.length"></select-search>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Código postal</label>
+            <input type="text" [(ngModel)]="model.direccion.codigo_postal"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Referencia</label>
+            <input type="text" [(ngModel)]="model.direccion.referencia" placeholder="Ej. frente al parque..."
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Observaciones</label>
+            <textarea [(ngModel)]="model.direccion.observaciones" rows="2"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opcional / avanzado -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <button (click)="toggleAvanzado()" class="w-full flex justify-between items-center">
+          <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Medio de envío, tracking y dimensiones (opcional)
+          </h2>
+          <lucide-icon [img]="mostrarAvanzado ? ChevronUp : ChevronDown" class="w-4 h-4 text-gray-400" />
+        </button>
+
+        <div *ngIf="mostrarAvanzado" class="grid grid-cols-2 gap-4 mt-4">
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Medio de envío</label>
+            <input type="text" [(ngModel)]="model.medio_envio" list="medios-envio"
+              placeholder="Ej: Olva Courier, InDriver, Recojo en tienda..."
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+            <datalist id="medios-envio">
+              <option *ngFor="let m of mediosEnvioSugeridos" [value]="m"></option>
+            </datalist>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">N.º de tracking</label>
+            <input type="text" [(ngModel)]="model.numero_tracking"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Costo de envío</label>
+            <input type="number" min="0" step="0.01" [(ngModel)]="model.costo_envio"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">¿Quién paga?</label>
+            <select [(ngModel)]="model.quien_paga"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+              <option [value]="undefined">—</option>
+              <option *ngFor="let q of quienPagaOptions" [value]="q.value">{{ q.label }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Peso total (kg)</label>
+            <input type="number" min="0" step="0.01" [(ngModel)]="model.peso_total_kg"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-gray-700 text-sm mb-1">Alto (cm)</label>
+              <input type="number" min="0" step="0.1" [(ngModel)]="model.alto_cm"
+                class="w-full border border-[#E5E5E5] rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+            </div>
+            <div>
+              <label class="block text-gray-700 text-sm mb-1">Ancho (cm)</label>
+              <input type="number" min="0" step="0.1" [(ngModel)]="model.ancho_cm"
+                class="w-full border border-[#E5E5E5] rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+            </div>
+            <div>
+              <label class="block text-gray-700 text-sm mb-1">Largo (cm)</label>
+              <input type="number" min="0" step="0.1" [(ngModel)]="model.largo_cm"
+                class="w-full border border-[#E5E5E5] rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Resumen del Paquete</h2>
+
+        <div class="space-y-2 text-sm mb-4">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Paquete</span>
+            <span class="font-medium text-[#1F1F1F] font-mono">{{ paquete.id_paquete }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Cliente</span>
+            <span class="font-medium text-[#1F1F1F]">{{ (paquete.id_cliente | UserNamePipe | async) || 'N/A' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Artículos</span>
+            <span class="font-medium text-[#1F1F1F]">{{ paquete.items.length }}</span>
+          </div>
+        </div>
+
+        <div class="border-t border-[#E5E5E5] pt-3">
+          <p class="text-xs text-gray-500 uppercase mb-2">Contenido</p>
+          <div *ngFor="let item of paquete.items" class="flex justify-between text-sm py-1">
+            <span class="text-gray-700 truncate pr-2">{{ item.id_entidad }}</span>
+            <span class="text-gray-500 whitespace-nowrap">{{ item.cantidad | number }} {{ item.unidad_medida }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#FFF8F0] border border-[#F0DFC8] rounded-lg p-4 text-sm text-[#8A5A2B]">
+        El envío nace en estado <strong>Pendiente</strong>. Después de crearlo vas a poder programarlo, despacharlo
+        (ahí se descuenta el stock real) o cancelarlo.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="h-full flex items-center justify-center text-gray-500">
+  Cargando...
+</div>

@@ -8,17 +8,26 @@
     </div>
 
     <div class="flex space-x-3">
-      <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded-lg shadow hover:bg-[#A67C52] transition"
+      <button
+        class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded-lg shadow hover:bg-[#A67C52] transition"
         (click)="openAdd()">
         <lucide-icon [img]="Plus" class="w-5 h-5 mr-2" />
         Pedido de Lotes
       </button>
+
 
       <button
         class="flex items-center bg-[#F4F4F4] text-[#1F1F1F] px-4 py-2 rounded-lg shadow hover:bg-[#E5E5E5] transition"
         (click)="openAddMaquila()">
         <lucide-icon [img]="Factory" class="w-5 h-5 mr-2" />
         Pedido de Maquila
+      </button>
+
+      <button
+        class="flex items-center bg-[#F4F4F4] text-[#1F1F1F] px-4 py-2 rounded-lg shadow hover:bg-[#E5E5E5] transition"
+        (click)="openAddDespacho()">
+        <lucide-icon [img]="PackageCheck" class="w-5 h-5 mr-2" />
+        Orden de Despacho
       </button>
     </div>
   </div>
@@ -28,9 +37,7 @@
 
     <!-- Tabs -->
     <div class="flex items-center border-b border-[#E5E5E5] px-6">
-      <button (click)="setTab('pendientes')"
-        class="py-4 mr-6 text-sm font-medium border-b-2 transition"
-        [ngClass]="activeTab === 'pendientes'
+      <button (click)="setTab('pendientes')" class="py-4 mr-6 text-sm font-medium border-b-2 transition" [ngClass]="activeTab === 'pendientes'
           ? 'border-[#B8672E] text-[#B8672E]'
           : 'border-transparent text-gray-500 hover:text-gray-700'">
         Pendientes
@@ -40,9 +47,7 @@
         </span>
       </button>
 
-      <button (click)="setTab('completados')"
-        class="py-4 text-sm font-medium border-b-2 transition"
-        [ngClass]="activeTab === 'completados'
+      <button (click)="setTab('completados')" class="py-4 text-sm font-medium border-b-2 transition" [ngClass]="activeTab === 'completados'
           ? 'border-[#B8672E] text-[#B8672E]'
           : 'border-transparent text-gray-500 hover:text-gray-700'">
         Completados
@@ -70,6 +75,7 @@
             <option value="Venta Verde">Venta Verde</option>
             <option value="Tostado Verde">Tostado Verde</option>
             <option value="Maquila">Maquila</option>
+            <option value="OrdenDespacho">Orden de Despacho</option>
           </select>
 
           <button (click)="clearFilters()"

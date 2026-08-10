@@ -1,56 +1,57 @@
-// src/app/features/envios/services/envios.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { CreateEnvio, Envio } from '../../../shared/models/envio';
+import { Envio, EnvioConDetalle, CreateEnvio, ProgramarEnvio, DespacharEnvio, ConfirmarEntregaEnvio, CancelarEnvio, RegistrarDevolucionEnvio,
+} from '../../../shared/models/envio';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class EnviosService {
-
   private readonly baseUrl = `${environment.apiUrl}/envio`;
 
   constructor(private http: HttpClient) {}
 
-  // ---- CRUD ----
-
-  createEnvio(data: CreateEnvio): Observable<Envio> {
-    return this.http.post<Envio>(`${this.baseUrl}`, data);
-  }
-
-  getEnvioById(id_envio: string): Observable<Envio> {
-    return this.http.get<Envio>(`${this.baseUrl}/${id_envio}`);
-  }
-
-  updateEnvio(id_envio: string, data: Partial<Envio>): Observable<Envio> {
-    return this.http.put<Envio>(`${this.baseUrl}/${id_envio}`, data);
-  }
-
-  deleteEnvio(id_envio: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id_envio}`);
-  }
-
-  // ---- Queries específicas ----
+  // ---- Lectura ----
   getAllEnvios(): Observable<Envio[]> {
     return this.http.get<Envio[]>(`${this.baseUrl}`);
   }
 
-  getEnviosByLote(id_lote_tostado: string): Observable<Envio[]> {
-    return this.http.get<Envio[]>(`${this.baseUrl}/lote/${id_lote_tostado}`);
+  getEnvioById(id_envio: string): Observable<EnvioConDetalle> {
+    return this.http.get<EnvioConDetalle>(`${this.baseUrl}/${id_envio}`);
   }
 
-  getEnviosByCliente(id_cliente: string): Observable<Envio[]> {
-    return this.http.get<Envio[]>(`${this.baseUrl}/cliente/${id_cliente}`);
+  // Paso 6: nace de un Paquete ya LISTO
+  crearEnvio(data: CreateEnvio): Observable<Envio> {
+    return this.http.post<Envio>(`${this.baseUrl}`, data);
   }
 
-  getEnviosByFechaRange(from: string, to: string): Observable<Envio[]> {
-    return this.http.get<Envio[]>(`${this.baseUrl}/rango-fecha`, { params: { from, to } });
+  // Paso 7 (opcional)
+  programar(id_envio: string, data: ProgramarEnvio): Observable<Envio> {
+    return this.http.put<Envio>(`${this.baseUrl}/${id_envio}/programar`, data);
   }
 
-  getEnviosByClasificacion(clasificacion: string): Observable<Envio[]> {
-    return this.http.get<Envio[]>(`${this.baseUrl}/clasificacion/${clasificacion}`);
+  // Paso 8 — acá recién se descuenta inventario real
+  despachar(id_envio: string, data: DespacharEnvio): Observable<Envio> {
+    return this.http.put<Envio>(`${this.baseUrl}/${id_envio}/despachar`, data);
   }
-  
+
+  // Paso 9
+  confirmarEntrega(id_envio: string, data: ConfirmarEntregaEnvio): Observable<Envio> {
+    return this.http.put<Envio>(`${this.baseUrl}/${id_envio}/entregar`, data);
+  }
+
+  // Solo válido en PENDIENTE/PROGRAMADO (nunca se descontó inventario)
+  cancelar(id_envio: string, data: CancelarEnvio): Observable<Envio> {
+    return this.http.put<Envio>(`${this.baseUrl}/${id_envio}/cancelar`, data);
+  }
+
+  // Solo válido desde DESPACHADO/EN_TRANSITO/ENTREGADO — reingresa stock
+  registrarDevolucion(id_envio: string, data: RegistrarDevolucionEnvio): Observable<Envio> {
+    return this.http.put<Envio>(`${this.baseUrl}/${id_envio}/devolucion`, data);
+  }
+
+  getEnviosPorEntidad(entidad: string, id_entidad: string): Observable<Envio[]> {
+    return this.http.get<Envio[]>(`${this.baseUrl}/por-entidad/${entidad}/${id_entidad}`);
+  }
+
 }

@@ -1,0 +1,228 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-5">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Envíos</h1>
+      <p class="text-gray-600">Gestiona la preparación y despacho de paquetes</p>
+    </div>
+
+  </div>
+
+  <!-- CARD PRINCIPAL -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm">
+
+    <!-- Tabs -->
+    <div class="flex items-center border-b border-[#E5E5E5] px-6 overflow-x-auto">
+      <button (click)="setTab('preparar')"
+        class="py-4 mr-6 text-sm font-medium border-b-2 transition whitespace-nowrap flex items-center"
+        [ngClass]="activeTab === 'preparar' ? 'border-[#B8672E] text-[#B8672E]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <lucide-icon [img]="Package" class="w-4 h-4 mr-1.5" />
+        Por Preparar
+        <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+          [ngClass]="activeTab === 'preparar' ? 'bg-[#B8672E] text-white' : 'bg-[#F4F4F4] text-gray-600'">
+          {{ paquetesPorPreparar.length }}
+        </span>
+      </button>
+
+      <button (click)="setTab('listos')"
+        class="py-4 mr-6 text-sm font-medium border-b-2 transition whitespace-nowrap flex items-center"
+        [ngClass]="activeTab === 'listos' ? 'border-[#B8672E] text-[#B8672E]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <lucide-icon [img]="PackageCheck" class="w-4 h-4 mr-1.5" />
+        Listos para Enviar
+        <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+          [ngClass]="activeTab === 'listos' ? 'bg-[#B8672E] text-white' : 'bg-[#F4F4F4] text-gray-600'">
+          {{ paquetesListos.length }}
+        </span>
+      </button>
+
+      <button (click)="setTab('camino')"
+        class="py-4 mr-6 text-sm font-medium border-b-2 transition whitespace-nowrap flex items-center"
+        [ngClass]="activeTab === 'camino' ? 'border-[#B8672E] text-[#B8672E]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <lucide-icon [img]="Truck" class="w-4 h-4 mr-1.5" />
+        En Camino
+        <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+          [ngClass]="activeTab === 'camino' ? 'bg-[#B8672E] text-white' : 'bg-[#F4F4F4] text-gray-600'">
+          {{ enviosEnCamino.length }}
+        </span>
+      </button>
+
+      <button (click)="setTab('historico')"
+        class="py-4 text-sm font-medium border-b-2 transition whitespace-nowrap flex items-center"
+        [ngClass]="activeTab === 'historico' ? 'border-[#B8672E] text-[#B8672E]' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <lucide-icon [img]="Archive" class="w-4 h-4 mr-1.5" />
+        Histórico
+      </button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="p-6 pb-4">
+      <div class="relative w-full max-w-md">
+        <lucide-icon [img]="Search" class="absolute left-1 top-1.5 w-4 h-4 text-gray-400" />
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Buscar por ID, correlativo o tracking..."
+          class="w-full border border-[#E5E5E5] rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+      </div>
+    </div>
+
+    <!-- ===== TAB: POR PREPARAR ===== -->
+    <div *ngIf="activeTab === 'preparar'" class="overflow-x-auto px-6 pb-6">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Paquete</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Origen</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let p of paquetesPorPrepararPaginados" class="hover:bg-[#FCFCFC] transition">
+            <td class="px-4 py-4 text-sm font-mono text-gray-700">{{ p.id_paquete }}</td>
+            <td class="px-4 py-4 text-sm text-gray-700">{{ (p.id_cliente | UserNamePipe | async) || 'N/A' }}</td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+              <span *ngIf="p.id_pedido_origen" class="text-gray-600">Orden {{ p.id_pedido_origen }}</span>
+              <span *ngIf="!p.id_pedido_origen" class="text-gray-400">Manual</span>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-700">{{ p.fecha_registro | date:'dd/MM/yyyy' }}</td>
+            <td class="px-4 py-4 text-right text-sm">
+              <button (click)="verPaquete(p)" class="text-gray-500 hover:text-[#B8672E]" title="Preparar">
+                <lucide-icon [img]="Eye" class="w-5 h-5" />
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="totalPaquetesPorPreparar === 0">
+            <td colspan="5" class="px-4 py-10 text-center text-gray-500">No hay paquetes por preparar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== TAB: LISTOS ===== -->
+    <div *ngIf="activeTab === 'listos'" class="overflow-x-auto px-6 pb-6">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Paquete</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Preparado</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let p of paquetesListosPaginados" class="hover:bg-[#FCFCFC] transition">
+            <td class="px-4 py-4 text-sm font-mono text-gray-700">{{ p.id_paquete }}</td>
+            <td class="px-4 py-4 text-sm text-gray-700">{{ (p.id_cliente | UserNamePipe | async) || 'N/A' }}</td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+              {{ p.fecha_preparado ? (p.fecha_preparado | date:'dd/MM/yyyy') : '—' }}
+            </td>
+            <td class="px-4 py-4 text-right text-sm space-x-2">
+              <button (click)="verPaquete(p)" class="text-gray-500 hover:text-[#B8672E]" title="Ver">
+                <lucide-icon [img]="Eye" class="w-5 h-5" />
+              </button>
+              <button (click)="crearEnvio(p)"
+                class="inline-flex items-center bg-[#B8672E] text-white px-3 py-1.5 rounded-lg text-xs hover:bg-[#A67C52] transition">
+                Crear Envío
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="totalPaquetesListos === 0">
+            <td colspan="4" class="px-4 py-10 text-center text-gray-500">No hay paquetes listos para enviar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== TAB: EN CAMINO ===== -->
+    <div *ngIf="activeTab === 'camino'" class="overflow-x-auto px-6 pb-6">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Correlativo</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tracking</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let e of enviosEnCaminoPaginados" class="hover:bg-[#FCFCFC] transition">
+            <td class="px-4 py-4 text-sm font-mono text-gray-700">{{ e.numero_correlativo }}</td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+              {{ (clienteDeEnvio(e) | UserNamePipe | async) || 'N/A' }}
+            </td>
+            <td class="px-4 py-4 text-sm">
+              <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="estadoEnvioClass(e.estado)">
+                {{ labelEstadoEnvio(e.estado) }}
+              </span>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-700">{{ e.numero_tracking || '—' }}</td>
+            <td class="px-4 py-4 text-sm text-gray-700">{{ e.fecha_registro | date:'dd/MM/yyyy' }}</td>
+            <td class="px-4 py-4 text-right text-sm">
+              <button (click)="verEnvio(e)" class="text-gray-500 hover:text-[#B8672E]" title="Ver">
+                <lucide-icon [img]="Eye" class="w-5 h-5" />
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="totalEnviosEnCamino === 0">
+            <td colspan="6" class="px-4 py-10 text-center text-gray-500">No hay envíos en camino.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== TAB: HISTÓRICO ===== -->
+    <div *ngIf="activeTab === 'historico'" class="overflow-x-auto px-6 pb-6">
+      <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Correlativo</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let e of enviosHistoricoPaginados" class="hover:bg-[#FCFCFC] transition">
+            <td class="px-4 py-4 text-sm font-mono text-gray-700">{{ e.numero_correlativo }}</td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+              {{ (clienteDeEnvio(e) | UserNamePipe | async) || 'N/A' }}
+            </td>
+            <td class="px-4 py-4 text-sm">
+              <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="estadoEnvioClass(e.estado)">
+                {{ labelEstadoEnvio(e.estado) }}
+              </span>
+            </td>
+            <td class="px-4 py-4 text-sm text-gray-700">{{ e.fecha_registro | date:'dd/MM/yyyy' }}</td>
+            <td class="px-4 py-4 text-right text-sm">
+              <button (click)="verEnvio(e)" class="text-gray-500 hover:text-[#B8672E]" title="Ver">
+                <lucide-icon [img]="Eye" class="w-5 h-5" />
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="totalEnviosHistorico === 0">
+            <td colspan="5" class="px-4 py-10 text-center text-gray-500">Sin historial de envíos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginador -->
+    <div class="flex items-center justify-between px-6 py-4 border-t border-[#E5E5E5]">
+      <p class="text-sm text-gray-500">Página {{ page }} de {{ totalPages }}</p>
+      <div class="flex items-center gap-2">
+        <button (click)="prevPage()" [disabled]="page === 1"
+          class="px-4 py-2 rounded-lg border border-[#E5E5E5] text-sm text-gray-700 hover:bg-[#F3F2F1] disabled:opacity-50 disabled:cursor-not-allowed">
+          Anterior
+        </button>
+        <button (click)="nextPage()" [disabled]="page === totalPages"
+          class="px-4 py-2 rounded-lg border border-[#E5E5E5] text-sm text-gray-700 hover:bg-[#F3F2F1] disabled:opacity-50 disabled:cursor-not-allowed">
+          Siguiente
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

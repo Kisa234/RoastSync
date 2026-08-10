@@ -1,37 +1,47 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe, Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LucideAngularModule, ArrowLeft, Eye } from 'lucide-angular';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { LucideAngularModule, ArrowLeft, Eye, Truck } from 'lucide-angular';
+import { forkJoin } from 'rxjs';
 
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { BolsaConInventario } from '../../../../../shared/models/bolsa';
 import { Historial } from '../../../../../shared/models/historial';
 import { LoteTostadoConInventario } from '../../../../../shared/models/lote-tostado';
+import { Envio } from '../../../../../shared/models/envio';
 
 import { BolsaService } from '../../service/bolsa.service';
 import { LoteTostadoService } from '../../../lotes-tostados/service/lote-tostado.service';
 import { HistorialService } from '../../../../../shared/services/historial.service';
 import { PedidoService } from '../../../../orders/service/orders.service';
+import { EnviosService } from '../../../../envios/service/envios.service';
+
+type RegistroActividad =
+  | { tipo: 'HISTORIAL'; accion: string; comentario: string; usuarioId: string; fecha: string | Date; id_pedido: string | null; id_envio: null }
+  | { tipo: 'ENVIO'; accion: string; comentario: string; usuarioId: string; fecha: string | Date; id_pedido: null; id_envio: string };
 
 @Component({
   selector: 'historic-bolsa',
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     DatePipe,
     DecimalPipe,
     UserNamePipe,
     LucideAngularModule,
   ],
   templateUrl: './historic-bolsa.component.html',
-  styles: ``
 })
 export class HistoricBolsaComponent implements OnInit {
   readonly ArrowLeft = ArrowLeft;
   readonly Eye = Eye;
+  readonly Truck = Truck;
 
   bolsaId = '';
   historiales: Historial[] = [];
+  envios: Envio[] = [];
+  registros: RegistroActividad[] = [];
 
   bolsa: BolsaConInventario = {
     id_bolsa: '',
@@ -46,7 +56,6 @@ export class HistoricBolsaComponent implements OnInit {
   };
 
   loteTostado: LoteTostadoConInventario | null = null;
-
   responsableEmbolsadoId = '';
 
   constructor(
@@ -56,7 +65,8 @@ export class HistoricBolsaComponent implements OnInit {
     private readonly bolsaSvc: BolsaService,
     private readonly loteTostadoSvc: LoteTostadoService,
     private readonly historialService: HistorialService,
-    private readonly pedidoSvc: PedidoService
+    private readonly pedidoSvc: PedidoService,
+    private readonly enviosSvc: EnviosService,
   ) {}
 
   ngOnInit(): void {
@@ -89,13 +99,42 @@ export class HistoricBolsaComponent implements OnInit {
       error: (err) => console.error('Error al cargar bolsa con inventario:', err)
     });
 
-    this.historialService.getByEntidad(this.bolsaId).subscribe({
-      next: (historial) => {
-        this.historiales = (historial ?? [])
-          .sort((a, b) => new Date(b.fecha_registro).getTime() - new Date(a.fecha_registro).getTime());
+    forkJoin({
+      historial: this.historialService.getByEntidad(this.bolsaId),
+      envios: this.enviosSvc.getEnviosPorEntidad('BOLSA', this.bolsaId),
+    }).subscribe({
+      next: ({ historial, envios }) => {
+        this.historiales = historial ?? [];
+        this.envios = envios ?? [];
+        this.buildRegistros();
       },
-      error: (err) => console.error('Error al cargar historial de la bolsa:', err)
+      error: (err) => console.error('Error al cargar actividad de la bolsa:', err)
     });
+  }
+
+  private buildRegistros(): void {
+    const historialMapeado: RegistroActividad[] = this.historiales.map(h => ({
+      tipo: 'HISTORIAL',
+      accion: h.accion,
+      comentario: h.comentario || '—',
+      usuarioId: h.id_user,
+      fecha: h.fecha_registro,
+      id_pedido: h.id_pedido || null,
+      id_envio: null,
+    }));
+
+    const enviosMapeados: RegistroActividad[] = this.envios.map(e => ({
+      tipo: 'ENVIO',
+      accion: e.numero_correlativo,
+      comentario: `Estado: ${e.estado}${e.medio_envio ? ' · ' + e.medio_envio : ''}`,
+      usuarioId: e.registrado_por_id,
+      fecha: e.fecha_registro,
+      id_pedido: null,
+      id_envio: e.id_envio,
+    }));
+
+    this.registros = [...historialMapeado, ...enviosMapeados]
+      .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
   }
 
   loadLoteTostado(idLoteTostado: string): void {
@@ -123,10 +162,7 @@ export class HistoricBolsaComponent implements OnInit {
   }
 
   get stockTotal(): number {
-    return (this.bolsa.inventarios || []).reduce(
-      (total, inv) => total + (inv.cantidad || 0),
-      0
-    );
+    return (this.bolsa.inventarios || []).reduce((total, inv) => total + (inv.cantidad || 0), 0);
   }
 
   get subtotalGramos(): number {
@@ -135,12 +171,14 @@ export class HistoricBolsaComponent implements OnInit {
 
   openPedido(idPedido: string | null | undefined): void {
     if (!idPedido) return;
-
     this.router.navigate(['/orders', idPedido], {
-      queryParams: {
-        origen: `Bolsa ${this.bolsaId}`
-      }
+      queryParams: { origen: `Bolsa ${this.bolsaId}` }
     });
+  }
+
+  openEnvio(idEnvio: string | null | undefined): void {
+    if (!idEnvio) return;
+    this.router.navigate(['/envios', idEnvio]);
   }
 
   goBack(): void {

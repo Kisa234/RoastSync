@@ -1,0 +1,176 @@
+<div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
+
+  <!-- Breadcrumb -->
+  <div class="text-sm text-gray-500 mb-1">
+    <a routerLink="/orders" class="hover:text-[#B8672E]">Pedidos</a>
+    <span class="mx-1">/</span>
+    <span class="text-[#1F1F1F] font-medium">
+      {{ mode === 'create' ? 'Nueva Orden de Despacho' : 'Editar Orden de Despacho' }}
+    </span>
+  </div>
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1F1F1F]">Orden de Despacho</h1>
+      <p class="text-gray-600">Indica qué artículos hay que preparar para el envío</p>
+    </div>
+    <div class="flex space-x-3">
+      <button (click)="onCancel()"
+        class="px-4 py-2 border border-[#E5E5E5] rounded-lg text-[#1F1F1F] hover:bg-[#F3F2F1] transition flex items-center">
+        Cancelar
+      </button>
+      <button (click)="onSave()" [disabled]="loading"
+        class="px-4 py-2 bg-[#B8672E] text-white rounded-lg hover:bg-[#A67C52] transition flex items-center disabled:opacity-50">
+        <lucide-icon [img]="Check" class="w-5 h-5 mr-2" />Guardar Orden
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- COLUMNA IZQUIERDA -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Info general -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información General</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
+            <select-search [(ngModel)]="model.id_user" (ngModelChange)="onClienteChange($event)" [items]="clientes"
+              displayField="nombre" valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 text-sm mb-1">Almacén *</label>
+            <select [(ngModel)]="model.id_almacen" (ngModelChange)="onAlmacenChange()"
+              [disabled]="!model.id_user || cargandoAlgunCatalogo || almacenesDisponibles.length <= 1"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E] disabled:bg-[#F9F9F9] disabled:text-gray-500">
+              <option value="" disabled>
+                {{ !model.id_user ? 'Selecciona un cliente primero' : (cargandoAlgunCatalogo ? 'Cargando...' : 'Selecciona almacén') }}
+              </option>
+              <option *ngFor="let a of almacenesDisponibles" [value]="a.id_almacen">{{ a.nombre }}</option>
+            </select>
+
+            <p class="text-xs text-gray-500 mt-1">
+              <ng-container *ngIf="!model.id_user">Elige un cliente para ver sus almacenes con stock.</ng-container>
+              <ng-container *ngIf="model.id_user && cargandoAlgunCatalogo">Revisando stock del cliente...</ng-container>
+            </p>
+          </div>
+
+          <div class="col-span-2">
+            <label class="block text-gray-700 text-sm mb-1">Comentario</label>
+            <textarea [(ngModel)]="model.comentario" rows="2"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+              placeholder="Notas adicionales sobre la orden..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Artículos a preparar -->
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Artículos a Preparar</h2>
+          <button (click)="addLinea()" [disabled]="!tiposDisponibles.length"
+            class="flex items-center text-sm text-[#B8672E] hover:text-[#A67C52] disabled:opacity-40 disabled:cursor-not-allowed">
+            <lucide-icon [img]="Plus" class="w-4 h-4 mr-1" />Agregar artículo
+          </button>
+        </div>
+
+        <p *ngIf="!model.id_almacen" class="text-sm text-gray-500 mb-3">
+          Selecciona cliente y almacén para ver los artículos disponibles.
+        </p>
+
+        <table *ngIf="model.id_almacen" class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-500 uppercase">
+              <th class="py-2 pr-4">Tipo</th>
+              <th class="py-2 pr-4">Artículo</th>
+              <th class="py-2 pr-4">Disponible</th>
+              <th class="py-2 pr-4">Cantidad</th>
+              <th class="py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let l of lineas" class="border-t border-[#E5E5E5]">
+              <td class="py-2 pr-4">
+                <select [(ngModel)]="l.entidad" (ngModelChange)="onEntidadChange(l)"
+                  class="border border-[#E5E5E5] rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#B8672E]">
+                  <option *ngFor="let e of tiposParaLinea(l)" [value]="e.value">{{ e.label }}</option>
+                </select>
+              </td>
+              <td class="py-2 pr-4 min-w-[220px]">
+                <select-search [(ngModel)]="l.id_entidad" [items]="opcionesLinea(l)" displayField="label"
+                  valueField="id_entidad" placeholder="Seleccionar artículo"
+                  [disabled]="!opcionesLinea(l).length"></select-search>
+              </td>
+              <td class="py-2 pr-4 text-gray-700 whitespace-nowrap">
+                <ng-container *ngIf="opcionSeleccionada(l) as op">
+                  {{ op.disponible | number }} {{ op.unidad }}
+                </ng-container>
+                <span *ngIf="!opcionSeleccionada(l)">—</span>
+              </td>
+              <td class="py-2 pr-4">
+                <input type="number" min="0.01" step="0.01" [(ngModel)]="l.cantidad"
+                  class="w-24 border rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#B8672E]"
+                  [ngClass]="excedeStockLinea(l) ? 'border-red-400' : 'border-[#E5E5E5]'" />
+              </td>
+              <td class="py-2">
+                <button (click)="removeLinea(l)" class="text-gray-400 hover:text-red-600">
+                  <lucide-icon [img]="Trash2" class="w-4 h-4" />
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="lineas.length === 0">
+              <td colspan="5" class="text-center text-gray-500 py-6">Sin artículos agregados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Resumen del Pedido</h2>
+
+        <div *ngIf="lineas.length === 0" class="text-sm text-gray-500">
+          Todavía no agregaste artículos.
+        </div>
+
+        <div *ngFor="let l of lineas; let last = last" class="py-2"
+          [ngClass]="!last ? 'border-b border-[#E5E5E5]' : ''">
+          <div class="flex justify-between items-start text-sm">
+            <div class="min-w-0 pr-2">
+              <p class="text-xs text-gray-500 uppercase">{{ labelTipo(l.entidad) }}</p>
+              <p class="text-[#1F1F1F] font-medium truncate">
+                {{ opcionSeleccionada(l)?.label || '—' }}
+              </p>
+            </div>
+            <div class="text-right whitespace-nowrap">
+              <span class="font-medium" [ngClass]="excedeStockLinea(l) ? 'text-red-600' : 'text-[#1F1F1F]'">
+                {{ l.cantidad | number }}
+              </span>
+              <span class="text-gray-500 text-xs"> {{ opcionSeleccionada(l)?.unidad }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2 text-sm mt-4 pt-3 border-t border-[#E5E5E5]">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Total artículos</span>
+            <span class="font-medium text-[#1F1F1F]">{{ totalLineas }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Cantidad total</span>
+            <span class="font-medium text-[#1F1F1F]">{{ totalCantidad | number }}</span>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>

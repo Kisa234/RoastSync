@@ -12,8 +12,6 @@ import { AddRoasterComponent } from '../../components/add-order-roast/add-order-
 import { Pedido, PedidoConLote } from '../../../../shared/models/pedido';
 import { PedidoService } from '../../../orders/service/orders.service';
 import { UserService } from '../../../users/service/users-service.service';
-import { OrderRoastsComponent } from '../../components/order-roasts/order-roasts.component';
-import { EditOrderComponent } from '../../components/edit-order/edit-order.component';
 import { UiService } from '../../../../shared/services/ui.service';
 import { RoastsService } from '../../service/roasts.service';
 import { Tueste } from '../../../../shared/models/tueste';
@@ -21,6 +19,7 @@ import { UserNamePipe } from "../../../../shared/pipes/user-name-pipe.pipe";
 import { MinSecPipe } from "../../../../shared/pipes/time.pipe";
 import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
 import { FichaTuesteComponent } from '../../../inventory/lotes-tostados/components/ficha-tueste/ficha-tueste.component';
+import { Router } from '@angular/router';
 
 
 
@@ -35,8 +34,6 @@ import { FichaTuesteComponent } from '../../../inventory/lotes-tostados/componen
     NgFor,
     LucideAngularModule,
     AddRoasterComponent,
-    OrderRoastsComponent,
-    EditOrderComponent,
     FichaTuesteComponent,
     UserNamePipe,
     MinSecPipe,
@@ -99,6 +96,7 @@ export class RoastsPage {
     private roastsSvc: RoastsService,
     private userSvc: UserService,
     private uiSvc: UiService,
+    private router: Router,
   ) { }
 
   ngOnInit() {
@@ -258,20 +256,17 @@ export class RoastsPage {
     this.pageSF = next;
     this.updatePagedSinFacturar();
   }
-  openAddRoaster() {
-    this.showAddRoaster = true;
+ 
+  openRoasts(o: Pedido): void {
+    this.router.navigate(['/roasts', o.id_pedido, 'tuestes']);
   }
 
-  openRoasts(o: Pedido) {
-    this.selectedOrder = o;
-    this.showRoastsModal = true;
+  openAddRoaster(): void {
+    this.router.navigate(['/roasts/tueste/nuevo']);
   }
 
-  onEditRoast(o: Pedido) {
-    this.selectedOrder = o;
-    this.showEditRoastModal = true;
-    this.loadPending();
-    this.loadHistory();
+  onEditRoast(o: Pedido): void {
+    this.router.navigate(['/roasts/tueste', o.id_pedido, 'editar']);
   }
 
   onRoasterCreated(data: any) {

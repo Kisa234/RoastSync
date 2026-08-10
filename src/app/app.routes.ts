@@ -28,8 +28,6 @@ import { authGuard } from './guards/auth.guard';
 import { AnalysisCompleteGuard } from './guards/analysis-complete.guard';
 import { LoteTostadoExistsGuard } from './guards/lote-tostado-exists.guard';
 import { permissionGuard } from './guards/permission.guard';
-import { UpdateInventoryComponent } from './features/inventory/update-inventory/pages/update-inventory.component';
-import { EnvioPageComponent } from './features/envios/pages/main/envio.page.component';
 import { KardexComponent } from './features/costing/pages/kardex/kardex.component';
 import { CostingComponent } from './features/costing/pages/main/costing.component';
 import { StadisticComponent } from './features/costing/pages/stadistic/stadistic.component';
@@ -48,6 +46,23 @@ import { BolsaShellComponent } from './features/inventory/bolsa/page/shell/bolsa
 import { BolsaMainComponent } from './features/inventory/bolsa/page/main/bolsa-main.component';
 import { ViewOrderPage } from './features/orders/page/view-order/view-order.page';
 import { HistoricBolsaComponent } from './features/inventory/bolsa/page/historic/historic-bolsa.component';
+import { EnviosShellComponent } from './features/envios/pages/shell/envios-shell.component';
+import { OrdenDespachoFormPage } from './features/orders/page/orden-despacho-form-page/orden-despacho-form-page.component';
+import { EnviosMainPage } from './features/envios/pages/main/envios-main.component';
+import { EnvioFormPage } from './features/envios/pages/envio-form-page/envio-form-page.component';
+import { ViewPaquetePage } from './features/envios/pages/view-paquete/view-paquete.page';
+import { ViewEnvioPage } from './features/envios/pages/view-envio/view-envio.page';
+import { ProgramarEnvioPage } from './features/envios/pages/programar-envio/programar-envio.page';
+import { DespacharEnvioPage } from './features/envios/pages/despachar-envio/espachar-envio.page';
+import { paqueteListoGuard } from './guards/paquete-listo.guard';
+import { envioEstadoGuard } from './guards/envio-estado.guard';
+import { UpdateInventoryComponent } from './features/inventory/update-inventory/pages/main/update-inventory.component';
+import { TrasladarStockPage } from './features/inventory/update-inventory/pages/trasladar-stock/trasladar-stock.page';
+import { AjustarStockPage } from './features/inventory/update-inventory/pages/ajustar-stock/ajustar-stock.page';
+import { UpdateInventoryShellComponent } from './features/inventory/update-inventory/pages/shell/update-inventory-shell.component';
+import { VerHistorialPage } from './shared/pages/ver-historial/ver-historial.page';
+import { OrderTuesteFormPage } from './features/roasts/page/order-tueste-form-page/order-tueste-form-page.component';
+import { OrderTuestesPage } from './features/roasts/page/order-tuestes-page/order-tuestes.page';
 
 export const appRoutes: Routes = [
 
@@ -221,7 +236,15 @@ export const appRoutes: Routes = [
               }
             ]
           },
-          { path: 'actualizar', component: UpdateInventoryComponent }
+           {
+            path: 'actualizar',
+            component: UpdateInventoryShellComponent,
+            children: [
+              { path: '', component: UpdateInventoryComponent },
+              { path: 'ajustar-stock', component: AjustarStockPage },
+              { path: 'trasladar-stock', component: TrasladarStockPage },
+            ]
+          }
         ]
       },
 
@@ -239,6 +262,8 @@ export const appRoutes: Routes = [
             component: MaquilaFormPage,
             data: { mode: 'edit' },
           },
+          { path: 'despacho/nuevo', component: OrdenDespachoFormPage },
+          { path: 'despacho/:id/editar', component: OrdenDespachoFormPage, data: { mode: 'edit' } },
           {
             path: ':id/editar',
             component: OrderFormPage,
@@ -254,11 +279,14 @@ export const appRoutes: Routes = [
         data: { permissions: ['tostado.read'] },
         children: [
           { path: '', component: RoastsPage },
+          { path: 'tueste/nuevo', component: OrderTuesteFormPage },
+          { path: 'tueste/:id/editar', component: OrderTuesteFormPage, data: { mode: 'edit' } },
+          { path: ':id_pedido/tuestes', component: OrderTuestesPage },
           { path: 'stadistic', component: StadisticRoastComponent },
           { path: 'balones-gas', component: BalonesGasComponent }
         ]
       },
-
+      { path: 'historial/:id', component: VerHistorialPage },
       {
         path: 'analisis',
         component: AnalisisPage,
@@ -277,10 +305,32 @@ export const appRoutes: Routes = [
       },
 
       {
-        path: 'envio',
-        component: EnvioPageComponent,
+        path: 'envios',
+        component: EnviosShellComponent,
         canActivate: [permissionGuard],
-        data: { permissions: ['envios.read'] }
+        data: { permissions: ['envios.read'] },
+        children: [
+          { path: '', component: EnviosMainPage },
+          {
+            path: 'nuevo/:id_paquete',
+            component: EnvioFormPage,
+            canActivate: [paqueteListoGuard],
+          },
+          { path: 'paquete/:id', component: ViewPaquetePage },
+          {
+            path: ':id/programar',
+            component: ProgramarEnvioPage,
+            canActivate: [envioEstadoGuard],
+            data: { estadosPermitidos: ['PENDIENTE'] },
+          },
+          {
+            path: ':id/despachar',
+            component: DespacharEnvioPage,
+            canActivate: [envioEstadoGuard],
+            data: { estadosPermitidos: ['PENDIENTE', 'PROGRAMADO'] },
+          },
+          { path: ':id', component: ViewEnvioPage }, // wildcard de un segmento — SIEMPRE al final
+        ],
       },
 
       {

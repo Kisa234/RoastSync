@@ -1,3 +1,5 @@
+import { EntidadInventario } from '../enum/entidad-inventario.enum';
+
 export interface MovimientoAlmacen {
   id_movimiento: string;
   tipo: TipoMovimiento;
@@ -10,7 +12,7 @@ export interface MovimientoAlmacen {
   id_almacen_origen?: string;
   id_almacen_destino?: string;
   comentario?: string;
-  id_pedido?:string;
+  id_pedido?: string;
 }
 
 export interface CreateMovimientoDto {
@@ -27,13 +29,7 @@ export interface CreateMovimientoDto {
   id_pedido?: string;
 }
 
-export enum EntidadInventario {
-  LOTE = 'LOTE',
-  LOTE_TOSTADO = 'LOTE_TOSTADO',
-  PRODUCTO = 'PRODUCTO',
-  MUESTRA = 'MUESTRA',
-  INSUMO = 'INSUMO',
-}
+export { EntidadInventario };
 
 export enum TipoMovimiento {
   INGRESO = 'INGRESO',
