@@ -73,16 +73,20 @@ export class FichaTuesteComponent implements OnInit {
 
   private async loadData() {
     this.loteTostadoSvc.getFichaTueste(this.id).subscribe(loteTostado => {
-      this.data = loteTostado;  // ya no se llama calcAgtrom()
+      this.data = loteTostado;
       this.loteService.getById(loteTostado.id_lote).subscribe(lote => {
         this.lote = lote;
-        this.userService.getUserById(lote.id_user!).subscribe(user => {
-          this.user = user;
-        });
+
+        if (lote.owned_by_store) {
+          this.user = { ...this.user, nombre: 'FORTUNATO' };
+        } else if (lote.id_user) {
+          this.userService.getUserById(lote.id_user).subscribe(user => {
+            this.user = user;
+          });
+        }
       });
     });
   }
-
 
   formatTiempoSegundos(segundos: number): string {
     const minutos = Math.floor(segundos / 60);

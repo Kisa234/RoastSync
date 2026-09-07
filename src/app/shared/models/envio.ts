@@ -46,6 +46,7 @@ export interface CreateEnvio {
   registrado_por_id?: string;
   direccion: CreateDireccionEnvio;
   medio_envio?: string;
+  fecha_programada?: string;
   numero_tracking?: string;
   costo_envio?: number;
   quien_paga?: QuienPaga;

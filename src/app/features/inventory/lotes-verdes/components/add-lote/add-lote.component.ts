@@ -40,7 +40,7 @@ export class AddLoteComponent implements OnInit {
     private ubigeoSvc: UbigeoService,
     private uiSvc: UiService,
     private ingresoCafeSvc: IngresoCafeService,
-    private almacenService:  AlmacenService
+    private almacenService: AlmacenService
   ) { }
 
   // icons
@@ -48,6 +48,8 @@ export class AddLoteComponent implements OnInit {
   readonly Check = Check;
   readonly ChevronDown = ChevronDown;
 
+  // sentinel de UI — no es un id_user real, solo marca "lote de la tienda"
+  readonly STORE_SENTINEL = '__STORE__';
 
   @Output() close = new EventEmitter<void>();
   @Output() create = new EventEmitter<void>();
@@ -75,25 +77,31 @@ export class AddLoteComponent implements OnInit {
     id_lote: '',
     fecha_registro: new Date(),
     eliminado: false,
-    almacen: ''
+    almacen: '',
+    owned_by_store: false
   };
 
   variedades: Variedad[] = [];
   procesos = ['LAVADO', 'NATURAL', 'HONEY'];
   clasificaciones = ['SELECTO', 'CLASICO', 'EXCLUSIVO', 'ESPECIAL', 'GOURMET'];
   almacenes: Almacen[] = [];
-  
-
 
   // datos de muestras
   muestras: Muestra[] = [];
   selectedMuestraId = '';
   muestraPeso = 0;
   clientes: any[] = [];
+  clientesConTienda: any[] = [];
 
   ngOnInit() {
     this.muestraSvc.getAll().subscribe(list => this.muestras = list);
-    this.userSvc.getUsers().subscribe(u => this.clientes = u);
+    this.userSvc.getUsers().subscribe(u => {
+      this.clientes = u.filter(x => x.rol === 'cliente');
+      this.clientesConTienda = [
+        { id_user: this.STORE_SENTINEL, nombre: 'FORTUNATO (Tienda)' },
+        ...this.clientes
+      ];
+    });
     this.variedadSvc.getAllVariedades().subscribe(variedades => {
       this.variedades = variedades;
     });
@@ -101,6 +109,16 @@ export class AddLoteComponent implements OnInit {
       this.departamentos = deps;
     });
     this.almacenService.getAlmacenesActivos().subscribe(a => this.almacenes = a);
+  }
+
+  onClienteChange(idSeleccionado: string) {
+    if (idSeleccionado === this.STORE_SENTINEL) {
+      this.model.owned_by_store = true;
+      this.model.id_user = undefined;
+    } else {
+      this.model.owned_by_store = false;
+      this.model.id_user = idSeleccionado;
+    }
   }
 
   onMuestraChange(muestraId: string) {
@@ -111,12 +129,25 @@ export class AddLoteComponent implements OnInit {
         this.model.finca = muestra.finca,
         this.model.distrito = muestra.distrito,
         this.model.departamento = muestra.departamento,
-        this.model.variedades = muestra.variedades,
+        this.model.variedades = this.parseVariedades(muestra.variedades),
         this.model.proceso = muestra.proceso.toUpperCase(),
-        this.model.id_user = muestra.id_user,
+        this.model.owned_by_store = muestra.owned_by_store,
+        this.model.id_user = muestra.owned_by_store ? undefined : muestra.id_user,
 
         this.model.peso = 0;
     })
+  }
+
+  parseVariedades(variedades: string | string[]): string[] {
+    if (Array.isArray(variedades)) return variedades;
+    if (!variedades) return [];
+    return variedades.split(',').map(v => v.trim()).filter(Boolean);
+  }
+
+  getClienteNombre(id_user?: string): string {
+    if (!id_user) return '';
+    const cliente = this.clientes.find(c => c.id_user === id_user);
+    return cliente?.nombre_comercial || cliente?.nombre || id_user;
   }
 
   selectTab(key: string) {
@@ -141,7 +172,9 @@ export class AddLoteComponent implements OnInit {
       clasificacion: '',
       id_lote: '',
       fecha_registro: new Date(),
-      eliminado: false
+      eliminado: false,
+      owned_by_store: false,
+      almacen: ''
     };
   }
 
@@ -182,7 +215,7 @@ export class AddLoteComponent implements OnInit {
       cancelText: 'No'
     }).then(confirmed => {
       if (!confirmed) { return }
-      
+
       this.ingresoCafeSvc.createIngreso({
         id_lote: lote.id_lote,
         cantidad_kg: lote.peso,
@@ -194,6 +227,45 @@ export class AddLoteComponent implements OnInit {
     });
   }
 
+  /**
+   * Validador único de campos obligatorios, reutilizado por ambos flujos
+   * (manual y desde-muestra). Devuelve true si todo está completo; si falta
+   * algo, avisa con UiService y devuelve false sin lanzar el request.
+   */
+  private validarModelo(): boolean {
+    const faltantes: string[] = [];
+
+    if (!this.model.productor?.trim()) faltantes.push('Productor');
+    if (!this.model.finca?.trim()) faltantes.push('Finca');
+    if (!this.model.departamento?.trim()) faltantes.push('Departamento');
+    if (!this.model.distrito?.trim()) faltantes.push('Distrito');
+    if (!this.model.peso || this.model.peso <= 0) faltantes.push('Peso');
+    if (!this.model.variedades || this.model.variedades.length === 0) faltantes.push('Variedades');
+    if (!this.model.proceso?.trim()) faltantes.push('Proceso');
+    if (!this.model.almacen?.trim()) faltantes.push('Almacén');
+
+    // Clasificación solo es obligatoria para lotes de tienda
+    if (this.model.owned_by_store && !this.model.clasificacion?.trim()) {
+      faltantes.push('Clasificación');
+    }
+
+    // Propiedad: o es de tienda, o tiene un cliente asignado — nunca ambos vacíos
+    if (!this.model.owned_by_store && !this.model.id_user) {
+      faltantes.push('Cliente (o marcar como Tienda)');
+    }
+
+    if (faltantes.length > 0) {
+      this.uiSvc.alert(
+        'error',
+        'Campos incompletos',
+        `Faltan los siguientes campos: ${faltantes.join(', ')}`
+      );
+      return false;
+    }
+
+    return true;
+  }
+
   onSave() {
     if (this.activeTab === 'manual') {
       this.saveManual();
@@ -203,6 +275,8 @@ export class AddLoteComponent implements OnInit {
   }
 
   saveManual() {
+    if (!this.validarModelo()) return;
+
     this.loteSvc.create(this.model).subscribe(l => {
       this.addIngreso(l);
       this.create.emit();
@@ -211,8 +285,12 @@ export class AddLoteComponent implements OnInit {
   }
 
   saveFromMuestra() {
-    console.log(this.selectedMuestraId);
-    console.log(this.model);
+    if (!this.selectedMuestraId) {
+      this.uiSvc.alert('error', 'Campos incompletos', 'Debes seleccionar una muestra');
+      return;
+    }
+    if (!this.validarModelo()) return;
+
     this.loteSvc.createByMuestra(this.selectedMuestraId, this.model).subscribe(l => {
       this.addIngreso(l);
       this.create.emit();

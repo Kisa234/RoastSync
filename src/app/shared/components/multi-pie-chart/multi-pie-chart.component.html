@@ -1,1 +1,17 @@
-<div #chartContainer></div>
+<div class="relative w-full h-full">
+  <div
+    *ngIf="loading"
+    class="absolute inset-0 flex items-center justify-center text-xs text-gray-400"
+  >
+    Cargando notas...
+  </div>
+
+  <div
+    *ngIf="error"
+    class="absolute inset-0 flex items-center justify-center text-xs text-red-400 text-center px-4"
+  >
+    {{ error }}
+  </div>
+
+  <div #chartContainer class="w-full h-full"></div>
+</div>

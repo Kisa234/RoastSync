@@ -19,7 +19,10 @@
         <div class="grid grid-cols-3 gap-4 text-sm">
           <div>
             <p class="text-gray-500">Cliente</p>
-            <p class="font-semibold text-[#1F1F1F]">{{ LoteTostado.id_user! | UserNamePipe | async }}</p>
+            <p class="font-semibold text-[#1F1F1F]">
+              <ng-container *ngIf="LoteTostado.owned_by_store; else clienteTostadoHistorico">FORTUNATO</ng-container>
+              <ng-template #clienteTostadoHistorico>{{ LoteTostado.id_user! | UserNamePipe | async }}</ng-template>
+            </p>
           </div>
           <div>
             <p class="text-gray-500">Lote Tostado</p>
@@ -62,7 +65,8 @@
         </div>
         <div class="px-4 py-3">
           <p class="text-[11px] uppercase text-gray-500">Variedades</p>
-          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ lote.variedades.length ? lote.variedades.join(', ') : '—' }}</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ lote.variedades.length ? lote.variedades.join(', ') : '—' }}
+          </p>
         </div>
       </div>
 
@@ -88,7 +92,8 @@
           <tfoot *ngIf="LoteTostado.inventarioLotesTostados.length" class="bg-[#F9F9F9] border-t border-[#E5E5E5]">
             <tr>
               <td class="px-6 py-4 text-sm font-semibold text-[#1F1F1F]">Stock total</td>
-              <td class="px-6 py-4 text-sm font-semibold text-[#1F1F1F]">{{ pesoTotalInventarios | number:'1.0-2' }} gr</td>
+              <td class="px-6 py-4 text-sm font-semibold text-[#1F1F1F]">{{ pesoTotalInventarios | number:'1.0-2' }} gr
+              </td>
             </tr>
           </tfoot>
         </table>
@@ -131,7 +136,8 @@
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-[#1F1F1F] font-medium">{{ r.accion }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ r.cantidad ? (r.cantidad | number:'1.0-2') + ' gr' : '—' }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ r.cantidad ? (r.cantidad | number:'1.0-2') + ' gr' : '—' }}
+              </td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ r.comentario }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">
                 <span class="text-xs text-gray-500">{{ r.responsableTitulo }}:</span>
@@ -139,10 +145,12 @@
               </td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ r.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
               <td class="px-6 py-4 text-sm">
-                <button *ngIf="r.id_pedido" (click)="openPedido(r)" class="text-gray-500 hover:text-[#B8672E]" title="Ver pedido">
+                <button *ngIf="r.id_pedido" (click)="openPedido(r)" class="text-gray-500 hover:text-[#B8672E]"
+                  title="Ver pedido">
                   <lucide-icon [img]="Eye" class="w-5 h-5" />
                 </button>
-                <button *ngIf="r.id_envio" (click)="openEnvio(r)" class="text-gray-500 hover:text-[#B8672E]" title="Ver envío">
+                <button *ngIf="r.id_envio" (click)="openEnvio(r)" class="text-gray-500 hover:text-[#B8672E]"
+                  title="Ver envío">
                   <lucide-icon [img]="Truck" class="w-5 h-5" />
                 </button>
                 <span *ngIf="!r.id_pedido && !r.id_envio" class="text-gray-400">—</span>

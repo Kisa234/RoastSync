@@ -85,7 +85,12 @@
 
             <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ t.id_lote_tostado }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ t.lote.productor }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ t.id_user | UserNamePipe | async }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">
+              <span *ngIf="t.owned_by_store; else clienteTostadoReal" class="font-medium text-[#B8672E]">
+                FORTUNATO
+              </span>
+              <ng-template #clienteTostadoReal>{{ t.id_user | UserNamePipe | async }}</ng-template>
+            </td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ t.perfil_tostado }}</td>
 
             <!-- ALMACÉN -->

@@ -3,7 +3,6 @@ import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, Eye, Edit2, Trash2, History, Plus, EyeOff, Sheet } from 'lucide-angular';
 
-import { ReportLoteComponent } from '../../../../../shared/components/report-lote/report-lote.component';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { Lote, LoteVerdeConInventario } from '../../../../../shared/models/lote';
 import { User } from '../../../../../shared/models/user';
@@ -31,7 +30,6 @@ import { saveAs } from 'file-saver';
     AddLoteComponent,
     AddInventoryComponent,
     EditLoteComponent,
-    ReportLoteComponent,
     UserNamePipe,
     RouterOutlet
   ],
@@ -69,7 +67,6 @@ export class LoteVerdeComponent {
 
   showAddLote = false;
   showEditLote = false;
-  showReportLote = false;
   showAddInventory = false;
 
   selectedLoteId = '';
@@ -131,8 +128,8 @@ export class LoteVerdeComponent {
         l.proceso?.toLowerCase().includes(term) ||
         cliente.includes(term);
 
-      // costo solo cuenta lotes admin que hacen match
-      if (match && user?.rol === 'admin' && !l.eliminado) {
+      // costo solo cuenta lotes de tienda que hacen match
+      if (match && l.owned_by_store && !l.eliminado) {
         const pesoInventarioKg = this.getPesoInventario(l) / 1000;
         this.costoInventarioVerde += Number(l.costo ?? 0) * pesoInventarioKg;
       }
@@ -142,10 +139,9 @@ export class LoteVerdeComponent {
   }
 
   getLotesFiltrados(): LoteVerdeConInventario[] {
-    return this.lotesFiltrados.filter(l => {
-      const user = this.usuarios.find(u => u.id_user === l.id_user);
-      return user?.rol === this.filtroTipo;
-    });
+    return this.lotesFiltrados.filter(l =>
+      this.filtroTipo === 'admin' ? l.owned_by_store : !l.owned_by_store
+    );
   }
 
   onSearchChange() {
@@ -153,17 +149,11 @@ export class LoteVerdeComponent {
   }
 
   getLotesAdmin() {
-    return this.lotesFiltrados.filter(l => {
-      const user = this.usuarios.find(u => u.id_user === l.id_user);
-      return user?.rol === 'admin';
-    });
+    return this.lotesFiltrados.filter(l => l.owned_by_store);
   }
 
   getLotesCliente() {
-    return this.lotesFiltrados.filter(l => {
-      const user = this.usuarios.find(u => u.id_user === l.id_user);
-      return user?.rol === 'cliente';
-    });
+    return this.lotesFiltrados.filter(l => !l.owned_by_store);
   }
 
   getVariedadesArray(variedades: string | string[]): string[] {
@@ -182,8 +172,7 @@ export class LoteVerdeComponent {
         this.uiService.alert('error', 'Error', 'El lote no tiene análisis asociado');
         return;
       }
-      this.selectedLoteId = l.id_lote;
-      this.showReportLote = true;
+      this.router.navigate(['/inventory/lotes-verdes/reporte', l.id_lote]);
     });
   }
 
@@ -241,7 +230,9 @@ export class LoteVerdeComponent {
   exportLotesVerdes() {
     const data = this.getLotesFiltrados().map(l => {
       const user = this.usuarios.find(u => u.id_user === l.id_user);
-      const cliente = user?.nombre_comercial || user?.nombre || 'Desconocido';
+      const cliente = l.owned_by_store
+        ? 'FORTUNATO'
+        : (user?.nombre_comercial || user?.nombre || 'Desconocido');
       const almacenes = (l.inventarioLotes || [])
         .map(inv => `${inv.almacen?.nombre || 'N/A'}: ${inv.cantidad_kg} gr`)
         .join(' | ');

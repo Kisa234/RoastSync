@@ -139,11 +139,27 @@ export class SidebarComponent {
       ]
     },
     {
-      type: 'link',
+      type: 'group',
       label: 'Pedidos',
-      path: '/orders',
       icon: ShoppingCart,
-      permissions: 'pedidos.read'
+      key: 'orders',
+      permissions: 'pedidos.read',
+      children: [
+        {
+          type: 'link',
+          label: 'Pedidos',
+          path: '/orders',
+          icon: ShoppingCart,
+          permissions: 'pedidos.read'
+        },
+        {
+          type: 'link',
+          label: 'Estadísticas',
+          path: '/orders/estadisticas',
+          icon: ChartBar,
+          permissions: 'pedidos.read'
+        },
+      ]
     },
     {
       type: 'group',

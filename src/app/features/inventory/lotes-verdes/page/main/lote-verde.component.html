@@ -89,7 +89,14 @@
               'bg-gray-100 opacity-75': l.eliminado
             }">
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
-              <td class="px-6 py-4 text-sm text-gray-700">{{ l.id_user! | UserNamePipe | async }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">
+                <span *ngIf="l.owned_by_store; else clienteReal" class="font-medium text-[#B8672E]">
+                  FORTUNATO
+                </span>
+                <ng-template #clienteReal>
+                  {{ l.id_user! | UserNamePipe | async }}
+                </ng-template>
+              </td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ l.distrito }}</td>
 
@@ -187,8 +194,6 @@
 
 <edit-lote *ngIf="showEditLote" [loteId]="selectedLoteId" (close)="showEditLote = false"
   (create)="onUpdated()"></edit-lote>
-
-<report-lote *ngIf="showReportLote" [loteId]="selectedLoteId" (close)="showReportLote = false"></report-lote>
 
 <add-inventory *ngIf="showAddInventory" [loteId]="selectedLoteId" (close)="showAddInventory = false"
   (create)="onInventoryCreated()"></add-inventory>

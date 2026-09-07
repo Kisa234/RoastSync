@@ -17,7 +17,7 @@ interface DiffRow {
 @Component({
   selector: 'app-ver-historial',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe, UserNamePipe, LucideAngularModule],
+  imports: [CommonModule, DatePipe, UserNamePipe, LucideAngularModule],
   templateUrl: './ver-historial.page.html'
 })
 export class VerHistorialPage implements OnInit {

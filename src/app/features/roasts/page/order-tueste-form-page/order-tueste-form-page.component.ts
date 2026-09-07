@@ -37,10 +37,14 @@ export class OrderTuesteFormPage implements OnInit {
   readonly Plus = Plus;
   readonly Trash2 = Trash2;
 
+  // sentinel de UI — no es un id_user real, solo marca "lotes de la tienda"
+  readonly STORE_SENTINEL = '__STORE__';
+
   mode: 'create' | 'edit' = 'create';
   pedidoId: string | null = null;
 
   clientes: User[] = [];
+  clientesConTienda: (User | { id_user: string; nombre: string })[] = [];
   lotes: any[] = [];
   private lotesAll: any[] = [];
 
@@ -61,6 +65,9 @@ export class OrderTuesteFormPage implements OnInit {
     facturado: undefined,
     fecha_tueste: new Date(),
   };
+
+  // selección real del selector "Cliente" — puede ser el sentinel de tienda
+  clienteSeleccionado = '';
 
   batches: Batch[] = [];
   batchTostado = 0;
@@ -90,6 +97,13 @@ export class OrderTuesteFormPage implements OnInit {
       this.loteSvc.getAll().subscribe(lotes => {
         this.lotesAll = lotes;
         this.clientes = usuarios.filter(u => lotes.some((l: any) => l.id_user === u.id_user));
+
+        // "FORTUNATO" solo aparece como opción si realmente hay lotes de tienda que tostar
+        const hayLotesDeTienda = lotes.some((l: any) => l.owned_by_store);
+        this.clientesConTienda = hayLotesDeTienda
+          ? [{ id_user: this.STORE_SENTINEL, nombre: 'FORTUNATO (Tienda)' }, ...this.clientes]
+          : this.clientes;
+
         this.loading = false;
 
         if (this.mode === 'edit' && this.pedidoId) {
@@ -105,7 +119,18 @@ export class OrderTuesteFormPage implements OnInit {
     this.pedidoSvc.getPedidoById(id).subscribe(pedido => {
       this.orden = { ...pedido };
 
-      this.lotes = this.lotesAll.filter((l: any) => l.id_user === this.orden.id_user);
+      // Reconstruye la selección visual del selector a partir del lote real del pedido,
+      // no del id_user guardado — si el lote origen es de tienda, el select debe
+      // mostrar "FORTUNATO" aunque el pedido internamente tenga el id_user sentinel.
+      const loteDelPedido = this.lotesAll.find((l: any) => l.id_lote === this.orden.id_lote);
+      if (loteDelPedido?.owned_by_store) {
+        this.clienteSeleccionado = this.STORE_SENTINEL;
+        this.lotes = this.lotesAll.filter((l: any) => l.owned_by_store);
+      } else {
+        this.clienteSeleccionado = this.orden.id_user ?? '';
+        this.lotes = this.lotesAll.filter((l: any) => l.id_user === this.orden.id_user);
+      }
+
       this.recalcularAlmacenesConStock();
 
       this.batchTostado = parseFloat(((this.orden.cantidad ?? 0) * 0.85).toFixed(2));
@@ -125,10 +150,15 @@ export class OrderTuesteFormPage implements OnInit {
   }
 
   onClienteChange(): void {
-    if (this.orden.id_user) {
-      this.lotes = this.lotesAll.filter((l: any) => l.id_user === this.orden.id_user);
+    if (this.clienteSeleccionado === this.STORE_SENTINEL) {
+      this.lotes = this.lotesAll.filter((l: any) => l.owned_by_store);
+      this.orden.id_user = undefined;
+    } else if (this.clienteSeleccionado) {
+      this.lotes = this.lotesAll.filter((l: any) => l.id_user === this.clienteSeleccionado);
+      this.orden.id_user = this.clienteSeleccionado;
     } else {
       this.lotes = [];
+      this.orden.id_user = undefined;
     }
     this.orden.id_lote = '';
     this.orden.id_almacen = '';
@@ -226,7 +256,7 @@ export class OrderTuesteFormPage implements OnInit {
   // ---------- Validación ----------
 
   private validarFormulario(): boolean {
-    if (!this.orden.id_user) {
+    if (!this.clienteSeleccionado) {
       this.uiSvc.alert('warning', 'Campo requerido', 'Debes seleccionar un cliente.');
       return false;
     }

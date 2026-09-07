@@ -19,7 +19,10 @@
         <div class="grid grid-cols-3 gap-4 text-sm">
           <div>
             <p class="text-gray-500">Cliente</p>
-            <p class="font-semibold text-[#1F1F1F]">{{ clienteId | UserNamePipe | async }}</p>
+            <p class="font-semibold text-[#1F1F1F]">
+              <ng-container *ngIf="esDeTienda; else clienteRealHist">FORTUNATO</ng-container>
+              <ng-template #clienteRealHist>{{ clienteId | UserNamePipe | async }}</ng-template>
+            </p>
           </div>
           <div>
             <p class="text-gray-500">Lote</p>
@@ -54,7 +57,8 @@
         </div>
         <div class="px-4 py-3 border-b sm:border-b xl:border-b-0 xl:border-r border-[#E5E5E5]">
           <p class="text-[11px] uppercase text-gray-500">Producido</p>
-          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ bolsa.cantidad | number }} uds ({{ subtotalGramos | number }} gr)</p>
+          <p class="mt-1 font-semibold text-[#1F1F1F]">{{ bolsa.cantidad | number }} uds ({{ subtotalGramos | number }}
+            gr)</p>
         </div>
         <div class="px-4 py-3">
           <p class="text-[11px] uppercase text-gray-500">Responsable Embolsado</p>
@@ -169,10 +173,12 @@
               <td class="px-6 py-4 text-sm text-gray-700">{{ r.usuarioId | UserNamePipe | async }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ r.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
               <td class="px-6 py-4 text-sm">
-                <button *ngIf="r.id_pedido" (click)="openPedido(r.id_pedido)" class="text-gray-500 hover:text-[#B8672E]" title="Ver pedido">
+                <button *ngIf="r.id_pedido" (click)="openPedido(r.id_pedido)" class="text-gray-500 hover:text-[#B8672E]"
+                  title="Ver pedido">
                   <lucide-icon [img]="Eye" class="w-5 h-5" />
                 </button>
-                <button *ngIf="r.id_envio" (click)="openEnvio(r.id_envio)" class="text-gray-500 hover:text-[#B8672E]" title="Ver envío">
+                <button *ngIf="r.id_envio" (click)="openEnvio(r.id_envio)" class="text-gray-500 hover:text-[#B8672E]"
+                  title="Ver envío">
                   <lucide-icon [img]="Truck" class="w-5 h-5" />
                 </button>
                 <span *ngIf="!r.id_pedido && !r.id_envio" class="text-gray-400">—</span>

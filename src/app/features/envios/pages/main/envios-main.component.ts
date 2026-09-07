@@ -2,24 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LucideAngularModule, Package, PackageCheck, Truck, Archive, Eye, Plus, Search } from 'lucide-angular';
+import { LucideAngularModule, Package, PackageCheck, Truck, Archive, Eye, Plus, Search, Printer, Calendar } from 'lucide-angular';
 import { forkJoin } from 'rxjs';
 
 import { PaqueteService } from '../../service/paquete.service';
 import { EnviosService } from '../../service/envios.service';
 import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
+import { PrintOrdenDespachoComponent, OrdenDespachoImprimible } from '../../components/print-orden-despacho/print-orden-despacho.component';
 
 import { Paquete } from '../../../../shared/models/paquete';
 import { Envio } from '../../../../shared/models/envio';
 import { EstadoEnvio } from '../../../../shared/enum/estado-envio.enum';
 import { EstadoPaquete } from '../../../../shared/enum/estado-paquete.enum';
 
-type TabEnvios = 'preparar' | 'listos' | 'camino' | 'historico';
+type TabEnvios = 'preparar' | 'listos' | 'porDespachar' | 'camino' | 'historico';
 
 @Component({
   selector: 'app-envios-main',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, UserNamePipe],
+  imports: [CommonModule, FormsModule, LucideAngularModule, UserNamePipe, PrintOrdenDespachoComponent],
   templateUrl: './envios-main.component.html'
 })
 export class EnviosMainPage implements OnInit {
@@ -30,6 +31,8 @@ export class EnviosMainPage implements OnInit {
   readonly Eye = Eye;
   readonly Plus = Plus;
   readonly Search = Search;
+  readonly Printer = Printer;
+  readonly Calendar = Calendar;
 
   activeTab: TabEnvios = 'preparar';
   searchTerm = '';
@@ -37,6 +40,7 @@ export class EnviosMainPage implements OnInit {
   paquetes: Paquete[] = [];
   envios: Envio[] = [];
 
+  datosParaImprimir: OrdenDespachoImprimible | null = null;
 
   page = 1;
   pageSize = 15;
@@ -92,10 +96,16 @@ export class EnviosMainPage implements OnInit {
       this.paquetes.filter(p => p.estado === EstadoPaquete.LISTO && !p.eliminado && !idsConEnvio.has(p.id_paquete))
     );
   }
+
+  /** Envío ya creado, pero todavía no salió del almacén */
+  get enviosPorDespachar(): Envio[] {
+    const estados: string[] = [EstadoEnvio.PENDIENTE, EstadoEnvio.PROGRAMADO];
+    return this.filterEnvios(this.envios.filter(e => estados.includes(e.estado) && !e.eliminado));
+  }
+
+  /** Ya salió físicamente del almacén */
   get enviosEnCamino(): Envio[] {
-    const estados: string[] = [
-      EstadoEnvio.PENDIENTE, EstadoEnvio.PROGRAMADO, EstadoEnvio.DESPACHADO, EstadoEnvio.EN_TRANSITO
-    ];
+    const estados: string[] = [EstadoEnvio.DESPACHADO, EstadoEnvio.EN_TRANSITO];
     return this.filterEnvios(this.envios.filter(e => estados.includes(e.estado) && !e.eliminado));
   }
 
@@ -118,6 +128,13 @@ export class EnviosMainPage implements OnInit {
     return this.paginar(this.paquetesListos);
   }
 
+  get totalEnviosPorDespachar(): number {
+    return this.enviosPorDespachar.length;
+  }
+  get enviosPorDespacharPaginados(): Envio[] {
+    return this.paginar(this.enviosPorDespachar);
+  }
+
   get totalEnviosEnCamino(): number {
     return this.enviosEnCamino.length;
   }
@@ -136,6 +153,7 @@ export class EnviosMainPage implements OnInit {
     const total = {
       preparar: this.totalPaquetesPorPreparar,
       listos: this.totalPaquetesListos,
+      porDespachar: this.totalEnviosPorDespachar,
       camino: this.totalEnviosEnCamino,
       historico: this.totalEnviosHistorico,
     }[this.activeTab];
@@ -177,7 +195,6 @@ export class EnviosMainPage implements OnInit {
 
   // ---------- Navegación ----------
 
-
   verPaquete(p: Paquete) {
     this.router.navigate(['/envios/paquete', p.id_paquete]);
   }
@@ -188,6 +205,29 @@ export class EnviosMainPage implements OnInit {
 
   verEnvio(e: Envio) {
     this.router.navigate(['/envios', e.id_envio]);
+  }
+
+  // ---------- Impresión ----------
+
+  /** Imprime desde "Listos para enviar" — todavía no existe Envio, así que
+   *  la dirección queda null (se llenará recién al crear el envío). */
+  imprimirPaquete(p: Paquete): void {
+    this.paqueteSvc.getById(p.id_paquete).subscribe({
+      next: (paquete) => {
+        this.datosParaImprimir = {
+          numero_orden: paquete.numero_correlativo || paquete.id_paquete,
+          id_cliente: paquete.id_cliente,
+          fecha: paquete.fecha_registro,
+          direccion: null,
+          items: paquete.items.map(i => ({
+            id_entidad: i.id_entidad, cantidad: i.cantidad, unidad_medida: i.unidad_medida
+          })),
+        };
+      },
+      error: () => {
+        this.datosParaImprimir = null;
+      }
+    });
   }
 
   // ---------- UI helpers ----------

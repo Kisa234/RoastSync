@@ -18,8 +18,10 @@ export interface Lote {
   peso_tostado?: number;
   almacen? :string;
   precio_venta?: number;
+  owned_by_store?: boolean;
 
 }
+
 export interface InventarioLoteMini {
   id_inventario: string;
   id_lote: string;

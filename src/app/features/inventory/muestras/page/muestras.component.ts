@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, AsyncPipe, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Eye, CheckCircle, Plus } from 'lucide-angular';
-import { Observable, map } from 'rxjs';
+import { LucideAngularModule, Search, Eye, CheckCircle, Plus, ChevronDown } from 'lucide-angular';
 import { AddMuestraComponent } from '../components/add-muestra/add-muestra.component';
 import { ReportLoteComponent } from '../../../../shared/components/report-lote/report-lote.component';
 import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
@@ -19,17 +18,10 @@ type FilterKey = 'todas' | 'sin-completar' | 'completadas';
   selector: 'muestras-page',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    AsyncPipe,
-    NgIf,
-    NgFor,
-    LucideAngularModule,
-    AddMuestraComponent,
-    ReportLoteComponent,
-    UserNamePipe,
-    AddInventoryMuestraComponent
-],
+    CommonModule, FormsModule, AsyncPipe, NgIf, NgFor,
+    LucideAngularModule, AddMuestraComponent, ReportLoteComponent,
+    UserNamePipe, AddInventoryMuestraComponent
+  ],
   templateUrl: './muestras.component.html'
 })
 export class MuestrasComponent {
@@ -38,11 +30,24 @@ export class MuestrasComponent {
   readonly Eye = Eye;
   readonly CheckCircle = CheckCircle;
   readonly Plus = Plus;
+  readonly ChevronDown = ChevronDown;
 
-  muestras$!: Observable<MuestraConInventario[]>;
+  muestras: MuestraConInventario[] = [];
+  private _muestrasFiltradas: MuestraConInventario[] = [];
+
+  public get muestrasFiltradas(): MuestraConInventario[] {
+    return this._muestrasFiltradas;
+  }
+  public set muestrasFiltradas(value: MuestraConInventario[]) {
+    this._muestrasFiltradas = value;
+  }
+
+  usuarios: User[] = [];
 
   filterTextMuestras = '';
-  filterMuestra: FilterKey = 'sin-completar';
+  filterMuestra: FilterKey = 'todas';
+  filtroTipo: 'admin' | 'cliente' = 'admin';
+  incluirHistorico = false;
 
   filtersMuestras = [
     { key: 'todas', label: 'TODOS' },
@@ -55,9 +60,6 @@ export class MuestrasComponent {
   selectedMuestraId = '';
   selectedMuestra: MuestraConInventario | null = null;
   showAsignarInventarioModal = false;
-
-
-  usuarios: User[] = [];
 
   constructor(
     private muestraService: MuestraService,
@@ -72,57 +74,70 @@ export class MuestrasComponent {
 
   loadUsuarios() {
     this.userService.getUsers().subscribe(users => {
-      this.usuarios = users;
+      this.usuarios = users ?? [];
+      this.aplicarFiltro();
     });
   }
 
   loadMuestras() {
-    this.muestras$ = this.muestraService.getMuestrasConInventario().pipe(
-      map(muestras => {
-        let filtradas = muestras;
+    this.muestraService.getMuestrasConInventario(this.incluirHistorico).subscribe(muestras => {
+      this.muestras = muestras ?? [];
+      this.aplicarFiltro();
+    });
+  }
 
-        switch (this.filterMuestra) {
-          case 'completadas':
-            filtradas = filtradas.filter(m => m.completado);
-            break;
-          case 'sin-completar':
-            filtradas = filtradas.filter(m => !m.completado);
-            break;
-        }
+  toggleHistorico() {
+    this.incluirHistorico = !this.incluirHistorico;
+    this.loadMuestras();
+  }
 
-        if (this.filterTextMuestras.trim()) {
-          const term = this.filterTextMuestras.toLowerCase();
+  aplicarFiltro() {
+    const term = this.filterTextMuestras.trim().toLowerCase();
 
-          filtradas = filtradas.filter(m => {
-            const user = this.usuarios.find(u => u.id_user === m.id_user);
-            const cliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
+    let filtradas = this.muestras.filter(m => {
+      const user = this.usuarios.find(u => u.id_user === m.id_user);
+      const cliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
 
-            const almacenes = (m.inventarioMuestras || [])
-              .map(inv => inv.almacen?.nombre?.toLowerCase() || '')
-              .join(' ');
+      const almacenes = (m.inventarioMuestras || [])
+        .map(inv => inv.almacen?.nombre?.toLowerCase() || '')
+        .join(' ');
 
-            return (
-              m.nombre_muestra?.toLowerCase().includes(term) ||
-              m.productor?.toLowerCase().includes(term) ||
-              m.finca?.toLowerCase().includes(term) ||
-              m.distrito?.toLowerCase().includes(term) ||
-              cliente.includes(term) ||
-              almacenes.includes(term)
-            );
-          });
-        }
-        return filtradas;
-      })
+      return (
+        !term ||
+        m.nombre_muestra?.toLowerCase().includes(term) ||
+        m.productor?.toLowerCase().includes(term) ||
+        m.finca?.toLowerCase().includes(term) ||
+        m.distrito?.toLowerCase().includes(term) ||
+        cliente.includes(term) ||
+        almacenes.includes(term)
+      );
+    });
+
+    switch (this.filterMuestra) {
+      case 'completadas':
+        filtradas = filtradas.filter(m => m.completado);
+        break;
+      case 'sin-completar':
+        filtradas = filtradas.filter(m => !m.completado);
+        break;
+    }
+
+    this.muestrasFiltradas = filtradas;
+  }
+
+  getMuestrasFiltradas(): MuestraConInventario[] {
+    return this.muestrasFiltradas.filter(m =>
+      this.filtroTipo === 'admin' ? m.owned_by_store : !m.owned_by_store
     );
   }
 
-  aplicarFiltro(key: string) {
+  aplicarFiltroTab(key: string) {
     this.filterMuestra = key as FilterKey;
-    this.loadMuestras();
+    this.aplicarFiltro();
   }
 
   onSearchChange() {
-    this.loadMuestras();
+    this.aplicarFiltro();
   }
 
   openAsignarInventarioMuestra(muestra: MuestraConInventario): void {
@@ -153,7 +168,6 @@ export class MuestrasComponent {
         this.uiService.alert('error', 'Error', 'La muestra no tiene análisis asociado');
         return;
       }
-
       this.selectedMuestraId = m.id_muestra;
       this.showReport = true;
     });
@@ -167,10 +181,6 @@ export class MuestrasComponent {
   getVariedadesArray(variedades: string | string[]): string[] {
     if (Array.isArray(variedades)) return variedades;
     if (!variedades) return [];
-
-    return variedades
-      .split(',')
-      .map(v => v.trim())
-      .filter(Boolean);
+    return variedades.split(',').map(v => v.trim()).filter(Boolean);
   }
 }

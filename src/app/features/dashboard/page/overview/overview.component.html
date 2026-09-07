@@ -18,28 +18,35 @@
 
     <!-- Metric cards row -->
     <div class="grid grid-cols-4 gap-3">
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-package text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Stock total</p>
-        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ stockTotal | number:'1.0-0' }}<span class="text-base font-normal text-gray-400 ml-1">kg</span></p>
+        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ stockTotal | number:'1.0-0' }}<span
+            class="text-base font-normal text-gray-400 ml-1">kg</span></p>
         <p class="text-xs text-gray-400">suma de inventarios activos</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-emerald-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-building-store text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Stock tienda</p>
-        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ stockAdmin | number:'1.0-0' }}<span class="text-base font-normal text-gray-400 ml-1">kg</span></p>
+        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ stockAdmin | number:'1.0-0' }}<span
+            class="text-base font-normal text-gray-400 ml-1">kg</span></p>
         <p class="text-xs text-gray-400">lotes propios en almacén</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-blue-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-users text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Stock clientes</p>
-        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ stockClientes | number:'1.0-0' }}<span class="text-base font-normal text-gray-400 ml-1">kg</span></p>
+        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ stockClientes | number:'1.0-0' }}<span
+            class="text-base font-normal text-gray-400 ml-1">kg</span></p>
         <p class="text-xs text-gray-400">en custodia para clientes</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-violet-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-flame text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Lotes tostados activos</p>
         <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ totalLotesActivos }}</p>
@@ -47,7 +54,8 @@
           <ng-container *ngIf="lotesUrgentes > 0">{{ lotesUrgentes }} de tienda sin despachar</ng-container>
           <ng-container *ngIf="lotesUrgentes === 0">tienda al día</ng-container>
         </p>
-        <div class="absolute bottom-0 left-0 right-0 h-[3px]" [ngClass]="lotesUrgentes > 0 ? 'bg-amber-500' : 'bg-emerald-500'"></div>
+        <div class="absolute bottom-0 left-0 right-0 h-[3px]"
+          [ngClass]="lotesUrgentes > 0 ? 'bg-amber-500' : 'bg-emerald-500'"></div>
       </div>
     </div>
 
@@ -68,7 +76,8 @@
               </g>
               <circle cx="80" cy="80" r="44" fill="white"></circle>
               <text x="80" y="75" text-anchor="middle" font-size="11" fill="#9ca3af">Total</text>
-              <text x="80" y="93" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">{{ stockTotalVerdes | number:'1.0-0' }}</text>
+              <text x="80" y="93" text-anchor="middle" font-size="13" font-weight="600" fill="#111827">{{
+                stockTotalVerdes | number:'1.0-0' }}</text>
               <text x="80" y="107" text-anchor="middle" font-size="10" fill="#9ca3af">kg</text>
             </svg>
           </div>
@@ -78,7 +87,8 @@
             <!-- Barra de peso total -->
             <div class="bg-gray-50 rounded-xl px-4 py-3 mb-1">
               <p class="text-xs text-gray-400 mb-1">Peso total en inventario</p>
-              <p class="text-xl font-semibold text-gray-900">{{ stockTotalVerdes | number:'1.0-0' }} <span class="text-sm font-normal text-gray-400">kg</span></p>
+              <p class="text-xl font-semibold text-gray-900">{{ stockTotalVerdes | number:'1.0-0' }} <span
+                  class="text-sm font-normal text-gray-400">kg</span></p>
             </div>
             <div *ngFor="let c of clasificaciones" class="flex items-center gap-2.5">
               <div class="w-2.5 h-2.5 rounded-full shrink-0" [style.background]="c.color"></div>
@@ -99,13 +109,13 @@
         <p class="text-xs text-gray-400 mb-4">más de 7 días sin despachar · solo tienda</p>
         <div *ngIf="lotesTostadosUrgentes.length > 0; else sinUrgentes" class="flex flex-col gap-0 flex-1">
           <div *ngFor="let l of lotesTostadosUrgentes | slice:0:6"
-               class="flex justify-between items-center py-3 border-b border-gray-50 last:border-0">
+            class="flex justify-between items-center py-3 border-b border-gray-50 last:border-0">
             <div>
               <p class="text-sm font-medium text-gray-800">{{ l.id_lote_tostado | slice:0:10 | uppercase }}</p>
               <p class="text-xs text-gray-400 mt-0.5">{{ l.kg | number:'1.1-1' }} kg en inventario</p>
             </div>
             <span class="text-xs font-semibold px-2.5 py-1 rounded-full ml-2 shrink-0"
-                  [ngClass]="l.dias >= 30 ? 'bg-red-50 text-red-700' : l.dias >= 14 ? 'bg-orange-50 text-orange-700' : 'bg-amber-50 text-amber-700'">
+              [ngClass]="l.dias >= 30 ? 'bg-red-50 text-red-700' : l.dias >= 14 ? 'bg-orange-50 text-orange-700' : 'bg-amber-50 text-amber-700'">
               {{ l.dias }}d
             </span>
           </div>
@@ -129,31 +139,36 @@
     </div>
 
     <div class="grid grid-cols-4 gap-3">
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-clock text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Órdenes pendientes</p>
         <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ totalPendientes }}</p>
         <p class="text-xs text-gray-400">sin completar</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-amber-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-flame text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Tuestes pendientes</p>
         <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ tuestes.length }}</p>
         <p class="text-xs text-gray-400">órdenes activas en cola</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-red-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-check text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Completadas este mes</p>
         <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ pedidosCompletadosMes }}</p>
         <p class="text-xs text-gray-400">órdenes cerradas</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-emerald-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-trending-up text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Kg despachados</p>
-        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ kgDespachados | number:'1.0-0' }}<span class="text-base font-normal text-gray-400 ml-1">kg</span></p>
+        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ kgDespachados | number:'1.0-0' }}<span
+            class="text-base font-normal text-gray-400 ml-1">kg</span></p>
         <p class="text-xs text-gray-400">este mes</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-blue-500"></div>
       </div>
@@ -166,13 +181,13 @@
         <p class="text-xs text-gray-400 mb-4">Órdenes de tueste en espera</p>
         <div *ngIf="tuestes.length > 0; else sinTuestes" class="flex flex-col flex-1">
           <div *ngFor="let t of tuestes | slice:0:6"
-               class="flex justify-between items-center py-3.5 border-b border-gray-50 last:border-0">
+            class="flex justify-between items-center py-3.5 border-b border-gray-50 last:border-0">
             <div>
               <p class="text-sm font-medium text-gray-800">{{ t.cliente }}</p>
               <p class="text-xs text-gray-400 mt-0.5">{{ t.peso }} kg · {{ t.tueste }}</p>
             </div>
             <span class="text-xs font-semibold px-2.5 py-1 rounded-full ml-2 shrink-0"
-                  [ngClass]="getBadgeEntrega(t.entrega)">{{ t.entrega }}</span>
+              [ngClass]="getBadgeEntrega(t.entrega)">{{ t.entrega }}</span>
           </div>
         </div>
         <ng-template #sinTuestes>
@@ -188,14 +203,16 @@
         <p class="text-xs text-gray-400 mb-4">Recientes en el sistema</p>
         <div *ngIf="pedidos.length > 0; else sinPedidos" class="flex flex-col flex-1">
           <div *ngFor="let p of pedidos | slice:0:6"
-               class="flex justify-between items-center py-3.5 border-b border-gray-50 last:border-0">
+            class="flex justify-between items-center py-3.5 border-b border-gray-50 last:border-0">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
                 <span class="text-sm font-medium text-gray-800">#{{ p.id_pedido.slice(0,8).toUpperCase() }}</span>
                 <span class="text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0"
-                      [ngClass]="getBadgeEstado(p.estado_pedido)">{{ p.estado_pedido }}</span>
+                  [ngClass]="getBadgeEstado(p.estado_pedido)">{{ p.estado_pedido }}</span>
               </div>
-              <p class="text-xs text-gray-400 mt-0.5 truncate">{{ clientesMap[p.id_user] || '…' }} · {{ p.tipo_pedido }}</p>
+              <p class="text-xs text-gray-400 mt-0.5 truncate">
+                {{ p.owned_by_store ? 'FORTUNATO' : (clientesMap[p.id_user!] || '…') }} · {{ p.tipo_pedido }}
+              </p>
             </div>
             <span class="text-xs text-gray-400 shrink-0 pl-3">{{ getTimeAgo(p.fecha_registro) }}</span>
           </div>
@@ -216,32 +233,39 @@
     </div>
 
     <div class="grid grid-cols-4 gap-3">
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-weight text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Kg tostados / mes</p>
         <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">
-          {{ estadisticas ? (estadisticas.kilosTostadosCandela | number:'1.0-0') : '—' }}<span class="text-base font-normal text-gray-400 ml-1">kg</span>
+          {{ estadisticas ? (estadisticas.kilosTostadosCandela | number:'1.0-0') : '—' }}<span
+            class="text-base font-normal text-gray-400 ml-1">kg</span>
         </p>
         <p class="text-xs text-gray-400">producción mensual</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-emerald-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-chart-bar text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Batch promedio</p>
         <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">
-          {{ estadisticas ? (estadisticas.pesoPromedioPorBatch | number:'1.1-1') : '—' }}<span class="text-base font-normal text-gray-400 ml-1">kg</span>
+          {{ estadisticas ? (estadisticas.pesoPromedioPorBatch | number:'1.1-1') : '—' }}<span
+            class="text-base font-normal text-gray-400 ml-1">kg</span>
         </p>
         <p class="text-xs text-gray-400">peso prom por batch</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-blue-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-stack text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Batches totales</p>
-        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ estadisticas ? estadisticas.batchTostadosCandela : '—' }}</p>
+        <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ estadisticas ?
+          estadisticas.batchTostadosCandela : '—' }}</p>
         <p class="text-xs text-gray-400">este mes</p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-violet-500"></div>
       </div>
-      <div class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
+      <div
+        class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-flame text-gray-200 text-2xl mb-3 block"></i>
         <p class="text-xs text-gray-400 font-medium mb-2">Balón de gas</p>
         <p class="text-3xl font-semibold text-gray-400 leading-none mb-2">—</p>
@@ -266,7 +290,8 @@
               <!-- Fortunato slice -->
               <path [attr.d]="getDistSlice(getPctFortunato(), 0)" fill="#14b8a6" stroke="white" stroke-width="2"></path>
               <!-- Clientes slice -->
-              <path [attr.d]="getDistSlice(getPctClientes(), getPctFortunato())" fill="#60a5fa" stroke="white" stroke-width="2"></path>
+              <path [attr.d]="getDistSlice(getPctClientes(), getPctFortunato())" fill="#60a5fa" stroke="white"
+                stroke-width="2"></path>
               <!-- Donut hole -->
               <circle cx="80" cy="80" r="44" fill="white"></circle>
               <text x="80" y="75" text-anchor="middle" font-size="11" fill="#9ca3af">Total</text>
@@ -311,28 +336,32 @@
               <p class="text-sm font-medium text-gray-700">Prom batch por pedido</p>
               <p class="text-xs text-gray-400 mt-0.5">eficiencia por orden</p>
             </div>
-            <p class="text-2xl font-semibold text-gray-900">{{ estadisticas ? (estadisticas.promedioBatchPorPedido | number:'1.1-1') : '—' }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ estadisticas ? (estadisticas.promedioBatchPorPedido |
+              number:'1.1-1') : '—' }}</p>
           </div>
           <div class="flex justify-between items-center py-4 border-b border-gray-50">
             <div>
               <p class="text-sm font-medium text-gray-700">Prom batch por día tostado</p>
               <p class="text-xs text-gray-400 mt-0.5">intensidad diaria</p>
             </div>
-            <p class="text-2xl font-semibold text-gray-900">{{ estadisticas ? (estadisticas.promedioBatchPorDiaTostado | number:'1.1-1') : '—' }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ estadisticas ? (estadisticas.promedioBatchPorDiaTostado |
+              number:'1.1-1') : '—' }}</p>
           </div>
           <div class="flex justify-between items-center py-4 border-b border-gray-50">
             <div>
               <p class="text-sm font-medium text-gray-700">Prom batch totales por día</p>
               <p class="text-xs text-gray-400 mt-0.5">incluyendo días sin tueste</p>
             </div>
-            <p class="text-2xl font-semibold text-gray-900">{{ estadisticas ? (estadisticas.promedioBatchPorDiaTotales | number:'1.1-1') : '—' }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ estadisticas ? (estadisticas.promedioBatchPorDiaTotales |
+              number:'1.1-1') : '—' }}</p>
           </div>
           <div class="flex justify-between items-center py-4">
             <div>
               <p class="text-sm font-medium text-gray-700">Batches tienda Candela</p>
               <p class="text-xs text-gray-400 mt-0.5">producción propia</p>
             </div>
-            <p class="text-2xl font-semibold text-gray-900">{{ estadisticas ? estadisticas.batchTostadosCandela : '—' }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ estadisticas ? estadisticas.batchTostadosCandela : '—' }}
+            </p>
           </div>
         </div>
       </div>
@@ -344,9 +373,7 @@
   <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-100 mt-3">
     <span class="text-xs text-gray-400 mr-1">{{ paginaActual + 1 }} / {{ totalPaginas }}</span>
     <div class="flex gap-1.5 mr-1">
-      <button *ngFor="let p of paginas; let i = index"
-        (click)="irA(i)"
-        [attr.aria-label]="'Ir a página ' + (i + 1)"
+      <button *ngFor="let p of paginas; let i = index" (click)="irA(i)" [attr.aria-label]="'Ir a página ' + (i + 1)"
         class="w-2 h-2 rounded-full border-none cursor-pointer transition-all duration-200 p-0"
         [ngClass]="i === paginaActual ? 'bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'">
       </button>

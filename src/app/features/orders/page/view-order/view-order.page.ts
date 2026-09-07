@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { LucideAngularModule, ArrowLeft, Eye, Download} from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, Eye, Download } from 'lucide-angular';
 
 import { PedidoService } from '../../service/orders.service';
 import { OrderBolsaService } from '../../service/order-bolsa.service';
@@ -89,7 +89,6 @@ export class ViewOrderPage implements OnInit {
 
     this.userSvc.getUsers().subscribe(users => {
       this.clientes = users.filter(u => u.rol === 'cliente');
-      const admins = users.filter(u => u.rol === 'admin');
 
       this.almacenService.getAlmacenesActivos().subscribe(almacenes => {
         this.almacenes = almacenes;
@@ -98,7 +97,7 @@ export class ViewOrderPage implements OnInit {
           this.model = { ...pedido, id_almacen: pedido.id_almacen || '' };
           this.isMaquila = pedido.tipo_pedido === 'Maquila';
           this.isDespacho = pedido.tipo_pedido === 'OrdenDespacho';
-          this.isOrdenTueste = pedido.tipo_pedido === 'Orden Tueste'; // 👈 nuevo
+          this.isOrdenTueste = pedido.tipo_pedido === 'Orden Tueste';
 
           if (this.isMaquila) {
             this.loadMaquilaExtras();
@@ -108,9 +107,7 @@ export class ViewOrderPage implements OnInit {
             this.loadTuesteExtras();
           } else {
             this.loteSvc.getLotesVerdesConInventario().subscribe(lotes => {
-              this.lotes = lotes.filter(lote =>
-                admins.some(admin => admin.id_user === lote.id_user)
-              );
+              this.lotes = lotes.filter(lote => lote.owned_by_store);
               this.onLoteChange();
             });
           }

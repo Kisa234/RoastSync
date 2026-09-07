@@ -81,16 +81,19 @@ export class ReportLoteTostadoComponent implements OnInit {
       .subscribe(async data => {
         this.tuestes = data.sort((a, b) => a.num_batch - b.num_batch);
 
-        // Resolver nombre del cliente
-        if (this.tuestes[0]?.id_cliente) {
+        // Resolver nombre del cliente (o "FORTUNATO" si es de tienda)
+        const primerTueste = this.tuestes[0];
+        if (primerTueste?.id_cliente) {
           try {
             const user = await firstValueFrom(
-              this.userService.getUserById(this.tuestes[0].id_cliente)
+              this.userService.getUserById(primerTueste.id_cliente)
             );
-            this.clienteNombre = user?.nombre_comercial || user?.nombre || this.tuestes[0].id_cliente;
+            this.clienteNombre = user?.nombre_comercial || user?.nombre || primerTueste.id_cliente;
           } catch {
-            this.clienteNombre = this.tuestes[0].id_cliente;
+            this.clienteNombre = primerTueste.id_cliente;
           }
+        } else if (primerTueste?.owned_by_store) {
+          this.clienteNombre = 'FORTUNATO';
         }
 
         this.loadFicha();
@@ -200,47 +203,90 @@ export class ReportLoteTostadoComponent implements OnInit {
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     const contentWidth = pageWidth - margin * 2;
+    const brandRed: [number, number, number] = [237, 40, 55];
+
+    // Barra roja de marca arriba de cada página — igual que en
+    // report-lote.component.ts. Se llama una vez para la portada y de
+    // nuevo en el didDrawPage de la tabla, para que aparezca también en
+    // las páginas que arma automáticamente el autoTable al paginar.
+    const drawTopBar = () => {
+      pdf.setFillColor(...brandRed);
+      pdf.rect(0, 0, pageWidth, 2.5, 'F');
+    };
 
     // ── LOGOS ──
+    // Los 3 logos se cargan como PNG (fetch → base64) y se recomprimen a
+    // JPEG con this.toJpeg() antes de meterlos al PDF: PNG es sin pérdida
+    // y era lo que más pesaba el archivo final, sin necesitarlo (son
+    // logos con fondo blanco, no íconos con transparencia real).
     this.uiService.showProgress('Cargando logos...', 15);
     let logoIzq = '', logoDer = '', logoFinal = '';
     let dimIzq = { w: 0, h: 0 }, dimDer = { w: 0, h: 0 }, dimFinal = { w: 0, h: 0 };
     try {
-      logoIzq = await this.imageToBase64('assets/img/lo-bueno-negro-rojo.png');
-      logoDer = await this.imageToBase64('assets/img/logotipo.png');
-      logoFinal = await this.imageToBase64('assets/img/logo-negro.png');
-      dimIzq = await this.getImgDimensions(logoIzq, 50, 14);
-      dimDer = await this.getImgDimensions(logoDer, 50, 14);
-      dimFinal = await this.getImgDimensions(logoFinal, 40, 12);
+      // Mismos archivos y mismos tamaños que en report-lote.component.ts,
+      // para que ambos reportes se vean consistentes (antes esta página
+      // usaba otros logos más chicos: lo-bueno-negro-rojo.png/logotipo.png
+      // a 50x14, y el triángulo del footer sin el aro "COFFEE ROASTER").
+      logoIzq = await this.toJpeg(await this.imageToBase64('assets/img/lo-buenos-negro.png'));
+      logoDer = await this.toJpeg(await this.imageToBase64('assets/img/fortunato-logo.png'));
+      logoFinal = await this.toJpeg(await this.imageToBase64('assets/img/logo-negro.png'));
+      dimIzq = await this.getImgDimensions(logoIzq, 58, 32);
+      dimDer = await this.getImgDimensions(logoDer, 65, 22);
+      dimFinal = await this.getImgDimensions(logoFinal, 40, 16);
     } catch (e) {
       console.warn('Logos no cargados', e);
     }
 
+    drawTopBar();
+
     this.uiService.showProgress('Construyendo encabezado...', 35);
-    const logoH = 14;
-    if (logoIzq) pdf.addImage(logoIzq, 'PNG', margin, margin + (logoH - dimIzq.h) / 2, dimIzq.w, dimIzq.h);
-    if (logoDer) pdf.addImage(logoDer, 'PNG', pageWidth - margin - dimDer.w, margin + (logoH - dimDer.h) / 2, dimDer.w, dimDer.h);
+    // logoH dinámico (antes fijo en 14) — con los logos más grandes de
+    // arriba, un alto fijo de 14 los recortaba contra la línea roja.
+    const logoH = Math.max(dimIzq.h, dimDer.h, 14);
+    if (logoIzq) pdf.addImage(logoIzq, 'JPEG', margin, margin + (logoH - dimIzq.h) / 2, dimIzq.w, dimIzq.h);
+    if (logoDer) pdf.addImage(logoDer, 'JPEG', pageWidth - margin - dimDer.w, margin + (logoH - dimDer.h) / 2, dimDer.w, dimDer.h);
 
     let y = margin + logoH + 6;
-    pdf.setDrawColor(200, 200, 200);
-    pdf.setLineWidth(0.3);
+    // Línea roja (antes gris) debajo de los logos, igual que en report-lote.
+    pdf.setDrawColor(...brandRed);
+    pdf.setLineWidth(0.4);
     pdf.line(margin, y - 2, pageWidth - margin, y - 2);
 
     pdf.setFontSize(18); pdf.setFont('helvetica', 'bold');
     pdf.text('Reporte Lote Tostado', margin, y + 6);
     y += 14;
 
-    pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'bold'); pdf.text('Cliente:', margin, y);
-    pdf.setFont('helvetica', 'normal'); pdf.text(` ${this.clienteNombre}`, margin + 14, y); y += 5;
-    pdf.setFont('helvetica', 'bold'); pdf.text('Lote:', margin, y);
-    pdf.setFont('helvetica', 'normal'); pdf.text(` ${this.id}`, margin + 10, y); y += 5;
-    pdf.setFont('helvetica', 'bold'); pdf.text('Fecha:', margin, y);
-    pdf.setFont('helvetica', 'normal');
     const fecha = this.tuestes[0]?.fecha_tueste
       ? new Date(this.tuestes[0].fecha_tueste).toLocaleDateString('es-PE') : '';
-    pdf.text(` ${fecha}`, margin + 12, y);
-    y += 10;
+
+    // Antes: "Cliente:", "Lote:", "Fecha:" como texto suelto uno debajo del
+    // otro. Ahora, mismo estilo que report-lote.component.ts: una tabla de
+    // 2 filas (etiqueta arriba, valor abajo) con bordes, cada campo en su
+    // propio "cuadro" en vez de todo el texto flotando junto.
+    const camposHeader: [string, string][] = [
+      ['Cliente', this.clienteNombre || 'N/A'],
+      ['Lote', this.id || 'N/A'],
+      ['Fecha', fecha || 'N/A'],
+    ];
+
+    autoTable(pdf, {
+      startY: y,
+      margin: { left: margin, right: margin },
+      body: [
+        camposHeader.map(([label]) => label),
+        camposHeader.map(([, value]) => value),
+      ],
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2.5, valign: 'middle' },
+      didParseCell: (data) => {
+        if (data.row.index === 0) {
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.styles.fillColor = [245, 245, 245];
+          data.cell.styles.textColor = [80, 80, 80];
+        }
+      },
+    });
+    y = (pdf as any).lastAutoTable.finalY + 8;
 
     // ── DATOS GENERALES ──
     this.uiService.showProgress('Agregando datos generales...', 55);
@@ -302,10 +348,16 @@ export class ReportLoteTostadoComponent implements OnInit {
       headStyles: { fillColor: [50, 50, 50], textColor: 255, fontSize: 7, fontStyle: 'bold', halign: 'center' },
       columnStyles: { 0: { cellWidth: 8 }, 2: { halign: 'left' } },
       didDrawPage: () => {
+        // Barra roja arriba (por si el autoTable paginó y esta es una
+        // página nueva que no pasó por el bloque de logos de arriba) y
+        // abajo, igual que en report-lote.component.ts.
+        drawTopBar();
+        pdf.setFillColor(...brandRed);
+        pdf.rect(0, pageHeight - 2.5, pageWidth, 2.5, 'F');
         pdf.setFontSize(8); pdf.setFont('helvetica', 'normal');
-        pdf.text(`Página ${pdf.getNumberOfPages()}`, pageWidth - margin, pageHeight - 6, { align: 'right' });
+        pdf.text(`Página ${pdf.getNumberOfPages()}`, pageWidth - margin, 8, { align: 'right' });
         if (logoFinal) {
-          pdf.addImage(logoFinal, 'PNG', (pageWidth - dimFinal.w) / 2, pageHeight - margin - dimFinal.h, dimFinal.w, dimFinal.h);
+          pdf.addImage(logoFinal, 'JPEG', (pageWidth - dimFinal.w) / 2, pageHeight - margin - dimFinal.h - 6, dimFinal.w, dimFinal.h);
         }
       }
     });
@@ -337,6 +389,35 @@ export class ReportLoteTostadoComponent implements OnInit {
     });
   }
 
+  // Recomprime una imagen (PNG cargado de assets) como JPEG con fondo
+  // blanco, y de paso la reduce si viene más grande de lo que el PDF
+  // necesita. Estos logos terminan impresos a ~50x14mm — si el PNG de
+  // origen es una exportación a resolución completa (p.ej. 2000px de
+  // ancho), lo estabas empaquetando tal cual, muchísimo más grande de lo
+  // que se ve. maxDim=900px alcanza y sobra de nitidez para ese tamaño
+  // impreso, y ya sobre eso además se recomprime a JPEG (PNG es sin
+  // pérdida, así que pesaba varias veces más de lo necesario).
+  private toJpeg(dataUri: string, quality = 0.85, maxDim = 900): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d')!;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = dataUri;
+    });
+  }
+
   private async imageToBase64(url: string): Promise<string> {
     const response = await fetch(url);
     const blob = await response.blob();
@@ -354,11 +435,13 @@ export class ReportLoteTostadoComponent implements OnInit {
     const batch = String(t.num_batch ?? '');
 
     // 1) Traer cliente antes de dibujar
-    let cliente = '';
-    try {
-      const user = await firstValueFrom(this.userService.getUserById(t.id_cliente));
-      cliente = user?.nombre_comercial || user?.nombre || '';
-    } catch { }
+    let cliente = 'FORTUNATO';
+    if (t.id_cliente) {
+      try {
+        const user = await firstValueFrom(this.userService.getUserById(t.id_cliente));
+        cliente = user?.nombre_comercial || user?.nombre || '';
+      } catch { }
+    }
 
     // 2) Lienzo más grande (ancho ↑, altura ↑)
     const W = 1400, H = 360, dpr = window.devicePixelRatio || 1;
@@ -423,5 +506,3 @@ export class ReportLoteTostadoComponent implements OnInit {
     this.loadFicha();
   }
 }
-
-

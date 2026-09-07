@@ -41,6 +41,7 @@ export class ReportLoteComponent implements OnInit {
 
   muestra: Muestra = {
     id_muestra: '',
+    owned_by_store: false,
     productor: '',
     finca: '',
     distrito: '',

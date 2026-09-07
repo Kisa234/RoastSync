@@ -52,6 +52,7 @@ export class HistoricBolsaComponent implements OnInit {
     cantidad: 0,
     fecha_embolsado: new Date(),
     eliminado: false,
+    owned_by_store: false,
     inventarios: []
   };
 
@@ -67,7 +68,7 @@ export class HistoricBolsaComponent implements OnInit {
     private readonly historialService: HistorialService,
     private readonly pedidoSvc: PedidoService,
     private readonly enviosSvc: EnviosService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.bolsaId = this.route.snapshot.paramMap.get('id_bolsa') || '';
@@ -153,9 +154,6 @@ export class HistoricBolsaComponent implements OnInit {
     });
   }
 
-  get clienteId(): string {
-    return this.bolsa.id_user || '';
-  }
 
   get loteVerdeId(): string {
     return this.loteTostado?.id_lote || '';
@@ -167,6 +165,14 @@ export class HistoricBolsaComponent implements OnInit {
 
   get subtotalGramos(): number {
     return (this.bolsa.gramaje || 0) * (this.bolsa.cantidad || 0);
+  }
+
+  get clienteId(): string {
+    return this.bolsa.owned_by_store ? '' : (this.bolsa.id_user || '');
+  }
+
+  get esDeTienda(): boolean {
+    return !!this.bolsa.owned_by_store;
   }
 
   openPedido(idPedido: string | null | undefined): void {

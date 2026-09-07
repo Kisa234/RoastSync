@@ -115,8 +115,10 @@ export class LoteTostadoComponent {
     if (this.filterTextTostado.trim()) {
       const term = this.filterTextTostado.toLowerCase();
       result = result.filter(t => {
-        const user = this.usuarios.find(u => u.id_user === t.id_user);
-        const cliente = (user?.nombre_comercial || user?.nombre || '').toLowerCase();
+        const cliente = t.owned_by_store
+          ? 'fortunato'
+          : (this.usuarios.find(u => u.id_user === t.id_user)?.nombre_comercial ||
+             this.usuarios.find(u => u.id_user === t.id_user)?.nombre || '').toLowerCase();
         const almacenes = (t.inventarioLotesTostados || [])
           .map(inv => inv.almacen?.nombre?.toLowerCase() || '')
           .join(' ');
@@ -149,12 +151,9 @@ export class LoteTostadoComponent {
 
     this.tostadosFiltrados = result;
 
-    // Costo solo cuenta lotes admin, activos, que hacen match con los filtros de arriba
+    // Costo solo cuenta lotes de tienda, activos, que hacen match con los filtros de arriba
     this.costoInventario = result
-      .filter(t => {
-        const user = this.usuarios.find(u => u.id_user === t.id_user);
-        return user?.rol === 'admin' && !t.eliminado;
-      })
+      .filter(t => t.owned_by_store && !t.eliminado)
       .reduce((total, t) => {
         const pesoInventarioKg = this.getPesoInventarioTostado(t) / 1000;
         const costo = Number(t.lote?.costo || 0);
@@ -163,10 +162,9 @@ export class LoteTostadoComponent {
   }
 
   getLotesFiltrados(): LoteTostadoConInventario[] {
-    return this.tostadosFiltrados.filter(t => {
-      const user = this.usuarios.find(u => u.id_user === t.id_user);
-      return user?.rol === this.filtroTipo;
-    });
+    return this.tostadosFiltrados.filter(t =>
+      this.filtroTipo === 'admin' ? t.owned_by_store : !t.owned_by_store
+    );
   }
 
   onSearchChange() {
@@ -228,10 +226,14 @@ export class LoteTostadoComponent {
       : formatDate(new Date(), 'dd/MM/yyyy', 'es-PE');
 
     let cliente = '';
-    try {
-      const user = await firstValueFrom(this.userService.getUserById(t.id_user));
-      cliente = user?.nombre_comercial || user?.nombre || '';
-    } catch { }
+    if (t.owned_by_store) {
+      cliente = 'FORTUNATO';
+    } else if (t.id_user) {
+      try {
+        const user = await firstValueFrom(this.userService.getUserById(t.id_user));
+        cliente = user?.nombre_comercial || user?.nombre || '';
+      } catch { }
+    }
 
     const W = 1400, H = 320, dpr = window.devicePixelRatio || 1;
     const canvas = document.createElement('canvas');
@@ -283,8 +285,10 @@ export class LoteTostadoComponent {
 
   exportLotesTostados() {
     const data = this.getLotesFiltrados().map(t => {
-      const user = this.usuarios.find(u => u.id_user === t.id_user);
-      const cliente = user?.nombre_comercial || user?.nombre || 'Desconocido';
+      const cliente = t.owned_by_store
+        ? 'FORTUNATO'
+        : (this.usuarios.find(u => u.id_user === t.id_user)?.nombre_comercial ||
+           this.usuarios.find(u => u.id_user === t.id_user)?.nombre || 'Desconocido');
       const almacenes = (t.inventarioLotesTostados || [])
         .map(inv => `${inv.almacen?.nombre || 'N/A'}: ${inv.cantidad_kg} gr`)
         .join(' | ');

@@ -39,17 +39,17 @@
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
-            <select [(ngModel)]="orden.id_user" (ngModelChange)="onClienteChange()" [disabled]="mode === 'edit'"
+            <select [(ngModel)]="clienteSeleccionado" (ngModelChange)="onClienteChange()" [disabled]="mode === 'edit'"
               class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E] disabled:bg-[#F9F9F9]">
               <option value="" disabled>Selecciona cliente</option>
-              <option *ngFor="let u of clientes" [value]="u.id_user">{{ u.nombre }}</option>
+              <option *ngFor="let u of clientesConTienda" [value]="u.id_user">{{ u.nombre }}</option>
             </select>
           </div>
 
           <div>
             <label class="block text-gray-700 text-sm mb-1">Lote *</label>
             <select [(ngModel)]="orden.id_lote" (ngModelChange)="onLoteChange()"
-              [disabled]="!orden.id_user || mode === 'edit'"
+              [disabled]="!clienteSeleccionado || mode === 'edit'"
               class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#B8672E] disabled:bg-[#F9F9F9]">
               <option value="" disabled>Selecciona lote</option>
               <option *ngFor="let l of lotes" [value]="l.id_lote">{{ l.id_lote }}</option>

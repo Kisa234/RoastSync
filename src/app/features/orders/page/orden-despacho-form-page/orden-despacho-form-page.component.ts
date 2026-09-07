@@ -136,7 +136,7 @@ export class OrdenDespachoFormPage implements OnInit {
       clientes: this.userSvc.getUsers().pipe(catchError(() => of([]))),
       almacenes: this.almacenSvc.getAlmacenesActivos().pipe(catchError(() => of([]))),
     }).subscribe(({ clientes, almacenes }) => {
-      this.clientes = clientes;
+      this.clientes = clientes.filter(u => u.rol === 'cliente');
       this.almacenes = almacenes;
       this.catalogosListos = true;
 

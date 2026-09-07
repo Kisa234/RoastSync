@@ -184,7 +184,9 @@ export class OrdersPage implements OnInit {
 
     this.filteredPedidos = this.pedidosBase.filter((p) => {
       const lote = `${p.id_lote ?? ''} ${p.id_lote_tostado ?? ''}`.toLowerCase();
-      const usuario = `${p.usuario_nombre ?? p.id_user ?? ''}`.toLowerCase();
+      const usuario = p.owned_by_store
+        ? 'fortunato'
+        : `${p.usuario_nombre ?? p.id_user ?? ''}`.toLowerCase();
       const tipoPedido = `${p.tipo_pedido ?? ''}`.toLowerCase();
 
       const matchesSearch = !term || lote.includes(term) || usuario.includes(term);

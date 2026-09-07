@@ -56,4 +56,16 @@ export class RoastsService {
     });
   }
 
+  getOwnedByStore(incluirEliminados: boolean = false): Observable<Tueste[]> {
+    return this.http.get<Tueste[]>(`${this.baseUrl}/owned-by-store`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
+  }
+
+  getByUser(id_cliente: string, incluirEliminados: boolean = false): Observable<Tueste[]> {
+    return this.http.get<Tueste[]>(`${this.baseUrl}/user/${id_cliente}`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
+  }
+
 }

@@ -66,4 +66,15 @@ export class LoteService {
     );
   }
 
+  getByUser(id_user: string, incluirEliminados: boolean = false): Observable<Lote[]> {
+    return this.http.get<Lote[]>(`${this.baseUrl}/user/${id_user}`, {
+      params: { incluirEliminados: incluirEliminados.toString() }
+    });
+  }
+
+  getLotesOwnedByStore(incluirEliminados: boolean = false): Observable<Lote[]> {
+    return this.http.get<Lote[]>(`${this.baseUrl}/owned-by-store`, {
+      params: { incluirEliminados: incluirEliminados.toString() }
+    });
+  }
 }

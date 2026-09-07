@@ -6,6 +6,7 @@ export interface Bolsa {
   molienda: string;
   cantidad: number;
   fecha_embolsado: string | Date;
+  owned_by_store: boolean;
   id_user?: string;
   comentario?: string;
   eliminado: boolean;

@@ -81,13 +81,14 @@ export class EditLoteComponent implements OnInit {
 
   selectedDeptoId?: string;
   selecterDistId?: string
+  clienteNombreDisplay = '';
 
   @Output() selection = new EventEmitter<{ depto: Departamento; distrito: Distrito }>();
 
 
   ngOnInit(): void {
     // 1. Cargar datos que no dependen del lote
-    this.userSvc.getUsers().subscribe(u => this.clientes = u);
+    // (ya no cargamos "clientes" — el dueño del lote no se edita después de creado)
     this.variedadSvc.getAllVariedades().subscribe(variedades => {
       this.variedades = variedades;
     });
@@ -100,14 +101,22 @@ export class EditLoteComponent implements OnInit {
       this.loteSvc.getById(this.loteId).subscribe(lote => {
         this.model = { ...lote };
         this.model.proceso = this.model.proceso.toUpperCase();
-        // 4. Si el lote tiene departamento, cargar sus distritos
+        this.clienteNombreDisplay = lote.owned_by_store
+          ? 'FORTUNATO (Tienda)'
+          : (lote.id_user ?? '—');
+
+        if (lote.id_user && !lote.owned_by_store) {
+          this.userSvc.getUserById(lote.id_user).subscribe(u => {
+            this.clienteNombreDisplay = u?.nombre_comercial || u?.nombre || lote.id_user!;
+          });
+        }
+
         if (this.model.departamento) {
           const dept = this.departamentos.find(d => d.nombre === this.model.departamento);
           if (dept) {
             this.ubigeoSvc.getDistritoByDepartamento(dept.codigo)
               .subscribe(provs => {
                 this.distritos = provs;
-                // El distrito del modelo ya está asignado, solo cargamos la lista
               });
           }
         }
@@ -130,7 +139,7 @@ export class EditLoteComponent implements OnInit {
 
   saveManual() {
     if (this.model.peso <= 0) {
-      this.uiSvc.alert('error', 'error','El peso del lote debe ser mayor a cero.', 5000);
+      this.uiSvc.alert('error', 'error', 'El peso del lote debe ser mayor a cero.', 5000);
       return;
     }
 
@@ -142,10 +151,10 @@ export class EditLoteComponent implements OnInit {
       cancelText: 'Cancelar'
     }).then(res => {
       if (!res.confirmed) return;
-      
+
       const payload = {
         ...this.model,
-         hcomentario: res.value ?? ''
+        hcomentario: res.value ?? ''
       };
 
       this.loteSvc.update(this.model.id_lote, payload).subscribe(l => {
