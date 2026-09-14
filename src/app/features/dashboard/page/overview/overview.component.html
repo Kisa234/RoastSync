@@ -48,11 +48,10 @@
       <div
         class="bg-white border border-gray-100 rounded-2xl p-5 relative overflow-hidden hover:shadow-sm transition-shadow">
         <i class="ti ti-flame text-gray-200 text-2xl mb-3 block"></i>
-        <p class="text-xs text-gray-400 font-medium mb-2">Lotes tostados activos</p>
+        <p class="text-xs text-gray-400 font-medium mb-2">Lotes tostados en Stock</p>
         <p class="text-3xl font-semibold text-gray-900 leading-none mb-2">{{ totalLotesActivos }}</p>
         <p class="text-xs" [ngClass]="lotesUrgentes > 0 ? 'text-amber-500' : 'text-emerald-500'">
           <ng-container *ngIf="lotesUrgentes > 0">{{ lotesUrgentes }} de tienda sin despachar</ng-container>
-          <ng-container *ngIf="lotesUrgentes === 0">tienda al día</ng-container>
         </p>
         <div class="absolute bottom-0 left-0 right-0 h-[3px]"
           [ngClass]="lotesUrgentes > 0 ? 'bg-amber-500' : 'bg-emerald-500'"></div>
@@ -63,7 +62,10 @@
     <div class="grid gap-3 flex-1" style="grid-template-columns: minmax(0,1.7fr) minmax(0,1fr)">
 
       <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
-        <p class="text-sm font-semibold text-gray-800 mb-0.5">Clasificación — lotes verdes</p>
+        <div class="flex items-center justify-between mb-0.5">
+          <p class="text-sm font-semibold text-gray-800">Clasificación — lotes verdes</p>
+
+        </div>
         <p class="text-xs text-gray-400 mb-4">kg disponibles por clasificación</p>
 
         <div *ngIf="clasificaciones.length > 0; else noClasif" class="flex gap-6 flex-1">
