@@ -14,6 +14,7 @@ export interface InventorySearchRow {
   reference: string;
   tipo: InventoryUiTipo;
   userId?: string;
+  ownedByStore?: boolean;
   stockTotal: number;
   almacenes: InventoryByAlmacen[];
 }

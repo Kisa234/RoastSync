@@ -46,15 +46,15 @@
             </select>
             <p *ngIf="userLote" class="text-xs text-gray-500 mt-1">
               Lote perteneciente a: <span class="font-medium">{{ userLote.nombre_comercial || userLote.nombre }}</span>
-              ({{ userLote.rol }})
             </p>
           </div>
 
           <div>
-            <label class="block text-gray-700 text-sm mb-1">Cliente *</label>
-            <select-search [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
-              valueField="id_user" placeholder="Seleccionar cliente"
-              [disabled]="userLote && userLote.rol !== 'admin'"></select-search>
+            <label class="block text-gray-700 text-sm mb-1">Cliente / Tienda *</label>
+            <select-search [ngModel]="model.owned_by_store ? STORE_SENTINEL : (model.id_user ?? '')"
+              (ngModelChange)="onClienteChange($event)" [items]="loteEsDeTienda ? clientesConTienda : clientes"
+              displayField="nombre" secondDisplayField="nombre_comercial" valueField="id_user"
+              placeholder="Seleccionar cliente" [disabled]="!loteEsDeTienda && !!userLote"></select-search>
           </div>
 
           <div>

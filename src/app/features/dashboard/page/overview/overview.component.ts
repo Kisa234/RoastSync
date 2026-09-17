@@ -4,7 +4,7 @@ import { forkJoin } from 'rxjs';
 import { differenceInCalendarDays, format, startOfMonth, endOfMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-import { DashboardService } from '../../service/dashboard.service';
+import { DashboardService, StockVerdeResponse } from '../../service/dashboard.service';
 import { LoteTostadoService } from '../../../inventory/lotes-tostados/service/lote-tostado.service';
 import { UserService } from '../../../users/service/users-service.service';
 import { PedidoService } from '../../../orders/service/orders.service';
@@ -58,7 +58,7 @@ export class OverviewComponent implements OnInit {
   fechaHoy = '';
   mesActual = '';
 
-  // Página 1 — Inventario
+  // Página 1 — Inventario (Stock = café VERDE; el resto de esta sección sigue siendo tostado)
   stockTotal = 0;
   stockAdmin = 0;
   stockClientes = 0;
@@ -81,10 +81,12 @@ export class OverviewComponent implements OnInit {
   estadisticas: EstadisticasTueste | null = null;
 
   private readonly CLASIFICACION_COLORS: Record<string, string> = {
-    'Especialidad': '#1D9E75',
-    'Premium':      '#378ADD',
-    'Comercial':    '#EF9F27',
-    'Muestra':      '#888780',
+    'Selecto': '#1D9E75',
+    'Especial': '#378ADD',
+    'Exclusivo': '#8B5CF6',
+    'Clasico': '#EF9F27',
+    'Gourmet': '#EC4899',
+    // cualquier otro valor (incl. "Sin clasificar") cae al gris por defecto
   };
 
   constructor(
@@ -92,7 +94,7 @@ export class OverviewComponent implements OnInit {
     private loteTostadoSvc: LoteTostadoService,
     private userSvc: UserService,
     private pedidoSvc: PedidoService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.fechaHoy = format(new Date(), "EEEE d 'de' MMMM", { locale: es });
@@ -108,13 +110,13 @@ export class OverviewComponent implements OnInit {
     forkJoin({
       lotesTostados: this.loteTostadoSvc.getLotesTostadosConInventario(),
       clasificacion: this.dashboardSvc.getStockLotesPorClasificacion(),
-      pedidos:       this.pedidoSvc.getPedidos(),
-      tuestes:       this.pedidoSvc.getPedidosOrdenTueste(),
-      estadisticas:  this.pedidoSvc.getEstadisticasTueste(desde, hasta),
-      usuarios:      this.userSvc.getUsers(),
+      pedidos: this.pedidoSvc.getPedidos(),
+      tuestes: this.pedidoSvc.getPedidosOrdenTueste(),
+      estadisticas: this.pedidoSvc.getEstadisticasTueste(desde, hasta),
+      usuarios: this.userSvc.getUsers(),
     }).subscribe({
       next: ({ lotesTostados, clasificacion, pedidos, tuestes, estadisticas, usuarios }) => {
-        this.procesarInventario(lotesTostados, usuarios);
+        this.procesarInventarioTostado(lotesTostados, usuarios);
         this.procesarClasificacion(clasificacion);
         this.procesarPedidos(pedidos, usuarios, hoy);
         this.procesarTuestes(tuestes, usuarios);
@@ -124,13 +126,12 @@ export class OverviewComponent implements OnInit {
     });
   }
 
-  // ── Inventario ─────────────────────────────────────────────────
+  // ── Inventario tostado (solo para "Lotes tostados activos" y "urgentes") ──
 
-  private procesarInventario(lotes: LoteTostadoConInventario[], usuarios: User[]): void {
+  private procesarInventarioTostado(lotes: LoteTostadoConInventario[], usuarios: User[]): void {
     const lotesActivos = lotes.filter(l => !l.eliminado && this.getKgInventario(l) > 0);
     this.totalLotesActivos = lotesActivos.length;
 
-    let total = 0, admin = 0, clientes = 0;
     const urgentes: LoteUrgente[] = [];
 
     for (const lote of lotesActivos) {
@@ -138,10 +139,6 @@ export class OverviewComponent implements OnInit {
       const user = usuarios.find(u => u.id_user === lote.id_user);
       const rol = user?.rol ?? 'desconocido';
       const dias = differenceInCalendarDays(new Date(), new Date(lote.fecha_tostado));
-
-      total += kg;
-      if (rol === 'admin') admin += kg;
-      else clientes += kg;
 
       // Urgentes: solo lotes de tienda (admin) con más de 7 días sin despachar
       if (rol === 'admin' && dias >= 7) {
@@ -154,11 +151,8 @@ export class OverviewComponent implements OnInit {
       }
     }
 
-    this.stockTotal    = Math.round(total);
-    this.stockAdmin    = Math.round(admin);
-    this.stockClientes = Math.round(clientes);
     this.lotesTostadosUrgentes = urgentes.sort((a, b) => b.dias - a.dias);
-    this.lotesUrgentes = urgentes.length; // ahora solo cuenta tienda >7 días
+    this.lotesUrgentes = urgentes.length;
   }
 
   private getKgInventario(lote: LoteTostadoConInventario): number {
@@ -166,21 +160,54 @@ export class OverviewComponent implements OnInit {
     return lote.inventarioLotesTostados.reduce((sum, inv) => sum + (inv.cantidad_kg ?? 0), 0);
   }
 
-  // ── Clasificación ──────────────────────────────────────────────
+  // ── Stock verde + Clasificación (tienda) ──────────────────────
 
-  private procesarClasificacion(data: Record<string, number>): void {
-    const total = Object.values(data).reduce((s, v) => s + v, 0);
-    if (total === 0) return;
-    this.stockTotalVerdes = Math.round(total);
-    this.clasificaciones = Object.entries(data)
-      .map(([nombre, kg]) => ({
-        nombre,
-        kg,
-        porcentaje: Math.round((kg / total) * 100),
-        color: this.CLASIFICACION_COLORS[nombre] ?? '#888780',
-      }))
-      .sort((a, b) => b.kg - a.kg);
-    this.pieSegments = this.buildPieSegments(this.clasificaciones, total);
+  private procesarClasificacion(data: StockVerdeResponse): void {
+    this.stockTotal = Math.round(data.resumen.total);
+    this.stockAdmin = Math.round(data.resumen.tienda);
+    this.stockClientes = Math.round(data.resumen.clientes);
+
+    const clasifData = data.clasificacion;
+    const entries = Object.entries(clasifData).sort((a, b) => b[1] - a[1]);
+    const totalClasif = entries.reduce((s, [, kg]) => s + kg, 0);
+
+    if (totalClasif === 0) {
+      this.stockTotalVerdes = 0;
+      this.clasificaciones = [];
+      this.pieSegments = [];
+      return;
+    }
+
+    const porcentajes = this.calcularPorcentajes(entries.map(([, kg]) => kg));
+
+    this.stockTotalVerdes = Math.round(totalClasif);
+    this.clasificaciones = entries.map(([nombre, kg], i) => ({
+      nombre,
+      kg,
+      porcentaje: porcentajes[i],
+      color: this.CLASIFICACION_COLORS[nombre] ?? '#888780',
+    }));
+    this.pieSegments = this.buildPieSegments(this.clasificaciones, totalClasif);
+  }
+
+  // Reparte los % con "mayor resto" para que siempre sumen exactamente 100
+  private calcularPorcentajes(valores: number[]): number[] {
+    const total = valores.reduce((s, v) => s + v, 0);
+    if (total === 0) return valores.map(() => 0);
+
+    const crudos = valores.map(v => (v / total) * 100);
+    const enteros = crudos.map(r => Math.floor(r));
+    const faltante = 100 - enteros.reduce((s, v) => s + v, 0);
+
+    const ordenPorResto = crudos
+      .map((r, i) => ({ i, resto: r - Math.floor(r) }))
+      .sort((a, b) => b.resto - a.resto);
+
+    const resultado = [...enteros];
+    for (let k = 0; k < faltante; k++) {
+      resultado[ordenPorResto[k].i]++;
+    }
+    return resultado;
   }
 
   private buildPieSegments(items: ClasificacionBar[], total: number): PieSegment[] {
@@ -212,7 +239,6 @@ export class OverviewComponent implements OnInit {
       this.clientesMap[u.id_user] = u.nombre_comercial || u.nombre || 'Sin nombre';
     }
 
-    // Últimas 8 órdenes por fecha_registro
     this.pedidos = [...pedidos]
       .filter(p => !p.eliminado)
       .sort((a, b) => new Date(b.fecha_registro).getTime() - new Date(a.fecha_registro).getTime())
@@ -276,15 +302,15 @@ export class OverviewComponent implements OnInit {
 
   getBadgeEstado(estado: string): string {
     switch (estado) {
-      case 'Pendiente':  return 'bg-amber-50 text-amber-700';
-      case 'Tostando':   return 'bg-orange-50 text-orange-700';
+      case 'Pendiente': return 'bg-amber-50 text-amber-700';
+      case 'Tostando': return 'bg-orange-50 text-orange-700';
       case 'Completado': return 'bg-green-50 text-green-700';
-      default:           return 'bg-gray-100 text-gray-500';
+      default: return 'bg-gray-100 text-gray-500';
     }
   }
 
   getBadgeEntrega(entrega: string): string {
-    if (entrega === 'Hoy')    return 'bg-red-50 text-red-700';
+    if (entrega === 'Hoy') return 'bg-red-50 text-red-700';
     if (entrega === 'Mañana') return 'bg-amber-50 text-amber-700';
     return 'bg-green-50 text-green-700';
   }
@@ -317,7 +343,7 @@ export class OverviewComponent implements OnInit {
 
   // ── Paginador ──────────────────────────────────────────────────
 
-  irA(n: number): void      { this.paginaActual = n; }
-  anterior(): void          { if (this.paginaActual > 0) this.paginaActual--; }
-  siguiente(): void         { if (this.paginaActual < this.totalPaginas - 1) this.paginaActual++; }
+  irA(n: number): void { this.paginaActual = n; }
+  anterior(): void { if (this.paginaActual > 0) this.paginaActual--; }
+  siguiente(): void { if (this.paginaActual < this.totalPaginas - 1) this.paginaActual++; }
 }

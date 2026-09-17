@@ -41,16 +41,24 @@ export class AddMuestraComponent implements OnInit {
     this.VariedadSvc.getAllVariedades().subscribe(variedades => {
       this.variedades = variedades;
     });
-    this.userSvc.getUsers().subscribe(u => this.clientes = u);
+    this.userSvc.getUsers().subscribe(u => {
+      this.clientes = u.filter(x => x.rol === 'cliente');
+      this.clientesConTienda = [
+        { id_user: this.STORE_SENTINEL, nombre: 'FORTUNATO (Tienda)' } as any,
+        ...this.clientes
+      ];
+    });
     this.ubigeoSvc.getDepartamentos().subscribe(deps => this.departamentos = deps);
     this.almacenService.getAlmacenesActivos().subscribe(a => this.almacenes = a);
-
   }
 
   // icons
   readonly X = X;
   readonly Check = Check;
   readonly ChevronDown = ChevronDown;
+
+  // sentinel de UI — no es un id_user real, solo marca "muestra de la tienda"
+  readonly STORE_SENTINEL = '__STORE__';
 
   @Output() close = new EventEmitter<void>();
   @Output() create = new EventEmitter<void>();
@@ -65,20 +73,21 @@ export class AddMuestraComponent implements OnInit {
     variedades: [],
     proceso: '',
     nombre_muestra: '',
-    almacen:'',
+    almacen: '',
+    owned_by_store: false,
+    id_user: ''
   };
 
   // Listas de opciones
   variedades: Variedad[] = [];
   clientes: User[] = [];
+  clientesConTienda: User[] = [];
   procesos = ['LAVADO', 'NATURAL', 'HONEY'];
   almacenes: Almacen[] = [];
-
 
   // Dropdown Propio
   showVarDropdown = false;
   filterVar = '';
-
 
   // ubigeo 
   departamentos: Departamento[] = [];
@@ -93,14 +102,21 @@ export class AddMuestraComponent implements OnInit {
     this.model.distrito = '';
     this.distritos = [];
 
-    // buscamos el código interno a partir del nombre
     const dept = this.departamentos.find(d => d.nombre === deptoNombre);
     if (!dept) return;
 
     this.ubigeoSvc.getDistritoByDepartamento(dept.codigo)
       .subscribe(provs => this.distritos = provs);
+  }
 
-    
+  onClienteChange(idSeleccionado: string) {
+    if (idSeleccionado === this.STORE_SENTINEL) {
+      this.model.owned_by_store = true;
+      this.model.id_user = undefined;
+    } else {
+      this.model.owned_by_store = false;
+      this.model.id_user = idSeleccionado;
+    }
   }
 
   onCancel() {
@@ -108,11 +124,9 @@ export class AddMuestraComponent implements OnInit {
   }
 
   onSave() {
-    console.log('Muestra creada:', this.model);
     this.MuestraSvc.create(this.model).subscribe(m => {
       this.create.emit();
       this.close.emit();
     });
   }
-
 }

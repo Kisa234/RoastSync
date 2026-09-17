@@ -9,7 +9,8 @@ export interface Pedido {
   facturado?: boolean;
   estado_pedido: string;
 
-  id_user: string;
+  owned_by_store: boolean;
+  id_user?: string;
   usuario_nombre?: string;
 
   id_lote?: string;
@@ -21,7 +22,7 @@ export interface Pedido {
   comentario?: string;
   pesos?: number[];
 
-  id_almacen:string;
+  id_almacen?: string;
 
   fecha_tueste?: Date | string;
   tostadora?: string;

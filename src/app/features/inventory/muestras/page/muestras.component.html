@@ -17,29 +17,47 @@
   <!-- Contenedor -->
   <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
 
-    <!-- Filtros y búsqueda -->
-    <div class="flex gap-2.5 mb-4">
+    <div class="flex flex-col md:flex-row md:justify-between mb-4">
 
       <!-- Buscador -->
-      <div class="relative w-full max-w-lg">
+      <div class="mb-4 relative w-full max-w-lg">
         <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400"></lucide-icon>
-
         <input type="text" [(ngModel)]="filterTextMuestras" (ngModelChange)="onSearchChange()"
           placeholder="Buscar por cliente, productor, finca o provincia..."
           class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
       </div>
 
-      <!-- Botones de filtro -->
-      <div class="flex gap-x-2.5">
-        <button *ngFor="let f of filtersMuestras" (click)="aplicarFiltro(f.key)" [ngClass]="
-            filterMuestra === f.key
-              ? 'bg-[#B8672E] text-white'
-              : 'bg-gray-700 text-white hover:bg-[#B8672E]'
-          " class="transition rounded-lg px-4 py-2 text-sm">
-          {{ f.label }}
+      <!-- Filtros de tipo (Tienda / Clientes) + histórico + estado -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <button (click)="filtroTipo = 'admin'" [class]="filtroTipo === 'admin'
+    ? 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#B8672E] text-white'
+    : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
+          Tienda
         </button>
+        <button (click)="filtroTipo = 'cliente'" [class]="filtroTipo === 'cliente'
+    ? 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#B8672E] text-white'
+    : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
+          Clientes
+        </button>
+
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" [checked]="incluirHistorico" (change)="toggleHistorico()"
+            class="w-4 h-4 accent-[#B8672E]" />
+          <span class="text-sm text-gray-600">Incluir histórico (inactivos)</span>
+        </label>
+
+        <div class="relative ml-auto w-48">
+          <select [ngModel]="filterMuestra" (ngModelChange)="aplicarFiltroTab($event)" class="w-full appearance-none border border-[#E5E5E5] rounded-lg pl-3 pr-8 py-1.5 bg-white text-sm
+             focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
+            <option *ngFor="let f of filtersMuestras" [value]="f.key">{{ f.label }}</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+            <lucide-icon [img]="ChevronDown" class="w-4 h-4 text-gray-400"></lucide-icon>
+          </div>
+        </div>
       </div>
     </div>
+
 
     <!-- Tabla -->
     <div class="rounded-lg shadow-sm overflow-x-auto">
@@ -63,70 +81,48 @@
         </thead>
 
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
-          <tr *ngFor="let m of muestras$ | async">
+          <tr *ngFor="let m of getMuestrasFiltradas()" [ngClass]="{ 'bg-gray-100 opacity-75': m.eliminado }">
 
-            <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">
-              {{ m.id_muestra }}
-            </td>
-
-            <td class="py-4 font-semibold text-sm text-gray-700">
-              {{ m.nombre_muestra || 'N/A' }}
-            </td>
+            <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ m.id_muestra }}</td>
+            <td class="py-4 font-semibold text-sm text-gray-700">{{ m.nombre_muestra || 'N/A' }}</td>
 
             <td class="px-6 py-4 text-sm text-gray-700">
-              {{ m.id_user! | UserNamePipe | async }}
+              <span *ngIf="m.owned_by_store; else clienteReal" class="font-medium text-[#B8672E]">
+                FORTUNATO
+              </span>
+              <ng-template #clienteReal>
+                {{ m.id_user! | UserNamePipe | async }}
+              </ng-template>
             </td>
 
-            <td class="px-6 py-4 text-sm text-gray-700">
-              {{ m.productor }}
-            </td>
-
-            <td class="px-6 py-4 text-sm text-gray-700">
-              {{ m.finca }}
-            </td>
-
-            <td class="px-6 py-4 text-sm text-gray-700">
-              {{ m.distrito }}
-            </td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ m.productor }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ m.finca }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ m.distrito }}</td>
 
             <!-- ALMACÉN -->
             <td class="px-6 py-4 text-sm text-gray-700">
               <ng-container *ngIf="m.inventarioMuestras.length; else sinAlmacen">
-
-                <!-- Un solo inventario -->
                 <ng-container *ngIf="m.inventarioMuestras.length === 1; else multiple">
                   {{ m.inventarioMuestras[0].almacen?.nombre || 'N/A' }}
                 </ng-container>
-
-                <!-- Más de un inventario -->
                 <ng-template #multiple>
                   <div class="relative inline-block group">
                     <span class="cursor-pointer font-medium text-[#1F1F1F]">
-                      {{ m.inventarioMuestras[0].almacen?.nombre }}
-                      +{{ m.inventarioMuestras.length - 1 }}
+                      {{ m.inventarioMuestras[0].almacen?.nombre }} +{{ m.inventarioMuestras.length - 1 }}
                     </span>
-
                     <div class="absolute left-0 top-full mt-2 w-64 bg-white border border-[#E5E5E5] rounded-lg shadow-lg
-                    opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                    transition-all duration-200 z-30">
+                    opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30">
                       <div class="p-3 space-y-1">
                         <div *ngFor="let inv of m.inventarioMuestras"
                           class="flex justify-between text-xs text-gray-700">
-                          <span class="font-medium">
-                            {{ inv.almacen?.nombre || 'N/A' }}
-                          </span>
-
-                          <span class="text-gray-500">
-                            {{ inv.peso | number:'1.0-2' }} kg
-                          </span>
+                          <span class="font-medium">{{ inv.almacen?.nombre || 'N/A' }}</span>
+                          <span class="text-gray-500">{{ inv.peso | number:'1.0-2' }} kg</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </ng-template>
-
               </ng-container>
-
               <ng-template #sinAlmacen>
                 <span (click)="openAsignarInventarioMuestra(m)"
                   class="text-gray-400 hover:text-[#B8672E] cursor-pointer transition font-medium">
@@ -135,9 +131,7 @@
               </ng-template>
             </td>
 
-            <td class="px-6 py-4 text-sm text-gray-700">
-              {{ m.peso.toLocaleString('en-US') }}
-            </td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ m.peso.toLocaleString('en-US') }}</td>
 
             <td class="px-6 py-4">
               <span *ngFor="let v of getVariedadesArray(m.variedades)"
@@ -156,38 +150,26 @@
               </span>
             </td>
 
-            <td class="px-6 py-4 text-sm text-gray-700">
-              {{ m.fecha_registro | date:'dd/MM/yyyy' }}
-            </td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ m.fecha_registro | date:'dd/MM/yyyy' }}</td>
 
             <td class="px-6 py-4 text-right text-sm space-x-2">
-
               <button (click)="onReport(m)" class="text-gray-500 hover:text-gray-700" title="Ver reporte">
                 <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
               </button>
-
               <button *ngIf="!m.completado" (click)="onComplete(m)" class="text-gray-500 hover:text-green-600"
                 title="Marcar como completa">
                 <lucide-icon [img]="CheckCircle" class="w-5 h-5"></lucide-icon>
               </button>
-
             </td>
           </tr>
         </tbody>
-
       </table>
     </div>
   </div>
 </div>
 
 <!-- Modales -->
-
-<add-muestra *ngIf="showAddMuestra" (close)="showAddMuestra = false" (create)="onCreated()">
-</add-muestra>
-
-<report-lote *ngIf="showReport" [MuestraId]="selectedMuestraId" (close)="showReport = false">
-</report-lote>
-
+<add-muestra *ngIf="showAddMuestra" (close)="showAddMuestra = false" (create)="onCreated()"></add-muestra>
+<report-lote *ngIf="showReport" [MuestraId]="selectedMuestraId" (close)="showReport = false"></report-lote>
 <add-inventory-muestra *ngIf="showAsignarInventarioModal && selectedMuestra" [muestraId]="selectedMuestra.id_muestra"
-  (close)="closeAsignarInventarioMuestra()" (create)="onInventarioMuestraCreated()">
-</add-inventory-muestra>
+  (close)="closeAsignarInventarioMuestra()" (create)="onInventarioMuestraCreated()"></add-inventory-muestra>

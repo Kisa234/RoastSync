@@ -59,10 +59,14 @@ export class UpdateInventoryComponent implements OnInit {
   readonly RefreshCcw = RefreshCcw;
   readonly labelTipo = labelTipo;
 
+  // sentinel de UI — no es un id_user real, solo marca "filtrar por lotes de tienda"
+  readonly STORE_SENTINEL = '__STORE__';
+
   loading = signal(true);
   error = signal('');
 
   clientes: UserEntity[] = [];
+  clientesConTienda: (UserEntity | { id_user: string; nombre: string })[] = [];
 
   search = signal('');
   searchUser = signal('');
@@ -85,7 +89,7 @@ export class UpdateInventoryComponent implements OnInit {
    *  sin que el tab activo se afecte a sí mismo. */
   private readonly baseFiltered = computed(() => {
     const general = this.search().trim().toLowerCase();
-    const user = this.searchUser().trim().toLowerCase();
+    const user = this.searchUser().trim();
     const withStock = this.onlyWithStock();
 
     return this.rows().filter(row => {
@@ -95,7 +99,12 @@ export class UpdateInventoryComponent implements OnInit {
         row.reference.toLowerCase().includes(general)
       )) return false;
 
-      if (user && !(row.userId ?? '').toLowerCase().includes(user)) return false;
+      if (user === this.STORE_SENTINEL) {
+        if (!row.ownedByStore) return false;
+      } else if (user && !(row.userId ?? '').toLowerCase().includes(user.toLowerCase())) {
+        return false;
+      }
+
       if (withStock && row.stockTotal <= 0) return false;
 
       return true;
@@ -134,7 +143,13 @@ export class UpdateInventoryComponent implements OnInit {
     this.loading.set(true);
     this.error.set('');
 
-    this.userService.getUsers().subscribe(users => this.clientes = users);
+    this.userService.getUsers().subscribe(users => {
+      this.clientes = users;
+      this.clientesConTienda = [
+        { id_user: this.STORE_SENTINEL, nombre: 'FORTUNATO (Tienda)' },
+        ...this.clientes
+      ];
+    });
 
     forkJoin({
       productos: this.productoService.getProductosConInventarios(),
@@ -216,7 +231,8 @@ export class UpdateInventoryComponent implements OnInit {
       }));
       return {
         id: lote.id_lote, displayName: lote.id_lote, reference: lote.productor ?? '',
-        tipo: 'LOTE_VERDE', userId: lote.id_user, stockTotal: this.totalAlmacenes(almacenes), almacenes,
+        tipo: 'LOTE_VERDE', userId: lote.id_user, ownedByStore: lote.owned_by_store,
+        stockTotal: this.totalAlmacenes(almacenes), almacenes,
       };
     });
   }
@@ -230,7 +246,8 @@ export class UpdateInventoryComponent implements OnInit {
       }));
       return {
         id: lote.id_lote_tostado, displayName: lote.id_lote_tostado, reference: lote.lote?.productor ?? '',
-        tipo: 'LOTE_TOSTADO', userId: lote.id_user, stockTotal: this.totalAlmacenes(almacenes), almacenes,
+        tipo: 'LOTE_TOSTADO', userId: lote.id_user, ownedByStore: lote.owned_by_store,
+        stockTotal: this.totalAlmacenes(almacenes), almacenes,
       };
     });
   }

@@ -1,0 +1,254 @@
+<div class="min-h-screen p-6 bg-[#F9F9F9]">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-[#1F1F1F]">Estadísticas de Pedidos</h1>
+    <p class="text-gray-600">Análisis general y por tipo de pedido (excluye Órdenes de Tueste)</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 mb-6">
+    <div class="flex flex-wrap gap-3 items-end">
+      <div class="w-40">
+        <label class="block text-xs text-gray-600 mb-1">Desde</label>
+        <input type="date" [(ngModel)]="startDate" (ngModelChange)="onFilterChange()"
+          class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+      </div>
+      <div class="w-40">
+        <label class="block text-xs text-gray-600 mb-1">Hasta</label>
+        <input type="date" [(ngModel)]="endDate" (ngModelChange)="onFilterChange()"
+          class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B8672E]" />
+      </div>
+      <div class="flex gap-3">
+        <button (click)="resetRange()" class="text-sm text-gray-600 hover:text-[#B8672E] underline">
+          Último mes
+        </button>
+        <button (click)="resetHistoric()" class="text-sm text-gray-600 hover:text-[#B8672E] underline">
+          Histórico
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!loading && stats; else loadingTpl">
+
+    <!-- KPIs Generales -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+        <p class="text-xs text-gray-500 mb-1">Total Pedidos</p>
+        <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.totalPedidos }}</p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+        <p class="text-xs text-gray-500 mb-1">Completados</p>
+        <p class="text-2xl font-bold text-green-600">{{ stats.pedidosCompletados }}</p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4">
+        <p class="text-xs text-gray-500 mb-1">Pendientes</p>
+        <p class="text-2xl font-bold text-yellow-600">{{ stats.pedidosPendientes }}</p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+        <p class="text-xs text-gray-500 mb-1">Prom. Pedidos / Día</p>
+        <p class="text-2xl font-bold text-[#1F1F1F]">{{ stats.promedioPedidosPorDia | number:'1.1-1' }}</p>
+        <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+          opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+          <p class="font-semibold mb-1 text-[#D4956A]">Promedio sobre todos los días del periodo</p>
+          <p class="text-gray-400">Total pedidos ÷ días del rango</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+        <p class="text-xs text-gray-500 mb-1">Pedidos Propios (Tienda)</p>
+        <p class="text-2xl font-bold text-[#B8672E]">{{ stats.pedidosPropios }}</p>
+        <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+    opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+          <p class="font-semibold mb-1 text-[#D4956A]">Pedidos cuyo cliente es la tienda (rol admin)</p>
+          <p class="text-gray-400">Nunca se facturan — excluidos del conteo de facturación</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+        <p class="text-xs text-gray-500 mb-1">Facturados</p>
+        <p class="text-2xl font-bold text-[#B8672E]">{{ stats.pedidosFacturados }}</p>
+        <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+    opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+          <p class="font-semibold mb-1 text-[#D4956A]">Solo sobre pedidos de clientes reales</p>
+          <p class="text-gray-400">Excluye los {{ stats.pedidosPropios }} pedidos propios de tienda</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-4 relative group cursor-default">
+        <p class="text-xs text-gray-500 mb-1">Tiempo Prom. Completado</p>
+        <p class="text-2xl font-bold text-[#1F1F1F]">
+          <ng-container *ngIf="stats.tiempoPromedioCompletadoHoras !== null; else sinTiempo">
+            {{ stats.tiempoPromedioCompletadoHoras | number:'1.1-1' }} h
+          </ng-container>
+          <ng-template #sinTiempo><span class="text-gray-300">—</span></ng-template>
+        </p>
+        <div class="absolute bottom-full left-0 mb-2 w-64 bg-[#1F1F1F] text-white text-xs rounded-lg p-3
+          opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 shadow-lg">
+          <p class="font-semibold mb-1 text-[#D4956A]">Tiempo promedio hasta completar</p>
+          <p class="text-gray-400">Fecha de registro → fecha de completado, solo pedidos completados</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Gráficas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Pedidos por Tipo</h2>
+        <apx-chart *ngIf="barSeries.length" [series]="barSeries" [chart]="barChart" [xaxis]="barXAxis"
+          [yaxis]="barYAxis" [colors]="barColors" [plotOptions]="barPlotOptions" [dataLabels]="barDataLabels">
+        </apx-chart>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Completados vs Pendientes</h2>
+        <apx-chart *ngIf="pieSeries.length" [series]="pieSeries" [chart]="pieChart" [labels]="pieLabels"
+          [colors]="pieColors" [legend]="pieLegend">
+        </apx-chart>
+      </div>
+
+    </div>
+
+    <!-- Desglose por Tipo -->
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 mb-6">
+      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Desglose por Tipo de Pedido</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+          <thead class="bg-[#F9F9F9]">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Total</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Completados</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Pendientes</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Facturados</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">No Facturados</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Cantidad Total</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">T. Prom. (h)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E5E5E5]">
+            <tr *ngFor="let t of stats.porTipo">
+              <td class="px-4 py-3 font-medium">{{ t.tipo }}</td>
+              <td class="px-4 py-3 text-right">{{ t.total }}</td>
+              <td class="px-4 py-3 text-right text-green-600">{{ t.completados }}</td>
+              <td class="px-4 py-3 text-right text-yellow-600">{{ t.pendientes }}</td>
+              <td class="px-4 py-3 text-right text-[#B8672E]">{{ t.facturados }}</td>
+              <td class="px-4 py-3 text-right text-red-500">{{ t.noFacturados }}</td>
+              <td class="px-4 py-3 text-right">{{ t.cantidadTotal | number:'1.0-0' }}</td>
+              <td class="px-4 py-3 text-right">
+                {{ t.tiempoPromedioCompletadoHoras !== null ? (t.tiempoPromedioCompletadoHoras | number:'1.1-1') : '—'
+                }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top Clientes -->
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 mb-6">
+      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Top 5 Clientes</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+          <thead class="bg-[#F9F9F9]">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Cantidad de Pedidos</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E5E5E5]">
+            <tr *ngFor="let c of stats.topClientes">
+              <td class="px-4 py-3 font-medium">{{ c.id_user | UserNamePipe | async }}</td>
+              <td class="px-4 py-3 text-right">{{ c.cantidadPedidos }}</td>
+            </tr>
+            <tr *ngIf="stats.topClientes.length === 0">
+              <td colspan="2" class="px-4 py-8 text-center text-gray-400">Sin datos en el periodo.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Tabla detalle de Pedidos -->
+  <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-[#1F1F1F]">Pedidos ({{ pedidosRango.length }})</h2>
+      <button (click)="exportar()"
+        class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 transition text-sm">
+        <lucide-angular [img]="FileSpreadsheet" class="w-4 h-4" />
+        Exportar Excel
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+        <thead class="bg-[#F9F9F9]">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha Registro</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Facturado</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#E5E5E5]">
+          <tr *ngFor="let p of pagedPedidos">
+            <td class="px-4 py-3 font-medium">{{ p.id_user | UserNamePipe | async }}</td>
+            <td class="px-4 py-3 text-gray-600">{{ p.tipo_pedido }}</td>
+            <td class="px-4 py-3 text-gray-600">{{ p.fecha_registro | date:'dd/MM/yyyy' }}</td>
+            <td class="px-4 py-3 text-gray-600">{{ p.cantidad | number:'1.0-0' }}</td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-full text-xs" [ngClass]="p.estado_pedido === 'Completado'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-yellow-100 text-yellow-800'">
+                {{ p.estado_pedido }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded-full text-xs"
+                [ngClass]="p.facturado ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                {{ p.facturado ? 'Sí' : 'No' }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="pedidosRango.length === 0">
+            <td colspan="6" class="px-4 py-8 text-center text-gray-400">Sin pedidos en el periodo.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="totalPagesPedidos > 1"
+        class="mt-4 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
+        <span class="text-gray-600">Página {{ pagePedidos }} de {{ totalPagesPedidos }}</span>
+        <div class="flex gap-2">
+          <button [disabled]="pagePedidos === 1" (click)="pagePedidos = pagePedidos - 1"
+            class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40 disabled:cursor-not-allowed">
+            ← Anterior
+          </button>
+          <button [disabled]="pagePedidos === totalPagesPedidos" (click)="pagePedidos = pagePedidos + 1"
+            class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40 disabled:cursor-not-allowed">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading / Sin datos -->
+  <ng-template #loadingTpl>
+    <div class="flex items-center justify-center py-20 text-gray-400">
+      <p *ngIf="loading">Cargando estadísticas...</p>
+      <p *ngIf="!loading && !stats">Sin datos en el periodo seleccionado.</p>
+    </div>
+  </ng-template>
+
+</div>

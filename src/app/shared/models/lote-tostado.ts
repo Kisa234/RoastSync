@@ -8,7 +8,8 @@ export interface LoteTostado {
   perfil_tostado: string;
   peso: number;
   fecha_registro: Date;
-  id_user:string;
+  owned_by_store?: boolean;
+  id_user?: string;
   id_analisis_rapido?: string;
   entregado?: Date;
   eliminado?: boolean;
@@ -22,7 +23,8 @@ export interface LoteTostadoConLote {
   perfil_tostado: string;
   peso: number;
   fecha_registro: Date;
-  id_user: string;
+  owned_by_store?: boolean;
+  id_user?: string;
   lote: Lote;
   id_analisis_rapido?: string;
   entregado?: Date;
@@ -35,7 +37,8 @@ export interface LoteTostadoConInventario {
   perfil_tostado: string;
   peso: number;
   fecha_registro: Date;
-  id_user: string;
+  owned_by_store?: boolean;
+  id_user?: string;
   eliminado?: boolean;
   
   lote: Lote;

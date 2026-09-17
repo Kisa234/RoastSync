@@ -60,10 +60,11 @@
       </div>
 
       <div class="col-span-2 sm:col-span-1">
-        <label class="block text-gray-700 text-sm mb-1" for="peso"> Cliente</label>
-        <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
-          secondDisplayField="nombre_comercial" valueField="id_user" placeholder="Seleccionar cliente"></select-search>
-      </div>
+  <label class="block text-gray-700 text-sm mb-1" for="peso"> Cliente / Tienda *</label>
+  <select-search name="cliente" [ngModel]="model.id_user ?? ''" (ngModelChange)="onClienteChange($event)"
+    [items]="clientesConTienda" displayField="nombre" secondDisplayField="nombre_comercial"
+    valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+</div>
 
       <div class="col-span-1 sm:col-span-1">
         <label class="block text-gray-700 text-sm mb-1">Almacen*</label>

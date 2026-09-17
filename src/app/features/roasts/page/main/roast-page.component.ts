@@ -72,7 +72,7 @@ export class RoastsPage {
   showFichaTueste = false;
   showAddBalonGas = false;
 
-  // paginator 
+  // paginator (historial)
   page = 1;
   pageSize = 5;
   totalPages = 1;
@@ -88,6 +88,14 @@ export class RoastsPage {
 
   clients: User[] = [];
   selectedClientId = '';
+
+  // ── Tab principal: 'pendientes' | 'historico' ──
+  pendingTab: 'pendientes' | 'historico' = 'pendientes';
+
+  // ── Sub-tab dentro de Pendientes: 'todos' | 'yyyy-MM-dd' (día) ──
+  pendingSubTab: string = 'todos';
+  pagePendientes = 1;
+  pageSizePendientes = 5;
 
 
   constructor(
@@ -119,6 +127,7 @@ export class RoastsPage {
       .subscribe({
         next: (list) => {
           this.pendingOrders = list ?? [];
+          this.pagePendientes = 1;
         },
         error: (error) => {
           console.error('Error cargando órdenes de tueste pendientes con lote:', error);
@@ -152,8 +161,7 @@ export class RoastsPage {
   }
 
   getEstadoFacturacion(p: PedidoConLote): 'ES_NUESTRO' | 'FACTURADO' | 'NO_FACTURADO' {
-    const duenioLote = this.clients.find(c => c.id_user === p.lote?.id_user);
-    if (duenioLote?.rol === 'admin') return 'ES_NUESTRO';
+    if (p.owned_by_store) return 'ES_NUESTRO';
     if (p.facturado === true) return 'FACTURADO';
     return 'NO_FACTURADO';
   }
@@ -256,7 +264,7 @@ export class RoastsPage {
     this.pageSF = next;
     this.updatePagedSinFacturar();
   }
- 
+
   openRoasts(o: Pedido): void {
     this.router.navigate(['/roasts', o.id_pedido, 'tuestes']);
   }
@@ -323,12 +331,14 @@ export class RoastsPage {
      * HOJA 1 – HISTORIAL DE PEDIDOS
      * =============================== */
     const pedidosSheet = this.filteredHistoryRoasts.map(h => {
-      const cliente = this.clients.find(c => c.id_user === h.lote?.id_user);
+      const cliente = h.owned_by_store
+        ? 'FORTUNATO'
+        : (this.clients.find(c => c.id_user === h.lote?.id_user)?.nombre ?? 'Desconocido');
       return {
         id_pedido: h.id_pedido,
         Lote: h.id_lote,
         Fecha: h.fecha_tueste,
-        Cliente: cliente?.nombre ?? 'Desconocido',  // ← fix
+        Cliente: cliente,
         Cantidad: h.cantidad,
         'Tipo de Tueste': h.comentario,
         Facturado: h.facturado ? 'Sí' : 'No',
@@ -411,8 +421,61 @@ export class RoastsPage {
     return parts.join('_') + '.xlsx';
   }
 
+  // ── Total de batches y agrupación por día (solo Pendientes) ──
+  get totalBatchesPendientes(): number {
+    return this.pendingOrders.reduce((sum, o) => sum + (o.pesos?.length || 0), 0);
+  }
 
+  get batchesPorDia(): { fecha: string; batches: number; ordenes: number }[] {
+    const mapa = new Map<string, { batches: number; ordenes: number }>();
 
+    for (const o of this.pendingOrders) {
+      if (!o.fecha_tueste) continue;
+      const clave = new Date(o.fecha_tueste).toISOString().split('T')[0]; // yyyy-MM-dd
+      const actual = mapa.get(clave) ?? { batches: 0, ordenes: 0 };
+      actual.batches += o.pesos?.length || 0;
+      actual.ordenes += 1;
+      mapa.set(clave, actual);
+    }
 
+    return [...mapa.entries()]
+      .map(([fecha, { batches, ordenes }]) => ({ fecha, batches, ordenes }))
+      .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  }
 
+  // ── Tab principal (Pendientes / Histórico) ──
+  setPendingTab(tab: 'pendientes' | 'historico'): void {
+    this.pendingTab = tab;
+  }
+
+  // ── Sub-tabs de Pendientes (Todos / por día) ──
+  setPendingSubTab(subTab: string): void {
+    this.pendingSubTab = subTab;
+    this.pagePendientes = 1;
+  }
+
+  get ordenesPendientesFiltradas(): PedidoConLote[] {
+    if (this.pendingSubTab === 'todos') {
+      return this.pendingOrders;
+    }
+    return this.pendingOrders.filter(o => {
+      if (!o.fecha_tueste) return false;
+      return new Date(o.fecha_tueste).toISOString().split('T')[0] === this.pendingSubTab;
+    });
+  }
+
+  get totalPagesPendientes(): number {
+    return Math.ceil(this.ordenesPendientesFiltradas.length / this.pageSizePendientes) || 1;
+  }
+
+  get pagedPendientes(): PedidoConLote[] {
+    const start = (this.pagePendientes - 1) * this.pageSizePendientes;
+    return this.ordenesPendientesFiltradas.slice(start, start + this.pageSizePendientes);
+  }
+
+  changePagePendientes(delta: number): void {
+    const next = this.pagePendientes + delta;
+    if (next < 1 || next > this.totalPagesPendientes) return;
+    this.pagePendientes = next;
+  }
 }

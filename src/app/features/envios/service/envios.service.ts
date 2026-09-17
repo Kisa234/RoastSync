@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Envio, EnvioConDetalle, CreateEnvio, ProgramarEnvio, DespacharEnvio, ConfirmarEntregaEnvio, CancelarEnvio, RegistrarDevolucionEnvio,
+import {
+  Envio, EnvioConDetalle, CreateEnvio, ProgramarEnvio, DespacharEnvio, ConfirmarEntregaEnvio, CancelarEnvio, RegistrarDevolucionEnvio,
 } from '../../../shared/models/envio';
 
 @Injectable({ providedIn: 'root' })
 export class EnviosService {
   private readonly baseUrl = `${environment.apiUrl}/envio`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ---- Lectura ----
   getAllEnvios(): Observable<Envio[]> {
@@ -52,6 +53,10 @@ export class EnviosService {
 
   getEnviosPorEntidad(entidad: string, id_entidad: string): Observable<Envio[]> {
     return this.http.get<Envio[]>(`${this.baseUrl}/por-entidad/${entidad}/${id_entidad}`);
+  }
+
+  getByCliente(id_cliente: string): Observable<EnvioConDetalle[]> {
+    return this.http.get<EnvioConDetalle[]>(`${this.baseUrl}/cliente/${id_cliente}`);
   }
 
 }

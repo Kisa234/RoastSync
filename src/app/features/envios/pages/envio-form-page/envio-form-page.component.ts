@@ -72,6 +72,7 @@ export class EnvioFormPage implements OnInit {
       observaciones: '',
     },
     medio_envio: '',
+    fecha_programada: '',
     numero_tracking: '',
     costo_envio: undefined,
     quien_paga: undefined,
@@ -204,8 +205,6 @@ export class EnvioFormPage implements OnInit {
     if (match) {
       this.onDepartamentoChange(match.id);
     } else if (this.clienteUser.departamento) {
-      // No hay match en el catálogo — se deja el texto tal cual para que el usuario
-      // elija manualmente el departamento correcto en el select.
       this.uiSvc.alert('warning', 'Departamento no reconocido',
         `"${this.clienteUser.departamento}" no coincide con ningún departamento del catálogo — selecciónalo manualmente.`);
     }
@@ -237,6 +236,7 @@ export class EnvioFormPage implements OnInit {
       id_paquete: this.idPaquete,
       direccion: { ...this.model.direccion },
       medio_envio: this.model.medio_envio || undefined,
+      fecha_programada: this.model.fecha_programada || undefined,
       numero_tracking: this.model.numero_tracking || undefined,
       costo_envio: this.model.costo_envio || undefined,
       quien_paga: this.model.quien_paga || undefined,
@@ -249,8 +249,8 @@ export class EnvioFormPage implements OnInit {
     this.enviosSvc.crearEnvio(payload).subscribe({
       next: (envio) => {
         this.saving = false;
-        this.uiSvc.alert('success', 'Envío creado', 'Ahora indica cuándo planeas despacharlo.');
-        this.router.navigate(['/envios', envio.id_envio, 'programar']); // 👈 antes: ['/envios', envio.id_envio]
+        this.uiSvc.alert('success', 'Envío creado', 'El envío quedó registrado correctamente.');
+        this.router.navigate(['/envios', envio.id_envio]);
       },
       error: (err) => {
         this.saving = false;

@@ -272,7 +272,9 @@
                 <tbody class="divide-y divide-[#E5E5E5]">
                     <tr *ngFor="let p of pagedPedidos">
                         <td class="px-4 py-3 font-medium">{{ p.id_lote }}</td>
-                        <td class="px-4 py-3 font-medium">{{ p.id_user | UserNamePipe | async}}</td>
+                        <td class="px-4 py-3 font-medium">
+                            {{ p.owned_by_store ? 'FORTUNATO' : (p.id_user | UserNamePipe | async) }}
+                        </td>
                         <td class="px-4 py-3 text-gray-600">{{ p.fecha_tueste | date:'dd/MM/yyyy' }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ p.tostadora }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ p.cantidad | number:'1.0-0' }} gr</td>
@@ -341,7 +343,9 @@
                 <tbody class="divide-y divide-[#E5E5E5]">
                     <tr *ngFor="let t of pagedTuestes">
                         <td class="px-4 py-3 font-medium">{{ t.id_lote }}</td>
-                        <td class="px-4 py-3 font-medium">{{ t.id_cliente | UserNamePipe | async }}</td>
+                        <td class="px-4 py-3 font-medium">
+                            {{ t.owned_by_store ? 'FORTUNATO' : (t.id_cliente | UserNamePipe | async) }}
+                        </td>
                         <td class="px-4 py-3 text-gray-600">{{ t.fecha_tueste | date:'dd/MM/yyyy' }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ t.tostadora }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ t.num_batch }}</td>

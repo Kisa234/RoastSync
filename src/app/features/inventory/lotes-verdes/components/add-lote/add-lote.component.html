@@ -1,4 +1,4 @@
-<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md  flex items-center justify-center z-50 p-4">
+<div class="fixed inset-0 bg-opacity-50 backdrop-blur-md  flex items-center justify-center z-10 p-4">
   <div class="bg-white rounded-lg shadow-lg w-full max-w-lg overflow-visible">
 
     <!-- Header con pestañas -->
@@ -102,9 +102,10 @@
           </div>
 
           <div class="col-span-2 sm:col-span-1">
-            <label for="cliente" class="block text-gray-700 text-sm mb-1">Cliente *</label>
-            <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
-              valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+            <label class="block text-gray-700 text-sm mb-1">Cliente</label>
+            <input type="text" disabled
+              [value]="model.owned_by_store ? 'FORTUNATO (Tienda)' : (getClienteNombre(model.id_user) || '—')"
+              class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 bg-gray-50 text-gray-600" />
           </div>
 
           <!-- Variedades -->
@@ -133,7 +134,9 @@
           </div>
 
           <div class="col-span-2">
-            <label class="block text-gray-700 text-sm mb-1">Clasificacion *</label>
+            <label class="block text-gray-700 text-sm mb-1">
+              Clasificación {{ model.owned_by_store ? '*' : '' }}
+            </label>
             <div class="relative">
               <select [(ngModel)]="model.clasificacion" name="clasificacion" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
                    focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">
@@ -155,7 +158,7 @@
         <!-- Productor -->
         <div class="col-span-1">
           <label class="block text-gray-700 text-sm mb-1" for="productor">
-            Productor
+            Productor *
           </label>
           <input id="productor" type="text" [(ngModel)]="model.productor" name="productor" placeholder="Ej: Simon Brown"
             class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
@@ -165,7 +168,7 @@
         <!-- Finca -->
         <div class="col-span-1">
           <label class="block text-gray-700 text-sm mb-1" for="finca">
-            Finca
+            Finca *
           </label>
           <input id="finca" type="text" [(ngModel)]="model.finca" name="finca" placeholder="Ej: Las Chimoyas" class="w-full border border-[#E5E5E5] rounded-lg px-3 py-2 placeholder-gray-400
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
@@ -174,7 +177,7 @@
         <!-- Departamento -->
         <div class="col-span-2 sm:col-span-1">
           <label class="block text-gray-700 text-sm mb-1" for="productor">
-            Departamento
+            Departamento *
           </label>
           <select-search name="depto" [items]="departamentos" displayField="nombre" valueField="nombre"
             placeholder="Departamento" [(ngModel)]="model.departamento" (ngModelChange)="onDeptoChange($event)">
@@ -184,7 +187,7 @@
         <!-- Distrito -->
         <div class="col-span-2 sm:col-span-1">
           <label class="block text-gray-700 text-sm mb-1" for="productor">
-            Distrito
+            Distrito *
           </label>
           <select-search name="prov" [items]="distritos" displayField="nombre" valueField="nombre"
             placeholder="Distrito" [(ngModel)]="model.distrito" [disabled]="!model.departamento">
@@ -203,13 +206,14 @@
            focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition" />
         </div>
 
-        <!-- cliente -->
+        <!-- cliente / tienda -->
         <div class="col-span-1">
           <label class="block text-gray-700 text-sm mb-1" for="productor">
-            Cliente
+            Cliente / Tienda *
           </label>
-          <select-search name="cliente" [(ngModel)]="model.id_user" [items]="clientes" displayField="nombre"
-            valueField="id_user" placeholder="Seleccionar cliente"></select-search>
+          <select-search name="cliente" [ngModel]="model.id_user ?? ''" (ngModelChange)="onClienteChange($event)"
+            [items]="clientesConTienda" displayField="nombre" valueField="id_user"
+            placeholder="Seleccionar cliente"></select-search>
         </div>
 
         <!-- Costo -->
@@ -256,7 +260,9 @@
 
         <!-- Clasificacion -->
         <div class="col-span-2">
-          <label class="block text-gray-700 text-sm mb-1">Clasificacion *</label>
+          <label class="block text-gray-700 text-sm mb-1">
+            Clasificación {{ model.owned_by_store ? '*' : '' }}
+          </label>
           <div class="relative">
             <select [(ngModel)]="model.clasificacion" name="clasificacion" class="w-full appearance-none border border-[#E5E5E5] rounded-lg px-3 py-2
                    focus:border-[#B8672E] focus:ring-2 focus:ring-[#B8672E] focus:outline-none transition">

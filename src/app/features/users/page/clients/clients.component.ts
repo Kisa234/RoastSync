@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule } from 'lucide-angular';
+import { Eye, LucideAngularModule } from 'lucide-angular';
 import { Search, Mail, Phone, Edit2, Trash2, UserPlus } from 'lucide-angular';
 import { map, Observable } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { UserService } from '../../service/users-service.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { AddClientComponent } from '../../components/add-client/add-client.component';
 import { EditClientComponent } from '../../components/edit-client/edit-client.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-clients-page',
@@ -26,24 +27,26 @@ import { EditClientComponent } from '../../components/edit-client/edit-client.co
 })
 export class ClientsComponent implements OnInit {
 
-  readonly Search   = Search;
-  readonly Mail     = Mail;
-  readonly Phone    = Phone;
-  readonly Edit2    = Edit2;
-  readonly Trash2   = Trash2;
+  readonly Search = Search;
+  readonly Mail = Mail;
+  readonly Phone = Phone;
+  readonly Edit2 = Edit2;
+  readonly Trash2 = Trash2;
   readonly UserPlus = UserPlus;
+  readonly Eye = Eye;
 
   users$!: Observable<User[]>;
   filterText = '';
 
-  showAddClient  = false;
+  showAddClient = false;
   showEditClient = false;
   selectedUserId?: string;
 
   constructor(
     private userSvc: UserService,
-    private ui: UiService
-  ) {}
+    private ui: UiService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.loadClients();
@@ -73,6 +76,10 @@ export class ClientsComponent implements OnInit {
   onEdit(u: User) {
     this.selectedUserId = u.id_user;
     this.showEditClient = true;
+  }
+
+  onViewDetail(u: User) {
+    this.router.navigate(['/users', u.id_user]);
   }
 
   onDelete(u: User) {

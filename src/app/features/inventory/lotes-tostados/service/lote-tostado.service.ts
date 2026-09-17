@@ -50,4 +50,16 @@ export class LoteTostadoService {
   getLoteTostadoConInventario(id: string): Observable<LoteTostadoConInventario> {
     return this.http.get<LoteTostadoConInventario>(`${this.baseUrl}/inventario/${id}`);
   }
+
+  getOwnedByStore(incluirEliminados: boolean = false): Observable<LoteTostado[]> {
+    return this.http.get<LoteTostado[]>(`${this.baseUrl}/owned-by-store`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
+  }
+
+  getByUser(id_user: string, incluirEliminados: boolean = false): Observable<LoteTostado[]> {
+    return this.http.get<LoteTostado[]>(`${this.baseUrl}/user/${id_user}`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
+  }
 }

@@ -1,5 +1,4 @@
 <div class="h-full p-6 bg-[#F9F9F9] overflow-auto">
-
   <!-- Breadcrumb dinámico -->
   <div class="text-sm text-gray-500 mb-1">
     <a (click)="goBack()" class="hover:text-[#B8672E] cursor-pointer">{{ breadcrumbOrigen }}</a>
@@ -8,19 +7,19 @@
       {{ isMaquila ? 'Pedido de Maquila' : (isDespacho ? 'Orden de Despacho' : (model.tipo_pedido || 'Pedido')) }}
     </span>
   </div>
-
   <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <div>
       <h1 class="text-2xl font-bold text-[#1F1F1F]">
-        {{ isMaquila ? 'Detalle de Pedido de Maquila' : (isDespacho ? 'Detalle de Orden de Despacho' : 'Detalle de Pedido') }}
+        {{ isMaquila ? 'Detalle de Pedido de Maquila' : (isDespacho ? 'Detalle de Orden de Despacho' : 'Detalle de
+        Pedido') }}
       </h1>
       <p class="text-gray-600">
         {{ isMaquila
         ? 'Información del lote tostado y líneas de embolsado'
         : (isDespacho
-          ? 'Artículos preparados para el envío'
-          : 'Información de la orden de Venta Verde o Tostado Verde') }}
+        ? 'Artículos preparados para el envío'
+        : 'Información de la orden de Venta Verde o Tostado Verde') }}
       </p>
     </div>
     <button (click)="goBack()"
@@ -28,38 +27,33 @@
       <lucide-icon [img]="ArrowLeft" class="w-5 h-5 mr-2" />Volver
     </button>
   </div>
-
   <!-- ===== MAQUILA ===== -->
   <div *ngIf="isMaquila" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
     <div class="lg:col-span-2 space-y-6">
-
       <!-- Info del lote -->
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información del Lote</h2>
-
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-gray-700 text-sm mb-1">Cliente</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
-              {{ (model.id_user | UserNamePipe | async) || 'N/A' }}
+              <span *ngIf="model.owned_by_store; else clienteMaquilaReal"
+                class="font-medium text-[#B8672E]">FORTUNATO</span>
+              <ng-template #clienteMaquilaReal>{{ (model.id_user | UserNamePipe | async) || 'N/A' }}</ng-template>
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Lote Tostado</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
               {{ model.id_lote_tostado || 'N/A' }}
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Almacén</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
               {{ almacenNombre }}
             </div>
           </div>
-
           <div class="col-span-2">
             <label class="block text-gray-700 text-sm mb-1">Comentario</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700 min-h-[80px]">
@@ -68,11 +62,9 @@
           </div>
         </div>
       </div>
-
       <!-- Líneas de embolsado -->
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Líneas de Embolsado</h2>
-
         <div class="border border-[#E5E5E5] rounded-lg overflow-hidden">
           <table class="min-w-full text-sm">
             <thead class="bg-[#F9F9F9]">
@@ -98,17 +90,14 @@
         </div>
       </div>
     </div>
-
     <!-- Columna derecha: resumen -->
     <div class="space-y-6">
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Resumen</h2>
-
         <div class="bg-[#F9F9F9] rounded-lg p-4 mb-4">
           <p class="text-xs text-gray-500 uppercase">Total Bolsas</p>
           <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalBolsas | number }}</p>
         </div>
-
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
             <span class="text-gray-500">Total en gramos</span>
@@ -116,10 +105,8 @@
           </div>
         </div>
       </div>
-
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Trazabilidad</h2>
-
         <div class="space-y-3 text-sm">
           <div>
             <p class="text-gray-500 text-xs">Creado por</p>
@@ -145,31 +132,27 @@
       </div>
     </div>
   </div>
-
   <!-- ===== ORDEN DE DESPACHO ===== -->
   <div *ngIf="isDespacho" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
     <div class="lg:col-span-2 space-y-6">
-
       <!-- Info general -->
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información General</h2>
-
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-gray-700 text-sm mb-1">Cliente</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
-              {{ (model.id_user | UserNamePipe | async) || 'N/A' }}
+              <span *ngIf="model.owned_by_store; else clienteDespachoReal"
+                class="font-medium text-[#B8672E]">FORTUNATO</span>
+              <ng-template #clienteDespachoReal>{{ (model.id_user | UserNamePipe | async) || 'N/A' }}</ng-template>
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Almacén</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
               {{ almacenNombre }}
             </div>
           </div>
-
           <div class="col-span-2">
             <label class="block text-gray-700 text-sm mb-1">Comentario</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700 min-h-[80px]">
@@ -178,11 +161,9 @@
           </div>
         </div>
       </div>
-
       <!-- Artículos preparados -->
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Artículos a Preparar</h2>
-
         <div class="border border-[#E5E5E5] rounded-lg overflow-hidden">
           <table class="min-w-full text-sm">
             <thead class="bg-[#F9F9F9]">
@@ -206,17 +187,14 @@
         </div>
       </div>
     </div>
-
     <!-- Columna derecha: resumen -->
     <div class="space-y-6">
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Resumen</h2>
-
         <div class="bg-[#F9F9F9] rounded-lg p-4 mb-4">
           <p class="text-xs text-gray-500 uppercase">Total Artículos</p>
           <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalItems | number }}</p>
         </div>
-
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
             <span class="text-gray-500">Cantidad total</span>
@@ -224,10 +202,8 @@
           </div>
         </div>
       </div>
-
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Trazabilidad</h2>
-
         <div class="space-y-3 text-sm">
           <div>
             <p class="text-gray-500 text-xs">Creado por</p>
@@ -253,52 +229,45 @@
       </div>
     </div>
   </div>
-
   <!-- ===== ORDEN DE TUESTE ===== -->
   <div *ngIf="isOrdenTueste" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
     <div class="lg:col-span-2 space-y-6">
-
       <!-- Info general -->
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información General</h2>
-
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-gray-700 text-sm mb-1">Cliente</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
-              {{ (model.id_user | UserNamePipe | async) || 'N/A' }}
+              <span *ngIf="model.owned_by_store; else clienteTuesteReal"
+                class="font-medium text-[#B8672E]">FORTUNATO</span>
+              <ng-template #clienteTuesteReal>{{ (model.id_user | UserNamePipe | async) || 'N/A' }}</ng-template>
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Lote Origen</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
               {{ model.id_lote || 'N/A' }}
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Almacén</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
               {{ almacenNombre }}
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Tipo de Tueste</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
               {{ model.comentario || 'N/A' }}
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Tostadora</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
               {{ model.tostadora || 'N/A' }}
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Cantidad Verde Total (Gr)</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
@@ -307,11 +276,9 @@
           </div>
         </div>
       </div>
-
       <!-- Batches -->
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Batches</h2>
-
         <div class="border border-[#E5E5E5] rounded-lg overflow-hidden">
           <table class="min-w-full text-sm">
             <thead class="bg-[#F9F9F9]">
@@ -346,17 +313,14 @@
         </div>
       </div>
     </div>
-
     <!-- Columna derecha: resumen -->
     <div class="space-y-6">
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Resumen</h2>
-
         <div class="bg-[#F9F9F9] rounded-lg p-4 mb-4">
           <p class="text-xs text-gray-500 uppercase">Batches Completados</p>
           <p class="text-2xl font-bold text-[#1F1F1F]">{{ totalBatchesCompletados }} / {{ tuestes.length }}</p>
         </div>
-
         <div class="space-y-2 text-sm mb-4">
           <div class="flex justify-between">
             <span class="text-gray-500">Peso entrada total</span>
@@ -367,7 +331,6 @@
             <span class="font-medium text-[#1F1F1F]">{{ totalPesoSalida | number }} gr</span>
           </div>
         </div>
-
         <div class="space-y-2" *ngIf="idLoteTostadoResultante">
           <button (click)="verLoteTostado()"
             class="w-full text-left border border-[#E5E5E5] rounded-lg px-3 py-2 text-[#B8672E] hover:bg-[#F3F2F1] transition flex items-center gap-2">
@@ -380,21 +343,17 @@
             Ver / Imprimir Reporte
           </button>
         </div>
-
         <p *ngIf="!idLoteTostadoResultante" class="text-sm text-gray-500">
           Aún no se generó el lote tostado — se crea al completar la orden.
         </p>
       </div>
     </div>
   </div>
-
   <!-- ===== VENTA VERDE / TOSTADO VERDE ===== -->
   <div *ngIf="!isMaquila && !isDespacho && !isOrdenTueste" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
     <div class="lg:col-span-2 space-y-6">
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Información del Pedido</h2>
-
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-gray-700 text-sm mb-1">Tipo Pedido</label>
@@ -402,21 +361,20 @@
               {{ model.tipo_pedido || 'N/A' }}
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Cliente</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
-              {{ (model.id_user | UserNamePipe | async) || 'N/A' }}
+              <span *ngIf="model.owned_by_store; else clienteVentaReal"
+                class="font-medium text-[#B8672E]">FORTUNATO</span>
+              <ng-template #clienteVentaReal>{{ (model.id_user | UserNamePipe | async) || 'N/A' }}</ng-template>
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Lote</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
               {{ model.id_lote || 'N/A' }}
             </div>
           </div>
-
           <div>
             <label class="block text-gray-700 text-sm mb-1">Almacén</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700">
@@ -429,7 +387,6 @@
               {{ model.cantidad | number }}
             </div>
           </div>
-
           <div class="col-span-2">
             <label class="block text-gray-700 text-sm mb-1">Comentario</label>
             <div class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded-lg px-3 py-2 text-gray-700 min-h-[80px]">
@@ -439,43 +396,35 @@
         </div>
       </div>
     </div>
-
     <div class="space-y-6">
       <!-- Pendiente: sigue siendo útil saber si hay stock antes de completar -->
       <div *ngIf="!isCompletado" class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Disponibilidad</h2>
-
         <div class="bg-[#F9F9F9] rounded-lg p-4">
           <p class="text-xs text-gray-500 uppercase">Disponible en almacén</p>
           <p class="text-2xl font-bold text-[#1F1F1F]">{{ availableQty | number }} <span
               class="text-sm font-normal">Gr</span></p>
         </div>
       </div>
-
       <!-- Completado: la disponibilidad en vivo del lote origen ya no dice nada de este pedido puntual -->
       <div *ngIf="isCompletado" class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Resultado</h2>
-
         <div class="bg-[#F9F9F9] rounded-lg p-4 mb-3">
           <p class="text-xs text-gray-500 uppercase">Cantidad consumida</p>
           <p class="text-2xl font-bold text-[#1F1F1F]">{{ model.cantidad | number }} <span
               class="text-sm font-normal">Gr</span></p>
         </div>
-
         <button *ngIf="idLoteResultante" (click)="verLoteResultante()"
           class="w-full text-left border border-[#E5E5E5] rounded-lg px-3 py-2 text-[#B8672E] hover:bg-[#F3F2F1] transition flex items-center gap-2">
           <lucide-icon [img]="Eye" class="w-4 h-4" />
           Ver lote generado para el cliente
         </button>
-
         <p *ngIf="!idLoteResultante" class="text-sm text-gray-500">
           No se registró un lote resultante para este pedido.
         </p>
       </div>
-
       <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
         <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Trazabilidad</h2>
-
         <div class="space-y-3 text-sm">
           <div>
             <p class="text-gray-500 text-xs">Creado por</p>

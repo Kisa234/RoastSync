@@ -18,12 +18,35 @@
   <!-- Contenedor -->
   <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
 
-    <!-- Buscador -->
-    <div class="mb-4 relative w-full max-w-lg">
-      <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400"></lucide-icon>
-      <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
-        placeholder="Buscar por ID bolsa, lote tostado, molienda o comentario..."
-        class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+    <div class="flex flex-col md:flex-row md:justify-between mb-4">
+
+      <!-- Buscador -->
+      <div class="mb-4 relative w-full max-w-lg">
+        <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400"></lucide-icon>
+        <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por ID bolsa, cliente, lote tostado, molienda..."
+          class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
+      </div>
+
+      <!-- Filtros de tipo (Tienda / Clientes) + histórico -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <button (click)="filtroTipo = 'admin'" [class]="filtroTipo === 'admin'
+          ? 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#B8672E] text-white'
+          : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
+          Tienda
+        </button>
+        <button (click)="filtroTipo = 'cliente'" [class]="filtroTipo === 'cliente'
+          ? 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#B8672E] text-white'
+          : 'px-4 py-1.5 rounded-full text-sm font-medium bg-[#E5E5E5] text-gray-600 hover:bg-gray-300'">
+          Clientes
+        </button>
+
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" [checked]="incluirHistorico" (change)="toggleHistorico()"
+            class="w-4 h-4 accent-[#B8672E]" />
+          <span class="text-sm text-gray-600">Incluir histórico (inactivos)</span>
+        </label>
+      </div>
     </div>
 
     <!-- Tabla -->
@@ -47,8 +70,14 @@
             <tr [ngClass]="{ 'bg-gray-100 opacity-75': b.eliminado }">
               <td class="px-6 py-4 font-semibold text-sm text-[#1F1F1F]">{{ b.id_bolsa }}</td>
               <td class="px-6 py-4 text-sm text-gray-700">{{ b.id_lote_tostado }}</td>
+
               <td class="px-6 py-4 text-sm text-gray-700">
-                {{ (b.id_user | UserNamePipe | async) || 'N/A' }}
+                <span *ngIf="b.owned_by_store; else clienteBolsaReal" class="font-medium text-[#B8672E]">
+                  FORTUNATO
+                </span>
+                <ng-template #clienteBolsaReal>
+                  {{ (b.id_user | UserNamePipe | async) || 'N/A' }}
+                </ng-template>
               </td>
 
               <td class="px-6 py-4">

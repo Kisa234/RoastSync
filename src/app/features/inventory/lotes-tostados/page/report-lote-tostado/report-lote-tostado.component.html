@@ -16,8 +16,13 @@
           </h1>
 
           <div class="text-sm text-gray-600 space-y-1 print:text-xs">
-            <p><span class="font-medium text-gray-900">Cliente:</span> {{ tuestes[0].id_cliente | UserNamePipe | async
-              }}</p>
+            <p>
+              <span class="font-medium text-gray-900">Cliente: </span>
+              <ng-container *ngIf="tuestes[0]?.id_cliente; else esFortunato">
+                {{ tuestes[0].id_cliente | UserNamePipe | async }}
+              </ng-container>
+              <ng-template #esFortunato>FORTUNATO</ng-template>
+            </p>
             <p><span class="font-medium text-gray-900">Lote:</span> {{ id }}</p>
             <p><span class="font-medium text-gray-900">Fecha:</span> {{ tuestes[0].fecha_tueste | date:'dd/MM/yyyy' }}
             </p>

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { LucideAngularModule, ArrowLeft, Calendar, Truck, Check, Ban, RotateCcw } from 'lucide-angular';
+import { LucideAngularModule, ArrowLeft, Calendar, Truck, Check, Ban, RotateCcw, Printer } from 'lucide-angular';
 
 import { EnviosService } from '../../service/envios.service';
 import { UiService } from '../../../../shared/services/ui.service';
@@ -10,11 +10,12 @@ import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
 
 import { EnvioConDetalle } from '../../../../shared/models/envio';
 import { EstadoEnvio } from '../../../../shared/enum/estado-envio.enum';
+import { PrintOrdenDespachoComponent, OrdenDespachoImprimible } from '../../components/print-orden-despacho/print-orden-despacho.component';
 
 @Component({
   selector: 'app-view-envio',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule, UserNamePipe],
+  imports: [CommonModule, FormsModule, RouterLink, LucideAngularModule, UserNamePipe, PrintOrdenDespachoComponent],
   templateUrl: './view-envio.page.html'
 })
 export class ViewEnvioPage implements OnInit {
@@ -25,6 +26,9 @@ export class ViewEnvioPage implements OnInit {
   readonly Ban = Ban;
   readonly RotateCcw = RotateCcw;
   readonly EstadoEnvio = EstadoEnvio;
+
+  readonly Printer = Printer;
+  showPrintModal = false;
 
   idEnvio = '';
   envio: EnvioConDetalle | null = null;
@@ -120,8 +124,46 @@ export class ViewEnvioPage implements OnInit {
     this.router.navigate(['/envios', this.idEnvio, 'programar']);
   }
 
-  irADespachar(): void {
-    this.router.navigate(['/envios', this.idEnvio, 'despachar']);
+  /** Reemplaza la navegación a página separada — mismo patrón in-page que confirmarEntregaEnvio */
+  despacharEnvioInPage(): void {
+    if (!this.envio) return;
+
+    const requiereTracking = this.calcularRequiereTracking();
+
+    this.uiSvc.prompt({
+      title: 'Despachar Envío',
+      message: 'Esto descuenta el stock real de cada artículo del paquete. Asegúrate de que esté listo físicamente'
+        + (requiereTracking ? '.' : ` (${this.envio.medio_envio} no requiere tracking).`),
+      placeholder: requiereTracking ? 'N.º de tracking (opcional)' : undefined,
+      confirmText: 'Confirmar Despacho',
+      cancelText: 'Cancelar'
+    }).then(({ confirmed, value }) => {
+      if (!confirmed) return;
+
+      this.saving = true;
+      this.enviosSvc.despachar(this.idEnvio, {
+        numero_tracking: requiereTracking ? (value || undefined) : undefined,
+      }).subscribe({
+        next: () => {
+          this.saving = false;
+          this.uiSvc.alert('success', 'Envío despachado', 'El stock fue descontado correctamente.');
+          this.load();
+        },
+        error: (err) => {
+          this.saving = false;
+          this.uiSvc.alert('error', 'Error', err?.error?.error || 'No se pudo despachar el envío.');
+        }
+      });
+    });
+  }
+
+  /** Solo couriers reales necesitan tracking — un viaje de InDriver o un recojo
+   *  presencial no lo tienen. Sin medio_envio definido, se pide por defecto. */
+  private calcularRequiereTracking(): boolean {
+    const medio = (this.envio?.medio_envio || '').trim().toLowerCase();
+    if (!medio) return true;
+    const sinTracking = ['recojo en tienda', 'indriver', 'yango'];
+    return !sinTracking.some(m => medio.includes(m));
   }
 
   // ---------- Confirmar entrega (in-page, sin navegación) ----------
@@ -205,5 +247,28 @@ export class ViewEnvioPage implements OnInit {
         }
       });
     });
+  }
+
+  // ---------- Impresión ----------
+
+  abrirImprimir(): void {
+    this.showPrintModal = true;
+  }
+
+  get datosImprimibles(): OrdenDespachoImprimible | null {
+    if (!this.envio) return null;
+    return {
+      numero_orden: this.envio.numero_correlativo,
+      id_cliente: this.envio.paquete?.id_cliente || '',
+      fecha: this.envio.fecha_registro,
+      fecha_programada: this.envio.fecha_programada,
+      direccion: this.envio.direccion,
+      medio_envio: this.envio.medio_envio,
+      numero_tracking: this.envio.numero_tracking,
+      quien_paga: this.envio.quien_paga,
+      items: (this.envio.paquete?.items ?? []).map(i => ({
+        id_entidad: i.id_entidad, cantidad: i.cantidad, unidad_medida: i.unidad_medida
+      })),
+    };
   }
 }

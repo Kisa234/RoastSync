@@ -63,6 +63,10 @@ import { UpdateInventoryShellComponent } from './features/inventory/update-inven
 import { VerHistorialPage } from './shared/pages/ver-historial/ver-historial.page';
 import { OrderTuesteFormPage } from './features/roasts/page/order-tueste-form-page/order-tueste-form-page.component';
 import { OrderTuestesPage } from './features/roasts/page/order-tuestes-page/order-tuestes.page';
+import { StadisticPedidosComponent } from './features/orders/page/stadistic-pedidos/stadistic-pedidos.component';
+import { ClientDetailComponent } from './features/users/page/client-detail/client-detail.component';
+import { HistoricLote } from './features/inventory/lotes-verdes/page/historic-lote/historic-lote.component';
+import { ReportLoteComponent } from './features/inventory/lotes-verdes/page/report-lote/report-lote.component';
 
 export const appRoutes: Routes = [
 
@@ -146,12 +150,8 @@ export const appRoutes: Routes = [
             path: 'lotes-verdes',
             children: [
               { path: '', component: LoteVerdeComponent },
-              {
-                path: 'historico/:id',
-                loadComponent: () =>
-                  import('./features/inventory/lotes-verdes/page/historic-lote/historic-lote.component')
-                    .then(m => m.HistoricLote)
-              }
+              { path: 'historico/:id', component: HistoricLote },
+              { path: 'reporte/:id', component: ReportLoteComponent }
             ]
           },
           {
@@ -236,7 +236,7 @@ export const appRoutes: Routes = [
               }
             ]
           },
-           {
+          {
             path: 'actualizar',
             component: UpdateInventoryShellComponent,
             children: [
@@ -264,6 +264,10 @@ export const appRoutes: Routes = [
           },
           { path: 'despacho/nuevo', component: OrdenDespachoFormPage },
           { path: 'despacho/:id/editar', component: OrdenDespachoFormPage, data: { mode: 'edit' } },
+          {
+            path: 'estadisticas',
+            component: StadisticPedidosComponent,
+          },
           {
             path: ':id/editar',
             component: OrderFormPage,
@@ -300,7 +304,8 @@ export const appRoutes: Routes = [
         data: { permissions: ['usuarios.read'] },
         children: [
           { path: '', component: ClientsComponent },
-          { path: 'interns', component: InternsComponent }
+          { path: 'interns', component: InternsComponent },
+          { path: ':id', component: ClientDetailComponent }
         ]
       },
 
@@ -317,19 +322,7 @@ export const appRoutes: Routes = [
             canActivate: [paqueteListoGuard],
           },
           { path: 'paquete/:id', component: ViewPaquetePage },
-          {
-            path: ':id/programar',
-            component: ProgramarEnvioPage,
-            canActivate: [envioEstadoGuard],
-            data: { estadosPermitidos: ['PENDIENTE'] },
-          },
-          {
-            path: ':id/despachar',
-            component: DespacharEnvioPage,
-            canActivate: [envioEstadoGuard],
-            data: { estadosPermitidos: ['PENDIENTE', 'PROGRAMADO'] },
-          },
-          { path: ':id', component: ViewEnvioPage }, // wildcard de un segmento — SIEMPRE al final
+          { path: ':id', component: ViewEnvioPage },
         ],
       },
 

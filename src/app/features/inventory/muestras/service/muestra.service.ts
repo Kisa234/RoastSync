@@ -9,7 +9,7 @@ import { environment } from '../../../../../environments/environment';
 export class MuestraService {
   private baseUrl = `${environment.apiUrl}/muestra`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<Muestra[]> {
     return this.http.get<Muestra[]>(this.baseUrl);
@@ -37,7 +37,20 @@ export class MuestraService {
     return this.http.patch<Muestra>(`${this.baseUrl}/complete/${id}`, {});
   }
 
-  getMuestrasConInventario(): Observable<MuestraConInventario[]>{
-    return this.http.get<MuestraConInventario[]>(`${this.baseUrl}/inventario`);
+  getMuestrasConInventario(incluirEliminados = false): Observable<MuestraConInventario[]> {
+    return this.http.get<MuestraConInventario[]>(`${this.baseUrl}/inventario`, {
+      params: { incluirEliminados }
+    });
+  }
+  getMuestrasOwnedByStore(incluirEliminados = false): Observable<Muestra[]> {
+    return this.http.get<Muestra[]>(`${this.baseUrl}/owned-by-store`, {
+      params: { incluirEliminados }
+    });
+  }
+
+  getMuestrasByUserId(id_user: string, incluirEliminados = false): Observable<Muestra[]> {
+    return this.http.get<Muestra[]>(`${this.baseUrl}/user/${id_user}`, {
+      params: { incluirEliminados }
+    });
   }
 }

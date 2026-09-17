@@ -8,7 +8,7 @@ import { Bolsa, BolsaConInventario } from '../../../../shared/models/bolsa';
 export class BolsaService {
   private baseUrl = `${environment.apiUrl}/bolsa`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<Bolsa[]> {
     return this.http.get<Bolsa[]>(this.baseUrl);
@@ -18,8 +18,10 @@ export class BolsaService {
     return this.http.get<Bolsa>(`${this.baseUrl}/${id}`);
   }
 
-  getConInventario(): Observable<BolsaConInventario[]> {
-    return this.http.get<BolsaConInventario[]>(`${this.baseUrl}/inventario`);
+  getConInventario(incluirEliminados: boolean = false): Observable<BolsaConInventario[]> {
+    return this.http.get<BolsaConInventario[]>(`${this.baseUrl}/inventario`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
   }
 
   getConInventarioById(id: string): Observable<BolsaConInventario> {
@@ -40,5 +42,17 @@ export class BolsaService {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  getOwnedByStore(incluirEliminados: boolean = false): Observable<Bolsa[]> {
+    return this.http.get<Bolsa[]>(`${this.baseUrl}/owned-by-store`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
+  }
+
+  getByUser(id_user: string, incluirEliminados: boolean = false): Observable<Bolsa[]> {
+    return this.http.get<Bolsa[]>(`${this.baseUrl}/user/${id_user}`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
   }
 }

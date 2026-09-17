@@ -46,6 +46,7 @@ export class AnalisisPdfComponent implements OnInit {
 
   muestra: Muestra = {
     id_muestra: '',
+    owned_by_store: false,
     peso: 0,
     variedades: [],
     proceso: '',

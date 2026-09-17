@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule, Check, X, Plus, Trash2, ArrowLeft } from 'lucide-angular';
-
 import { PedidoService } from '../../service/orders.service';
 import { OrderBolsaService } from '../../service/order-bolsa.service';
 import { UserService } from '../../../users/service/users-service.service';
@@ -12,7 +11,6 @@ import { InventarioLoteTostadoService } from '../../../inventory/lotes-tostados/
 import { AlmacenService } from '../../../inventory/almacenes/service/almacen.service';
 import { UiService } from '../../../../shared/services/ui.service';
 import { SelectSearchComponent } from '../../../../shared/components/select-search/select-search.component';
-
 import { Pedido } from '../../../../shared/models/pedido';
 import { PedidoBolsa } from '../../../../shared/models/pedido-bolsa';
 import { User } from '../../../../shared/models/user';
@@ -41,11 +39,15 @@ export class MaquilaFormPage implements OnInit {
 
   readonly molienda = MOLIENDAS;
 
+  // sentinel de UI — no es un id_user real, solo marca "maquila para la tienda"
+  readonly STORE_SENTINEL = '__STORE__';
+
   mode: 'create' | 'edit' = 'create';
   pedidoId: string | null = null;
 
   model: Partial<Pedido> = {
     tipo_pedido: 'Maquila',
+    owned_by_store: false,
     id_user: '',
     id_lote_tostado: '',
     id_almacen: '',
@@ -56,10 +58,16 @@ export class MaquilaFormPage implements OnInit {
   lineasEliminadas: string[] = []; // ids de PedidoBolsa a borrar en el backend al guardar (modo edit)
 
   clientesOriginal: User[] = [];
+  clientesConTienda: User[] = [];
   clientes: User[] = [];
   lotesTostados: any[] = [];
   almacenes: Almacen[] = [];
   userLote: any = null;
+
+  // true cuando el LoteTostado seleccionado es de tienda — habilita el
+  // toggle Cliente/Tienda. Si el lote pertenece a un cliente, la Maquila
+  // siempre es para ese mismo cliente, sin opción de reasignar.
+  loteEsDeTienda = false;
 
   availableQty: number | null = null;
   loading = false;
@@ -84,8 +92,12 @@ export class MaquilaFormPage implements OnInit {
 
   loadCatalogos() {
     this.userSvc.getUsers().subscribe(res => {
-      this.clientesOriginal = res;
-      this.clientes = res;
+      this.clientesOriginal = res.filter(u => u.rol === 'cliente');
+      this.clientes = this.clientesOriginal;
+      this.clientesConTienda = [
+        { id_user: this.STORE_SENTINEL, nombre: 'FORTUNATO (Tienda)' } as any,
+        ...this.clientesOriginal
+      ];
     });
 
     this.almacenSvc.getAlmacenesActivos().subscribe(res => {
@@ -110,7 +122,14 @@ export class MaquilaFormPage implements OnInit {
       if (this.model.id_lote_tostado) {
         const lote = this.lotesTostados.find(l => l.id_lote_tostado === this.model.id_lote_tostado);
         if (lote) {
-          this.userSvc.getUserById(lote.id_user).subscribe(u => this.userLote = u);
+          this.loteEsDeTienda = !!lote.owned_by_store;
+
+          if (lote.owned_by_store) {
+            this.userLote = { nombre: 'FORTUNATO' };
+            this.clientes = this.clientesOriginal;
+          } else if (lote.id_user) {
+            this.userSvc.getUserById(lote.id_user).subscribe(u => this.userLote = u);
+          }
         }
       }
 
@@ -133,19 +152,43 @@ export class MaquilaFormPage implements OnInit {
 
   onLoteChange() {
     const lote = this.lotesTostados.find(l => l.id_lote_tostado === this.model.id_lote_tostado);
-    if (!lote) { this.userLote = null; this.availableQty = null; return; }
+    if (!lote) {
+      this.userLote = null;
+      this.availableQty = null;
+      this.loteEsDeTienda = false;
+      return;
+    }
 
-    this.userSvc.getUserById(lote.id_user).subscribe(u => {
-      this.userLote = u;
-      if (u.rol === 'admin') {
-        this.clientes = [...this.clientesOriginal];
-      } else {
+    this.loteEsDeTienda = !!lote.owned_by_store;
+
+    if (lote.owned_by_store) {
+      // Lote tostado de tienda: la Maquila puede quedar de tienda o
+      // asignarse a cualquier cliente — el toggle decide, no se fuerza nada.
+      this.userLote = { nombre: 'FORTUNATO' };
+      this.clientes = this.clientesOriginal;
+      this.model.id_user = undefined;
+      this.model.owned_by_store = false;
+    } else if (lote.id_user) {
+      // Lote tostado de un cliente: la Maquila SIEMPRE es para ese cliente.
+      this.userSvc.getUserById(lote.id_user).subscribe(u => {
+        this.userLote = u;
         this.clientes = this.clientesOriginal.filter(c => c.id_user === u.id_user);
         this.model.id_user = u.id_user;
-      }
-    });
+        this.model.owned_by_store = false;
+      });
+    }
 
     this.refreshDisponible();
+  }
+
+  onClienteChange(idSeleccionado: string) {
+    if (idSeleccionado === this.STORE_SENTINEL) {
+      this.model.owned_by_store = true;
+      this.model.id_user = undefined;
+    } else {
+      this.model.owned_by_store = false;
+      this.model.id_user = idSeleccionado;
+    }
   }
 
   onAlmacenChange() {
@@ -211,8 +254,12 @@ export class MaquilaFormPage implements OnInit {
   }
 
   onSave() {
-    if (!this.model.id_user || !this.model.id_lote_tostado || !this.model.id_almacen) {
-      this.uiSvc.alert('warning', 'Campos incompletos', 'Completa cliente, lote tostado y almacén.');
+    if (!this.model.id_lote_tostado || !this.model.id_almacen) {
+      this.uiSvc.alert('warning', 'Campos incompletos', 'Completa lote tostado y almacén.');
+      return;
+    }
+    if (!this.model.owned_by_store && !this.model.id_user) {
+      this.uiSvc.alert('warning', 'Campos incompletos', 'Debes seleccionar un cliente o marcar como Tienda.');
       return;
     }
     if (this.lineas.length === 0 || this.lineas.some(l => !l.gramaje || !l.cantidad)) {
@@ -237,6 +284,7 @@ export class MaquilaFormPage implements OnInit {
   private crearPedido() {
     const payload = {
       tipo_pedido: 'Maquila',
+      owned_by_store: this.model.owned_by_store,
       id_user: this.model.id_user,
       id_lote_tostado: this.model.id_lote_tostado,
       id_almacen: this.model.id_almacen,
@@ -249,17 +297,13 @@ export class MaquilaFormPage implements OnInit {
       }))
     };
 
-    console.log('[Maquila] payload enviado:', payload); // 👈 ver qué se manda
-
     this.pedidoSvc.createPedido(payload).subscribe({
       next: (res) => {
-        console.log('[Maquila] respuesta OK:', res); // 👈 confirmar éxito real
         this.uiSvc.alert('success', 'Pedido creado', 'El pedido de maquila se registró correctamente.');
         this.router.navigate(['/orders']);
       },
       error: (err) => {
         this.loading = false;
-
         const msg = this.extraerMensajeError(err);
         this.uiSvc.alert('error', 'Error', msg);
       }

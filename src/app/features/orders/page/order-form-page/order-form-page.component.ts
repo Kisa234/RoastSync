@@ -55,7 +55,7 @@ export class OrderFormPage implements OnInit {
     private userSvc: UserService,
     private almacenSvc: AlmacenService,
     private uiSvc: UiService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.mode = this.route.snapshot.data['mode'] ?? 'create';
@@ -66,12 +66,11 @@ export class OrderFormPage implements OnInit {
   loadCatalogos() {
     this.userSvc.getUsers().subscribe(users => {
       this.clientes = users.filter(u => u.rol === 'cliente');
-      const admins = users.filter(u => u.rol === 'admin');
 
       this.loteSvc.getLotesVerdesConInventario().subscribe(lotes => {
         this.lotes = lotes.filter(
           lote =>
-            admins.some(admin => admin.id_user === lote.id_user) &&
+            lote.owned_by_store &&
             (this.mode === 'edit' || this.getPesoGeneral(lote) > 0)
         );
 
@@ -85,7 +84,6 @@ export class OrderFormPage implements OnInit {
       });
     });
   }
-
   loadPedidoExistente(id: string) {
     this.pedidoSvc.getPedidoById(id).subscribe(pedido => {
       this.model = {

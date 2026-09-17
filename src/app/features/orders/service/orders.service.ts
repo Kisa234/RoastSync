@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Pedido, PedidoConLote } from '../../../shared/models/pedido';
 import { environment } from '../../../../environments/environment';
 import { EstadisticasTueste } from '../../../shared/models/estadisticas-tueste';
+import { EstadisticasPedidos } from '../../../shared/models/estadisticas-pedidos';
 
 
 @Injectable({
@@ -101,4 +102,22 @@ export class PedidoService {
     });
   }
 
+  getEstadisticasPedidos(desde: string, hasta: string): Observable<EstadisticasPedidos> {
+    return this.http.get<EstadisticasPedidos>(`${this.base}/estadisticas/pedidos`, {
+      params: { desde, hasta }
+    });
+  }
+
+
+  getPedidosOwnedByStore(incluirEliminados: boolean = false): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.base}/owned-by-store`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
+  }
+
+  getPedidosByUserId(id_user: string, incluirEliminados: boolean = false): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.base}/user/${id_user}`, {
+      params: { incluirEliminados: String(incluirEliminados) }
+    });
+  }
 }

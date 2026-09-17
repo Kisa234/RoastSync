@@ -6,8 +6,7 @@
       <h1 class="text-2xl font-bold text-[#1F1F1F]">Clientes</h1>
       <p class="text-gray-600">Gestiona los clientes del sistema</p>
     </div>
-    <button
-      class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
+    <button class="flex items-center bg-[#B8672E] text-white px-4 py-2 rounded shadow hover:bg-[#A67C52] transition"
       (click)="openAddClient()">
       <lucide-icon [img]="UserPlus" class="w-5 h-5 mr-2"></lucide-icon>
       Agregar Cliente
@@ -21,12 +20,10 @@
 
     <!-- Buscador -->
     <div class="relative max-w-md">
-      <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
-        placeholder="Buscar por nombre"
+      <input type="text" [(ngModel)]="filterText" (ngModelChange)="onSearchChange()" placeholder="Buscar por nombre"
         class="w-full border border-[#E5E5E5] rounded-lg px-4 py-2 pl-10
                focus:outline-none focus:ring-1 focus:ring-[#B8672E]" />
-      <lucide-icon [img]="Search"
-        class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></lucide-icon>
+      <lucide-icon [img]="Search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></lucide-icon>
     </div>
 
     <!-- Tabla -->
@@ -74,6 +71,9 @@
             </td>
 
             <td class="px-6 py-4 text-right space-x-2">
+              <button (click)="onViewDetail(u)" class="text-gray-500 hover:text-blue-600">
+                <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+              </button>
               <button (click)="onEdit(u)" class="text-gray-500 hover:text-[#B8672E]">
                 <lucide-icon [img]="Edit2" class="w-5 h-5"></lucide-icon>
               </button>
@@ -91,15 +91,8 @@
 </div>
 
 <!-- Modales -->
-<add-client
-  *ngIf="showAddClient"
-  (close)="showAddClient = false"
-  (create)="onClientCreated()">
+<add-client *ngIf="showAddClient" (close)="showAddClient = false" (create)="onClientCreated()">
 </add-client>
 
-<edit-client
-  *ngIf="showEditClient"
-  [userId]="selectedUserId"
-  (close)="showEditClient = false"
-  (update)="loadClients()">
+<edit-client *ngIf="showEditClient" [userId]="selectedUserId" (close)="showEditClient = false" (update)="loadClients()">
 </edit-client>

@@ -2,6 +2,7 @@ import { Almacen } from './almacen';
 import { InventarioMuestra } from './inventario-muestra';
 export interface Muestra {
   id_muestra: string;
+  owned_by_store: boolean;
   nombre_muestra?: string;
   productor: string;
   finca: string;
@@ -21,6 +22,7 @@ export interface Muestra {
 
 export interface MuestraConInventario {
   id_muestra: string;
+  owned_by_store: boolean;
   nombre_muestra: string;
   proveedor: string;
   productor: string;

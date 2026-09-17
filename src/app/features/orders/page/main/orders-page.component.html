@@ -104,7 +104,12 @@
         <tbody class="bg-white divide-y divide-[#E5E5E5]">
           <tr *ngFor="let p of paginatedPedidos" class="hover:bg-[#FCFCFC] transition">
             <td class="px-4 py-4 text-sm text-gray-700">{{ p.tipo_pedido }}</td>
-            <td class="px-4 py-4 text-sm text-gray-700">{{ p.id_user | UserNamePipe | async }}</td>
+            <td class="px-4 py-4 text-sm text-gray-700">
+              <span *ngIf="p.owned_by_store; else clientePedidoReal" class="font-medium text-[#B8672E]">
+                FORTUNATO
+              </span>
+              <ng-template #clientePedidoReal>{{ p.id_user | UserNamePipe | async }}</ng-template>
+            </td>
             <td class="px-4 py-4 text-sm text-gray-700">{{ p.cantidad | number }}</td>
             <td class="px-4 py-4 text-sm text-gray-700">{{ p.id_lote_tostado || p.id_lote || 'N/A' }}</td>
             <td class="px-4 py-4 text-sm">

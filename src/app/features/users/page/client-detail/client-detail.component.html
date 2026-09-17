@@ -1,0 +1,282 @@
+<div class="min-h-screen p-6 bg-[#F9F9F9]">
+
+  <button type="button" (click)="goBack()"
+    class="mb-4 inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#1F1F1F] transition">
+    <lucide-icon [img]="ArrowLeft" class="w-4 h-4"></lucide-icon>
+    Volver a Clientes
+  </button>
+
+  <ng-container *ngIf="!loading && cliente; else loadingTpl">
+
+    <!-- Header cliente -->
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 mb-6">
+      <div class="flex items-start justify-between flex-wrap gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-[#1F1F1F]">{{ cliente.nombre }}</h1>
+          <p *ngIf="cliente.nombre_comercial" class="text-gray-500">{{ cliente.nombre_comercial }}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-[#E5E5E5]">
+        <div>
+          <p class="text-xs text-gray-500 uppercase">Email</p>
+          <p class="text-sm text-[#1F1F1F] flex items-center gap-1 mt-0.5">
+            <lucide-icon [img]="Mail" class="w-3.5 h-3.5 text-gray-400"></lucide-icon>
+            {{ cliente.email }}
+          </p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 uppercase">Teléfono</p>
+          <p class="text-sm text-[#1F1F1F] flex items-center gap-1 mt-0.5">
+            <lucide-icon [img]="Phone" class="w-3.5 h-3.5 text-gray-400"></lucide-icon>
+            {{ cliente.numero_telefono || '—' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 uppercase">Documento</p>
+          <p class="text-sm text-[#1F1F1F] mt-0.5">
+            {{ cliente.documento_tipo || '—' }} {{ cliente.documento_identidad || '' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 uppercase">Fecha de Nacimiento</p>
+          <p class="text-sm text-[#1F1F1F] mt-0.5">
+            {{ cliente.fecha_nacimiento ? (cliente.fecha_nacimiento | date:'dd/MM/yyyy') : '—' }}
+          </p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 uppercase">Departamento</p>
+          <p class="text-sm text-[#1F1F1F] mt-0.5">{{ cliente.departamento || '—' }}</p>
+        </div>
+        <div class="md:col-span-2">
+          <p class="text-xs text-gray-500 uppercase">Dirección</p>
+          <p class="text-sm text-[#1F1F1F] mt-0.5">{{ cliente.direccion || '—' }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 uppercase">Cliente Desde</p>
+          <p class="text-sm text-[#1F1F1F] mt-0.5">{{ cliente.fecha_registro | date:'dd/MM/yyyy' }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-500 uppercase">Primera Compra</p>
+          <p class="text-sm text-[#1F1F1F] mt-0.5">
+            {{ cliente.fecha_primera_compra ? (cliente.fecha_primera_compra | date:'dd/MM/yyyy') : '—' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6">
+      <div class="flex gap-2 mb-4 flex-wrap">
+        <button (click)="tab = 'pedidos'" class="px-4 py-2 rounded text-sm font-medium transition flex items-center gap-2"
+          [ngClass]="tab === 'pedidos' ? 'bg-[#B8672E] text-white' : 'border border-[#E5E5E5] text-gray-600 hover:bg-gray-50'">
+          <lucide-icon [img]="Package" class="w-4 h-4"></lucide-icon>
+          Pedidos ({{ pedidos.length }})
+        </button>
+        <button (click)="tab = 'envios'" class="px-4 py-2 rounded text-sm font-medium transition flex items-center gap-2"
+          [ngClass]="tab === 'envios' ? 'bg-[#B8672E] text-white' : 'border border-[#E5E5E5] text-gray-600 hover:bg-gray-50'">
+          <lucide-icon [img]="Truck" class="w-4 h-4"></lucide-icon>
+          Envíos ({{ envios.length }})
+        </button>
+        <button (click)="tab = 'lotesVerdes'" class="px-4 py-2 rounded text-sm font-medium transition flex items-center gap-2"
+          [ngClass]="tab === 'lotesVerdes' ? 'bg-[#B8672E] text-white' : 'border border-[#E5E5E5] text-gray-600 hover:bg-gray-50'">
+          <lucide-icon [img]="Sprout" class="w-4 h-4"></lucide-icon>
+          Lotes Verdes ({{ lotesVerdes.length }})
+        </button>
+        <button (click)="tab = 'lotesTostados'" class="px-4 py-2 rounded text-sm font-medium transition flex items-center gap-2"
+          [ngClass]="tab === 'lotesTostados' ? 'bg-[#B8672E] text-white' : 'border border-[#E5E5E5] text-gray-600 hover:bg-gray-50'">
+          <lucide-icon [img]="Flame" class="w-4 h-4"></lucide-icon>
+          Lotes Tostados ({{ lotesTostados.length }})
+        </button>
+      </div>
+
+      <!-- Tabla Pedidos -->
+      <div *ngIf="tab === 'pedidos'" class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+          <thead class="bg-[#F9F9F9]">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tipo</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha Registro</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cantidad</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Facturado</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E5E5E5]">
+            <tr *ngFor="let p of pagedPedidos" class="hover:bg-[#F9F9F9] transition">
+              <td class="px-4 py-3 font-medium">{{ p.tipo_pedido }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ p.fecha_registro | date:'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ p.cantidad | number:'1.0-0' }}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded-full text-xs" [ngClass]="estadoPedidoClass(p.estado_pedido)">
+                  {{ p.estado_pedido }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded-full text-xs"
+                  [ngClass]="p.facturado ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                  {{ p.facturado ? 'Sí' : 'No' }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <button (click)="verPedido(p)" class="text-gray-500 hover:text-[#B8672E] transition">
+                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="pedidos.length === 0">
+              <td colspan="6" class="px-4 py-8 text-center text-gray-400">Sin pedidos registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="totalPagesPedidos > 1" class="mt-4 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
+          <span class="text-gray-600">Página {{ pagePedidos }} de {{ totalPagesPedidos }}</span>
+          <div class="flex gap-2">
+            <button [disabled]="pagePedidos === 1" (click)="pagePedidos = pagePedidos - 1"
+              class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40">← Anterior</button>
+            <button [disabled]="pagePedidos === totalPagesPedidos" (click)="pagePedidos = pagePedidos + 1"
+              class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla Envíos -->
+      <div *ngIf="tab === 'envios'" class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+          <thead class="bg-[#F9F9F9]">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">N° Correlativo</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha Registro</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Medio</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Tracking</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E5E5E5]">
+            <tr *ngFor="let e of pagedEnvios" class="hover:bg-[#F9F9F9] transition">
+              <td class="px-4 py-3 font-medium">{{ e.numero_correlativo }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ e.fecha_registro | date:'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ e.medio_envio || '—' }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ e.numero_tracking || '—' }}</td>
+              <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded-full text-xs" [ngClass]="estadoEnvioClass(e.estado)">
+                  {{ e.estado }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <button (click)="verEnvio(e)" class="text-gray-500 hover:text-[#B8672E] transition">
+                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="envios.length === 0">
+              <td colspan="6" class="px-4 py-8 text-center text-gray-400">Sin envíos registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="totalPagesEnvios > 1" class="mt-4 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
+          <span class="text-gray-600">Página {{ pageEnvios }} de {{ totalPagesEnvios }}</span>
+          <div class="flex gap-2">
+            <button [disabled]="pageEnvios === 1" (click)="pageEnvios = pageEnvios - 1"
+              class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40">← Anterior</button>
+            <button [disabled]="pageEnvios === totalPagesEnvios" (click)="pageEnvios = pageEnvios + 1"
+              class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla Lotes Verdes -->
+      <div *ngIf="tab === 'lotesVerdes'" class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+          <thead class="bg-[#F9F9F9]">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Productor</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Proceso</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha Registro</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E5E5E5]">
+            <tr *ngFor="let l of pagedLotesVerdes" class="hover:bg-[#F9F9F9] transition">
+              <td class="px-4 py-3 font-medium">{{ l.id_lote }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ l.productor || '—' }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ l.proceso }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ l.peso | number:'1.0-0' }} gr</td>
+              <td class="px-4 py-3 text-gray-600">{{ l.fecha_registro | date:'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3 text-right">
+                <button (click)="verLoteVerde(l)" class="text-gray-500 hover:text-[#B8672E] transition">
+                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="lotesVerdes.length === 0">
+              <td colspan="6" class="px-4 py-8 text-center text-gray-400">Sin lotes verdes registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="totalPagesLotesVerdes > 1" class="mt-4 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
+          <span class="text-gray-600">Página {{ pageLotesVerdes }} de {{ totalPagesLotesVerdes }}</span>
+          <div class="flex gap-2">
+            <button [disabled]="pageLotesVerdes === 1" (click)="pageLotesVerdes = pageLotesVerdes - 1"
+              class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40">← Anterior</button>
+            <button [disabled]="pageLotesVerdes === totalPagesLotesVerdes" (click)="pageLotesVerdes = pageLotesVerdes + 1"
+              class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla Lotes Tostados -->
+      <div *ngIf="tab === 'lotesTostados'" class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-[#E5E5E5] text-sm">
+          <thead class="bg-[#F9F9F9]">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Lote Tostado</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Perfil</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase">Fecha Tostado</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E5E5E5]">
+            <tr *ngFor="let l of pagedLotesTostados" class="hover:bg-[#F9F9F9] transition">
+              <td class="px-4 py-3 font-medium">{{ l.id_lote_tostado }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ l.perfil_tostado }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ l.peso | number:'1.0-0' }} gr</td>
+              <td class="px-4 py-3 text-gray-600">{{ l.fecha_tostado | date:'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3 text-right">
+                <button (click)="verLoteTostado(l)" class="text-gray-500 hover:text-[#B8672E] transition">
+                  <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="lotesTostados.length === 0">
+              <td colspan="5" class="px-4 py-8 text-center text-gray-400">Sin lotes tostados registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="totalPagesLotesTostados > 1" class="mt-4 flex items-center justify-between border-t border-[#E5E5E5] pt-4 text-sm">
+          <span class="text-gray-600">Página {{ pageLotesTostados }} de {{ totalPagesLotesTostados }}</span>
+          <div class="flex gap-2">
+            <button [disabled]="pageLotesTostados === 1" (click)="pageLotesTostados = pageLotesTostados - 1"
+              class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40">← Anterior</button>
+            <button [disabled]="pageLotesTostados === totalPagesLotesTostados" (click)="pageLotesTostados = pageLotesTostados + 1"
+              class="px-3 py-1.5 rounded border border-[#E5E5E5] hover:bg-[#F9F9F9] disabled:opacity-40">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <div class="flex items-center justify-center py-20 text-gray-400">
+      <p>Cargando información del cliente...</p>
+    </div>
+  </ng-template>
+
+</div>
