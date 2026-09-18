@@ -275,7 +275,8 @@ export class AddLoteComponent implements OnInit {
   }
 
   saveManual() {
-    if (!this.validarModelo()) return;
+    if (!this.validarModelo())return;
+    console.log('Creando lote manual', this.model);
 
     this.loteSvc.create(this.model).subscribe(l => {
       this.addIngreso(l);

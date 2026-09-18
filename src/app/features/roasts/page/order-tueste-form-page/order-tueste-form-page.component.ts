@@ -52,7 +52,7 @@ export class OrderTuesteFormPage implements OnInit {
   almacenesConStock: AlmacenConStock[] = [];
 
   readonly Tostadoras: string[] = ['Kaleido', 'Candela'];
-  readonly tiposTueste: string[] = ['Tueste Claro', 'Tueste Medio', 'Tueste Oscuro'];
+  readonly tiposTueste: string[] = ['Tueste Claro', 'Tueste Medio', 'Tueste Medio Oscuro', 'Tueste Oscuro'];
 
   orden: Partial<Pedido> = {
     tipo_pedido: 'Orden Tueste',
