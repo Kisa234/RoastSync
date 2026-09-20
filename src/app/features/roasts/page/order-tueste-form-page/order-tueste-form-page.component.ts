@@ -54,7 +54,7 @@ export class OrderTuesteFormPage implements OnInit {
   readonly Tostadoras: string[] = ['Kaleido', 'Candela'];
   readonly tiposTueste: string[] = ['Tueste Claro', 'Tueste Medio', 'Tueste Medio Oscuro', 'Tueste Oscuro'];
 
-  orden: Partial<Pedido> = {
+  orden: Partial<Pedido> & { owned_by_store?: boolean } = {
     tipo_pedido: 'Orden Tueste',
     cantidad: 0,
     comentario: '',
@@ -64,6 +64,7 @@ export class OrderTuesteFormPage implements OnInit {
     tostadora: '',
     facturado: undefined,
     fecha_tueste: new Date(),
+    owned_by_store: false,
   };
 
   // selección real del selector "Cliente" — puede ser el sentinel de tienda
@@ -123,11 +124,14 @@ export class OrderTuesteFormPage implements OnInit {
       // no del id_user guardado — si el lote origen es de tienda, el select debe
       // mostrar "FORTUNATO" aunque el pedido internamente tenga el id_user sentinel.
       const loteDelPedido = this.lotesAll.find((l: any) => l.id_lote === this.orden.id_lote);
+
       if (loteDelPedido?.owned_by_store) {
         this.clienteSeleccionado = this.STORE_SENTINEL;
+        this.orden.owned_by_store = true;
         this.lotes = this.lotesAll.filter((l: any) => l.owned_by_store);
       } else {
         this.clienteSeleccionado = this.orden.id_user ?? '';
+        this.orden.owned_by_store = false;
         this.lotes = this.lotesAll.filter((l: any) => l.id_user === this.orden.id_user);
       }
 
@@ -140,10 +144,10 @@ export class OrderTuesteFormPage implements OnInit {
       this.roastsSvc.getTuestesByPedido(id).subscribe(tuestes => {
         this.batches = tuestes.length
           ? tuestes.map((t: any, i: number) => ({
-              id: i + 1,
-              pesoVerde: t.peso_entrada,
-              pesoTostado: parseFloat((t.peso_entrada * 0.85).toFixed(2)),
-            }))
+            id: i + 1,
+            pesoVerde: t.peso_entrada,
+            pesoTostado: parseFloat((t.peso_entrada * 0.85).toFixed(2)),
+          }))
           : [{ id: 1, pesoVerde: 0, pesoTostado: 0 }];
       });
     });
@@ -153,12 +157,15 @@ export class OrderTuesteFormPage implements OnInit {
     if (this.clienteSeleccionado === this.STORE_SENTINEL) {
       this.lotes = this.lotesAll.filter((l: any) => l.owned_by_store);
       this.orden.id_user = undefined;
+      this.orden.owned_by_store = true;   // ← esto faltaba
     } else if (this.clienteSeleccionado) {
       this.lotes = this.lotesAll.filter((l: any) => l.id_user === this.clienteSeleccionado);
       this.orden.id_user = this.clienteSeleccionado;
+      this.orden.owned_by_store = false;  // ← y esto
     } else {
       this.lotes = [];
       this.orden.id_user = undefined;
+      this.orden.owned_by_store = false;
     }
     this.orden.id_lote = '';
     this.orden.id_almacen = '';
@@ -324,6 +331,8 @@ export class OrderTuesteFormPage implements OnInit {
 
   onSave(): void {
     if (!this.validarFormulario()) return;
+
+    console.log('Guardando orden de tueste:', this.orden, 'Batches:', this.batches);
 
     this.saving = true;
     const payload = {
