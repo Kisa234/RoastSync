@@ -2,172 +2,144 @@
 
   <!-- Header -->
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-[#1F1F1F]">Calculadora de Costeo</h1>
+    <h1 class="text-2xl font-bold text-[#1F1F1F]">Calculadora de Costeo Avanzada</h1>
     <p class="text-gray-600">
-      Simula precios, márgenes y ganancia según lote, volumen y escala
+      Simula precios, márgenes y ganancia ajustando mermas, empaques y comisiones.
     </p>
   </div>
 
-  <!-- Card principal -->
   <div class="bg-white rounded-lg border border-[#E5E5E5] shadow-sm p-6 space-y-8">
 
-    <!-- ========================= -->
-    <!-- Datos del lote -->
-    <!-- ========================= -->
+    <!-- SECCIÓN 1: Datos Base del Café -->
     <div>
-      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Datos del lote</h2>
-
+      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4 border-b pb-2">1. Datos del Café (Verde y Tueste)</h2>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-        <!-- Café / Lote -->
+        
         <div>
           <label class="block text-xs text-gray-600 mb-1">Café / Lote</label>
-          <select
-            [(ngModel)]="lote"
-            (ngModelChange)="onLoteChange()"
-            class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm
-                   focus:ring-2 focus:ring-[#B8672E] bg-white">
+          <select [(ngModel)]="lote" (ngModelChange)="onLoteChange()" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E] bg-white">
             <option [ngValue]="undefined">Selecciona un café</option>
-            <option *ngFor="let l of lotes" [ngValue]="l">
-              {{ l.id_lote }}
-            </option>
+            <option *ngFor="let l of lotes" [ngValue]="l">{{ l.id_lote }}</option>
           </select>
         </div>
 
-        <!-- Tipo de café -->
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Clasificacion de café</label>
-          <input
-            type="text"
-            [value]="lote?.clasificacion | titlecase"
-            disabled
-            class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded px-3 py-2 text-sm" />
+          <label class="block text-xs text-gray-600 mb-1">Costo Café Verde (x) S/.</label>
+          <input type="number" [(ngModel)]="precioVerde" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
         </div>
 
-        <!-- Costo café -->
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Costo del café (S/.)</label>
-          <input
-            type="number"
-            [value]="costoCafe"
-            disabled
-            class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded px-3 py-2 text-sm" />
+          <label class="block text-xs text-gray-600 mb-1">Merma en Tostado (y%)</label>
+          <input type="number" [(ngModel)]="mermaPorcentaje" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
         </div>
 
-        <!-- Precio venta unitario -->
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Precio de venta (S/.)</label>
-          <input
-            type="number"
-            min="0"
-            [(ngModel)]="precioVentaManual"
-            (ngModelChange)="onPrecioVentaChange($event)"
-            class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm
-                   focus:ring-2 focus:ring-[#B8672E]" />
-        </div>
-
-        <!-- Escala -->
-        <div>
-          <label class="block text-xs text-gray-600 mb-1">Escala</label>
-          <input
-            type="text"
-            [value]="escala === 'escala2' ? 'Escala 2' : 'Escala 1'"
-            disabled
-            class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded px-3 py-2 text-sm" />
-        </div>
-
-        <!-- Kilos -->
-        <div>
-          <label class="block text-xs text-gray-600 mb-1">Kilos cotizados</label>
-          <input
-            type="number"
-            min="1"
-            [(ngModel)]="kilos"
-            class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm
-                   focus:ring-2 focus:ring-[#B8672E]" />
+          <label class="block text-xs text-gray-600 mb-1">Gastos Logísticos (z) S/.</label>
+          <input type="number" [(ngModel)]="gastosLogisticos" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
         </div>
 
       </div>
     </div>
 
-    <!-- ========================= -->
-    <!-- Costos adicionales -->
-    <!-- ========================= -->
+    <!-- SECCIÓN 2: Empaque y Ventas -->
     <div>
-      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4">Costos adicionales</h2>
-
+      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4 border-b pb-2">2. Parámetros de Empaque y Venta</h2>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-        <!-- Comisión -->
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Comisión (%)</label>
-          <input
-            type="number"
-            min="0"
-            [(ngModel)]="comision"
-            class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm" />
+          <label class="block text-xs text-gray-600 mb-1">Peso del Café (a) g.</label>
+          <input type="number" [(ngModel)]="pesoGramos" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
         </div>
 
-        <!-- Tueste (solo lectura, calculado) -->
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Costo de tueste (según tipo)</label>
-          <input
-            type="number"
-            [value]="costoTostado"
-            disabled
-            class="w-full bg-[#F9F9F9] border border-[#E5E5E5] rounded px-3 py-2 text-sm" />
+          <label class="block text-xs text-gray-600 mb-1">Costo Empaque/Bolsa (b) S/.</label>
+          <input type="number" [(ngModel)]="costosEmpaque" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">Comisión (P%)</label>
+          <input type="number" [(ngModel)]="comisionPorcentaje" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">IGV (Q%)</label>
+          <select [(ngModel)]="igvPorcentaje" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E] bg-white">
+            <option [ngValue]="0">0% (Inafecto)</option>
+            <option [ngValue]="10">10% (Reducido)</option>
+            <option [ngValue]="18">18% (General)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1 font-bold text-[#B8672E]">Precio de Venta (M) S/.</label>
+          <input type="number" [(ngModel)]="precioVenta" class="w-full border-2 border-[#B8672E] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E] bg-orange-50" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">Cant. Volumen (N)</label>
+          <input type="number" [(ngModel)]="cantidadVolumen" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">Ganancia Esperada (GmR%)</label>
+          <input type="number" [(ngModel)]="gananciaMinimaRecomend" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
         </div>
 
       </div>
     </div>
 
-    <!-- ========================= -->
-    <!-- Resultados -->
-    <!-- ========================= -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- SECCIÓN 3: Resultados -->
+    <div>
+      <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4 border-b pb-2">3. Resultados del Simulador</h2>
+      
+      <!-- Primera Fila de Resultados -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        
+        <div class="border border-[#E5E5E5] rounded-lg p-4 bg-gray-100">
+          <p class="text-xs text-gray-500 mb-1">Costo Real Tostado (CRT) x Kg</p>
+          <p class="text-xl font-bold">S/. {{ crt | number:'1.2-2' }}</p>
+          <p class="text-xs text-gray-500">Costo café x bolsa: S/.{{ met | number:'1.2-2' }}</p>
+        </div>
 
-      <!-- Ganancia unitaria -->
-      <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#D9EAD3]">
-        <p class="text-xs text-gray-500 mb-1">Ganancia</p>
-        <p class="text-2xl font-bold">
-          S/. {{ ganancia | number:'1.2-2' }}
-        </p>
-        <p class="text-sm text-gray-600">
-          {{ margenReal | number:'1.2-2' }} %
-        </p>
+        <div class="border border-[#E5E5E5] rounded-lg p-4 bg-gray-100">
+          <p class="text-xs text-gray-500 mb-1">Costo del Producto (CdP)</p>
+          <p class="text-xl font-bold">S/. {{ cdp | number:'1.2-2' }}</p>
+          <p class="text-xs text-gray-500">Incluye igv (S/.{{igvv | number:'1.2-2'}}) y comisión</p>
+        </div>
+
+        <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#FCE5CD]">
+          <p class="text-xs text-[#B8672E] font-bold mb-1">Venta Recomendada</p>
+          <p class="text-2xl font-bold">S/. {{ ventaRecomendada | number:'1.2-2' }}</p>
+          <p class="text-xs text-gray-600">Para ganar el {{ gananciaMinimaRecomend }}% neto</p>
+        </div>
       </div>
 
-      <!-- Ganancia con tostado -->
-      <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#FCE5CD]">
-        <p class="text-xs text-gray-500 mb-1">Ganancia con tostado</p>
-        <p class="text-2xl font-bold">
-          S/. {{ gananciaConTostado | number:'1.2-2' }}
-        </p>
-        <p class="text-xs text-gray-500">
-          Tueste: S/. {{ costoTostado | number:'1.2-2' }} / kg
-        </p>
-      </div>
+      <!-- Segunda Fila de Resultados (Ganancias) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="border border-[#E5E5E5] rounded-lg p-4" [ngClass]="ganancia >= 0 ? 'bg-[#D9EAD3]' : 'bg-[#F4CCCC]'">
+          <p class="text-xs text-gray-600 mb-1">Ganancia Unitaria Neta (G)</p>
+          <p class="text-3xl font-bold" [ngClass]="ganancia >= 0 ? 'text-green-700' : 'text-red-600'">
+            S/. {{ ganancia | number:'1.2-2' }}
+          </p>
+        </div>
 
-      <!-- Ganancia en volumen -->
-      <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#D0E0E3]">
-        <p class="text-xs text-gray-500 mb-1">Ganancia en Volumen</p>
-        <p class="text-2xl font-bold">
-          S/. {{ gananciaTotal | number:'1.2-2' }}
-        </p>
-        <p class="text-xs text-gray-500">
-          {{ kilos }} kg
-        </p>
-      </div>
+        <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#D0E0E3]">
+          <p class="text-xs text-gray-600 mb-1">Porcentaje de Ganancia Real</p>
+          <p class="text-3xl font-bold text-blue-800">
+            {{ porcentajeGanancia | number:'1.2-2' }} %
+          </p>
+          <p class="text-xs text-gray-500">Margen neto (Sin IGV)</p>
+        </div>
 
-      <!-- Venta recomendada -->
-      <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#F4CCCC]">
-        <p class="text-xs text-gray-500 mb-1">Venta recomendada</p>
-        <p class="text-2xl font-bold">
-          S/. {{ ventaRecomendadaTotal | number:'1.2-2' }}
-        </p>
-        <p class="text-xs text-gray-500">
-          Unitario: S/. {{ ventaRecomendadaUnitaria | number:'1.2-2' }} ({{ (margenRecomendado * 100) | number:'1.0-0' }}%)
-        </p>
+        <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#FFF2CC]">
+          <p class="text-xs text-gray-600 mb-1">Ganancia en Volumen</p>
+          <p class="text-3xl font-bold text-yellow-700">
+            S/. {{ gananciaVolumen | number:'1.2-2' }}
+          </p>
+          <p class="text-xs text-gray-500">Por {{ cantidadVolumen }} bolsas/kilos</p>
+        </div>
+
       </div>
 
     </div>
