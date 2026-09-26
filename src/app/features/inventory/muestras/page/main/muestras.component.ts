@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule, AsyncPipe, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Eye, CheckCircle, Plus, ChevronDown } from 'lucide-angular';
-import { AddMuestraComponent } from '../components/add-muestra/add-muestra.component';
-import { ReportLoteComponent } from '../../../../shared/components/report-lote/report-lote.component';
-import { UserNamePipe } from '../../../../shared/pipes/user-name-pipe.pipe';
-import { User } from '../../../../shared/models/user';
-import { UserService } from '../../../users/service/users-service.service';
-import { UiService } from '../../../../shared/services/ui.service';
-import { MuestraService } from '../service/muestra.service';
-import { MuestraConInventario } from '../../../../shared/models/muestra';
-import { AddInventoryMuestraComponent } from "../components/add-inventory-muestra/add-inventory-muestra.component";
+import { LucideAngularModule, Search, Eye, CheckCircle, EyeOffIcon,Plus, ChevronDown } from 'lucide-angular';
+import { AddMuestraComponent } from '../../components/add-muestra/add-muestra.component';
+import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
+import { User } from '../../../../../shared/models/user';
+import { UserService } from '../../../../users/service/users-service.service';
+import { UiService } from '../../../../../shared/services/ui.service';
+import { MuestraService } from '../../service/muestra.service';
+import { MuestraConInventario } from '../../../../../shared/models/muestra';
+import { AddInventoryMuestraComponent } from "../../components/add-inventory-muestra/add-inventory-muestra.component";
+import { Router } from '@angular/router';
 
 type FilterKey = 'todas' | 'sin-completar' | 'completadas';
 
@@ -19,7 +19,7 @@ type FilterKey = 'todas' | 'sin-completar' | 'completadas';
   standalone: true,
   imports: [
     CommonModule, FormsModule, AsyncPipe, NgIf, NgFor,
-    LucideAngularModule, AddMuestraComponent, ReportLoteComponent,
+    LucideAngularModule, AddMuestraComponent,
     UserNamePipe, AddInventoryMuestraComponent
   ],
   templateUrl: './muestras.component.html'
@@ -28,6 +28,7 @@ export class MuestrasComponent {
 
   readonly Search = Search;
   readonly Eye = Eye;
+  readonly EyeOff = EyeOffIcon;
   readonly CheckCircle = CheckCircle;
   readonly Plus = Plus;
   readonly ChevronDown = ChevronDown;
@@ -56,15 +57,14 @@ export class MuestrasComponent {
   ];
 
   showAddMuestra = false;
-  showReport = false;
-  selectedMuestraId = '';
   selectedMuestra: MuestraConInventario | null = null;
   showAsignarInventarioModal = false;
 
   constructor(
     private muestraService: MuestraService,
     private userService: UserService,
-    private uiService: UiService
+    private uiService: UiService,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -168,8 +168,7 @@ export class MuestrasComponent {
         this.uiService.alert('error', 'Error', 'La muestra no tiene análisis asociado');
         return;
       }
-      this.selectedMuestraId = m.id_muestra;
-      this.showReport = true;
+      this.router.navigate(['/inventory/muestras/reporte', m.id_muestra]);
     });
   }
 

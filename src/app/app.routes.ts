@@ -16,7 +16,6 @@ import { ClientFormComponent } from './features/client-form/pages/client-form.co
 import { LoteTostadoComponent } from './features/inventory/lotes-tostados/page/main/lote-tostado.component';
 import { InternsComponent } from './features/users/page/interns/interns.component';
 import { ClientsComponent } from './features/users/page/clients/clients.component';
-import { MuestrasComponent } from './features/inventory/muestras/page/muestras.component';
 import { LoteVerdeComponent } from './features/inventory/lotes-verdes/page/main/lote-verde.component';
 import { VerMovimientosPage } from './features/inventory/almacenes/page/ver-movimientos/ver-movimientos.component';
 import { AlmacenComponent } from './features/inventory/almacenes/page/main/almacen.component';
@@ -67,6 +66,8 @@ import { StadisticPedidosComponent } from './features/orders/page/stadistic-pedi
 import { ClientDetailComponent } from './features/users/page/client-detail/client-detail.component';
 import { HistoricLote } from './features/inventory/lotes-verdes/page/historic-lote/historic-lote.component';
 import { ReportLoteComponent } from './features/inventory/lotes-verdes/page/report-lote/report-lote.component';
+import { MuestrasComponent } from './features/inventory/muestras/page/main/muestras.component';
+import { ReportMuestraComponent } from './features/inventory/muestras/page/reporte-muestra/report-muestra.component';
 
 export const appRoutes: Routes = [
 
@@ -144,7 +145,12 @@ export const appRoutes: Routes = [
         path: 'inventory',
         component: InventoryPage,
         children: [
-          { path: 'muestras', component: MuestrasComponent },
+          { path: 'muestras' ,
+            children: [
+              {path: '', component: MuestrasComponent},
+              {path: 'reporte/:id', component: ReportMuestraComponent}
+            ]
+          },
           { path: 'lotes-verdes', component: LoteVerdeComponent },
           {
             path: 'lotes-verdes',

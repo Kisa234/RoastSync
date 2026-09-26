@@ -154,7 +154,8 @@
 
             <td class="px-6 py-4 text-right text-sm space-x-2">
               <button (click)="onReport(m)" class="text-gray-500 hover:text-gray-700" title="Ver reporte">
-                <lucide-icon [img]="Eye" class="w-5 h-5"></lucide-icon>
+                <lucide-icon [img]="m.id_analisis ? Eye : EyeOff"
+                  [class]="m.id_analisis ? 'w-5 h-5' : 'w-5 h-5 text-red-500'"></lucide-icon>
               </button>
               <button *ngIf="!m.completado" (click)="onComplete(m)" class="text-gray-500 hover:text-green-600"
                 title="Marcar como completa">
@@ -170,6 +171,5 @@
 
 <!-- Modales -->
 <add-muestra *ngIf="showAddMuestra" (close)="showAddMuestra = false" (create)="onCreated()"></add-muestra>
-<report-lote *ngIf="showReport" [MuestraId]="selectedMuestraId" (close)="showReport = false"></report-lote>
 <add-inventory-muestra *ngIf="showAsignarInventarioModal && selectedMuestra" [muestraId]="selectedMuestra.id_muestra"
   (close)="closeAsignarInventarioMuestra()" (create)="onInventarioMuestraCreated()"></add-inventory-muestra>
