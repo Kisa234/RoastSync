@@ -27,8 +27,6 @@ interface FlavorNode {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './multi-pie-chart.component.html',
-  // overflow: visible — igual que en spider-graph, para que las etiquetas
-  // externas del anillo de notas no se recorten contra el borde del host.
   styles: [':host { display: block; width: 100%; height: 400px; overflow: visible; }']
 })
 export class MultiPieChartComponent implements OnChanges, AfterViewInit, OnDestroy {
@@ -78,10 +76,7 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit, OnDestr
   }
 
   public getChartImage(): string {
-    // pixelRatio 2 = 4x los píxeles totales (2x por eje), todos
-    // exportados como PNG sin pérdida — eso engordaba bastante el PDF.
-    // 1.5 se sigue viendo nítido y pesa bastante menos de entrada, antes
-    // de que report-lote lo recomprima a JPEG.
+    // pixelRatio 1.5: nítido y liviano (report-lote/muestra lo recomprime a JPEG)
     return this.chart.getDataURL({
       type: 'png',
       pixelRatio: 1.5,
@@ -197,6 +192,11 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit, OnDestr
         }]
       : rootData;
 
+    // Pocas notas en el anillo exterior → texto tangencial (sigue el arco,
+    // se lee derecho). Muchas notas → radial (cabe en segmentos angostos).
+    const hojas = this.countLeaves(rootData);
+    const rotacionExterior: 'tangential' | 'radial' = hojas <= 6 ? 'tangential' : 'radial';
+
     const nivelesCategorias: any[] = necesitaAnilloBlanco
       ? [
           // Anillo 0: blanco/invisible, sin label, solo para dar espacio.
@@ -206,9 +206,6 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit, OnDestr
             itemStyle: { color: 'transparent', borderWidth: 0 }
           },
           {
-            // Antes: 14%-38% (banda de 24% de radio, muy angosta para
-            // texto largo tipo "nueces/cacao" → se veía apretado/estirado).
-            // Ahora: 14%-48% (34% de radio), más espacio radial para el texto.
             r0: '14%', r: '48%',
             label: {
               rotate: 'radial',
@@ -225,7 +222,7 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit, OnDestr
             label: { rotate: 'tangential', fontSize: 12, color: '#fff', minAngle: 10 },
             itemStyle: { borderWidth: 1.5, borderColor: '#fff' }
           },
-          this.outerRingLevel('72%', '90%')
+          this.outerRingLevel('72%', '90%', rotacionExterior)
         ]
       : [
           {
@@ -245,21 +242,17 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit, OnDestr
             label: { rotate: 'tangential', fontSize: 12, color: '#fff', minAngle: 10 },
             itemStyle: { borderWidth: 1.5, borderColor: '#fff' }
           },
-          this.outerRingLevel('68%', '90%')
+          this.outerRingLevel('68%', '90%', rotacionExterior)
         ];
 
     const option: EChartsOption = {
       tooltip: { trigger: 'item', formatter: '{b}' },
       series: <SunburstSeriesOption>{
         type: 'sunburst',
-        // Antes llegaba hasta 90% del contenedor; ahora dejamos 68% de margen
-        // libre alrededor para que quepan las etiquetas externas del anillo
-        // de notas (estilo rueda SCA), que ya no viven dentro del arco.
-        radius: [0, '68%'],
+        radius: [0, '90%'],
         data: sunburstData,
         // minAngle: si un segmento queda más angosto que esto (en grados),
-        // ECharts oculta su etiqueta en vez de forzarla y que se encime
-        // con la del segmento vecino.
+        // ECharts oculta su etiqueta en vez de encimarla con la vecina.
         label: { rotate: 'radial', color: '#fff', fontSize: 11, fontWeight: 500, minAngle: 8 },
         itemStyle: {
           borderWidth: 1.5,
@@ -273,35 +266,37 @@ export class MultiPieChartComponent implements OnChanges, AfterViewInit, OnDestr
     this.chart.setOption(option, { notMerge: true });
   }
 
-  // Config del anillo exterior (las notas individuales, ej. "manzana",
-  // "piña") al estilo de la rueda SCA: la etiqueta vive AFUERA del arco,
-  // conectada por una línea fina, con el texto en el mismo color de su
-  // segmento — en vez de intentar meter el texto adentro del arco.
-  private outerRingLevel(r0: string, r: string): any {
+  // Anillo exterior (notas individuales: "caramelo", "manzana"...).
+  // Antes la etiqueta iba AFUERA del arco con una línea; quedaba chica y al
+  // costado (en el PDF casi no se leía). Ahora va dentro del arco, en blanco
+  // como los demás anillos.
+  private outerRingLevel(r0: string, r: string, rotate: 'tangential' | 'radial'): any {
     return {
       r0,
       r,
       label: {
-        position: 'outside',
-        rotate: 0,
+        position: 'inside',
+        rotate,
         fontSize: 11,
         fontWeight: 600,
-        color: 'inherit',
-        minAngle: 4
+        color: '#fff',
+        minAngle: 4,
+        overflow: 'truncate',
       },
-      labelLine: {
-        show: true,
-        length: 6,
-        length2: 10,
-        lineStyle: { color: 'inherit', width: 1 }
-      },
+      labelLine: { show: false },
       itemStyle: { borderWidth: 1.5, borderColor: '#fff' }
     };
   }
 
+  private countLeaves(nodes: any[]): number {
+    return nodes.reduce(
+      (n, node) => n + (node.children?.length ? this.countLeaves(node.children) : 1),
+      0
+    );
+  }
+
   // Parte etiquetas largas tipo "Nueces/Cacao" en dos líneas por el "/",
-  // igual que "NUTTY/COCOA" en la rueda oficial SCA — evita que el texto
-  // se vea apretado/estirado dentro de una banda radial angosta.
+  // igual que "NUTTY/COCOA" en la rueda oficial SCA.
   private splitLabel(name: string): string {
     if (!name) return '';
     if (name.includes('/')) {

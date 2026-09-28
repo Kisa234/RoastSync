@@ -21,6 +21,9 @@ import { AnalisisFisicoService } from '../../../../analysis/service/analisis-fis
 import { AnalisisSensorialService } from '../../../../analysis/service/analisis-sensorial.service';
 import { AnalisisDefectosService } from '../../../../analysis/service/analisis-defectos.service';
 import { UserService } from '../../../../users/service/users-service.service';
+import { UbigeoService } from '../../../../../shared/services/ubigeo.service';
+import { inferirProvincia } from '../../../../../shared/utils/ubigeo.utils';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'report-muestra',
@@ -154,6 +157,7 @@ export class ReportMuestraComponent implements OnInit {
     private analisisFisicoService: AnalisisFisicoService,
     private analisisDefectosService: AnalisisDefectosService,
     private userService: UserService,
+    private ubigeoSvc: UbigeoService,
     private ui: UiService,
     private route: ActivatedRoute,
     private location: Location,
@@ -172,6 +176,7 @@ export class ReportMuestraComponent implements OnInit {
     this.muestraService.getById(this.id).subscribe({
       next: muestra => {
         this.muestra = muestra;
+        this.deducirProvinciaSiFalta(muestra.departamento, muestra.provincia, muestra.distrito);
 
         if (muestra.id_analisis) {
           this.analisisService.getAnalisisById(muestra.id_analisis).subscribe({
@@ -215,13 +220,43 @@ export class ReportMuestraComponent implements OnInit {
     });
   }
 
+  // ── Datos generales (rotulado) ─────────────────────────────────
+
+  /** Provincia deducida por ubigeo para registros antiguos que no la tienen guardada */
+  provinciaInferida = '';
+
+  /** Nombre del producto para el rotulado: "<ID> - Café oro verde" */
+  get productoTexto(): string {
+    return this.muestra.id_muestra ? `${this.muestra.id_muestra} - Café oro verde` : '';
+  }
+
+  private deducirProvinciaSiFalta(departamento?: string, provincia?: string | null, distrito?: string) {
+    if (provincia || !departamento || !distrito) return;
+    this.ubigeoSvc.getDepartamentos().subscribe(deps => {
+      const dept = deps.find(d => d.nombre.trim().toUpperCase() === departamento.trim().toUpperCase());
+      if (!dept) return;
+      forkJoin({
+        provincias: this.ubigeoSvc.getProvincias(dept.codigo),
+        distritos: this.ubigeoSvc.getDistritoByDepartamento(dept.codigo),
+      }).subscribe(({ provincias, distritos }) => {
+        this.provinciaInferida = inferirProvincia(distrito, distritos, provincias)?.nombre ?? '';
+      });
+    });
+  }
+
+  /** Origen: Departamento - Provincia - Distrito (la finca va aparte) */
   get origen(): string {
     const m = this.muestra;
-    const segmentos: string[] = [];
-    if (m.departamento) segmentos.push(m.departamento);
-    if (m.distrito) segmentos.push(m.distrito);
-    if (m.finca) segmentos.push(m.finca);
-    return segmentos.join(' - ');
+    const provincia = m.provincia || this.provinciaInferida;
+    return [m.departamento, provincia, m.distrito].filter(Boolean).join(' - ');
+  }
+
+  get alturaTexto(): string {
+    return this.muestra.altura ? `${this.muestra.altura} msnm` : '';
+  }
+
+  get anioCosechaTexto(): string {
+    return this.muestra.anio_cosecha ? String(this.muestra.anio_cosecha) : '';
   }
 
   // El backend a veces manda `variedades` como string ("Caturra, Bourbon")
@@ -234,6 +269,8 @@ export class ReportMuestraComponent implements OnInit {
     }
     return '';
   }
+
+  // ───────────────────────────────────────────────────────────────
 
   // Mismos divisores que el reporte de lote. Aquí sí se asigna
   // calc.grano_negro (en report-lote nunca se seteaba).
@@ -338,33 +375,47 @@ export class ReportMuestraComponent implements OnInit {
     pdf.text('Reporte de Analisis', margin, y + 6);
     y += 14;
 
+    // Datos generales (rotulado). Origen = Departamento - Provincia - Distrito;
+    // la Finca va en su propio cuadro.
     const camposHeader: [string, string][] = [
-      ['Matriz de Muestra', this.muestra.id_muestra],
+      ['Producto', this.productoTexto],
       ['Cliente', this.user.nombre],
       ['Productor', this.muestra.productor || 'N/A'],
+      ['Origen', this.origen],
+      ['Finca', this.muestra.finca || ''],
+      ['Variedad', this.variedadesTexto],
+      ['Proceso', this.muestra.proceso || 'N/A'],
+      ['Altitud', this.alturaTexto],
+      ['Año de cosecha', this.anioCosechaTexto],
     ];
-    if (this.origen) camposHeader.push(['Origen', this.origen]);
-    camposHeader.push(['Variedad', this.variedadesTexto]);
-    camposHeader.push(['Proceso', this.muestra.proceso || 'N/A']);
 
+    // 9 campos → 3 filas de 3 pares (etiqueta | valor), compacto para que
+    // los defectos no se empujen a la página 2
+    const filasHeader: string[][] = [];
+    for (let i = 0; i < camposHeader.length; i += 3) {
+      filasHeader.push(
+        camposHeader.slice(i, i + 3).flatMap(([label, value]) => [label, value || 'N/A'])
+      );
+    }
+
+    const labelW = 21;                                  // columnas de etiqueta
+    const valueW = (contentWidth - labelW * 3) / 3;     // columnas de valor
     autoTable(pdf, {
       startY: y,
       margin: { left: margin, right: margin },
-      body: [
-        camposHeader.map(([label]) => label),
-        camposHeader.map(([, value]) => value || 'N/A'),
-      ],
+      body: filasHeader,
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2.5, valign: 'middle' },
-      didParseCell: (data) => {
-        if (data.row.index === 0) {
-          data.cell.styles.fontStyle = 'bold';
-          data.cell.styles.fillColor = [245, 245, 245];
-          data.cell.styles.textColor = [80, 80, 80];
-        }
+      styles: { fontSize: 7, cellPadding: 1.5, valign: 'middle' },
+      columnStyles: {
+        0: { fontStyle: 'bold', fillColor: [245, 245, 245], textColor: [80, 80, 80], cellWidth: labelW },
+        1: { cellWidth: valueW },
+        2: { fontStyle: 'bold', fillColor: [245, 245, 245], textColor: [80, 80, 80], cellWidth: labelW },
+        3: { cellWidth: valueW },
+        4: { fontStyle: 'bold', fillColor: [245, 245, 245], textColor: [80, 80, 80], cellWidth: labelW },
+        5: { cellWidth: valueW },
       },
     });
-    y = (pdf as any).lastAutoTable.finalY + 8;
+    y = (pdf as any).lastAutoTable.finalY + 6;
 
     // ── 1.- ANÁLISIS FÍSICO ──
     this.ui.showProgress('Agregando análisis físico...', 35);
@@ -442,7 +493,7 @@ export class ReportMuestraComponent implements OnInit {
     ];
 
     autoTable(pdf, {
-      startY: y, margin: { left: margin, right: margin + halfWidth + 6 },
+      startY: y, margin: { left: margin, right: margin + halfWidth + 6, bottom: 32 },
       head: [['Defecto Primario', 'N°', 'Valor']],
       body: [...primarios, ['Valor Total', '', this.totalPrimarios]] as any,
       theme: 'grid',
@@ -456,7 +507,7 @@ export class ReportMuestraComponent implements OnInit {
     const primYEnd = (pdf as any).lastAutoTable.finalY;
 
     autoTable(pdf, {
-      startY: y, margin: { left: margin + halfWidth + 6, right: margin },
+      startY: y, margin: { left: margin + halfWidth + 6, right: margin, bottom: 32 },
       head: [['Defecto Secundario', 'N°', 'Valor']],
       body: [...secundarios, ['Valor Total', '', this.totalSecundarios]] as any,
       theme: 'grid',

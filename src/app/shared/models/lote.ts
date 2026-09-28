@@ -4,6 +4,7 @@ export interface Lote {
   finca?: string;
   distrito?: string;
   departamento?: string;
+  provincia?: string | null;
   peso: number;
   variedades: string[];
   proceso: string;
@@ -12,7 +13,8 @@ export interface Lote {
   eliminado: boolean;
   clasificacion?:string;
   costo?: number;
-  altura?: number;
+  altura?: number | null;
+  anio_cosecha?: number | null;
   id_user?: string;
   id_analisis?: string;
   peso_tostado?: number;

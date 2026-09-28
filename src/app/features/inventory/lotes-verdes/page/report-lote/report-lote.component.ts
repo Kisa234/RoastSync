@@ -21,6 +21,9 @@ import { AnalisisSensorial } from '../../../../../shared/models/analisis-sensori
 import { User } from '../../../../../shared/models/user';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
+import { UbigeoService } from '../../../../../shared/services/ubigeo.service';
+import { inferirProvincia } from '../../../../../shared/utils/ubigeo.utils';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'report-lote',
@@ -189,6 +192,7 @@ export class ReportLoteComponent implements OnInit {
     private analisisFisicoService: AnalisisFisicoService,
     private analisisDefectosService: AnalisisDefectosService,
     private userService: UserService,
+    private ubigeoSvc: UbigeoService,
     private ui: UiService,
     private route: ActivatedRoute,
     private location: Location,
@@ -222,6 +226,7 @@ export class ReportLoteComponent implements OnInit {
           idAnalisis = lote.id_analisis;
           idUser = lote.id_user;
           this.lote = lote;
+          this.deducirProvinciaSiFalta(lote.departamento, lote.provincia, lote.distrito);
 
           if (idAnalisis) {
             this.analisisService.getAnalisisById(idAnalisis).subscribe({
@@ -268,6 +273,7 @@ export class ReportLoteComponent implements OnInit {
         idAnalisis = muestra.id_analisis;
         idUser = muestra.id_user;
         this.muestra = muestra;
+        this.deducirProvinciaSiFalta(muestra.departamento, muestra.provincia, muestra.distrito);
 
         if (idAnalisis) {
           this.analisisService.getAnalisisById(idAnalisis).subscribe(analisis => {
@@ -303,15 +309,61 @@ export class ReportLoteComponent implements OnInit {
 
   private notasPipe = new NotasSensorialesPipe();
 
-  get origen(): string {
-    const fuente = this.type === 'lote' ? this.lote : this.muestra;
-    if (!fuente) return '';
-    const segmentos: string[] = [];
-    if (fuente.departamento) segmentos.push(fuente.departamento);
-    if (fuente.distrito) segmentos.push(fuente.distrito);
-    if (fuente.finca) segmentos.push(fuente.finca);
-    return segmentos.length ? segmentos.join(' - ') : '';
+  // ── Datos generales (rotulado) ─────────────────────────────────
+
+  /** Lote o muestra según el tipo de reporte */
+  get fuente(): Lote | Muestra {
+    return this.type === 'lote' ? this.lote : this.muestra;
   }
+
+  /** Provincia deducida por ubigeo para registros antiguos que no la tienen guardada */
+  provinciaInferida = '';
+
+  /** Nombre del producto para el rotulado: "<ID> - Café oro verde" */
+  get productoTexto(): string {
+    const id = this.type === 'lote' ? this.lote.id_lote : this.muestra.id_muestra;
+    return id ? `${id} - Café oro verde` : '';
+  }
+
+  private deducirProvinciaSiFalta(departamento?: string, provincia?: string | null, distrito?: string) {
+    if (provincia || !departamento || !distrito) return;
+    this.ubigeoSvc.getDepartamentos().subscribe(deps => {
+      const dept = deps.find(d => d.nombre.trim().toUpperCase() === departamento.trim().toUpperCase());
+      if (!dept) return;
+      forkJoin({
+        provincias: this.ubigeoSvc.getProvincias(dept.codigo),
+        distritos: this.ubigeoSvc.getDistritoByDepartamento(dept.codigo),
+      }).subscribe(({ provincias, distritos }) => {
+        this.provinciaInferida = inferirProvincia(distrito, distritos, provincias)?.nombre ?? '';
+      });
+    });
+  }
+
+  /** Origen: Departamento - Provincia - Distrito (la finca va aparte) */
+  get origen(): string {
+    const f = this.fuente;
+    if (!f) return '';
+    const provincia = f.provincia || this.provinciaInferida;
+    return [f.departamento, provincia, f.distrito].filter(Boolean).join(' - ');
+  }
+
+  get alturaTexto(): string {
+    return this.fuente?.altura ? `${this.fuente.altura} msnm` : '';
+  }
+
+  get anioCosechaTexto(): string {
+    return this.fuente?.anio_cosecha ? String(this.fuente.anio_cosecha) : '';
+  }
+
+  // En muestras el backend manda variedades como "A, B" (string), en lotes como array
+  get variedadesTexto(): string {
+    const v = this.fuente?.variedades as unknown;
+    if (Array.isArray(v)) return v.join(', ');
+    if (typeof v === 'string') return v.split(',').map(s => s.trim()).filter(Boolean).join(', ');
+    return '';
+  }
+
+  // ───────────────────────────────────────────────────────────────
 
   calcGrado() {
     // defectos primarios
@@ -443,7 +495,7 @@ export class ReportLoteComponent implements OnInit {
     y += 4;
 
     const esLote = this.type === 'lote';
-    const fuente = esLote ? this.lote : this.muestra;
+    const fuente = this.fuente;
 
     // Faltaba un título de página como el que sí tiene report-lote-tostado
     // ("Reporte Lote Tostado") — antes se iba directo de la línea roja a
@@ -452,37 +504,47 @@ export class ReportLoteComponent implements OnInit {
     pdf.text(`Reporte de Analisis`, margin, y + 6);
     y += 14;
 
+    // Datos generales (rotulado). Origen = Departamento - Provincia - Distrito;
+    // la Finca va en su propio cuadro.
     const camposHeader: [string, string][] = [
-      [esLote ? 'Matriz de Lote' : 'Matriz de Muestra', esLote ? this.lote.id_lote : this.muestra.id_muestra],
+      ['Producto', this.productoTexto],
       ['Cliente', this.user.nombre],
       ['Productor', fuente.productor || 'N/A'],
+      ['Origen', this.origen],
+      ['Finca', fuente.finca || ''],
+      ['Variedad', this.variedadesTexto],
+      ['Proceso', fuente.proceso || 'N/A'],
+      ['Altitud', this.alturaTexto],
+      ['Año de cosecha', this.anioCosechaTexto],
     ];
-    if (this.origen) camposHeader.push(['Origen', this.origen]);
-    camposHeader.push(['Variedad', (fuente.variedades || []).join(', ')]);
-    camposHeader.push(['Proceso', fuente.proceso || 'N/A']);
 
-    // Antes: texto suelto en una fila, sin ninguna separación visual entre
-    // campos. Ahora: una tabla de 2 filas (etiqueta arriba, valor abajo)
-    // con bordes — cada campo queda en su propio "cuadro" correlacionado,
-    // en vez de todo el texto flotando junto.
+    // 9 campos → 3 filas de 3 pares (etiqueta | valor), compacto para que
+    // los defectos no se empujen a la página 2
+    const filasHeader: string[][] = [];
+    for (let i = 0; i < camposHeader.length; i += 3) {
+      filasHeader.push(
+        camposHeader.slice(i, i + 3).flatMap(([label, value]) => [label, value || 'N/A'])
+      );
+    }
+
+    const labelW = 21;                                  // columnas de etiqueta
+    const valueW = (contentWidth - labelW * 3) / 3;     // columnas de valor
     autoTable(pdf, {
       startY: y,
       margin: { left: margin, right: margin },
-      body: [
-        camposHeader.map(([label]) => label),
-        camposHeader.map(([, value]) => value || 'N/A'),
-      ],
+      body: filasHeader,
       theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2.5, valign: 'middle' },
-      didParseCell: (data) => {
-        if (data.row.index === 0) {
-          data.cell.styles.fontStyle = 'bold';
-          data.cell.styles.fillColor = [245, 245, 245];
-          data.cell.styles.textColor = [80, 80, 80];
-        }
+      styles: { fontSize: 7, cellPadding: 1.5, valign: 'middle' },
+      columnStyles: {
+        0: { fontStyle: 'bold', fillColor: [245, 245, 245], textColor: [80, 80, 80], cellWidth: labelW },
+        1: { cellWidth: valueW },
+        2: { fontStyle: 'bold', fillColor: [245, 245, 245], textColor: [80, 80, 80], cellWidth: labelW },
+        3: { cellWidth: valueW },
+        4: { fontStyle: 'bold', fillColor: [245, 245, 245], textColor: [80, 80, 80], cellWidth: labelW },
+        5: { cellWidth: valueW },
       },
     });
-    y = (pdf as any).lastAutoTable.finalY + 8;
+    y = (pdf as any).lastAutoTable.finalY + 6;
 
     // ── 1.- ANÁLISIS FÍSICO ──
     this.ui.showProgress('Agregando análisis físico...', 35);
@@ -557,7 +619,7 @@ export class ReportLoteComponent implements OnInit {
     ];
 
     autoTable(pdf, {
-      startY: y, margin: { left: margin, right: margin + halfWidth + 6 },
+      startY: y, margin: { left: margin, right: margin + halfWidth + 6, bottom: 32 },
       head: [['Defecto Primario', 'N°', 'Valor']],
       body: [...primarios, ['Valor Total', '', this.totalPrimarios]] as any,
       theme: 'grid',
@@ -571,7 +633,7 @@ export class ReportLoteComponent implements OnInit {
     const primYEnd = (pdf as any).lastAutoTable.finalY;
 
     autoTable(pdf, {
-      startY: y, margin: { left: margin + halfWidth + 6, right: margin },
+      startY: y, margin: { left: margin + halfWidth + 6, right: margin, bottom: 32 },
       head: [['Defecto Secundario', 'N°', 'Valor']],
       body: [...secundarios, ['Valor Total', '', this.totalSecundarios]] as any,
       theme: 'grid',

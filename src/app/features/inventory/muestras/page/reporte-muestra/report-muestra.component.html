@@ -26,18 +26,22 @@
 
         <!-- Datos Generales -->
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-5">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 mb-5">
                 <div>
-                    <p class="text-xs text-gray-400 uppercase tracking-wide">Matriz de Muestra</p>
-                    <p class="font-semibold text-[#1F1F1F]">{{ muestra.id_muestra }}</p>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">Producto</p>
+                    <p class="font-semibold text-[#1F1F1F]">{{ productoTexto }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 uppercase tracking-wide">Productor</p>
-                    <p class="font-semibold text-[#1F1F1F]">{{ muestra.productor ? muestra.productor : 'N/A' }}</p>
+                    <p class="font-semibold text-[#1F1F1F]">{{ muestra.productor || 'N/A' }}</p>
                 </div>
-                <div *ngIf="origen">
+                <div>
                     <p class="text-xs text-gray-400 uppercase tracking-wide">Origen</p>
-                    <p class="font-semibold text-[#1F1F1F]">{{ origen }}</p>
+                    <p class="font-semibold text-[#1F1F1F]">{{ origen || 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">Finca</p>
+                    <p class="font-semibold text-[#1F1F1F]">{{ muestra.finca || 'N/A' }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 uppercase tracking-wide">Variedad</p>
@@ -45,7 +49,15 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 uppercase tracking-wide">Proceso</p>
-                    <p class="font-semibold text-[#1F1F1F]">{{ muestra.proceso ? muestra.proceso : 'N/A' }}</p>
+                    <p class="font-semibold text-[#1F1F1F]">{{ muestra.proceso || 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">Altitud</p>
+                    <p class="font-semibold text-[#1F1F1F]">{{ alturaTexto || 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">Año de cosecha</p>
+                    <p class="font-semibold text-[#1F1F1F]">{{ anioCosechaTexto || 'N/A' }}</p>
                 </div>
             </div>
         </div>

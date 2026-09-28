@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule, AsyncPipe, NgIf, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, Eye, CheckCircle, EyeOffIcon,Plus, ChevronDown } from 'lucide-angular';
+import { LucideAngularModule, Search, Eye, CheckCircle, EyeOffIcon, Plus, ChevronDown, Pencil } from 'lucide-angular';
 import { AddMuestraComponent } from '../../components/add-muestra/add-muestra.component';
+import { EditMuestraComponent } from '../../components/edit-muestra/edit-muestra.component';
 import { UserNamePipe } from '../../../../../shared/pipes/user-name-pipe.pipe';
 import { User } from '../../../../../shared/models/user';
 import { UserService } from '../../../../users/service/users-service.service';
@@ -19,7 +20,7 @@ type FilterKey = 'todas' | 'sin-completar' | 'completadas';
   standalone: true,
   imports: [
     CommonModule, FormsModule, AsyncPipe, NgIf, NgFor,
-    LucideAngularModule, AddMuestraComponent,
+    LucideAngularModule, AddMuestraComponent, EditMuestraComponent,
     UserNamePipe, AddInventoryMuestraComponent
   ],
   templateUrl: './muestras.component.html'
@@ -32,6 +33,7 @@ export class MuestrasComponent {
   readonly CheckCircle = CheckCircle;
   readonly Plus = Plus;
   readonly ChevronDown = ChevronDown;
+  readonly Pencil = Pencil;
 
   muestras: MuestraConInventario[] = [];
   private _muestrasFiltradas: MuestraConInventario[] = [];
@@ -59,6 +61,9 @@ export class MuestrasComponent {
   showAddMuestra = false;
   selectedMuestra: MuestraConInventario | null = null;
   showAsignarInventarioModal = false;
+
+  // editar
+  editMuestraId: string | null = null;
 
   constructor(
     private muestraService: MuestraService,
@@ -107,6 +112,7 @@ export class MuestrasComponent {
         m.nombre_muestra?.toLowerCase().includes(term) ||
         m.productor?.toLowerCase().includes(term) ||
         m.finca?.toLowerCase().includes(term) ||
+        m.provincia?.toLowerCase().includes(term) ||
         m.distrito?.toLowerCase().includes(term) ||
         cliente.includes(term) ||
         almacenes.includes(term)
@@ -174,6 +180,20 @@ export class MuestrasComponent {
 
   onCreated() {
     this.showAddMuestra = false;
+    this.loadMuestras();
+  }
+
+  // ─── Editar ──────────────────────────────────────────────
+  onEdit(m: MuestraConInventario) {
+    this.editMuestraId = m.id_muestra;
+  }
+
+  closeEdit() {
+    this.editMuestraId = null;
+  }
+
+  onUpdated() {
+    this.editMuestraId = null;
     this.loadMuestras();
   }
 

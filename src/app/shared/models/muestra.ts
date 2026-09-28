@@ -8,9 +8,12 @@ export interface Muestra {
   finca: string;
   distrito: string;
   departamento: string;
+  provincia?: string | null;
   peso: number;
   variedades: string[];
   proceso: string;
+  altura?: number | null;
+  anio_cosecha?: number | null;
   fecha_registro: Date;
   completado: boolean;
   eliminado: boolean;
@@ -29,9 +32,12 @@ export interface MuestraConInventario {
   finca: string;
   distrito: string;
   departamento: string;
+  provincia?: string | null;
   peso: number;
   variedades: string;
   proceso: string;
+  altura?: number | null;
+  anio_cosecha?: number | null;
   fecha_registro: string;
   completado: boolean;
   eliminado: boolean;

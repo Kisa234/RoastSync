@@ -18,6 +18,8 @@ import { UiService } from '../../../../../shared/services/ui.service';
 import { IngresoCafeService } from '../../service/ingreso-cafe.service';
 import { AlmacenService } from '../../../almacenes/service/almacen.service';
 import { Almacen } from '../../../../../shared/models/almacen';
+import { forkJoin } from 'rxjs';
+import { filtrarDistritosPorProvincia, inferirProvincia } from '../../../../../shared/utils/ubigeo.utils';
 
 @Component({
   selector: 'add-lote',
@@ -78,8 +80,14 @@ export class AddLoteComponent implements OnInit {
     fecha_registro: new Date(),
     eliminado: false,
     almacen: '',
-    owned_by_store: false
+    owned_by_store: false,
+    provincia: '',
+    anio_cosecha: null,
+    altura: null,
   };
+
+  // tope para el input de año de cosecha (mismo criterio que el backend)
+  readonly anioMax = new Date().getFullYear() + 1;
 
   variedades: Variedad[] = [];
   procesos = ['LAVADO', 'NATURAL', 'HONEY'];
@@ -135,6 +143,15 @@ export class AddLoteComponent implements OnInit {
         this.model.id_user = muestra.owned_by_store ? undefined : muestra.id_user,
 
         this.model.peso = 0;
+
+      // datos de rotulado: se precargan de la muestra pero quedan editables
+      this.model.provincia = muestra.provincia ?? '';
+      this.model.anio_cosecha = muestra.anio_cosecha ?? null;
+      this.model.altura = muestra.altura ?? null;
+
+      // carga provincias del departamento de la muestra; si la muestra no tiene
+      // provincia (registros antiguos), se deduce del distrito por ubigeo
+      this.cargarUbigeo(this.model.departamento, true);
     })
   }
 
@@ -156,6 +173,9 @@ export class AddLoteComponent implements OnInit {
     this.selectedMuestraId = '';
     this.muestraPeso = 0;
     this.cleanModel();
+    this.provincias = [];
+    this.distritosDepto = [];
+    this.distritos = [];
   }
 
   cleanModel() {
@@ -174,7 +194,10 @@ export class AddLoteComponent implements OnInit {
       fecha_registro: new Date(),
       eliminado: false,
       owned_by_store: false,
-      almacen: ''
+      almacen: '',
+      provincia: '',
+      anio_cosecha: null,
+      altura: null,
     };
   }
 
@@ -186,25 +209,63 @@ export class AddLoteComponent implements OnInit {
     this.close.emit();
   }
 
-  // ubigeo 
+  // ubigeo
   departamentos: Departamento[] = [];
-  distritos: Distrito[] = []
-
-  selectedDeptoId?: string;
-  selecterDistId?: string
+  provincias: Provincia[] = [];
+  private distritosDepto: Distrito[] = [];   // todos los del departamento
+  distritos: Distrito[] = [];                // los que se muestran (filtrados por provincia)
 
   @Output() selection = new EventEmitter<{ depto: Departamento; distrito: Distrito }>();
 
-  onDeptoChange(deptoNombre: string) {
-    this.model.distrito = '';
-    this.distritos = [];
-
-    // buscamos el código interno a partir del nombre
+  /**
+   * Carga provincias + distritos del departamento.
+   * @param inferir si true y no hay provincia, la deduce del distrito actual (sin limpiar valores)
+   */
+  private cargarUbigeo(deptoNombre?: string, inferir = false) {
     const dept = this.departamentos.find(d => d.nombre === deptoNombre);
     if (!dept) return;
 
-    this.ubigeoSvc.getDistritoByDepartamento(dept.codigo)
-      .subscribe(provs => this.distritos = provs);
+    forkJoin({
+      provincias: this.ubigeoSvc.getProvincias(dept.codigo),
+      distritos: this.ubigeoSvc.getDistritoByDepartamento(dept.codigo),
+    }).subscribe(({ provincias, distritos }) => {
+      this.provincias = provincias;
+      this.distritosDepto = distritos;
+
+      if (inferir && !this.model.provincia) {
+        const prov = inferirProvincia(this.model.distrito, distritos, provincias);
+        if (prov) this.model.provincia = prov.nombre;
+      }
+      this.distritos = filtrarDistritosPorProvincia(distritos, provincias, this.model.provincia);
+    });
+  }
+
+  onDeptoChange(deptoNombre: string) {
+    this.model.provincia = '';
+    this.model.distrito = '';
+    this.provincias = [];
+    this.distritosDepto = [];
+    this.distritos = [];
+    this.cargarUbigeo(deptoNombre);
+  }
+
+  onProvinciaChange(provinciaNombre: string) {
+    this.distritos = filtrarDistritosPorProvincia(this.distritosDepto, this.provincias, provinciaNombre);
+    // si el distrito elegido no pertenece a la nueva provincia, se limpia
+    if (this.model.distrito && !this.distritos.some(d => d.nombre === this.model.distrito)) {
+      this.model.distrito = '';
+    }
+  }
+
+  onDistritoChange(distritoNombre: string) {
+    // si eligió distrito sin provincia, la deducimos del código ubigeo
+    if (!this.model.provincia) {
+      const prov = inferirProvincia(distritoNombre, this.distritosDepto, this.provincias);
+      if (prov) {
+        this.model.provincia = prov.nombre;
+        this.distritos = filtrarDistritosPorProvincia(this.distritosDepto, this.provincias, prov.nombre);
+      }
+    }
   }
 
   addIngreso(lote: Lote) {
@@ -260,6 +321,18 @@ export class AddLoteComponent implements OnInit {
         'Campos incompletos',
         `Faltan los siguientes campos: ${faltantes.join(', ')}`
       );
+      return false;
+    }
+
+    // Campos de rotulado: opcionales, pero si vienen deben ser válidos
+    const anio = this.model.anio_cosecha;
+    if (anio != null && (!Number.isInteger(anio) || anio < 2000 || anio > this.anioMax)) {
+      this.uiSvc.alert('error', 'Año de cosecha inválido', `Debe estar entre 2000 y ${this.anioMax}`);
+      return false;
+    }
+    const altura = this.model.altura;
+    if (altura != null && (!Number.isInteger(altura) || altura <= 0)) {
+      this.uiSvc.alert('error', 'Altitud inválida', 'Debe ser un número entero mayor a 0 (msnm)');
       return false;
     }
 

@@ -1,19 +1,22 @@
 import { AlmacenService } from './../../../almacenes/service/almacen.service';
-import { Component, EventEmitter, Output, ViewChild, ElementRef, HostListener, OnInit } from '@angular/core';
-import { CommonModule, NgIf } from '@angular/common';
+import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { X, Check, ChevronDown } from 'lucide-angular';
+import { forkJoin } from 'rxjs';
 import { SelectSearchComponent } from '../../../../../shared/components/select-search/select-search.component';
 import { MuestraService } from '../../service/muestra.service';
 import { VariedadService } from '../../../../../shared/services/variedad.service';
 import { UserService } from '../../../../users/service/users-service.service';
 import { UbigeoService } from '../../../../../shared/services/ubigeo.service';
+import { UiService } from '../../../../../shared/services/ui.service';
 import { Muestra } from '../../../../../shared/models/muestra';
 import { Variedad } from '../../../../../shared/models/variedad';
 import { User } from '../../../../../shared/models/user';
 import { Departamento, Distrito, Provincia } from '../../../../../shared/models/ubigeo';
 import { Almacen } from '../../../../../shared/models/almacen';
+import { filtrarDistritosPorProvincia, inferirProvincia } from '../../../../../shared/utils/ubigeo.utils';
 
 
 @Component({
@@ -34,7 +37,8 @@ export class AddMuestraComponent implements OnInit {
     private VariedadSvc: VariedadService,
     private userSvc: UserService,
     private ubigeoSvc: UbigeoService,
-    private almacenService: AlmacenService
+    private almacenService: AlmacenService,
+    private uiSvc: UiService,
   ) { }
 
   ngOnInit() {
@@ -60,6 +64,9 @@ export class AddMuestraComponent implements OnInit {
   // sentinel de UI — no es un id_user real, solo marca "muestra de la tienda"
   readonly STORE_SENTINEL = '__STORE__';
 
+  // tope para el input de año de cosecha (mismo criterio que el backend)
+  readonly anioMax = new Date().getFullYear() + 1;
+
   @Output() close = new EventEmitter<void>();
   @Output() create = new EventEmitter<void>();
 
@@ -69,13 +76,16 @@ export class AddMuestraComponent implements OnInit {
     finca: '',
     distrito: '',
     departamento: '',
+    provincia: '',
     peso: 0,
     variedades: [],
     proceso: '',
     nombre_muestra: '',
     almacen: '',
     owned_by_store: false,
-    id_user: ''
+    id_user: '',
+    altura: null,
+    anio_cosecha: null,
   };
 
   // Listas de opciones
@@ -85,29 +95,54 @@ export class AddMuestraComponent implements OnInit {
   procesos = ['LAVADO', 'NATURAL', 'HONEY'];
   almacenes: Almacen[] = [];
 
-  // Dropdown Propio
-  showVarDropdown = false;
-  filterVar = '';
-
-  // ubigeo 
+  // ubigeo
   departamentos: Departamento[] = [];
-  distritos: Distrito[] = [];
+  provincias: Provincia[] = [];
+  private distritosDepto: Distrito[] = [];   // todos los del departamento
+  distritos: Distrito[] = [];                // los que se muestran (filtrados por provincia)
 
-  selectedDeptoId?: string;
-  selectedProvId?: string;
-
-  @Output() selection = new EventEmitter<{ depto: Departamento; prov: Provincia }>();
+  // ─── Cascada de ubigeo ───────────────────────────────────────────
 
   onDeptoChange(deptoNombre: string) {
+    this.model.provincia = '';
     this.model.distrito = '';
+    this.provincias = [];
+    this.distritosDepto = [];
     this.distritos = [];
 
     const dept = this.departamentos.find(d => d.nombre === deptoNombre);
     if (!dept) return;
 
-    this.ubigeoSvc.getDistritoByDepartamento(dept.codigo)
-      .subscribe(provs => this.distritos = provs);
+    forkJoin({
+      provincias: this.ubigeoSvc.getProvincias(dept.codigo),
+      distritos: this.ubigeoSvc.getDistritoByDepartamento(dept.codigo),
+    }).subscribe(({ provincias, distritos }) => {
+      this.provincias = provincias;
+      this.distritosDepto = distritos;
+      this.distritos = distritos;
+    });
   }
+
+  onProvinciaChange(provinciaNombre: string) {
+    this.distritos = filtrarDistritosPorProvincia(this.distritosDepto, this.provincias, provinciaNombre);
+    // si el distrito elegido no pertenece a la nueva provincia, se limpia
+    if (this.model.distrito && !this.distritos.some(d => d.nombre === this.model.distrito)) {
+      this.model.distrito = '';
+    }
+  }
+
+  onDistritoChange(distritoNombre: string) {
+    // si eligió distrito sin provincia, la deducimos del código ubigeo
+    if (!this.model.provincia) {
+      const prov = inferirProvincia(distritoNombre, this.distritosDepto, this.provincias);
+      if (prov) {
+        this.model.provincia = prov.nombre;
+        this.distritos = filtrarDistritosPorProvincia(this.distritosDepto, this.provincias, prov.nombre);
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────
 
   onClienteChange(idSeleccionado: string) {
     if (idSeleccionado === this.STORE_SENTINEL) {
@@ -123,7 +158,24 @@ export class AddMuestraComponent implements OnInit {
     this.close.emit();
   }
 
+  /** Campos de rotulado: opcionales, pero si vienen deben ser válidos */
+  private validarRotulado(): boolean {
+    const anio = this.model.anio_cosecha;
+    if (anio != null && (!Number.isInteger(anio) || anio < 2000 || anio > this.anioMax)) {
+      this.uiSvc.alert('error', 'Año de cosecha inválido', `Debe estar entre 2000 y ${this.anioMax}`);
+      return false;
+    }
+    const altura = this.model.altura;
+    if (altura != null && (!Number.isInteger(altura) || altura <= 0)) {
+      this.uiSvc.alert('error', 'Altitud inválida', 'Debe ser un número entero mayor a 0 (msnm)');
+      return false;
+    }
+    return true;
+  }
+
   onSave() {
+    if (!this.validarRotulado()) return;
+
     this.MuestraSvc.create(this.model).subscribe(m => {
       this.create.emit();
       this.close.emit();

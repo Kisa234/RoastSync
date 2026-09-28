@@ -23,7 +23,7 @@
       <div class="mb-4 relative w-full max-w-lg">
         <lucide-icon [img]="Search" class="absolute left-2 top-2 w-5 h-5 text-gray-400"></lucide-icon>
         <input type="text" [(ngModel)]="filterTextMuestras" (ngModelChange)="onSearchChange()"
-          placeholder="Buscar por cliente, productor, finca o provincia..."
+          placeholder="Buscar por cliente, productor, finca, provincia o distrito..."
           class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
       </div>
 
@@ -70,7 +70,7 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Cliente</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Productor</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Finca</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Provincia</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Provincia / Distrito</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Almacén</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Peso (Gr)</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Variedades</th>
@@ -97,7 +97,12 @@
 
             <td class="px-6 py-4 text-sm text-gray-700">{{ m.productor }}</td>
             <td class="px-6 py-4 text-sm text-gray-700">{{ m.finca }}</td>
-            <td class="px-6 py-4 text-sm text-gray-700">{{ m.distrito }}</td>
+
+            <!-- PROVINCIA / DISTRITO -->
+            <td class="px-6 py-4 text-sm text-gray-700">
+              <div>{{ m.provincia || '—' }}</div>
+              <div class="text-xs text-gray-500">{{ m.distrito }}</div>
+            </td>
 
             <!-- ALMACÉN -->
             <td class="px-6 py-4 text-sm text-gray-700">
@@ -152,10 +157,14 @@
 
             <td class="px-6 py-4 text-sm text-gray-700">{{ m.fecha_registro | date:'dd/MM/yyyy' }}</td>
 
-            <td class="px-6 py-4 text-right text-sm space-x-2">
+            <td class="px-6 py-4 text-right text-sm space-x-2 whitespace-nowrap">
               <button (click)="onReport(m)" class="text-gray-500 hover:text-gray-700" title="Ver reporte">
                 <lucide-icon [img]="m.id_analisis ? Eye : EyeOff"
                   [class]="m.id_analisis ? 'w-5 h-5' : 'w-5 h-5 text-red-500'"></lucide-icon>
+              </button>
+              <button *ngIf="!m.eliminado" (click)="onEdit(m)" class="text-gray-500 hover:text-[#B8672E]"
+                title="Editar muestra">
+                <lucide-icon [img]="Pencil" class="w-5 h-5"></lucide-icon>
               </button>
               <button *ngIf="!m.completado" (click)="onComplete(m)" class="text-gray-500 hover:text-green-600"
                 title="Marcar como completa">
@@ -171,5 +180,6 @@
 
 <!-- Modales -->
 <add-muestra *ngIf="showAddMuestra" (close)="showAddMuestra = false" (create)="onCreated()"></add-muestra>
+<edit-muestra *ngIf="editMuestraId" [muestraId]="editMuestraId" (close)="closeEdit()" (update)="onUpdated()"></edit-muestra>
 <add-inventory-muestra *ngIf="showAsignarInventarioModal && selectedMuestra" [muestraId]="selectedMuestra.id_muestra"
   (close)="closeAsignarInventarioMuestra()" (create)="onInventarioMuestraCreated()"></add-inventory-muestra>
