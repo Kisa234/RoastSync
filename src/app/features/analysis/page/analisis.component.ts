@@ -54,14 +54,16 @@ export class AnalisisPage implements OnInit {
   selectedMuest = '';
   muestraPicked: Muestra | null = null;
 
-  tostadosAll: LoteTostado[]=[];
+  tostadosAll: LoteTostado[] = [];
   tostados: LoteTostado[] = [];
   selectedRoast = '';
   roastPicked: LoteTostado | null = null;
 
-  clientes: User[] = [];
   selectedClient = '';
 
+  readonly STORE_SENTINEL = '__STORE__';
+
+  clientes: (User | { id_user: string; nombre: string })[] = [];
 
   targetTypes = ['Lote', 'Muestra', 'Café Tostado'];
   selectedTargetType = this.targetTypes[0];
@@ -107,37 +109,47 @@ export class AnalisisPage implements OnInit {
     this.loadHistory();
   }
 
+
+
+  private conTienda(usuarios: User[], items: any[]) {
+    const clientes = usuarios.filter(u => items.some(i => !i.owned_by_store && i.id_user === u.id_user));
+    return items.some(i => i.owned_by_store)
+      ? [{ id_user: this.STORE_SENTINEL, nombre: 'FORTUNATO (Tienda)' }, ...clientes]
+      : clientes;
+  }
+
+  private esDelCliente(item: any, id: string): boolean {
+    return id === this.STORE_SENTINEL
+      ? !!item.owned_by_store
+      : !item.owned_by_store && item.id_user === id;
+  }
+
   loadUsersLote() {
     this.userSvc.getUsers().subscribe(usuarios => {
       this.loteSvc.getAll().subscribe(lotes => {
         this.lotesAll = lotes;
-        this.clientes = usuarios.filter(u =>
-          lotes.some(l => l.id_user === u.id_user)
-        );
+        this.clientes = this.conTienda(usuarios, lotes);
       });
     });
   }
 
-    loadUsersMuestra() {
+  loadUsersMuestra() {
     this.userSvc.getUsers().subscribe(usuarios => {
       this.muestraSvc.getAll().subscribe(muestra => {
         // Filtrar solo las muestras incompletas
         this.muestrasAll = muestra.filter(m => !m.completado);
         this.muestras = this.muestrasAll;
-        this.clientes = usuarios.filter(u => 
-          this.muestrasAll.some(m => m.id_user === u.id_user)
-        );
+        this.clientes = this.conTienda(usuarios, this.muestrasAll);
       });
     });
   }
 
-
-  loadUsersCafeTostado(){
+  loadUsersCafeTostado() {
     this.userSvc.getUsers().subscribe(usuarios => {
       this.tostadoSvc.getAll().subscribe(lotesTostados => {
         this.tostadosAll = lotesTostados;
         this.tostados = this.tostadosAll;
-        this.clientes = usuarios.filter(u => this.tostados.some(m => m.id_user === u.id_user));
+        this.clientes = this.conTienda(usuarios, this.tostadosAll);
       });
     });
   }
@@ -145,28 +157,16 @@ export class AnalisisPage implements OnInit {
   onClientChange(id: string) {
     this.selectedClient = id;
     this.loteSvc.getAll().subscribe((list) => {
-      this.lotes = list.filter(lote => lote.id_user === id);
-      if (this.lotes.length > 0) {
-        this.selectedLot = this.lotes[0].id_lote;
-      } else {
-        this.selectedLot = '';
-      }
+      this.lotes = list.filter(lote => this.esDelCliente(lote, id));
+      this.selectedLot = this.lotes.length > 0 ? this.lotes[0].id_lote : '';
     });
     this.muestraSvc.getAll().subscribe((list) => {
-      this.muestras = list.filter(muestra => muestra.id_user === id && !muestra.completado);
-      if (this.muestras.length > 0) {
-        this.selectedMuest = this.muestras[0].id_muestra;
-      } else {
-        this.selectedMuest = '';
-      }
+      this.muestras = list.filter(muestra => this.esDelCliente(muestra, id) && !muestra.completado);
+      this.selectedMuest = this.muestras.length > 0 ? this.muestras[0].id_muestra : '';
     });
     this.tostadoSvc.getAll().subscribe((list) => {
-      this.tostados = list.filter(tostado => tostado.id_user === id);
-      if (this.tostados.length > 0) {
-        this.selectedRoast = this.tostados[0].id_lote_tostado;
-      } else {
-        this.selectedRoast = '';
-      }
+      this.tostados = list.filter(tostado => this.esDelCliente(tostado, id));
+      this.selectedRoast = this.tostados.length > 0 ? this.tostados[0].id_lote_tostado : '';
     });
   }
 
@@ -216,7 +216,7 @@ export class AnalisisPage implements OnInit {
       this.loadUsersMuestra();
     } else if (type === this.targetTypes[0]) {
       this.loadUsersLote();
-    } else if (type ==this.targetTypes[2]){
+    } else if (type == this.targetTypes[2]) {
       this.loadUsersCafeTostado();
     }
   }
@@ -281,14 +281,14 @@ export class AnalisisPage implements OnInit {
     });
   }
 
-  onRoastChange(id:string){
+  onRoastChange(id: string) {
     if (this.selectedTargetType !== 'Café Tostado') return;
     if (!id) { this.roastPicked = null; return; }
-    
-    this.tostadoSvc.getById(id).subscribe(t=>{
+
+    this.tostadoSvc.getById(id).subscribe(t => {
       this.roastPicked = t;
     })
-    
+
   }
 
   onTargetIdChange(id: string) {
@@ -697,6 +697,5 @@ export class AnalisisPage implements OnInit {
 
     this.resetData();
   }
-
 
 }
