@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { LoteService } from '../../../inventory/lotes-verdes/service/lote.service';
-
 import { UserService } from '../../../users/service/users-service.service';
 import { Lote } from '../../../../shared/models/lote';
 
@@ -44,13 +43,13 @@ export class CostingComponent implements OnInit {
       this.loteSvc.getLotesOwnedByStore().subscribe(lotes => {
         this.lotes = lotes;
       });
-
   }
 
-  // Cuando selecciona un lote, extraemos su costo (x)
+  // Cuando selecciona un lote, extraemos su costo por defecto (x)
   onLoteChange(): void {
     if (this.lote) {
-      this.precioVerde = this.lote.costo ?? 0;
+      // Por defecto seleccionará el Costo Base, si no hay, prueba con los demás
+      this.precioVerde = this.lote.costo ?? this.lote.precio_1 ?? this.lote.escala_2 ?? this.lote.escala_3 ?? 0;
     } else {
       this.precioVerde = 0;
     }

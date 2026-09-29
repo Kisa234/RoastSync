@@ -24,8 +24,15 @@
         </div>
 
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Costo Café Verde (x) S/.</label>
-          <input type="number" [(ngModel)]="precioVerde" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
+          <label class="block text-xs text-gray-600 mb-1">Precio Café Verde (x) S/.</label>
+          <!-- Creado Select inteligente que muestra solo las escalas disponibles del lote -->
+          <select [(ngModel)]="precioVerde" [disabled]="!lote" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E] bg-white disabled:bg-gray-100">
+            <option [ngValue]="0" disabled *ngIf="!lote">Seleccione un lote primero</option>
+            <option *ngIf="lote" [ngValue]="lote.costo || 0">Costo Base (S/. {{lote.costo || 0}})</option>
+            <option *ngIf="lote && lote.precio_1" [ngValue]="lote.precio_1">Precio 1 (S/. {{lote.precio_1}})</option>
+            <option *ngIf="lote && lote.escala_2" [ngValue]="lote.escala_2">Escala 2 (S/. {{lote.escala_2}})</option>
+            <option *ngIf="lote && lote.escala_3" [ngValue]="lote.escala_3">Escala 3 (S/. {{lote.escala_3}})</option>
+          </select>
         </div>
 
         <div>
@@ -34,7 +41,7 @@
         </div>
 
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Gastos Logísticos (z) S/.</label>
+          <label class="block text-xs text-gray-600 mb-1">Precio del Tostado (z) S/.</label>
           <input type="number" [(ngModel)]="gastosLogisticos" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
         </div>
 

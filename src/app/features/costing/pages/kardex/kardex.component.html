@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-[#1F1F1F]">Mostrador de Precios - Café Verde</h1>
-        <p class="text-gray-600">Consulta rápida de precios sugeridos y escalas por lote.</p>
+        <p class="text-gray-600">Consulta las escalas de precios por lote y edítalas con el lápiz.</p>
     </div>
 
     <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
@@ -16,65 +16,74 @@
                     placeholder="Buscar por código de lote o productor..."
                     class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-[#B8672E] focus:outline-none text-sm" />
             </div>
-            
+
             <div class="mt-4 md:mt-0 flex items-center">
                 <span class="px-4 py-1.5 rounded-full text-sm font-medium bg-[#D9EAD3] text-green-800 border border-green-300">
-                    Mostrando Venta en Verde
+                    Mostrando Lotes con Stock
                 </span>
             </div>
         </div>
 
         <!-- Tabla de Precios -->
-        <div class="rounded-lg border border-[#E5E5E5] overflow-hidden">
+        <div class="rounded-lg border border-[#E5E5E5] overflow-x-auto">
             <table class="min-w-full table-auto divide-y divide-[#E5E5E5]">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Café / Lote</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Productor</th>
-                        <th *ngIf="canVerPrecioCompra" class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase bg-gray-100">
+                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Café / Lote</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Productor</th>
+                        <th *ngIf="isAdmin" class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase bg-gray-100 whitespace-nowrap">
                             Costo Base
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-[#B8672E] uppercase bg-orange-50">
+                        <th class="px-4 py-3 text-left text-xs font-bold text-[#B8672E] uppercase bg-orange-50 whitespace-nowrap">
                             Sugerido (S/.)
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Precio 1 (S/.)</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Escala 2 (S/.)</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Escala 3 (S/.)</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Precio 1 (S/.)</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Escala 2 (S/.)</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Escala 3 (S/.)</th>
+                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Acciones</th>
                     </tr>
                 </thead>
 
                 <tbody class="bg-white divide-y divide-[#E5E5E5]">
                     <tr *ngFor="let l of lotesFiltrados" class="hover:bg-gray-50 transition-colors">
-                        
+
                         <!-- Datos Básicos -->
-                        <td class="px-6 py-4 font-bold text-sm text-[#1F1F1F]">{{ l.id_lote }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-700">{{ l.productor || '—' }}</td>
-                        
-                        <!-- Costo Ocultable (según permisos) -->
-                        <td *ngIf="canVerPrecioCompra" class="px-6 py-4 text-sm text-gray-500 bg-gray-50">
+                        <td class="px-4 py-3 font-bold text-sm text-[#1F1F1F] whitespace-nowrap">{{ l.id_lote }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">{{ l.productor || '—' }}</td>
+
+                        <!-- Costo Base -->
+                        <td *ngIf="isAdmin" class="px-4 py-3 text-sm text-gray-500 bg-gray-50 whitespace-nowrap">
                             {{ l.costo ? (l.costo | number:'1.2-2') : '0.00' }}
                         </td>
 
-                        <!-- Sugerido (Dinámico con fórmula) -->
-                        <td class="px-6 py-4 text-sm font-bold text-[#B8672E] bg-orange-50/30">
+                        <!-- Sugerido (Fórmula) -->
+                        <td class="px-4 py-3 text-sm font-bold text-[#B8672E] bg-orange-50/30 whitespace-nowrap">
                             {{ getPrecioSugerido(l) ? (getPrecioSugerido(l) | number:'1.2-2') : '—' }}
                         </td>
 
-                        <!-- Precios Estáticos -->
-                        <td class="px-6 py-4 text-sm text-gray-800 font-medium">
-                            {{ getPreciosFijos(l.id_lote).p1 > 0 ? (getPreciosFijos(l.id_lote).p1 | number:'1.2-2') : '—' }}
+                        <!-- Precios (solo lectura) -->
+                        <td class="px-4 py-3 text-sm font-medium text-[#1F1F1F] whitespace-nowrap">
+                            {{ l.precio_1 != null ? (l.precio_1 | number:'1.2-2') : '—' }}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-800 font-medium">
-                            {{ getPreciosFijos(l.id_lote).e2 > 0 ? (getPreciosFijos(l.id_lote).e2 | number:'1.2-2') : '—' }}
+                        <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+                            {{ l.escala_2 != null ? (l.escala_2 | number:'1.2-2') : '—' }}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-800 font-medium">
-                            {{ getPreciosFijos(l.id_lote).e3 > 0 ? (getPreciosFijos(l.id_lote).e3 | number:'1.2-2') : '—' }}
+                        <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+                            {{ l.escala_3 != null ? (l.escala_3 | number:'1.2-2') : '—' }}
+                        </td>
+
+                        <!-- Acciones -->
+                        <td class="px-4 py-3 text-right whitespace-nowrap">
+                            <button type="button" (click)="abrirEditarPrecios(l)" title="Editar precios"
+                                class="p-2 rounded-lg text-gray-500 hover:text-[#B8672E] hover:bg-orange-50 transition-colors">
+                                <lucide-icon [img]="Pencil" class="w-4 h-4" />
+                            </button>
                         </td>
                     </tr>
 
                     <tr *ngIf="lotesFiltrados.length === 0">
-                        <td [attr.colspan]="canVerPrecioCompra ? 7 : 6" class="px-6 py-8 text-center text-sm text-gray-400">
-                            No se encontraron lotes de café verde.
+                        <td [attr.colspan]="isAdmin ? 8 : 7" class="px-4 py-8 text-center text-sm text-gray-400">
+                            No se encontraron lotes de café verde con stock disponible.
                         </td>
                     </tr>
                 </tbody>
@@ -82,3 +91,12 @@
         </div>
     </div>
 </div>
+
+<!-- Modal: editar precios -->
+<edit-precios *ngIf="loteEditando"
+    [lote]="loteEditando"
+    [isAdmin]="isAdmin"
+    [precioSugerido]="getPrecioSugerido(loteEditando)"
+    (close)="cerrarEditarPrecios()"
+    (saved)="onPreciosGuardados($event)">
+</edit-precios>

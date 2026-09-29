@@ -4,7 +4,7 @@ export interface Lote {
   finca?: string;
   distrito?: string;
   departamento?: string;
-  provincia?: string | null;
+  provincia?: string | null;     // <-- Lo nuevo que hizo tu amigo
   peso: number;
   variedades: string[];
   proceso: string;
@@ -13,15 +13,19 @@ export interface Lote {
   eliminado: boolean;
   clasificacion?:string;
   costo?: number;
-  altura?: number | null;
-  anio_cosecha?: number | null;
+  altura?: number | null;        // <-- Tu amigo le agregó "| null" a esto
+  anio_cosecha?: number | null;  // <-- Lo nuevo que hizo tu amigo
   id_user?: string;
   id_analisis?: string;
   peso_tostado?: number;
   almacen? :string;
   precio_venta?: number;
   owned_by_store?: boolean;
-
+  
+  // --- NUESTROS CAMBIOS ---
+  precio_1?: number;
+  escala_2?: number;
+  escala_3?: number;
 }
 
 export interface InventarioLoteMini {
