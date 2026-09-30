@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-[#1F1F1F]">Mostrador de Precios - Café Verde</h1>
-        <p class="text-gray-600">Consulta las escalas de precios por lote y edítalas con el lápiz.</p>
+        <p class="text-gray-600">Consulta las escalas de precios por lote y edita si eres admin.</p>
     </div>
 
     <div class="border border-[#E5E5E5] rounded-lg bg-white p-6 shadow-sm">
@@ -40,7 +40,9 @@
                         <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Precio 1 (S/.)</th>
                         <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Escala 2 (S/.)</th>
                         <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Escala 3 (S/.)</th>
-                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Acciones</th>
+                        
+                        <!-- Le agregamos el *ngIf="isAdmin" a la cabecera de Acciones -->
+                        <th *ngIf="isAdmin" class="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase whitespace-nowrap">Acciones</th>
                     </tr>
                 </thead>
 
@@ -72,8 +74,8 @@
                             {{ l.escala_3 != null ? (l.escala_3 | number:'1.2-2') : '—' }}
                         </td>
 
-                        <!-- Acciones -->
-                        <td class="px-4 py-3 text-right whitespace-nowrap">
+                        <!-- Le agregamos el *ngIf="isAdmin" a la celda del Lápiz -->
+                        <td *ngIf="isAdmin" class="px-4 py-3 text-right whitespace-nowrap">
                             <button type="button" (click)="abrirEditarPrecios(l)" title="Editar precios"
                                 class="p-2 rounded-lg text-gray-500 hover:text-[#B8672E] hover:bg-orange-50 transition-colors">
                                 <lucide-icon [img]="Pencil" class="w-4 h-4" />
@@ -82,7 +84,8 @@
                     </tr>
 
                     <tr *ngIf="lotesFiltrados.length === 0">
-                        <td [attr.colspan]="isAdmin ? 8 : 7" class="px-4 py-8 text-center text-sm text-gray-400">
+                        <!-- Ajustamos el colspan: 8 para admin, 6 para los demás -->
+                        <td [attr.colspan]="isAdmin ? 8 : 6" class="px-4 py-8 text-center text-sm text-gray-400">
                             No se encontraron lotes de café verde con stock disponible.
                         </td>
                     </tr>
