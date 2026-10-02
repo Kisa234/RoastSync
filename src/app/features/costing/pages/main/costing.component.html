@@ -13,26 +13,42 @@
     <!-- SECCIÓN 1: Datos Base del Café -->
     <div>
       <h2 class="text-lg font-semibold text-[#1F1F1F] mb-4 border-b pb-2">1. Datos del Café (Verde y Tueste)</h2>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
         
+        <!-- Café / Lote -->
         <div>
           <label class="block text-xs text-gray-600 mb-1">Café / Lote</label>
           <select [(ngModel)]="lote" (ngModelChange)="onLoteChange()" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E] bg-white">
             <option [ngValue]="undefined">Selecciona un café</option>
-            <option *ngFor="let l of lotes" [ngValue]="l">{{ l.id_lote }}</option>
+            <!-- Se agregó el nombre del productor para fácil lectura -->
+            <option *ngFor="let l of lotes" [ngValue]="l">{{ l.id_lote }} - {{ l.productor || l.clasificacion || 'Sin datos' }}</option>
           </select>
         </div>
 
+        <!-- Precio Café Verde (Dinámico) -->
         <div>
           <label class="block text-xs text-gray-600 mb-1">Precio Café Verde (x) S/.</label>
-          <!-- Creado Select inteligente que muestra solo las escalas disponibles del lote -->
-          <select [(ngModel)]="precioVerde" [disabled]="!lote" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E] bg-white disabled:bg-gray-100">
-            <option [ngValue]="0" disabled *ngIf="!lote">Seleccione un lote primero</option>
-            <option *ngIf="lote" [ngValue]="lote.costo || 0">Costo Base (S/. {{lote.costo || 0}})</option>
-            <option *ngIf="lote && lote.precio_1" [ngValue]="lote.precio_1">Precio 1 (S/. {{lote.precio_1}})</option>
-            <option *ngIf="lote && lote.escala_2" [ngValue]="lote.escala_2">Escala 2 (S/. {{lote.escala_2}})</option>
-            <option *ngIf="lote && lote.escala_3" [ngValue]="lote.escala_3">Escala 3 (S/. {{lote.escala_3}})</option>
-          </select>
+          <div class="flex flex-col gap-2">
+            <!-- El selector de origen del precio -->
+            <select [(ngModel)]="opcionPrecio" (ngModelChange)="aplicarPrecio()" [disabled]="!lote" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E] bg-white disabled:bg-gray-100">
+              <option value="" disabled *ngIf="!lote">Seleccione un lote primero</option>
+              
+              <!-- Solo Admin ve el Costo Base -->
+              <option *ngIf="lote && isAdmin" value="costo">Costo Base (S/. {{lote.costo || 0 | number:'1.2-2'}})</option>
+              
+              <option *ngIf="lote" value="sugerido">Sugerido (S/. {{getPrecioSugerido(lote) | number:'1.2-2'}})</option>
+              <option *ngIf="lote && lote.precio_1" value="p1">Precio 1 (S/. {{lote.precio_1 | number:'1.2-2'}})</option>
+              <option *ngIf="lote && lote.escala_2" value="e2">Escala 2 (S/. {{lote.escala_2 | number:'1.2-2'}})</option>
+              <option *ngIf="lote && lote.escala_3" value="e3">Escala 3 (S/. {{lote.escala_3 | number:'1.2-2'}})</option>
+              
+              <!-- Opción Manual -->
+              <option *ngIf="lote" value="manual">Personalizado (Manual)</option>
+            </select>
+
+            <!-- Input que solo aparece si eliges "Personalizado" -->
+            <input *ngIf="opcionPrecio === 'manual'" type="number" [(ngModel)]="precioVerde" placeholder="Escribe un precio..." 
+                   class="w-full border border-[#B8672E] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E] bg-orange-50 transition-all" />
+          </div>
         </div>
 
         <div>
@@ -41,6 +57,7 @@
         </div>
 
         <div>
+          <!-- Texto actualizado: "Precio del Tostado" -->
           <label class="block text-xs text-gray-600 mb-1">Precio del Tostado (z) S/.</label>
           <input type="number" [(ngModel)]="gastosLogisticos" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
         </div>
@@ -59,7 +76,8 @@
         </div>
 
         <div>
-          <label class="block text-xs text-gray-600 mb-1">Costo Empaque/Bolsa (b) S/.</label>
+          <!-- Texto actualizado -->
+          <label class="block text-xs text-gray-600 mb-1">Costo Empaque/Bolsa y Mano de Obra (b) S/.</label>
           <input type="number" [(ngModel)]="costosEmpaque" class="w-full border border-[#E5E5E5] rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#B8672E]" />
         </div>
 
@@ -117,7 +135,7 @@
         <div class="border border-[#E5E5E5] rounded-lg p-4 bg-[#FCE5CD]">
           <p class="text-xs text-[#B8672E] font-bold mb-1">Venta Recomendada</p>
           <p class="text-2xl font-bold">S/. {{ ventaRecomendada | number:'1.2-2' }}</p>
-          <p class="text-xs text-gray-600">Para ganar el {{ gananciaMinimaRecomend }}% neto</p>
+          <p class="text-xs text-gray-600">Rentabilidad del {{ gananciaMinimaRecomend }}% sobre el costo</p>
         </div>
       </div>
 
