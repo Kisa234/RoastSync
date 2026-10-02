@@ -99,6 +99,19 @@ export class KardexComponent implements OnInit {
   }
 
   // ==========================================
+  // NUEVO: FÓRMULA DE GANANCIA REAL (PGR)
+  // ==========================================
+  getPorcentajeGananciaReal(precio?: number, costoBase?: number): number {
+    if (!precio || precio <= 0) return 0;
+    
+    const costo = costoBase ?? 0;
+    const comision = precio * 0.06; // 6%
+    const ganancia = precio - (costo + 1.20 + comision);
+    
+    return (ganancia * 100) / precio;
+  }
+
+  // ==========================================
   // BUSCADOR + FILTRO DE STOCK
   // ==========================================
   onSearchChange(): void {

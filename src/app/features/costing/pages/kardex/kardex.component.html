@@ -63,18 +63,41 @@
                             {{ getPrecioSugerido(l) ? (getPrecioSugerido(l) | number:'1.2-2') : '—' }}
                         </td>
 
-                        <!-- Precios (solo lectura) -->
+                        <!-- Precio 1 -->
                         <td class="px-4 py-3 text-sm font-medium text-[#1F1F1F] whitespace-nowrap">
-                            {{ l.precio_1 != null ? (l.precio_1 | number:'1.2-2') : '—' }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
-                            {{ l.escala_2 != null ? (l.escala_2 | number:'1.2-2') : '—' }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
-                            {{ l.escala_3 != null ? (l.escala_3 | number:'1.2-2') : '—' }}
+                            <div class="flex items-center gap-1" *ngIf="l.precio_1; else sinP1">
+                                <span>{{ l.precio_1 | number:'1.2-2' }}</span>
+                                <!-- Aquí cambiamos a '1.2-2' para tener 2 decimales -->
+                                <span class="text-[11px] text-gray-500 bg-gray-200/60 px-1.5 py-0.5 rounded" title="Margen Real">
+                                    ({{ getPorcentajeGananciaReal(l.precio_1, l.costo) | number:'1.2-2' }}%)
+                                </span>
+                            </div>
+                            <ng-template #sinP1><span class="text-gray-400">—</span></ng-template>
                         </td>
 
-                        <!-- Le agregamos el *ngIf="isAdmin" a la celda del Lápiz -->
+                        <!-- Escala 2 -->
+                        <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+                            <div class="flex items-center gap-1" *ngIf="l.escala_2; else sinE2">
+                                <span>{{ l.escala_2 | number:'1.2-2' }}</span>
+                                <span class="text-[11px] text-gray-500 bg-gray-200/60 px-1.5 py-0.5 rounded" title="Margen Real">
+                                    ({{ getPorcentajeGananciaReal(l.escala_2, l.costo) | number:'1.2-2' }}%)
+                                </span>
+                            </div>
+                            <ng-template #sinE2><span class="text-gray-400">—</span></ng-template>
+                        </td>
+
+                        <!-- Escala 3 -->
+                        <td class="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+                            <div class="flex items-center gap-1" *ngIf="l.escala_3; else sinE3">
+                                <span>{{ l.escala_3 | number:'1.2-2' }}</span>
+                                <span class="text-[11px] text-gray-500 bg-gray-200/60 px-1.5 py-0.5 rounded" title="Margen Real">
+                                    ({{ getPorcentajeGananciaReal(l.escala_3, l.costo) | number:'1.2-2' }}%)
+                                </span>
+                            </div>
+                            <ng-template #sinE3><span class="text-gray-400">—</span></ng-template>
+                        </td>
+
+                        <!-- Acciones (Lápiz) -->
                         <td *ngIf="isAdmin" class="px-4 py-3 text-right whitespace-nowrap">
                             <button type="button" (click)="abrirEditarPrecios(l)" title="Editar precios"
                                 class="p-2 rounded-lg text-gray-500 hover:text-[#B8672E] hover:bg-orange-50 transition-colors">
@@ -84,7 +107,6 @@
                     </tr>
 
                     <tr *ngIf="lotesFiltrados.length === 0">
-                        <!-- Ajustamos el colspan: 8 para admin, 6 para los demás -->
                         <td [attr.colspan]="isAdmin ? 8 : 6" class="px-4 py-8 text-center text-sm text-gray-400">
                             No se encontraron lotes de café verde con stock disponible.
                         </td>
